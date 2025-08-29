@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}{% endblock %}</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Font: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!--titel icon-->
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('static', filename='img/logo-32.png') }}">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+        }
+    </style>
+</head>
+<body class="flex flex-col h-screen overflow-hidden">
+    
+
+    <!-- Navbar -->
+    <nav class="bg-white shadow-sm p-4 flex justify-between items-center z-10">
+        <!-- Logo -->
+        <div class="flex items-center space-x-2">
+             <a href="{{ url_for('home')}}" class="flex items-center">
+            <img src="{{ url_for('static', filename='img/logo.jpg') }}" alt="LOGO" class="h-12 w-12 rounded-full mr-3">
+           
+            <span class="text-xl font-semibold text-gray-800">{% block user %}{% endblock %}</span>
+            </a>
+        </div>
+
+        <!-- Profile Dropdown -->
+        <div class="relative">
+            <button id="profile-dropdown-btn" class="flex items-center space-x-2 p-2 rounded-full hover:bg-gray-100 transition-colors duration-200 focus:outline-none focus:ring focus:ring-blue-300">
+                <img class="h-8 w-8 rounded-full" src="https://placehold.co/100x100/38761D/ffffff?" alt="User Profile">
+                <span class="text-sm font-medium text-gray-700 hidden sm:block">{{ user_email }}</span>
+            </button>
+
+            <!-- Dropdown menu -->
+            <div id="profile-menu" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 ring-1 ring-black ring-opacity-5 focus:outline-none transition-transform transform origin-top-right">
+                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">My Profile</a>
+                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Settings</a>
+                <a href="{{ url_for('home')}}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Sign out</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Container for Sidebar and Content -->
+    <div class="flex flex-1 overflow-hidden">
+        
+        <!-- Sidebar -->
+        {% block Sidebar %}{% endblock %}
+
+        <!-- Main Content Area -->
+        <main class="flex-1 p-8 overflow-y-auto">
+            
+            
+            {% block content %}{% endblock %}
+           
+        </main>
+
+    </div> 
+
+
+    <script>
+        const profileBtn = document.getElementById('profile-dropdown-btn');
+        const profileMenu = document.getElementById('profile-menu');
+        let isMenuOpen = false;
+
+        profileBtn.addEventListener('click', (event) => {
+            event.stopPropagation();
+            isMenuOpen = !isMenuOpen;
+            if (isMenuOpen) {
+                profileMenu.classList.remove('hidden');
+                profileMenu.classList.add('animate-scale-in');
+            } else {
+                profileMenu.classList.add('hidden');
+                profileMenu.classList.remove('animate-scale-in');
+            }
+        });
+
+        // Close the dropdown if the user clicks outside of it
+        document.addEventListener('click', (event) => {
+            if (isMenuOpen && !profileMenu.contains(event.target) && event.target !== profileBtn) {
+                isMenuOpen = false;
+                profileMenu.classList.add('hidden');
+                profileMenu.classList.remove('animate-scale-in');
+            }
+        });
+    </script>
+</body>
+</html>

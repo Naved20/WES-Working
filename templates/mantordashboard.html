@@ -1,0 +1,122 @@
+{% extends "base2.html" %}
+{% block title %} Mentor Dashboard {% endblock %}
+{% block user %}Mentor{% endblock %}
+{% block Sidebar %}
+<aside class="bg-gray-800 text-white w-64 p-4 flex-shrink-0">
+  <nav class="space-y-2">
+    <button onclick="showSection('dashboard')" id="link-dashboard"
+      class="flex items-center w-full text-left p-3 rounded-lg hover:bg-gray-700 transition-colors duration-200">
+      <svg class="w-5 h-5 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+          d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-10l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+      </svg>
+      Dashboard
+    </button>
+
+    <button onclick="showSection('mentees')" id="link-mentees"
+      class="flex items-center w-full text-left p-3 rounded-lg hover:bg-gray-700 transition-colors duration-200">
+      <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+          d="M5.121 19a9 9 0 0113.758 0M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+      </svg>
+      My Mentees
+    </button>
+
+    <button onclick="showSection('upcoming')" id="link-upcoming"
+      class="flex items-center w-full text-left p-3 rounded-lg hover:bg-gray-700 transition-colors duration-200">
+      <svg class="w-5 h-5 mr-3" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+          d="M7 3v4M17 3v4M3 9h18M5 5h14a2 2 0 012 2v12a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2z"/>
+      </svg>
+      Upcoming Meeting Request
+    </button>
+  </nav>
+</aside>
+{% endblock %}
+
+{% block content %}
+<div class="p-6 flex-1">
+
+  <!-- Dashboard Section -->
+  <div id="section-dashboard" class="hidden">
+    <h1 class="text-2xl font-bold mb-4">Dashboard</h1>
+    <p>Welcome to your dashboard.</p>
+  </div>
+
+  <!-- Mentees Section -->
+  <div id="section-mentees" class="hidden">
+    <h1 class="text-2xl font-bold mb-4">My Mentees</h1>
+
+        <!-- Example meeting request card -->
+    <section class="flex flex-wrap gap-8">
+        
+        {% for i in range(6) %}
+
+        <div class="bg-white border rounded-lg shadow p-4 max-w-sm">
+      <div class="flex items-center mb-2">
+        <img src="{{ url_for('static', filename='img/logo.jpg') }}" alt="Profile" class="w-10 h-10 rounded-full mr-3">
+        <div>
+          <p class="font-bold text-gray-800">Name</p>
+          <p class="text-sm text-gray-500">School</p>
+        </div>
+      </div>
+      <p class="text-gray-700 mb-3">Hello, I’d like to meet you tomorrow</p>
+
+        <button class="mt-4 w-full px-3 py-2 rounded-lg bg-gray-500 text-white font-medium hover:bg-green-600 transition">
+        Request For Chat
+       </button>
+
+       
+        </div>
+        
+        {% endfor %}
+        
+    </section>
+
+  </div>
+
+  <!-- Upcoming Meetings Section -->
+  <div id="section-upcoming" class="hidden">
+    <h1 class="text-2xl font-bold mb-4">Upcoming Meeting Requests</h1>
+    
+    <!-- Example meeting request card -->
+    <section class="flex flex-wrap gap-8">
+
+        {% for i in range(6) %}
+
+        <div class="bg-white border rounded-lg shadow p-4 max-w-sm">
+      <div class="flex items-center mb-2">
+        <img src="{{ url_for('static', filename='img/logo.jpg') }}" alt="Profile" class="w-10 h-10 rounded-full mr-3">
+        <div>
+          <p class="font-bold text-gray-800">Name</p>
+          <p class="text-sm text-gray-500">School</p>
+        </div>
+      </div>
+      <p class="text-gray-700 mb-3">Hello, I’d like to meet you tomorrow</p>
+      <div class="flex gap-2">
+        <button class="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400">Accept</button>
+        <button class="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400">Deny</button>
+      </div>
+        </div>
+        
+        {% endfor %}
+        
+    </section>
+  </div>
+</div>
+
+<script>
+  function showSection(section) {
+    // Hide all
+    document.querySelectorAll('[id^="section-"]').forEach(el => el.classList.add('hidden'));
+    document.querySelectorAll('[id^="link-"]').forEach(el => el.classList.remove('bg-gray-700'));
+
+    // Show selected
+    document.getElementById('section-' + section).classList.remove('hidden');
+    document.getElementById('link-' + section).classList.add('bg-gray-700');
+  }
+
+  // default open Dashboard
+  showSection('dashboard');
+</script>
+{% endblock %}

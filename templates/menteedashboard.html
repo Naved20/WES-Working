@@ -1,0 +1,105 @@
+{% extends "base2.html" %}
+{% block title %}Mentee Dashboard{% endblock %}
+{% block user %}Mentee{% endblock %}
+
+{% block Sidebar %}
+<aside class="bg-gray-800 text-white w-64 p-4 flex-shrink-0">
+  <nav class="space-y-2">
+    <button onclick="showSection('dashboard')" 
+            class="w-full flex items-center p-3 rounded-lg hover:bg-gray-700 transition-colors duration-200">
+      <svg class="w-5 h-5 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+              d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-10l2 2m-2-2v10a1 1 0 
+              01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 
+              011 1v4a1 1 0 001 1m-6 0h6"/>
+      </svg>
+      Dashboard
+    </button>
+
+    <button onclick="showSection('mymentors')" 
+            class="w-full flex items-center p-3 rounded-lg hover:bg-gray-700 transition-colors duration-200">
+      <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+              d="M5.121 19a9 9 0 0113.758 0M15 11a3 3 0 
+              11-6 0 3 3 0 016 0z"/>
+      </svg>
+      My Mentors
+    </button>
+
+    <button onclick="showSection('findmentor')" 
+            class="w-full flex items-center p-3 rounded-lg hover:bg-gray-700 transition-colors duration-200">
+      <svg class="w-5 h-5 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+              d="M21 21l-6-6m2-5a7 7 0 
+              11-14 0 7 7 0 0114 0z"/>
+      </svg>
+      Find Mentor
+    </button>
+  </nav>
+</aside>
+{% endblock %}
+
+{% block content %}
+
+<!-- Dashboard Section -->
+<section id="dashboard" class="p-6">
+  <h1 class="text-2xl font-bold text-gray-800 mb-4">Welcome to your Dashboard</h1>
+  <p class="text-gray-600">Here you can track your progress, mentorships, and opportunities.</p>
+</section>
+
+<!-- My Mentors Section -->
+<section id="mymentors" class="hidden p-6">
+  <h1 class="text-xl font-bold mb-6 text-gray-800">My Mentors</h1>
+  <div class="flex flex-wrap gap-6">
+    
+    {% for i in range(3) %}
+    <div class="bg-white shadow-md rounded-2xl border border-gray-200 p-4 w-full max-w-sm flex flex-col">
+      <div class="flex items-center gap-4">
+        <img src="{{ url_for('static', filename='img/logo.jpg') }}"
+             alt="Mentor Image"
+             class="w-16 h-16 rounded-full object-cover border border-gray-300">
+        <div>
+          <h2 class="text-lg font-bold text-gray-800">Prof. Mentor {{ i+1 }}</h2>
+          <p class="text-sm text-gray-600">Senior Guide</p>
+        </div>
+      </div>
+      <button class="mt-4 w-full px-3 py-2 rounded-lg bg-gray-500 text-white font-medium hover:bg-green-600 transition">
+        Chat with Mentor
+      </button>
+    </div>
+    {% endfor %}
+  </div>
+</section>
+
+<!-- Find Mentor Section -->
+<section id="findmentor" class="hidden p-6">
+  <h1 class="text-xl font-bold mb-6 text-gray-800">Find New Mentors</h1>
+  <div class="flex flex-wrap gap-6">
+    
+    {% for i in range(6) %}
+    <div class="bg-white shadow-md rounded-2xl border border-gray-200 p-4 w-full max-w-sm flex flex-col">
+      <div class="flex items-center gap-4">
+        <img src="{{ url_for('static', filename='img/logo.jpg') }}"
+             alt="Mentor Image"
+             class="w-16 h-16 rounded-full object-cover border border-gray-300">
+        <div>
+          <h2 class="text-lg font-bold text-gray-800">Prof. C {{ i+1 }}</h2>
+          <p class="text-sm text-gray-600">ML Engineer</p>
+        </div>
+      </div>
+      <button class="mt-4 w-full px-3 py-2 rounded-lg bg-gray-500 text-white font-medium hover:bg-blue-600 transition">
+        Request Mentorship
+      </button>
+    </div>
+    {% endfor %}
+  </div>
+</section>
+
+<script>
+function showSection(id) {
+  document.querySelectorAll("section").forEach(sec => sec.classList.add("hidden"));
+  document.getElementById(id).classList.remove("hidden");
+}
+</script>
+
+{% endblock %}
