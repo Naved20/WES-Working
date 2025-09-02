@@ -2,11 +2,26 @@ from flask import Flask, redirect, url_for, render_template, request, session, f
 from datetime import timedelta
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
+import os
+from werkzeug.utils import secure_filename
 
 
 app = Flask(__name__)
 app.secret_key = "1234"
 app.permanent_session_lifetime = timedelta(days=10)
+
+# Image upload configuration
+UPLOAD_FOLDER = "static/uploads"
+ALLOWED_EXTENSIONS = {"png", "jpg", "jpeg", "gif"}
+
+app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
+
+# Ensure folder exists
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
 
 
 
@@ -64,6 +79,12 @@ class MentorProfile(db.Model):
     social_link = db.Column(db.String(200))
     why_mentor = db.Column(db.Text)
     additional_info = db.Column(db.Text)
+    profile_picture = db.Column(db.String(100))  # add this line
+
+
+
+#---------add img uplode function--------------
+
 
 
 
@@ -219,6 +240,15 @@ def editmantorprofile():
         profile.why_mentor = request.form.get("mentor_reason")
         profile.additional_info = request.form.get("additional_info")  # optional
 
+        # Handle profile picture upload
+        file = request.files.get("profile_picture")
+        if file and allowed_file(file.filename):
+            filename = secure_filename(file.filename)
+            # Save file to upload folder
+            file.save(os.path.join(app.config["UPLOAD_FOLDER"], filename))
+            #store filename in db
+            profile.profile_picture = filename
+
         db.session.add(profile)
         db.session.commit()
 
@@ -243,7 +273,7 @@ def editmantorprofile():
         social_link=profile.social_link if profile else "",
         mentor_reason=profile.why_mentor if profile else "",
         additional_info=profile.additional_info if profile else "",
-        profile_picture=None  # optional – handle file upload separately
+        profile_picture=profile.profile_picture if profile else None 
     )
 
 
@@ -289,7 +319,7 @@ def mantorprofile():
             social_link=profile.social_link if profile else "",
             mentor_reason=profile.why_mentor if profile else "",
             additional_info=profile.additional_info if profile else "",
-            profile_picture=None  # optional – handle file upload separately
+            profile_picture=profile.profile_picture if profile else None
         )
     return redirect(url_for("signin"))
 
