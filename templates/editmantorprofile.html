@@ -1,0 +1,94 @@
+{% extends "base2.html" %}
+{% block title %}Mentor Profile{% endblock %}
+
+{% block user %}Mentor Profile{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto mt-8 p-6 bg-gray-50 rounded-lg shadow-lg">
+    <form action="{{ url_for('editmantorprofile') }}" method="POST" enctype="multipart/form-data" class="space-y-6">
+        <!-- Profile Header -->
+        <div class="flex flex-col items-center md:flex-row md:items-center md:justify-start space-y-4 md:space-y-0 md:space-x-6 mb-8">
+            <!-- Profile Picture Upload -->
+            <div>
+                {% if profile_picture %}
+                <img src="{{ url_for('static', filename='uploads/' + profile_picture) }}" 
+                     alt="Profile Picture" 
+                     class="w-32 h-32 md:w-40 md:h-40 object-cover rounded-full shadow-md border-2 border-gray-200 mb-2">
+                {% else %}
+                <div class="w-32 h-32 md:w-40 md:h-40 flex items-center justify-center bg-gray-200 text-gray-500 rounded-full text-lg font-semibold mb-2">
+                    No Picture
+                </div>
+                {% endif %}
+                <input type="file" name="profile_picture" class="block text-sm text-gray-600">
+            </div>
+
+            <!-- Name & Email -->
+            <div class="text-center md:text-left w-full">
+                <label class="block text-gray-700 font-semibold">Full Name</label>
+                <input type="text" name="full_name" value="{{ full_name }}" class="w-full p-2 border rounded-lg" readonly>
+
+                <label class="block text-gray-700 font-semibold mt-2">Email</label>
+                <input type="email" name="email" value="{{ email }}" class="w-full p-2 border rounded-lg" readonly>
+
+                <label class="block text-gray-700 font-semibold mt-2">Profession</label>
+                <input type="text" name="profession" value="{{ profession }}" class="w-full p-2 border rounded-lg">
+
+                <label class="block text-gray-700 font-semibold mt-2">Organisation / College</label>
+                <input type="text" name="organisation_or_college" value="{{ organisation_or_college }}" class="w-full p-2 border rounded-lg">
+            </div>
+        </div>
+
+        <!-- Profile Details -->
+        <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+            <h3 class="text-2xl font-semibold text-gray-700 mb-4">Profile Details</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-gray-700 font-semibold">WhatsApp</label>
+                    <input type="text" name="whatsapp_number" value="{{ whatsapp_number }}" class="w-full p-2 border rounded-lg">
+
+                    <label class="block text-gray-700 font-semibold mt-2">Location</label>
+                    <input type="text" name="location" value="{{ location }}" class="w-full p-2 border rounded-lg">
+
+                    <label class="block text-gray-700 font-semibold mt-2">Education</label>
+                    <input type="text" name="education" value="{{ education }}" class="w-full p-2 border rounded-lg">
+
+                    <label class="block text-gray-700 font-semibold mt-2">Language</label>
+                    <input type="text" name="language" value="{{ language }}" class="w-full p-2 border rounded-lg">
+                </div>
+                <div>
+                    <label class="block text-gray-700 font-semibold">Availability (Months)</label>
+                    <input type="text" name="availability_month" value="{{ availability_month }}" class="w-full p-2 border rounded-lg">
+
+                    <label class="block text-gray-700 font-semibold mt-2">Connect Frequency</label>
+                    <input type="text" name="connect_frequency" value="{{ connect_frequency }}" class="w-full p-2 border rounded-lg">
+
+                    <label class="block text-gray-700 font-semibold mt-2">Preferred Communication</label>
+                    <input type="text" name="preferred_communication" value="{{ preferred_communication }}" class="w-full p-2 border rounded-lg">
+
+                    <label class="block text-gray-700 font-semibold mt-2">Social Link</label>
+                    <input type="url" name="social_link" value="{{ social_link }}" class="w-full p-2 border rounded-lg">
+                </div>
+            </div>
+        </div>
+
+        <!-- Mentor Motivation -->
+        <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+            <h3 class="text-2xl font-semibold text-gray-700 mb-4">Why Become a Mentor?</h3>
+            <textarea name="mentor_reason" class="w-full p-2 border rounded-lg" rows="4">{{ mentor_reason }}</textarea>
+        </div>
+
+        <!-- Additional Info -->
+        <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+            <h3 class="text-2xl font-semibold text-gray-700 mb-4">Additional Information</h3>
+            <textarea name="additional_info" class="w-full p-2 border rounded-lg" rows="4">{{ additional_info }}</textarea>
+        </div>
+
+        <!-- Submit Button -->
+        <div class="text-center">
+            <button type="submit" class="px-6 py-2 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700">
+                Save Profile
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}
