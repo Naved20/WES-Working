@@ -51,55 +51,109 @@
 <section id="mymentors" class="hidden p-6">
   <h1 class="text-xl font-bold mb-6 text-gray-800">My Mentors</h1>
   <div class="flex flex-wrap gap-6">
-    
-    {% for i in range(3) %}
-    <div class="bg-white shadow-md rounded-2xl border border-gray-200 p-4 w-full max-w-sm flex flex-col">
-      <div class="flex items-center gap-4">
-        <img src="{{ url_for('static', filename='img/logo.jpg') }}"
-             alt="Mentor Image"
-             class="w-16 h-16 rounded-full object-cover border border-gray-300">
-        <div>
-          <h2 class="text-lg font-bold text-gray-800">Prof. Mentor {{ i+1 }}</h2>
-          <p class="text-sm text-gray-600">Senior Guide</p>
+    {% if my_mentors %}
+      {% for mentor in my_mentors %}
+      <div class="bg-white shadow-md rounded-2xl border border-gray-200 p-4 w-full max-w-sm flex flex-col">
+        <div class="flex items-center gap-4">
+          {% if mentor.profile_picture %}
+            <img src="{{ url_for('static', filename='uploads/' ~ mentor.profile_picture) }}" 
+                 alt="{{ mentor.user.name }}" 
+                 class="w-16 h-16 rounded-full object-cover border border-gray-300">
+          {% else %}
+            <div class="w-16 h-16 rounded-full bg-gray-200 flex items-center justify-center text-gray-500 border border-gray-300">
+              N/A
+            </div>
+          {% endif %}
+          <div>
+            <h2 class="text-lg font-bold text-gray-800">{{ mentor.user.name }}</h2>
+            <p class="text-sm text-gray-600">{{ mentor.profession }} at {{ mentor.organisation }}</p>
+          </div>
         </div>
+        <button class="mt-4 w-full px-3 py-2 rounded-lg bg-gray-500 text-white font-medium hover:bg-green-600 transition">
+          Chat with Mentor
+        </button>
       </div>
-      <button class="mt-4 w-full px-3 py-2 rounded-lg bg-gray-500 text-white font-medium hover:bg-green-600 transition">
-        Chat with Mentor
-      </button>
-    </div>
-    {% endfor %}
+      {% endfor %}
+    {% else %}
+      <p class="text-gray-500">You have no mentors assigned yet.</p>
+    {% endif %}
   </div>
 </section>
 
 <!-- Find Mentor Section -->
 <section id="findmentor" class="hidden p-6">
-  <h1 class="text-xl font-bold mb-6 text-gray-800">Find New Mentors</h1>
-  <div class="flex flex-wrap gap-6">
-    
-    {% for i in range(6) %}
-    <div class="bg-white shadow-md rounded-2xl border border-gray-200 p-4 w-full max-w-sm flex flex-col">
-      <div class="flex items-center gap-4">
-        <img src="{{ url_for('static', filename='img/logo.jpg') }}"
-             alt="Mentor Image"
-             class="w-16 h-16 rounded-full object-cover border border-gray-300">
-        <div>
-          <h2 class="text-lg font-bold text-gray-800">Prof. C {{ i+1 }}</h2>
-          <p class="text-sm text-gray-600">ML Engineer</p>
+  <h1 class="text-xl font-bold mb-4 text-gray-800">Find New Mentors</h1>
+
+  <!-- Search Input -->
+  <input type="text" id="findMentorSearch" placeholder="Search mentors by name, profession, location, email..."
+         class="w-full p-2 mb-6 border border-gray-300 rounded"
+         onkeyup="filterFindMentors()">
+
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6" id="allMentorsGrid">
+    {% if all_mentors %}
+      {% for mentor in all_mentors %}
+      <div class="find-mentor-card bg-white p-5 rounded-lg shadow hover:shadow-lg transition-shadow flex flex-col">
+        <div class="flex items-center mb-4">
+          {% if mentor.profile_picture %}
+            <img src="{{ url_for('static', filename='uploads/' ~ mentor.profile_picture) }}" 
+                 alt="{{ mentor.user.name }}" 
+                 class="w-16 h-16 rounded-full object-cover mr-4">
+          {% else %}
+            <div class="w-16 h-16 rounded-full bg-gray-200 flex items-center justify-center text-gray-500 mr-4">
+              N/A
+            </div>
+          {% endif %}
+          <div class="flex flex-col">
+            <h2 class="text-lg font-semibold find-mentor-name">{{ mentor.user.name }}</h2>
+            <p class="text-gray-500 text-sm find-mentor-profession">{{ mentor.profession }} at {{ mentor.organisation }}</p>
+          </div>
         </div>
+        <div class="flex flex-col gap-1">
+          <p class="text-gray-500"><span class="font-semibold">Location:</span> 
+             <span class="find-mentor-location">{{ mentor.location }}</span></p>
+          <p class="text-gray-700"><span class="font-semibold">Email:</span> 
+             <span class="find-mentor-email">{{ mentor.user.email }}</span></p>
+        </div>
+        <button class="mt-4 w-full px-3 py-2 rounded-lg bg-gray-500 text-white font-medium hover:bg-blue-600 transition">
+          Request Mentorship
+        </button>
       </div>
-      <button class="mt-4 w-full px-3 py-2 rounded-lg bg-gray-500 text-white font-medium hover:bg-blue-600 transition">
-        Request Mentorship
-      </button>
-    </div>
-    {% endfor %}
+      {% endfor %}
+    {% else %}
+      <p class="text-gray-500">No mentors available currently.</p>
+    {% endif %}
   </div>
 </section>
+
+
 
 <script>
 function showSection(id) {
   document.querySelectorAll("section").forEach(sec => sec.classList.add("hidden"));
   document.getElementById(id).classList.remove("hidden");
   }
+
+
+
+  // Filter Mentees
+    function filterFindMentors() {
+      const input = document.getElementById('findMentorSearch').value.toLowerCase();
+      const cards = document.querySelectorAll('.find-mentor-card');
+    
+      cards.forEach(card => {
+        const name = card.querySelector('.find-mentor-name').innerText.toLowerCase();
+        const profession = card.querySelector('.find-mentor-profession').innerText.toLowerCase();
+        const location = card.querySelector('.find-mentor-location').innerText.toLowerCase();
+        const email = card.querySelector('.find-mentor-email').innerText.toLowerCase();
+      
+        if(name.includes(input) || profession.includes(input) || location.includes(input) || email.includes(input)) {
+          card.style.display = 'flex';
+        } else {
+          card.style.display = 'none';
+        }
+      });
+    }
+
 </script>
 
 {% endblock %}

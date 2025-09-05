@@ -81,7 +81,8 @@ class MentorProfile(db.Model):
     social_link = db.Column(db.String(200))
     why_mentor = db.Column(db.Text)
     additional_info = db.Column(db.Text)
-    profile_picture = db.Column(db.String(100))  
+    profile_picture = db.Column(db.String(100)) 
+    status = db.Column(db.String(20), default="pending")  # Add this 
 
 
 
@@ -113,7 +114,8 @@ class MenteeProfile(db.Model):
     comments = db.Column(db.Text)
     terms_agreement = db.Column(db.String(10))  # Yes / No
     profile_picture = db.Column(db.String(100))  # store image filename
-
+    status = db.Column(db.String(20), default="pending")  # Add this
+    user = db.relationship("User", backref="mentee_profile", uselist=False)
 
 
 #------------next table supervisor details-------------------
@@ -241,15 +243,68 @@ def mantordashboard():
 @app.route("/menteedashboard")
 def menteedashboard():
     if "email" in session and session.get("user_type") == "2":
-        return render_template("menteedashboard.html", user_email=session["email"])
+        # Fetch current mentee
+        user = User.query.filter_by(email=session["email"]).first()
+
+        # Mentors already registered (you can filter by approved status if needed)
+        all_mentors = MentorProfile.query.filter_by(status="approved").all()
+
+        # Optionally, fetch mentors already assigned to this mentee
+        # This depends if you have a "mentorship" table, for now we just show all mentors
+        return render_template(
+            "menteedashboard.html",
+            user_email=session["email"],
+            all_mentors=all_mentors
+        )
     return redirect(url_for("signin"))
+
 
 
 @app.route("/supervisordashboard")
 def supervisordashboard():
     if "email" in session and session.get("user_type") == "0":
-        return render_template("supervisordashboard.html", user_email=session["email"])
+        # Fetch all mentors and mentees
+        mentors = MentorProfile.query.all()
+        mentees = MenteeProfile.query.all()
+
+        # Fetch pending requests
+        mentor_requests = MentorProfile.query.filter_by(status='pending').all()
+        mentee_requests = MenteeProfile.query.filter_by(status='pending').all()
+
+        return render_template(
+            "supervisordashboard.html",
+            user_email=session["email"],
+            mentors=mentors,
+            mentees=mentees,
+            mentor_requests=mentor_requests,
+            mentee_requests=mentee_requests
+        )
     return redirect(url_for("signin"))
+
+
+
+
+
+
+
+#------------------- PROFILE PICTURE AT TOP ------------------
+@app.context_processor
+def inject_user_profile_pic():
+    if "email" in session:
+        user = User.query.filter_by(email=session["email"]).first()
+        profile_pic = None
+        if user:
+            if session.get("user_type") == "1":  # Mentor
+                profile = MentorProfile.query.filter_by(user_id=user.id).first()
+                profile_pic = profile.profile_picture if profile else None
+            elif session.get("user_type") == "2":  # Mentee
+                profile = MenteeProfile.query.filter_by(user_id=user.id).first()
+                profile_pic = profile.profile_picture if profile else None
+            elif session.get("user_type") == "0":  # Supervisor
+                profile = SupervisorProfile.query.filter_by(user_id=user.id).first()
+                profile_pic = profile.profile_picture if profile else None
+        return dict(current_user_profile_pic=profile_pic)
+    return dict(current_user_profile_pic=None)
 
 
 # ------------------ LOGOUT ------------------
