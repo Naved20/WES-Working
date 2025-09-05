@@ -1,0 +1,75 @@
+{% extends "base2.html" %}
+{% block title %}Mentee Profile{% endblock %}
+
+{% block user %}Mentee Profile{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto mt-8 p-6 bg-gray-50 rounded-lg shadow-lg">
+    <!-- Profile Header -->
+    <div class="flex flex-col items-center md:flex-row md:items-center md:justify-start space-y-4 md:space-y-0 md:space-x-6 mb-8">
+        <!-- Profile Picture -->
+        {% if profile_picture %}
+        <img src="{{ url_for('static', filename='uploads/' + profile_picture) }}" alt="Profile Picture" class="w-32 h-32 md:w-40 md:h-40 object-cover rounded-full shadow-md border-2 border-gray-200">
+        {% else %}
+        <div class="w-32 h-32 md:w-40 md:h-40 flex items-center justify-center bg-gray-200 text-gray-500 rounded-full text-lg font-semibold">
+            No Picture
+        </div>
+        {% endif %}
+
+        <!-- Name & Email -->
+        <div class="text-center md:text-left">
+            <h2 class="text-3xl font-bold text-gray-800">{{ full_name }}</h2>
+            <p class="text-gray-600 mt-1">{{ email }}</p>
+            <p class="text-gray-500 mt-2"><strong>Date of Birth:</strong> {{ dob }}</p>
+            <p class="text-gray-500"><strong>School/College:</strong> {{ school_college_name }}</p>
+        </div>
+    </div>
+
+    <!-- Profile Details -->
+    <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+        <h3 class="text-2xl font-semibold text-gray-700 mb-4">Profile Details</h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+                <p class="text-gray-600"><span class="font-semibold">Mobile Number:</span> {{ mobile_number }}</p>
+                <p class="text-gray-600 mt-2"><span class="font-semibold">WhatsApp Number:</span> {{ whatsapp_number }}</p>
+                <p class="text-gray-600 mt-2"><span class="font-semibold">Government/Private:</span> {{ govt_private }}</p>
+                <p class="text-gray-600 mt-2"><span class="font-semibold">Stream:</span> {{ stream }}</p>
+            </div>
+            <div>
+                <p class="text-gray-600"><span class="font-semibold">Class / Year:</span> {{ class_year }}</p>
+                <p class="text-gray-600 mt-2"><span class="font-semibold">Favourite Subject:</span> {{ favourite_subject }}</p>
+                <p class="text-gray-600 mt-2"><span class="font-semibold">Goal / Future Aspiration:</span> {{ goal }}</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Parents Info -->
+    <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200 mt-6">
+        <h3 class="text-2xl font-semibold text-gray-700 mb-4">Parent’s Information</h3>
+        <p class="text-gray-600"><span class="font-semibold">Father’s/Mother’s Name:</span> {{ parent_name }}</p>
+        <p class="text-gray-600 mt-2"><span class="font-semibold">Father’s/Mother’s Mobile Number:</span> {{ parent_mobile }}</p>
+    </div>
+
+    <!-- Comments -->
+    {% if comments %}
+    <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200 mt-6">
+        <h3 class="text-2xl font-semibold text-gray-700 mb-4">Comments about Programme</h3>
+        <p class="text-gray-600">{{ comments }}</p>
+    </div>
+    {% endif %}
+
+    <!-- Terms Agreement -->
+    <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200 mt-6">
+        <h3 class="text-2xl font-semibold text-gray-700 mb-4">Terms & Conditions</h3>
+        <p class="text-gray-600"><span class="font-semibold">Agreed:</span> {{ terms_agreement }}</p>
+    </div>
+
+    <!-- Edit Profile Button -->
+    <div class="mt-6 text-center">
+        <a href="{{ url_for('editmenteeprofile') }}"
+           class="px-6 py-2 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700">
+            Edit Profile
+        </a>
+    </div>
+</div>
+{% endblock %}

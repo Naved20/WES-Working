@@ -27,7 +27,17 @@
     <nav class="bg-white shadow-sm p-4 flex justify-between items-center z-10">
         <!-- Logo -->
         <div class="flex items-center space-x-2">
-             <a href="{{ url_for('home')}}" class="flex items-center">
+             <a href="
+             {% if session.get('user_type') == '0' %}
+                {{ url_for('supervisordashboard') }}
+            {% elif session.get('user_type') == '1' %}
+                {{ url_for('mantordashboard') }}
+            {% elif session.get('user_type') == '2' %}
+                {{ url_for('menteedashboard') }}
+            {% else %}
+                {{ url_for('home') }}
+            {% endif %}
+             " class="flex items-center">
             <img src="{{ url_for('static', filename='img/logo.jpg') }}" alt="LOGO" class="h-12 w-12 rounded-full mr-3">
            
             <span class="text-xl font-semibold text-gray-800">{% block user %}{% endblock %}</span>
@@ -38,7 +48,7 @@
         <div class="relative">
             <button id="profile-dropdown-btn" class="flex items-center space-x-2 p-2 rounded-full hover:bg-gray-100 transition-colors duration-200 focus:outline-none focus:ring focus:ring-blue-300">
                 <img class="h-8 w-8 rounded-full" src="https://placehold.co/100x100/38761D/ffffff?" alt="User Profile">
-                <span class="text-sm font-medium text-gray-700 hidden sm:block">{{ user_email }}</span>
+                <span class="text-sm font-medium text-gray-700 hidden sm:block">{{ session.get('email') }}</span>
             </button>
 
             <!-- Dropdown menu -->

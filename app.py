@@ -4,6 +4,8 @@ from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
 import os
 from werkzeug.utils import secure_filename
+from datetime import datetime
+
 
 
 app = Flask(__name__)
@@ -26,7 +28,7 @@ def allowed_file(filename):
 
 
 #--------------User_type Code------------------------
-# -------------superviser = "0"----------------------
+# -------------supervisor = "0"----------------------
 # -------------mantor = "1"--------------------------
 # -------------mantee = "2"--------------------------
 
@@ -56,7 +58,7 @@ class User(db.Model):
         return f"<user {self.name}>"
 
 
-#------------next table mantors details-------------------
+#------------table mantors details-------------------
 
 class MentorProfile(db.Model):
     __tablename__="mentor_profile"
@@ -79,11 +81,60 @@ class MentorProfile(db.Model):
     social_link = db.Column(db.String(200))
     why_mentor = db.Column(db.Text)
     additional_info = db.Column(db.Text)
-    profile_picture = db.Column(db.String(100))  # add this line
+    profile_picture = db.Column(db.String(100))  
 
 
 
-#---------add img uplode function--------------
+
+
+#------------next table mentee details-------------------
+class MenteeProfile(db.Model):
+    __tablename__ = "mentee_profile"
+
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("signup_details.id"), nullable=False)
+
+    # mentee details
+    dob = db.Column(db.String(20))
+    school_college_name = db.Column(db.String(150))
+    mobile_number = db.Column(db.String(20))
+    whatsapp_number = db.Column(db.String(20))
+    govt_private = db.Column(db.String(50))
+    stream = db.Column(db.String(100))
+    class_year = db.Column(db.String(50))
+    favourite_subject = db.Column(db.String(100))
+    goal = db.Column(db.Text)
+
+    # parent info
+    parent_name = db.Column(db.String(150))
+    parent_mobile = db.Column(db.String(20))
+
+    # other
+    comments = db.Column(db.Text)
+    terms_agreement = db.Column(db.String(10))  # Yes / No
+    profile_picture = db.Column(db.String(100))  # store image filename
+
+
+
+#------------next table supervisor details-------------------
+class SupervisorProfile(db.Model):
+    __tablename__ = "supervisor_profile"
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("signup_details.id"), nullable=False, unique=True)
+
+
+
+    organisation = db.Column(db.String(150))
+    whatsapp = db.Column(db.String(20))
+    location = db.Column(db.String(100))
+    role = db.Column(db.String(100))
+    additional_info = db.Column(db.Text)
+    profile_picture = db.Column(db.String(100))
+
+    # One-to-one relationship with User
+    user = db.relationship("User", backref="supervisor_profile", uselist=False)
+
+
 
 
 
@@ -131,7 +182,7 @@ def signup():
         elif user_type == "2":
             return redirect(url_for("menteedashboard"))
         elif user_type == "0":
-            return redirect(url_for("superviserdashboard"))
+            return redirect(url_for("supervisordashboard"))
         
         # agar user_type galat aaya ho
         return redirect(url_for("signin"))
@@ -170,7 +221,7 @@ def signin():
         elif user.user_type == "2":
             return redirect(url_for("menteedashboard"))
         elif user.user_type == "0":
-            return redirect(url_for("superviserdashboard"))
+            return redirect(url_for("supervisordashboard"))
         
         
         
@@ -194,10 +245,10 @@ def menteedashboard():
     return redirect(url_for("signin"))
 
 
-@app.route("/superviserdashboard")
-def superviserdashboard():
+@app.route("/supervisordashboard")
+def supervisordashboard():
     if "email" in session and session.get("user_type") == "0":
-        return render_template("superviserdashboard.html", user_email=session["email"])
+        return render_template("supervisordashboard.html", user_email=session["email"])
     return redirect(url_for("signin"))
 
 
@@ -278,6 +329,119 @@ def editmantorprofile():
 
 
 
+
+#-----------------edit mentee profile-------------------
+@app.route("/editmenteeprofile", methods=["GET", "POST"])
+def editmenteeprofile():
+    if "email" not in session or session.get("user_type") != "2":
+        return redirect(url_for("signin"))
+
+    # Current user
+    user = User.query.filter_by(email=session["email"]).first()
+    profile = MenteeProfile.query.filter_by(user_id=user.id).first()
+
+    if request.method == "POST":
+        # Create profile if not exists
+        if not profile:
+            profile = MenteeProfile(user_id=user.id)
+
+        # Save form data
+        profile.dob = request.form.get("dob")
+        profile.school_college_name = request.form.get("school_college_name")
+        profile.mobile_number = request.form.get("mobile_number")
+        profile.whatsapp_number = request.form.get("whatsapp_number")
+        profile.govt_private = request.form.get("govt_private")
+        profile.stream = request.form.get("stream")
+        profile.class_year = request.form.get("class_year")
+        profile.favourite_subject = request.form.get("favourite_subject")
+        profile.goal = request.form.get("goal")
+        profile.parent_name = request.form.get("parent_name")
+        profile.parent_mobile = request.form.get("parent_mobile")
+        profile.comments = request.form.get("comments")
+        profile.terms_agreement = request.form.get("terms_agreement")
+
+        # Handle profile picture upload
+        file = request.files.get("profile_picture")
+        if file and allowed_file(file.filename):
+            filename = secure_filename(file.filename)
+            # Save file to upload folder
+            file.save(os.path.join(app.config["UPLOAD_FOLDER"], filename))
+            # Store filename in db
+            profile.profile_picture = filename
+
+        db.session.add(profile)
+        db.session.commit()
+
+        flash("Mentee profile updated successfully!", "success")
+        # Redirect to mentee profile page
+        return redirect(url_for("menteeprofile"))
+
+    # GET request – pre-fill form with existing data
+    return render_template(
+        "editmenteeprofile.html",
+        full_name=user.name,
+        email=user.email,
+        dob=profile.dob if profile else "",
+        school_college_name=profile.school_college_name if profile else "",
+        mobile_number=profile.mobile_number if profile else "",
+        whatsapp_number=profile.whatsapp_number if profile else "",
+        govt_private=profile.govt_private if profile else "",
+        stream=profile.stream if profile else "",
+        class_year=profile.class_year if profile else "",
+        favourite_subject=profile.favourite_subject if profile else "",
+        goal=profile.goal if profile else "",
+        parent_name=profile.parent_name if profile else "",
+        parent_mobile=profile.parent_mobile if profile else "",
+        comments=profile.comments if profile else "",
+        terms_agreement=profile.terms_agreement if profile else "",
+        profile_picture=profile.profile_picture if profile else None
+    )
+
+
+#----------------edit supervisor profile-------------------
+@app.route("/edit_supervisor_profile", methods=["GET", "POST"])
+def editsupervisorprofile():
+    if "email" not in session or session.get("user_type") != "0":  
+        return redirect(url_for("signin"))
+
+    user = User.query.filter_by(email=session["email"]).first()
+    profile = SupervisorProfile.query.filter_by(user_id=user.id).first()
+
+    if request.method == "POST":
+        if not profile:
+            profile = SupervisorProfile(user_id=user.id)
+            db.session.add(profile)
+
+        profile.organisation = request.form.get("organisation_or_college")
+        profile.whatsapp = request.form.get("whatsapp_number")
+        profile.location = request.form.get("location")
+        profile.role = request.form.get("role")
+        profile.additional_info = request.form.get("additional_info")
+
+        # Profile picture handling
+        file = request.files.get("profile_picture")
+        if file and allowed_file(file.filename):
+            filename = f"{user.id}_{int(datetime.now().timestamp())}{secure_filename(file.filename)}"
+            file.save(os.path.join(app.config["UPLOAD_FOLDER"], filename))
+            profile.profile_picture = filename
+        db.session.add(profile)
+        db.session.commit()
+        flash("Profile updated successfully!", "success")
+        return redirect(url_for("supervisorprofile"))
+
+    return render_template(
+        "editsupervisorprofile.html",
+        full_name=user.name,
+        email=user.email,
+        organisation_or_college=profile.organisation if profile else "",
+        whatsapp_number=profile.whatsapp if profile else "",
+        location=profile.location if profile else "",
+        role=profile.role if profile else "",
+        additional_info=profile.additional_info if profile else "",
+        profile_picture=profile.profile_picture if profile else None
+    )
+
+
 # ------------------ PROFILE ------------------
 
 @app.route("/profile")
@@ -290,9 +454,9 @@ def profile():
     if user_type == "1":
         return redirect(url_for("mantorprofile"))
     elif user_type == "2":
-        return redirect(url_for("manteeprofile"))
+        return redirect(url_for("menteeprofile"))
     elif user_type == "0":
-        return redirect(url_for("superviserprofile"))
+        return redirect(url_for("supervisorprofile"))
 
 #--------------route for all profiles----------------
 
@@ -324,17 +488,70 @@ def mantorprofile():
     return redirect(url_for("signin"))
 
 
+from datetime import datetime
+
 @app.route("/mentee_profile")
-def manteeprofile():
+def menteeprofile():
     if "email" in session and session.get("user_type") == "2":
-        return render_template("manteeprofile.html", user_email=session["email"])
+        user = User.query.filter_by(email=session["email"]).first()
+        profile = MenteeProfile.query.filter_by(user_id=user.id).first()
+
+        dob_formatted = ""
+        if profile and profile.dob:
+            try:
+                # Assume dob stored as yyyy-mm-dd (from HTML <input type="date">)
+                dob_formatted = datetime.strptime(profile.dob, "%Y-%m-%d").strftime("%d-%m-%Y")
+            except ValueError:
+                dob_formatted = profile.dob   # fallback if already formatted
+
+        return render_template(
+            "menteeprofile.html",
+            full_name=user.name,
+            email=user.email,
+            dob=dob_formatted,
+            school_college_name=profile.school_college_name if profile else "",
+            mobile_number=profile.mobile_number if profile else "",
+            whatsapp_number=profile.whatsapp_number if profile else "",
+            govt_private=profile.govt_private if profile else "",
+            stream=profile.stream if profile else "",
+            class_year=profile.class_year if profile else "",
+            favourite_subject=profile.favourite_subject if profile else "",
+            goal=profile.goal if profile else "",
+            parent_name=profile.parent_name if profile else "",
+            parent_mobile=profile.parent_mobile if profile else "",
+            comments=profile.comments if profile else "",
+            terms_agreement=profile.terms_agreement if profile else "",
+            profile_picture=profile.profile_picture if profile else None
+        )
     return redirect(url_for("signin"))
 
-@app.route("/superviser_profile")
-def superviserprofile():
-    if "email" in session and session.get("user_type") == "0":
-        return render_template("superviserprofile.html", user_email=session["email"])
-    return redirect(url_for("signin"))
+
+
+@app.route("/supervisor_profile")
+def supervisorprofile():
+    # Ensure user is logged in and is a supervisor
+    if "email" not in session or session.get("user_type") != "0":
+        return redirect(url_for("signin"))
+
+    # Fetch current user
+    user = User.query.filter_by(email=session["email"]).first()
+    if not user:
+        return redirect(url_for("signin"))
+
+    # Fetch supervisor profile
+    profile = SupervisorProfile.query.filter_by(user_id=user.id).first()
+
+    return render_template(
+        "supervisorprofile.html",
+        full_name=user.name,
+        email=user.email,
+        organisation_or_college=profile.organisation if profile else "",
+        whatsapp_number=profile.whatsapp if profile else "",
+        location=profile.location if profile else "",
+        role=profile.role if profile else "",
+        additional_info=profile.additional_info if profile else "",
+        profile_picture=profile.profile_picture if profile else None
+    )
 
 
 

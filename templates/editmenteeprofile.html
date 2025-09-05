@@ -1,0 +1,109 @@
+{% extends "base2.html" %}
+{% block title %}Mentee Profile{% endblock %}
+
+{% block user %}Mentee Profile{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto mt-8 p-6 bg-gray-50 rounded-lg shadow-lg">
+    <form action="{{ url_for('editmenteeprofile') }}" method="POST" enctype="multipart/form-data" class="space-y-6">
+        <!-- Profile Header -->
+        <div class="flex flex-col items-center md:flex-row md:items-center md:justify-start space-y-4 md:space-y-0 md:space-x-6 mb-8">
+            <!-- Profile Picture Upload -->
+            <div>
+                {% if profile_picture %}
+                <img src="{{ url_for('static', filename='uploads/' + profile_picture) }}" 
+                     alt="Profile Picture" 
+                     class="w-32 h-32 md:w-40 md:h-40 object-cover rounded-full shadow-md border-2 border-gray-200 mb-2">
+                {% else %}
+                <div class="w-32 h-32 md:w-40 md:h-40 flex items-center justify-center bg-gray-200 text-gray-500 rounded-full text-lg font-semibold mb-2">
+                    No Picture
+                </div>
+                {% endif %}
+                <input type="file" name="profile_picture" class="block text-sm text-gray-600">
+            </div>
+
+            <!-- Name & Email -->
+            <div class="text-center md:text-left w-full">
+                <label class="block text-gray-700 font-semibold">Full Name</label>
+                <input type="text" name="full_name" value="{{ full_name }}" class="w-full p-2 border rounded-lg" readonly>
+
+                <label class="block text-gray-700 font-semibold mt-2">Email</label>
+                <input type="email" name="email" value="{{ email }}" class="w-full p-2 border rounded-lg" readonly>
+
+                <label class="block text-gray-700 font-semibold mt-2">Date of Birth</label>
+                <input type="date" name="dob" value="{{ dob }}" class="w-full p-2 border rounded-lg">
+
+                <label class="block text-gray-700 font-semibold mt-2">School / College</label>
+                <input type="text" name="school_college_name" value="{{ school_college_name }}" class="w-full p-2 border rounded-lg">
+            </div>
+        </div>
+
+        <!-- Profile Details -->
+        <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+            <h3 class="text-2xl font-semibold text-gray-700 mb-4">Profile Details</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-gray-700 font-semibold">Mobile Number</label>
+                    <input type="text" name="mobile_number" value="{{ mobile_number }}" class="w-full p-2 border rounded-lg">
+
+                    <label class="block text-gray-700 font-semibold mt-2">WhatsApp Number</label>
+                    <input type="text" name="whatsapp_number" value="{{ whatsapp_number }}" class="w-full p-2 border rounded-lg">
+
+                    <label class="block text-gray-700 font-semibold mt-2">Government / Private</label>
+                    <input type="text" name="govt_private" value="{{ govt_private }}" class="w-full p-2 border rounded-lg">
+
+                    <label class="block text-gray-700 font-semibold mt-2">Stream</label>
+                    <input type="text" name="stream" value="{{ stream }}" class="w-full p-2 border rounded-lg">
+                </div>
+                <div>
+                    <label class="block text-gray-700 font-semibold">Class / Year</label>
+                    <input type="text" name="class_year" value="{{ class_year }}" class="w-full p-2 border rounded-lg">
+
+                    <label class="block text-gray-700 font-semibold mt-2">Favourite Subject</label>
+                    <input type="text" name="favourite_subject" value="{{ favourite_subject }}" class="w-full p-2 border rounded-lg">
+
+                    <label class="block text-gray-700 font-semibold mt-2">Goal / Future Aspiration</label>
+                    <textarea name="goal" class="w-full p-2 border rounded-lg" rows="2">{{ goal }}</textarea>
+                </div>
+            </div>
+        </div>
+
+        <!-- Parent Info -->
+        <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+            <h3 class="text-2xl font-semibold text-gray-700 mb-4">Parent’s Information</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-gray-700 font-semibold">Parent’s Name</label>
+                    <input type="text" name="parent_name" value="{{ parent_name }}" class="w-full p-2 border rounded-lg">
+                </div>
+                <div>
+                    <label class="block text-gray-700 font-semibold">Parent’s Mobile Number</label>
+                    <input type="text" name="parent_mobile" value="{{ parent_mobile }}" class="w-full p-2 border rounded-lg">
+                </div>
+            </div>
+        </div>
+
+        <!-- Comments -->
+        <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+            <h3 class="text-2xl font-semibold text-gray-700 mb-4">Comments about Programme</h3>
+            <textarea name="comments" class="w-full p-2 border rounded-lg" rows="4">{{ comments }}</textarea>
+        </div>
+
+        <!-- Terms Agreement -->
+        <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+            <h3 class="text-2xl font-semibold text-gray-700 mb-4">Terms & Conditions</h3>
+            <select name="terms_agreement" class="w-full p-2 border rounded-lg">
+                <option value="Yes" {% if terms_agreement == "Yes" %}selected{% endif %}>Yes</option>
+                <option value="No" {% if terms_agreement == "No" %}selected{% endif %}>No</option>
+            </select>
+        </div>
+
+        <!-- Submit Button -->
+        <div class="text-center">
+            <button type="submit" class="px-6 py-2 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700">
+                Save Profile
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}

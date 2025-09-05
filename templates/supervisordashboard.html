@@ -1,0 +1,133 @@
+{% extends "base2.html" %}
+{% block title %}Supervisor Dashboard{% endblock %}
+{% block user %}Supervisor{% endblock %}
+
+{% block Sidebar %}
+<aside class="bg-gray-800 text-white w-64 p-4 flex-shrink-0">
+  <nav class="space-y-2">
+    <button onclick="showSection('dashboard')" id="link-dashboard"
+      class="flex items-center w-full text-left p-3 rounded-lg hover:bg-gray-700 transition-colors duration-200">
+      <svg class="w-5 h-5 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+          d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-10l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+      </svg>
+      Dashboard
+    </button>
+
+    <button onclick="showSection('mentors')" id="link-mentors"
+      class="flex items-center w-full text-left p-3 rounded-lg hover:bg-gray-700 transition-colors duration-200">
+      <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+          d="M5.121 19a9 9 0 0113.758 0M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+      </svg>
+      Mentors
+    </button>
+
+    <button onclick="showSection('mentees')" id="link-mentees"
+      class="flex items-center w-full text-left p-3 rounded-lg hover:bg-gray-700 transition-colors duration-200">
+      <svg class="w-5 h-5 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+          d="M12 11c0-1.105-.895-2-2-2s-2 .895-2 2 .895 2 2 2 2-.895 2-2zM20 21v-2a4 4 0 00-3-3.87M4 21v-2a4 4 0 013-3.87"/>
+      </svg>
+      Mentees
+    </button>
+  </nav>
+</aside>
+{% endblock %}
+
+{% block content %}
+<div class="p-6 flex-1">
+
+  <!-- Dashboard -->
+  <div id="section-dashboard" class="hidden">
+    <h1 class="text-2xl font-bold mb-4">Supervisor Dashboard</h1>
+    <p class="text-gray-700">Welcome Supervisor. Monitor and manage mentors & mentees from here.</p>
+  </div>
+
+  <!-- Mentors Section -->
+  <div id="section-mentors" class="hidden">
+    <h1 class="text-2xl font-bold mb-4">All Mentors</h1>
+    <div class="overflow-x-auto">
+      <table class="min-w-full bg-white border rounded-lg shadow">
+        <thead>
+          <tr class="bg-gray-100 text-gray-700 text-sm">
+            <th class="py-2 px-4 border">Name</th>
+            <th class="py-2 px-4 border">Email</th>
+            <th class="py-2 px-4 border">Profession</th>
+            <th class="py-2 px-4 border">Organisation</th>
+            <th class="py-2 px-4 border">Location</th>
+            <th class="py-2 px-4 border">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for mentor in mentors %}
+          <tr class="text-gray-600">
+            <td class="py-2 px-4 border">{{ mentor.user.name }}</td>
+            <td class="py-2 px-4 border">{{ mentor.user.email }}</td>
+            <td class="py-2 px-4 border">{{ mentor.profession }}</td>
+            <td class="py-2 px-4 border">{{ mentor.organisation }}</td>
+            <td class="py-2 px-4 border">{{ mentor.location }}</td>
+            <td class="py-2 px-4 border text-center">
+              <button class="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600">View</button>
+            </td>
+          </tr>
+          {% else %}
+          <tr><td colspan="6" class="py-3 px-4 text-center text-gray-500">No mentors found.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Mentees Section -->
+  <div id="section-mentees" class="hidden">
+    <h1 class="text-2xl font-bold mb-4">All Mentees</h1>
+    <div class="overflow-x-auto">
+      <table class="min-w-full bg-white border rounded-lg shadow">
+        <thead>
+          <tr class="bg-gray-100 text-gray-700 text-sm">
+            <th class="py-2 px-4 border">Name</th>
+            <th class="py-2 px-4 border">Email</th>
+            <th class="py-2 px-4 border">School/College</th>
+            <th class="py-2 px-4 border">Class/Year</th>
+            <th class="py-2 px-4 border">Goal</th>
+            <th class="py-2 px-4 border">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for mentee in mentees %}
+          <tr class="text-gray-600">
+            <td class="py-2 px-4 border">{{ mentee.user.name }}</td>
+            <td class="py-2 px-4 border">{{ mentee.user.email }}</td>
+            <td class="py-2 px-4 border">{{ mentee.school_college_name }}</td>
+            <td class="py-2 px-4 border">{{ mentee.class_year }}</td>
+            <td class="py-2 px-4 border">{{ mentee.goal }}</td>
+            <td class="py-2 px-4 border text-center">
+              <button class="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600">View</button>
+            </td>
+          </tr>
+          {% else %}
+          <tr><td colspan="6" class="py-3 px-4 text-center text-gray-500">No mentees found.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  function showSection(section) {
+    // hide all
+    document.querySelectorAll('[id^="section-"]').forEach(el => el.classList.add('hidden'));
+    document.querySelectorAll('[id^="link-"]').forEach(el => el.classList.remove('bg-gray-700'));
+
+    // show chosen
+    document.getElementById('section-' + section).classList.remove('hidden');
+    document.getElementById('link-' + section).classList.add('bg-gray-700');
+  }
+
+  // Default open Dashboard
+  showSection('dashboard');
+</script>
+{% endblock %}
