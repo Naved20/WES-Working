@@ -30,12 +30,21 @@
       </svg>
       Upcoming Meeting Request
     </button>
+
+    <button onclick="showSection('findmentee')" id="link-findmentee"
+      class="flex items-center w-full text-left p-3 rounded-lg hover:bg-gray-700 transition-colore duration-200">
+    <svg class="w-5 h-5 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+          d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+      </svg>
+      Find Mentee
+  </button>
   </nav>
 </aside>
 {% endblock %}
 
 {% block content %}
-<div class="p-6 flex-1">
+<div class="   flex-1">
 
   <!-- Dashboard Section -->
   <div id="section-dashboard" class="hidden">
@@ -105,7 +114,62 @@
   </div>
 </div>
 
+<!-- find a mentee section -->
+
+<div id="section-findmentee" class="hidden">
+  <h1 class="text-2xl font-bold mb-4 text-gray-800">Find New Mentees</h1>
+
+  <!-- Search Input -->
+  <input type="text" id="findMenteeSearch" placeholder="Search mentees by name, profession, location, email..."
+         class="w-full p-2 mb-6 border border-gray-300 rounded"
+         onkeyup="filterFindMentees()">
+
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6" id="allMenteesGrid">
+{% if all_mentees %}
+  {% for mentee in all_mentees %}
+  <div class="find-mentee-card bg-white p-5 rounded-lg shadow hover:shadow-lg transition-shadow flex flex-col">
+    <div class="flex items-center mb-4">
+      {% if mentee.profile_picture %}
+        <img src="{{ url_for('static', filename='uploads/' ~ mentee.profile_picture) }}" 
+             alt="{{ mentee.user.name }}" 
+             class="w-16 h-16 rounded-full object-cover mr-4">
+      {% else %}
+        <div class="w-16 h-16 rounded-full bg-gray-200 flex items-center justify-center text-gray-500 mr-4">N/A</div>
+      {% endif %}
+      <div class="flex flex-col">
+        <h2 class="text-lg font-semibold find-mentee-name">{{ mentee.user.name }}</h2>
+        <p class="text-gray-500 text-sm find-mentee-school">{{ mentee.school_college_name }}</p>
+      </div>
+    </div>
+    <p class="text-gray-500"><span class="font-semibold">Stream:</span> 
+       <span class="find-mentee-stream">{{ mentee.stream }}</span></p>
+    <p class="text-gray-500"><span class="font-semibold">Goal:</span> 
+       <span class="find-mentee-goal">{{ mentee.goal }}</span></p>
+    <p class="text-gray-700"><span class="font-semibold">Email:</span> 
+       <span class="find-mentee-email">{{ mentee.user.email }}</span></p>
+    <button class="mt-4 w-full px-3 py-2 rounded-lg bg-gray-500 text-white font-medium hover:bg-green-600 transition">
+      Connect with Mentee
+    </button>
+  </div>
+  {% endfor %}
+{% endif %}
 <script>
+
+  function filterFindMentees() {
+    const input = document.getElementById('findMenteeSearch').value.toLowerCase();
+    ducument.querySelectorAll('.find-mentee-card').forEach(card => {
+      const name = card.querySelector('.find-mentee-name').innerText.toLowerCase();
+      const profession = card.querySelector('.find-mentee-profession').innerText.toLowerCase();
+      const location = card.querySelector('.find-mentee-location').innerText.toLowerCase();
+      const email = card.querySelector('.find-mentee-email').innerText.toLowerCase();
+      card.style.display = (name.includes(input) || profession.includes(input) || location.includes(input) || email.includes(input))
+             ? '' : 'none';
+
+     
+      });
+    }
+  
+
   function showSection(section) {
     // Hide all
     document.querySelectorAll('[id^="section-"]').forEach(el => el.classList.add('hidden'));

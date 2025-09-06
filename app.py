@@ -7,7 +7,6 @@ from werkzeug.utils import secure_filename
 from datetime import datetime
 
 
-
 app = Flask(__name__)
 app.secret_key = "1234"
 app.permanent_session_lifetime = timedelta(days=10)
@@ -29,11 +28,11 @@ def allowed_file(filename):
 
 #--------------User_type Code------------------------
 # -------------supervisor = "0"----------------------
-# -------------mantor = "1"--------------------------
+# -------------mentor = "1"--------------------------
 # -------------mantee = "2"--------------------------
 
 #---------------DATABASE CONFIGURATION----------------
-app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///mantors_connect.db"
+app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///mentors_connect.db"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 db = SQLAlchemy(app)
@@ -58,7 +57,7 @@ class User(db.Model):
         return f"<user {self.name}>"
 
 
-#------------table mantors details-------------------
+#------------table mentors details-------------------
 
 class MentorProfile(db.Model):
     __tablename__="mentor_profile"
@@ -68,7 +67,7 @@ class MentorProfile(db.Model):
     # foregin key link to User table
     user_id= db.Column(db.Integer, db.ForeignKey("signup_details.id"),nullable=False)
 
-    #  mantor's details
+    #  mentor's details
     profession = db.Column(db.String(100))
     organisation = db.Column(db.String(150))
     whatsapp = db.Column(db.String(20))
@@ -180,7 +179,7 @@ def signup():
 
         #render based on role
         if user_type == "1":
-            return redirect(url_for("mantordashboard"))
+            return redirect(url_for("mentordashboard"))
         elif user_type == "2":
             return redirect(url_for("menteedashboard"))
         elif user_type == "0":
@@ -219,7 +218,7 @@ def signin():
 
         # Redirect based on role
         if user.user_type == "1":
-            return redirect(url_for("mantordashboard"))
+            return redirect(url_for("mentordashboard"))
         elif user.user_type == "2":
             return redirect(url_for("menteedashboard"))
         elif user.user_type == "0":
@@ -233,11 +232,22 @@ def signin():
     return render_template("signin.html")
 
 # ------------------ DASHBOARDS ------------------
-@app.route("/mantordashboard")
-def mantordashboard():
+@app.route("/mentordashboard")
+def mentordashboard():
     if "email" in session and session.get("user_type") == "1":
-        return render_template("mantordashboard.html", user_email=session["email"])
+        # fetch current mentor
+        user = User.query.filter_by(email=session["email"]).first()
+
+        # fetch all mentees (approved ones only if needed)
+        all_mentees = MenteeProfile.query.all()
+
+        return render_template(
+            "mentordashboard.html",
+            user_email=session["email"],
+            all_mentees=all_mentees
+        )
     return redirect(url_for("signin"))
+
 
 
 @app.route("/menteedashboard")
@@ -247,7 +257,7 @@ def menteedashboard():
         user = User.query.filter_by(email=session["email"]).first()
 
         # Mentors already registered (you can filter by approved status if needed)
-        all_mentors = MentorProfile.query.filter_by(status="approved").all()
+        all_mentors = MentorProfile.query.filter_by().all()
 
         # Optionally, fetch mentors already assigned to this mentee
         # This depends if you have a "mentorship" table, for now we just show all mentors
@@ -316,9 +326,9 @@ def logout():
 
 
 
-# ------------------ editmantorprofile ------------------
-@app.route("/editmantorprofile", methods=["GET", "POST"])
-def editmantorprofile():
+# ------------------ editmentorprofile ------------------
+@app.route("/editmentorprofile", methods=["GET", "POST"])
+def editmentorprofile():
     if "email" not in session or session.get("user_type") != "1":
         return redirect(url_for("signin"))
 
@@ -360,11 +370,11 @@ def editmantorprofile():
 
         flash("Profile updated successfully!", "success")
         # Redirect to mentor profile page with data
-        return redirect(url_for("mantorprofile"))
+        return redirect(url_for("mentorprofile"))
 
     # GET request – pre-fill form with existing data
     return render_template(
-        "editmantorprofile.html",
+        "editmentorprofile.html",
         full_name=user.name,
         email=user.email,
         profession=profile.profession if profile else "",
@@ -507,7 +517,7 @@ def profile():
     user_type = session.get("user_type")
     
     if user_type == "1":
-        return redirect(url_for("mantorprofile"))
+        return redirect(url_for("mentorprofile"))
     elif user_type == "2":
         return redirect(url_for("menteeprofile"))
     elif user_type == "0":
@@ -516,14 +526,14 @@ def profile():
 #--------------route for all profiles----------------
 
 @app.route("/mentor_profile")
-def mantorprofile(): 
+def mentorprofile(): 
     if "email" in session and session.get("user_type") == "1":
         # Fetch current user
         user = User.query.filter_by(email=session["email"]).first()
         profile = MentorProfile.query.filter_by(user_id=user.id).first()
 
         return render_template(
-            "mantorprofile.html",
+            "mentorprofile.html",
             full_name=user.name,
             email=user.email,
             profession=profile.profession if profile else "",
@@ -612,7 +622,5 @@ def supervisorprofile():
 
 
 if __name__ == "__main__":
-    with app.app_context():
-        db.create_all()
     app.run(debug=True)
 
