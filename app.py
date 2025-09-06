@@ -7,6 +7,8 @@ from werkzeug.utils import secure_filename
 from datetime import datetime
 
 
+
+
 app = Flask(__name__)
 app.secret_key = "1234"
 app.permanent_session_lifetime = timedelta(days=10)
@@ -26,19 +28,29 @@ def allowed_file(filename):
 
 
 
+
+
 #--------------User_type Code------------------------
 # -------------supervisor = "0"----------------------
 # -------------mentor = "1"--------------------------
 # -------------mantee = "2"--------------------------
 
 #---------------DATABASE CONFIGURATION----------------
-app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///mentors_connect.db"
+
+
+uri = os.getenv("DATABASE_URL")
+if uri.startswith("postgresql://"):
+    uri = uri.replace("postgresql://", "postgres://", 1)
+app.config["SQLALCHEMY_DATABASE_URI"] = uri or "sqlite:///mentors_connect.db"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 db = SQLAlchemy(app)
 
 from flask_migrate import Migrate
 migrate = Migrate(app, db)
+
+
+
 
 
 #--------------USER MODEL----------------
