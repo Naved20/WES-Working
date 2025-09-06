@@ -36,13 +36,16 @@ def allowed_file(filename):
 # -------------mantee = "2"--------------------------
 
 #---------------DATABASE CONFIGURATION----------------
-
-
+    
 uri = os.getenv("DATABASE_URL")
-if uri.startswith("postgresql://"):
-    uri = uri.replace("postgresql://", "postgres://", 1)
+
+# Convert postgres:// → postgresql://
+if uri and uri.startswith("postgres://"):
+    uri = uri.replace("postgres://", "postgresql://", 1)
+
 app.config["SQLALCHEMY_DATABASE_URI"] = uri or "sqlite:///mentors_connect.db"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+
 
 db = SQLAlchemy(app)
 
