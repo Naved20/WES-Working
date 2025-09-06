@@ -1,47 +1,48 @@
 {% extends "base2.html" %}
 {% block title %} Mentor Dashboard {% endblock %}
 {% block user %}Mentor{% endblock %}
+
 {% block Sidebar %}
-<aside class="bg-gray-800 text-white w-64 p-4 flex-shrink-0">
-  <nav class="space-y-2">
-    <button onclick="showSection('dashboard')" id="link-dashboard"
-      class="flex items-center w-full text-left p-3 rounded-lg hover:bg-gray-700 transition-colors duration-200">
-      <svg class="w-5 h-5 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-          d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-10l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
-      </svg>
-      Dashboard
-    </button>
 
-    <button onclick="showSection('mentees')" id="link-mentees"
-      class="flex items-center w-full text-left p-3 rounded-lg hover:bg-gray-700 transition-colors duration-200">
-      <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-          d="M5.121 19a9 9 0 0113.758 0M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
-      </svg>
-      My Mentees
-    </button>
+      <a href="{{ url_for('profile')}}" 
+         class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+         👤 My Profile
+      </a>
+      
+      <a href="javascript:void(0)" onclick="showSection('dashboard')" id="link-dashboard"
+         class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-md">
+         📊 Dashboard
+      </a>
+      
+      <a href="javascript:void(0)" onclick="showSection('mentees')" id="link-mentees"
+         class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-md">
+         👥 My Mentees
+      </a>
+      
+      <a href="javascript:void(0)" onclick="showSection('upcoming')" id="link-upcoming"
+         class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-md">
+         📅 Upcoming Meeting Request
+      </a>
+      
+      <a href="javascript:void(0)" onclick="showSection('findmentee')" id="link-findmentee"
+         class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-md">
+         🔍 Find Mentee
+      </a>
+      
+      <a href="#" 
+         class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+         ⚙️ Settings
+      </a>
+      
+      <a href="{{ url_for('logout')}}" 
+         class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+         🚪 Sign out
+      </a>
 
-    <button onclick="showSection('upcoming')" id="link-upcoming"
-      class="flex items-center w-full text-left p-3 rounded-lg hover:bg-gray-700 transition-colors duration-200">
-      <svg class="w-5 h-5 mr-3" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-          d="M7 3v4M17 3v4M3 9h18M5 5h14a2 2 0 012 2v12a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2z"/>
-      </svg>
-      Upcoming Meeting Request
-    </button>
 
-    <button onclick="showSection('findmentee')" id="link-findmentee"
-      class="flex items-center w-full text-left p-3 rounded-lg hover:bg-gray-700 transition-colore duration-200">
-    <svg class="w-5 h-5 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-          d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-      </svg>
-      Find Mentee
-  </button>
-  </nav>
-</aside>
+
 {% endblock %}
+
 
 {% block content %}
 <div class="   flex-1">
@@ -173,11 +174,9 @@
   function showSection(section) {
     // Hide all
     document.querySelectorAll('[id^="section-"]').forEach(el => el.classList.add('hidden'));
-    document.querySelectorAll('[id^="link-"]').forEach(el => el.classList.remove('bg-gray-700'));
 
     // Show selected
     document.getElementById('section-' + section).classList.remove('hidden');
-    document.getElementById('link-' + section).classList.add('bg-gray-700');
   }
 
   // default open Dashboard

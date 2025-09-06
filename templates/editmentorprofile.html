@@ -3,6 +3,16 @@
 
 {% block user %}Mentor Profile{% endblock %}
 
+
+{% block Sidebar %}
+
+    <a href="{{ url_for('profile')}}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">👤 My Profile</a>
+    <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">⚙️ Settings</a>
+    <a href="{{ url_for('logout')}}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">🚪 Sign out</a>
+    
+
+{% endblock %}
+
 {% block content %}
 <div class="max-w-4xl mx-auto mt-8 p-6 bg-gray-50 rounded-lg shadow-lg">
     <form action="{{ url_for('editmentorprofile') }}" method="POST" enctype="multipart/form-data" class="space-y-6">

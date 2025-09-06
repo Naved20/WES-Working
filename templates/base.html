@@ -1,48 +1,79 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}{% endblock %}</title>
-     <!-- Use Tailwind CSS CDN for styling -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Use Inter font from Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('static', filename='img/logo.jpg') }}">
-
-     <style>
-        body {
-            font-family: 'Inter', sans-serif;
-        }
-        /* Custom styles to hide/show sections */
-        .hidden-section {
-            display: none;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}{% endblock %}</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Inter font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('static', filename='img/logo.jpg') }}">
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+    }
+  </style>
 </head>
 <body class="bg-gray-100 min-h-screen flex flex-col items-center">
-     <!-- Main Container for the entire application -->
-    <div id="app-container" class="w-full max-w-4xl p-8 space-y-12">
-     <!-- Header -->
-        <header class="flex justify-between items-center py-4">
-           <a href="{{ url_for('home')}}" class="flex items-center">
-            <img src="{{ url_for('static', filename='img/logo.jpg') }}" alt="LOGO" class="h-12 w-12 rounded-full mr-3">
-            <h1 class="text-3xl font-bold  text-[#149CFC]">WES</h1> </a>
-            <nav>
-                <a href="{{ url_for('signin') }}" 
-                   class="px-4 py-2 mr-2 font-medium text-[#149CFC] rounded-lg hover:bg-indigo-50 transition-colors duration-200">
-                   Sign In
-                </a>
-                <a href="{{ url_for('signup') }}" 
-                   class="px-4 py-2 font-medium text-white bg-[#149CFC] rounded-lg shadow-lg hover:bg-indigo-700 transition-colors duration-200">
-                   Sign Up
-                </a>
-            </nav>
-        </header>
-     {% block content %}{% endblock %}
-     </div>
+  <!-- Main Container -->
+  <div id="app-container" class="w-full max-w-6xl px-4 md:px-8 py-6 space-y-12">
+    
+    <!-- Header -->
+    <header class="flex justify-between items-center py-4">
+      <!-- Logo -->
+      <a href="{{ url_for('home')}}" class="flex items-center">
+        <img src="{{ url_for('static', filename='img/logo.jpg') }}" alt="LOGO" class="h-10 w-10 md:h-12 md:w-12 rounded-full mr-2">
+        <h1 class="text-2xl md:text-3xl font-bold text-[#149CFC]">WES</h1>
+      </a>
+
+      <!-- Desktop Nav -->
+      <nav class="hidden md:flex space-x-4">
+        <a href="{{ url_for('signin') }}" 
+           class="px-4 py-2 font-medium text-[#149CFC] rounded-lg hover:bg-indigo-50 transition-colors duration-200">
+           Sign In
+        </a>
+        <a href="{{ url_for('signup') }}" 
+           class="px-4 py-2 font-medium text-white bg-[#149CFC] rounded-lg shadow-lg hover:bg-indigo-700 transition-colors duration-200">
+           Sign Up
+        </a>
+      </nav>
+
+      <!-- Mobile Menu Button -->
+      <button id="menu-btn" class="md:hidden focus:outline-none">
+        <svg class="w-6 h-6 text-[#149CFC]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+            d="M4 6h16M4 12h16M4 18h16"/>
+        </svg>
+      </button>
+    </header>
+
+    <!-- Mobile Nav -->
+    <nav id="mobile-menu" class="hidden flex-col space-y-2 md:hidden bg-white shadow-lg rounded-lg p-4">
+      <a href="{{ url_for('signin') }}" 
+         class="block px-4 py-2 font-medium text-[#149CFC] rounded-lg hover:bg-indigo-50 transition-colors duration-200">
+         Sign In
+      </a>
+      <a href="{{ url_for('signup') }}" 
+         class="block px-4 py-2 font-medium text-white bg-[#149CFC] rounded-lg shadow-lg hover:bg-indigo-700 transition-colors duration-200">
+         Sign Up
+      </a>
+    </nav>
+
+    <!-- Page Content -->
+    {% block content %}{% endblock %}
+
+  </div>
+
+  <!-- Script to toggle mobile menu -->
+  <script>
+    const menuBtn = document.getElementById('menu-btn');
+    const mobileMenu = document.getElementById('mobile-menu');
+    menuBtn.addEventListener('click', () => {
+      mobileMenu.classList.toggle('hidden');
+    });
+  </script>
 </body>
 </html>
-
