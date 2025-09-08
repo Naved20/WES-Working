@@ -37,24 +37,24 @@ def allowed_file(filename):
 
 #---------------DATABASE CONFIGURATION----------------
 
-db_url = os.getenv("DATABASE_URL", "sqlite:///mentors_connect.db")
+# db_url = os.getenv("DATABASE_URL", "sqlite:///mentors_connect.db")
 
-#render gives 'postgres://' but SQLAlchemy needs 'postgresql://'
-if db_url.startswith("postgres://"):
-    db_url = db_url.replace("postgres://", "postgresql://", 1)
+# #render gives 'postgres://' but SQLAlchemy needs 'postgresql://'
+# if db_url.startswith("postgres://"):
+#     db_url = db_url.replace("postgres://", "postgresql://", 1)
 
-app.config["SQLALCHEMY_DATABASE_URI"] = db_url
-app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+# app.config["SQLALCHEMY_DATABASE_URI"] = db_url
+# app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
     
-# app.config["SQLALCHEMY_DATABASE_URI"] ="sqlite:///mentors_connect.db"
-# app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+app.config["SQLALCHEMY_DATABASE_URI"] ="sqlite:///mentors_connect.db"
+app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 
 db = SQLAlchemy(app)
 
-# from flask_migrate import Migrate
-# migrate = Migrate(app, db)
+from flask_migrate import Migrate
+migrate = Migrate(app, db)
 
 
 
