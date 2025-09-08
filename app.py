@@ -26,10 +26,6 @@ def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 
-
-
-
-
 #--------------User_type Code------------------------
 # -------------supervisor = "0"----------------------
 # -------------mentor = "1"--------------------------
@@ -46,7 +42,6 @@ def allowed_file(filename):
 # app.config["SQLALCHEMY_DATABASE_URI"] = db_url
 # app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
-    
 app.config["SQLALCHEMY_DATABASE_URI"] ="sqlite:///mentors_connect.db"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
