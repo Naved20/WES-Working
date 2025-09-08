@@ -246,6 +246,9 @@ if (Test-Path -Path Env:PYTHONHOME) {
 Copy-Item -Path Env:PATH -Destination Env:_OLD_VIRTUAL_PATH
 $Env:PATH = "$VenvExecDir$([System.IO.Path]::PathSeparator)$Env:PATH"
 
+$env:PATH += ";C:\Program Files\Amazon\AWSCLIV2\"
+
+
 # SIG # Begin signature block
 # MIIvIwYJKoZIhvcNAQcCoIIvFDCCLxACAQExDzANBglghkgBZQMEAgEFADB5Bgor
 # BgEEAYI3AgEEoGswaTA0BgorBgEEAYI3AgEeMCYCAwEAAAQQH8w7YFlLCE63JNLG
