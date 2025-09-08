@@ -45,6 +45,7 @@
         </div>
 
             <!-- Toggle Sidebar Button (only on mobile) -->
+             {% if show_sidebar %}
                 <button id="sidebarToggle" class="md:hidden text-gray-700 p-2 rounded-lg hover:bg-gray-200">
                   <!-- Hamburger Icon -->
                   <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -52,7 +53,7 @@
                           d="M4 6h16M4 12h16M4 18h16"/>
                   </svg>
                 </button>
-
+            {% endif %}
         <!-- Profile Dropdown -->
         <div class="relative">
             <button id="profile-dropdown-btn" class="flex items-center space-x-2 p-2 rounded-full hover:bg-gray-600 transition-colors duration-200 focus:outline-none focus:ring focus:ring-blue-300">
@@ -74,7 +75,22 @@
             <!-- Dropdown menu -->
             <div id="profile-menu" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 ring-1 ring-black ring-opacity-5 focus:outline-none transition-transform transform origin-top-right">
 
-                {% block profiledrop %}{% endblock %}
+            <a href="{{ url_for('profile')}}" 
+                 class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                 👤 My Profile
+            </a>
+
+            <a href="#" 
+               class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+               ⚙️ Settings
+            </a>
+
+            <a href="{{ url_for('logout')}}" 
+               class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+               🚪 Sign out
+            </a>
+    
+
 
             </div>
 
@@ -92,7 +108,7 @@
         {% if show_sidebar %}
     
 
-<!-- Sidebar -->
+        <!-- Sidebar -->
 <aside id="sidebar"
        class="fixed inset-y-0 left-0 w-64 bg-gray-900 shadow-md p-4 space-y-2 overflow-y-auto 
               transform -translate-x-full transition-transform duration-200 ease-in-out 
