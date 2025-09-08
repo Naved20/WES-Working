@@ -4,26 +4,11 @@
 
 
 
-{% block Sidebar %}
+{% block profiledrop %}
 
     <a href="{{ url_for('profile')}}" 
        class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
        👤 My Profile
-    </a>
-    
-    <a href="javascript:void(0)" onclick="showSection('dashboard')" id="link-dashboard"
-       class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-md">
-       📊 Dashboard
-    </a>
-    
-    <a href="javascript:void(0)" onclick="showSection('mentors')" id="link-mentors"
-       class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-md">
-       🎓 My Mentors
-    </a>
-    
-    <a href="javascript:void(0)" onclick="showSection('findmentor')" id="link-findmentor"
-       class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-md">
-       🔍 Find Mentor
     </a>
     
     <a href="#" 

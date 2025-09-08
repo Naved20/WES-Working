@@ -44,9 +44,18 @@
             </a>
         </div>
 
+            <!-- Toggle Sidebar Button (only on mobile) -->
+                <button id="sidebarToggle" class="md:hidden text-gray-700 p-2 rounded-lg hover:bg-gray-200">
+                  <!-- Hamburger Icon -->
+                  <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M4 6h16M4 12h16M4 18h16"/>
+                  </svg>
+                </button>
+
         <!-- Profile Dropdown -->
         <div class="relative">
-            <button id="profile-dropdown-btn" class="flex items-center space-x-2 p-2 rounded-full hover:bg-gray-100 transition-colors duration-200 focus:outline-none focus:ring focus:ring-blue-300">
+            <button id="profile-dropdown-btn" class="flex items-center space-x-2 p-2 rounded-full hover:bg-gray-600 transition-colors duration-200 focus:outline-none focus:ring focus:ring-blue-300">
                 <!-- Top right profile image -->
                     <div class="top-right-profile">
                         {% if current_user_profile_pic %}
@@ -65,9 +74,12 @@
             <!-- Dropdown menu -->
             <div id="profile-menu" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 ring-1 ring-black ring-opacity-5 focus:outline-none transition-transform transform origin-top-right">
 
-                {% block Sidebar %}{% endblock %}
+                {% block profiledrop %}{% endblock %}
 
             </div>
+
+
+
         </div>
     </nav>
 
@@ -75,13 +87,92 @@
     <div class="flex flex-1 overflow-hidden">
         
 
-        <!-- Main Content Area -->
-        <main class="flex-1 p-8 overflow-y-auto">
-            
-            
-            {% block content %}{% endblock %}
-           
-        </main>
+    <!-- Sidebar -->
+    <div class="flex flex-1 overflow-hidden">
+        {% if show_sidebar %}
+    
+
+<!-- Sidebar -->
+<aside id="sidebar"
+       class="fixed inset-y-0 left-0 w-64 bg-gray-900 shadow-md p-4 space-y-2 overflow-y-auto 
+              transform -translate-x-full transition-transform duration-200 ease-in-out 
+              md:relative md:translate-x-0 z-20">
+
+    {% if session.get('user_type') == '0' %}
+        <!-- Supervisor Dashboard -->
+        <a href="javascript:void(0)" onclick="showSection('dashboard')" id="link-dashboard"
+           class="block px-4 py-2 text-white  hover:bg-gray-600 rounded-md">
+           📊 Dashboard
+        </a>
+        
+        <a href="javascript:void(0)" onclick="showSection('mentors')" id="link-mentors"
+           class="block px-4 py-2 text-white  hover:bg-gray-600 rounded-md">
+           🎓 Mentors
+        </a>
+        
+        <a href="javascript:void(0)" onclick="showSection('mentees')" id="link-mentees"
+           class="block px-4 py-2 text-white  hover:bg-gray-600 rounded-md">
+           👥 Mentees
+        </a>
+        
+        <a href="javascript:void(0)" onclick="showSection('requests')" id="link-requests"
+           class="block px-4 py-2 text-white  hover:bg-gray-600 rounded-md">
+           📩 Requests
+        </a>
+
+    {% elif session.get('user_type') == '1' %}
+        <!-- Mentor Dashboard -->
+        <a href="javascript:void(0)" onclick="showSection('dashboard')" id="link-dashboard"
+           class="block px-4 py-2 text-white  hover:bg-gray-600 rounded-md">
+           📊 Dashboard
+        </a>
+        
+        <a href="javascript:void(0)" onclick="showSection('mentees')" id="link-mentees"
+           class="block px-4 py-2 text-white  hover:bg-gray-600 rounded-md">
+           👥 My Mentees
+        </a>
+        
+        <a href="javascript:void(0)" onclick="showSection('upcoming')" id="link-upcoming"
+           class="block px-4 py-2 text-white  hover:bg-gray-600 rounded-md">
+           📅 Upcoming Meeting Request
+        </a>
+        
+        <a href="javascript:void(0)" onclick="showSection('findmentee')" id="link-findmentee"
+           class="block px-4 py-2 text-white  hover:bg-gray-600 rounded-md">
+           🔍 Find Mentee
+        </a>
+
+    {% elif session.get('user_type') == '2' %}
+        <!-- Mentee Dashboard -->
+        <a href="javascript:void(0)" onclick="showSection('dashboard')" id="link-dashboard"
+           class="block px-4 py-2 text-white  hover:bg-gray-600 rounded-md">
+           📊 Dashboard
+        </a>
+        
+        <a href="javascript:void(0)" onclick="showSection('mentors')" id="link-mentors"
+           class="block px-4 py-2 text-white  hover:bg-gray-600 rounded-md">
+           🎓 My Mentors
+        </a>
+        
+        <a href="javascript:void(0)" onclick="showSection('findmentor')" id="link-findmentor"
+           class="block px-4 py-2 text-white  hover:bg-gray-600 rounded-md">
+           🔍 Find Mentor
+        </a>
+    {% endif %}
+</aside>
+
+<!-- Overlay (SEPARATE) -->
+<div id="overlay" class="fixed inset-0 bg-black bg-opacity-50 hidden z-10 md:hidden"></div>
+
+        {% endif %}
+
+
+    <!-- Main Content Area -->
+    <main class="flex-1 p-8 overflow-y-auto">
+        {% block content %}{% endblock %}
+    </main>
+</div>
+
 
     </div> 
 
@@ -111,6 +202,21 @@
                 profileMenu.classList.remove('animate-scale-in');
             }
         });
-    </script>
+  
+      const sidebar = document.getElementById("sidebar");
+      const toggleBtn = document.getElementById("sidebarToggle");
+      const overlay = document.getElementById("overlay");
+        
+      toggleBtn.addEventListener("click", () => {
+        sidebar.classList.toggle("-translate-x-full");
+        overlay.classList.toggle("hidden");
+      });
+    
+      overlay.addEventListener("click", () => {
+        sidebar.classList.add("-translate-x-full");
+        overlay.classList.add("hidden");
+      });
+</script>
+
 </body>
 </html>

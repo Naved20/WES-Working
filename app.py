@@ -262,6 +262,7 @@ def mentordashboard():
 
         return render_template(
             "mentordashboard.html",
+            show_sidebar=True,
             user_email=session["email"],
             all_mentees=all_mentees
         )
@@ -282,6 +283,7 @@ def menteedashboard():
         # This depends if you have a "mentorship" table, for now we just show all mentors
         return render_template(
             "menteedashboard.html",
+            show_sidebar=True,
             user_email=session["email"],
             all_mentors=all_mentors
         )
@@ -302,6 +304,7 @@ def supervisordashboard():
 
         return render_template(
             "supervisordashboard.html",
+            show_sidebar=True,
             user_email=session["email"],
             mentors=mentors,
             mentees=mentees,
@@ -553,6 +556,7 @@ def mentorprofile():
 
         return render_template(
             "mentorprofile.html",
+            show_sidebar=False,
             full_name=user.name,
             email=user.email,
             profession=profile.profession if profile else "",
@@ -590,6 +594,7 @@ def menteeprofile():
 
         return render_template(
             "menteeprofile.html",
+            show_sidebar=False,
             full_name=user.name,
             email=user.email,
             dob=dob_formatted,
@@ -627,6 +632,7 @@ def supervisorprofile():
 
     return render_template(
         "supervisorprofile.html",
+        show_sidebar=False,
         full_name=user.name,
         email=user.email,
         organisation_or_college=profile.organisation if profile else "",

@@ -2,31 +2,11 @@
 {% block title %} Mentor Dashboard {% endblock %}
 {% block user %}Mentor{% endblock %}
 
-{% block Sidebar %}
+{% block profiledrop %}
 
       <a href="{{ url_for('profile')}}" 
          class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
          👤 My Profile
-      </a>
-      
-      <a href="javascript:void(0)" onclick="showSection('dashboard')" id="link-dashboard"
-         class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-md">
-         📊 Dashboard
-      </a>
-      
-      <a href="javascript:void(0)" onclick="showSection('mentees')" id="link-mentees"
-         class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-md">
-         👥 My Mentees
-      </a>
-      
-      <a href="javascript:void(0)" onclick="showSection('upcoming')" id="link-upcoming"
-         class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-md">
-         📅 Upcoming Meeting Request
-      </a>
-      
-      <a href="javascript:void(0)" onclick="showSection('findmentee')" id="link-findmentee"
-         class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-md">
-         🔍 Find Mentee
       </a>
       
       <a href="#" 

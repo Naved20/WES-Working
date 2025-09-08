@@ -2,32 +2,13 @@
 {% block title %}Supervisor Dashboard{% endblock %}
 {% block user %}Supervisor{% endblock %}
 
-{% block Sidebar %}
+{% block profiledrop %}
 
   <a href="{{ url_for('profile')}}" 
    class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
    👤 My Profile
   </a>
   
-  <a href="javascript:void(0)" onclick="showSection('dashboard')" id="link-dashboard"
-     class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-md">
-     📊 Dashboard
-  </a>
-  
-  <a href="javascript:void(0)" onclick="showSection('mentors')" id="link-mentors"
-     class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-md">
-     🎓 Mentors
-  </a>
-  
-  <a href="javascript:void(0)" onclick="showSection('mentees')" id="link-mentees"
-     class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-md">
-     👥 Mentees
-  </a>
-  
-  <a href="javascript:void(0)" onclick="showSection('requests')" id="link-requests"
-     class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-md">
-     📩 Requests
-  </a>
   
   <a href="#" 
      class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
