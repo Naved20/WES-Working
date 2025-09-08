@@ -95,7 +95,8 @@ class MentorProfile(db.Model):
     why_mentor = db.Column(db.Text)
     additional_info = db.Column(db.Text)
     profile_picture = db.Column(db.String(100)) 
-    status = db.Column(db.String(20), default="pending")  # Add this 
+    years_of_experience = db.Column(db.String(100))     
+    status = db.Column(db.String(20), default="pending") 
 
 
 
@@ -371,6 +372,7 @@ def editmentorprofile():
         profile.preferred_communication = request.form.get("preferred_communication")
         profile.social_link = request.form.get("social_link")
         profile.why_mentor = request.form.get("mentor_reason")
+        profile.years_of_experience = request.form.get("experience")  # new field
         profile.additional_info = request.form.get("additional_info")  # optional
 
         # Handle profile picture upload
@@ -406,6 +408,7 @@ def editmentorprofile():
         social_link=profile.social_link if profile else "",
         mentor_reason=profile.why_mentor if profile else "",
         additional_info=profile.additional_info if profile else "",
+        experience=profile.years_of_experience if profile else "",
         profile_picture=profile.profile_picture if profile else None 
     )
 
@@ -566,6 +569,7 @@ def mentorprofile():
             social_link=profile.social_link if profile else "",
             mentor_reason=profile.why_mentor if profile else "",
             additional_info=profile.additional_info if profile else "",
+            experience=profile.years_of_experience if profile else "",
             profile_picture=profile.profile_picture if profile else None
         )
     return redirect(url_for("signin"))
