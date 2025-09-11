@@ -56,7 +56,7 @@
             {% endif %}
         <!-- Profile Dropdown -->
         <div class="relative">
-            <button id="profile-dropdown-btn" class="flex items-center space-x-2 p-2 rounded-full hover:bg-gray-600 transition-colors duration-200 focus:outline-none focus:ring focus:ring-blue-300">
+            <button id="profile-dropdown-btn" class="group flex items-center space-x-2 p-2 rounded-full hover:bg-gray-600 hover:text-white transition-colors duration-200 focus:outline-none focus:ring focus:ring-blue-300">
                 <!-- Top right profile image -->
                     <div class="top-right-profile">
                         {% if current_user_profile_pic %}
@@ -68,7 +68,7 @@
                         {% endif %}
                     </div>
 
-                <span class="text-sm font-medium text-gray-700 hidden sm:block">{{ session.get('email') }}</span>
+                <span class="text-sm font-medium text-gray-700 group-hover:text-white hidden sm:block">{{ session.get('email') }}</span>
 
             </button>
 
@@ -165,7 +165,7 @@
            📊 Dashboard
         </a>
         
-        <a href="javascript:void(0)" onclick="showSection('mentors')" id="link-mentors"
+        <a href="javascript:void(0)" onclick="showSection('mymentors')" id="link-mentors"
            class="block px-4 py-2 text-white  hover:bg-gray-600 rounded-md">
            🎓 My Mentors
         </a>

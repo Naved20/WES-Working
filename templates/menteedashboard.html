@@ -2,125 +2,396 @@
 {% block title %}Mentee Dashboard{% endblock %}
 {% block user %}Mentee{% endblock %}
 
-
-
-{% block profiledrop %}
-
-
-{% endblock %}
+{% block profiledrop %}{% endblock %}
 
 {% block content %}
 
-<!-- Dashboard Section -->
-<section id="dashboard" class="p-6">
-  <h1 class="text-2xl font-bold text-gray-800 mb-4">Welcome to your Dashboard</h1>
-  <p class="text-gray-600">Here you can track your progress, mentorships, and opportunities.</p>
-</section>
 
-<!-- My Mentors Section -->
-<section id="mymentors" class="hidden p-6">
-  <h1 class="text-xl font-bold mb-6 text-gray-800">My Mentors</h1>
-  <div class="flex flex-wrap gap-6">
+<style>
+  .nav-btn {
+    background: transparent;
+    color: #6b7280;
+  }
+  
+  .nav-btn.active, .nav-btn:hover {
+    background: white;
+    color: #111827;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  }
+</style>
+
+<!-- Main Content Container -->
+<main class="max-w-7xl mx-auto px-2 sm:px-3 lg:px-3 py-2">
+  
+  <!-- Dashboard Section -->
+  <section id="dashboard" class="p-6 bg-white rounded-xl shadow-sm">
+    <div class="mb-8">
+      <h2 class="text-xl font-semibold text-gray-800 mb-2">Welcome back!</h2>
+      <p class="text-gray-600">Here's your progress summary and upcoming sessions.</p>
+    </div>
+    
+    <!-- Stats Overview -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+      <div class="bg-blue-50 p-5 rounded-xl border border-blue-100">
+        <div class="flex items-center">
+          <div class="rounded-full bg-blue-100 p-3 mr-4">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+            </svg>
+          </div>
+          <div>
+            <p class="text-sm font-medium text-gray-500">Active Mentors</p>
+            <p class="text-2xl font-bold text-gray-800">{{ my_mentors|length if my_mentors else 0 }}</p>
+          </div>
+        </div>
+      </div>
+      
+      <div class="bg-green-50 p-5 rounded-xl border border-green-100">
+        <div class="flex items-center">
+          <div class="rounded-full bg-green-100 p-3 mr-4">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+            </svg>
+          </div>
+          <div>
+            <p class="text-sm font-medium text-gray-500">Completed Sessions</p>
+            <p class="text-2xl font-bold text-gray-800">12</p>
+          </div>
+        </div>
+      </div>
+      
+      <div class="bg-purple-50 p-5 rounded-xl border border-purple-100">
+        <div class="flex items-center">
+          <div class="rounded-full bg-purple-100 p-3 mr-4">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>
+          </div>
+          <div>
+            <p class="text-sm font-medium text-gray-500">Upcoming Sessions</p>
+            <p class="text-2xl font-bold text-gray-800">2</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Upcoming Sessions -->
+    <div class="mb-8">
+      <div class="flex justify-between items-center mb-4">
+        <h3 class="text-lg font-semibold text-gray-800">Upcoming Sessions</h3>
+        <a href="#" class="text-sm text-blue-600 hover:text-blue-800 font-medium">View all</a>
+      </div>
+      <div class="bg-gray-50 rounded-lg border border-gray-200 p-4">
+        <p class="text-gray-500 text-center py-4">No upcoming sessions scheduled</p>
+      </div>
+    </div>
+    
+    <!-- Recent Activity -->
+    <div>
+      <div class="flex justify-between items-center mb-4">
+        <h3 class="text-lg font-semibold text-gray-800">Recent Activity</h3>
+        <a href="#" class="text-sm text-blue-600 hover:text-blue-800 font-medium">View all</a>
+      </div>
+      <div class="space-y-3">
+        <div class="flex items-start p-3 bg-gray-50 rounded-lg">
+          <div class="rounded-full bg-blue-100 p-2 mr-3 mt-1">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </div>
+          <div>
+            <p class="text-sm font-medium">You sent a mentorship request to Sarah Johnson</p>
+            <p class="text-xs text-gray-500">2 hours ago</p>
+          </div>
+        </div>
+        
+        <div class="flex items-start p-3 bg-gray-50 rounded-lg">
+          <div class="rounded-full bg-green-100 p-2 mr-3 mt-1">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </div>
+          <div>
+            <p class="text-sm font-medium">David Chen accepted your mentorship request</p>
+            <p class="text-xs text-gray-500">1 day ago</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- My Mentors Section -->
+  <section id="mymentors" class="hidden p-6 bg-white rounded-xl shadow-sm">
+    <div class="mb-6">
+      <h2 class="text-xl font-semibold text-gray-800 mb-2">My Mentors</h2>
+      <p class="text-gray-600">Manage your current mentorship relationships</p>
+    </div>
+    
     {% if my_mentors %}
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       {% for mentor in my_mentors %}
-      <div class="bg-white shadow-md rounded-2xl border border-gray-200 p-4 w-full max-w-sm flex flex-col">
-        <div class="flex items-center gap-4">
+      <div class="bg-white rounded-xl border border-gray-200 p-5 transition-all hover:shadow-md">
+        <div class="flex items-center gap-4 mb-4">
           {% if mentor.profile_picture %}
             <img src="{{ url_for('static', filename='uploads/' ~ mentor.profile_picture) }}" 
                  alt="{{ mentor.user.name }}" 
-                 class="w-16 h-16 rounded-full object-cover border border-gray-300">
+                 class="w-16 h-16 rounded-full object-cover border-2 border-white shadow">
           {% else %}
-            <div class="w-16 h-16 rounded-full bg-gray-200 flex items-center justify-center text-gray-500 border border-gray-300">
-              N/A
+            <div class="w-16 h-16 rounded-full bg-gradient-to-br from-blue-100 to-blue-200 flex items-center justify-center text-blue-600 border-2 border-white shadow">
+              <span class="text-xl font-semibold">{{ mentor.user.name[0] if mentor.user.name else '?' }}</span>
             </div>
           {% endif %}
           <div>
-            <h2 class="text-lg font-bold text-gray-800">{{ mentor.user.name }}</h2>
+            <h3 class="text-lg font-bold text-gray-800">{{ mentor.user.name }}</h3>
             <p class="text-sm text-gray-600">{{ mentor.profession }} at {{ mentor.organisation }}</p>
           </div>
         </div>
-        <button class="mt-4 w-full px-3 py-2 rounded-lg bg-gray-500 text-white font-medium hover:bg-green-600 transition">
-          Chat with Mentor
-        </button>
+        
+        <div class="space-y-2 mb-4">
+          <div class="flex items-center text-sm text-gray-600">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+            </svg>
+            <span>{{ mentor.location if mentor.location else 'Not specified' }}</span>
+          </div>
+          
+          <div class="flex items-center text-sm text-gray-600">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <span>Next session: Not scheduled</span>
+          </div>
+        </div>
+        
+        <div class="flex space-x-2">
+          <button class="flex-1 px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition">
+            Message
+          </button>
+          <button class="px-4 py-2 bg-white border border-gray-300 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-50 transition">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
+            </svg>
+          </button>
+        </div>
       </div>
       {% endfor %}
-    {% else %}
-      <p class="text-gray-500">You have no mentors assigned yet.</p>
-    {% endif %}
-  </div>
-</section>
-
-<!-- Find Mentor Section -->
-<section id="findmentor" class="hidden p-6">
-  <h1 class="text-xl font-bold mb-4 text-gray-800">Find New Mentors</h1>
-
-  <!-- Search Input -->
-  <input type="text" id="findMentorSearch" placeholder="Search mentors by name, profession, location, email..."
-         class="w-full p-2 mb-6 border border-gray-300 rounded"
-         onkeyup="filterFindMentors()">
-
-  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6" id="allMentorsGrid">
-{% if all_mentors %}
-  {% for mentor in all_mentors %}
-  <div class="find-mentor-card bg-white p-5 rounded-lg shadow hover:shadow-lg transition-shadow flex flex-col">
-    <div class="flex items-center mb-4">
-      {% if mentor.profile_picture %}
-        <img src="{{ url_for('static', filename='uploads/' ~ mentor.profile_picture) }}" 
-             alt="{{ mentor.user.name }}" 
-             class="w-16 h-16 rounded-full object-cover mr-4">
-      {% else %}
-        <div class="w-16 h-16 rounded-full bg-gray-200 flex items-center justify-center text-gray-500 mr-4">N/A</div>
-      {% endif %}
-      <div class="flex flex-col">
-        <h2 class="text-lg font-semibold find-mentor-name">{{ mentor.user.name }}</h2>
-        <p class="text-gray-500 text-sm find-mentor-profession">{{ mentor.profession }} at {{ mentor.organisation }}</p>
-      </div>
     </div>
-    <p class="text-gray-500"><span class="font-semibold">Location:</span> 
-       <span class="find-mentor-location">{{ mentor.location }}</span></p>
-    <p class="text-gray-700"><span class="font-semibold">Email:</span> 
-       <span class="find-mentor-email">{{ mentor.user.email }}</span></p>
-    <button class="mt-4 w-full px-3 py-2 rounded-lg bg-gray-500 text-white font-medium hover:bg-blue-600 transition">
-      Request Mentorship
+    {% else %}
+    <div class="text-center py-12">
+      <div class="mx-auto w-24 h-24 rounded-full bg-gray-100 flex items-center justify-center mb-4">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+        </svg>
+      </div>
+      <h3 class="text-lg font-medium text-gray-900 mb-1">No mentors yet</h3>
+      <p class="text-gray-500 mb-6">You haven't connected with any mentors yet.</p>
+      <button onclick="showSection('findmentor')" class="px-5 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition">
+        Find Mentors
+      </button>
+    </div>
+    {% endif %}
+  </section>
+
+  <!-- Find Mentor Section -->
+  <section id="findmentor" class="hidden bg-white rounded-xl shadow-sm overflow-hidden">
+    <div class="p-6 border-b border-gray-200">
+      <h2 class="text-xl font-semibold text-gray-800 mb-2">Find Mentors</h2>
+      <p class="text-gray-600">Browse and connect with experienced professionals</p>
+    </div>
+    
+    <!-- Filters -->
+    <div class="p-6 bg-gray-50 border-b border-gray-200">
+     <form method="GET" action="{{ url_for('find_mentor') }}">
+      <div class="flex flex-wrap items-center gap-3">
+
+    <!-- Profession -->
+    <div class="relative">
+      <select name="profession" class="appearance-none pl-4 pr-10 py-2 border rounded-full text-gray-700 bg-white" >
+        <option value="" {% if not request.args.get('profession') %}selected{% endif %}>All Professions</option>
+        <!-- <option value="Software Engineer" {% if request.args.get('profession') == 'Software Engineer' %}selected{% endif %}>Software Engineer</option>
+        <option value="Professor" {% if request.args.get('profession') == 'Professor' %}selected{% endif %}>Professor</option>
+        <option value="Doctor" {% if request.args.get('profession') == 'Doctor' %}selected{% endif %}>Doctor</option>
+        <option value="Entrepreneur" {% if request.args.get('profession') == 'Entrepreneur' %}selected{% endif %}>Entrepreneur</option> -->
+        {% for profession in professions %}
+        <option value="{{ profession }}" {% if request.args.get('profession') == profession %}selected{% endif %}>
+          {{ profession }}
+        </option>
+        {% endfor %}
+
+      </select>
+    </div>
+
+    <!-- Location -->
+    <div class="relative">
+      <select name="location" class="appearance-none pl-4 pr-10 py-2 border rounded-full text-gray-700 bg-white">
+         <option value="" {% if not request.args.get('location') %}selected{% endif %}>All Locations</option>
+        <!-- <option value="Bhopal" {% if request.args.get('location') == 'Bhopal' %}selected{% endif %}>Bhopal</option>
+        <option value="Delhi" {% if request.args.get('location') == 'Delhi' %}selected{% endif %}>Delhi</option>
+        <option value="Mumbai" {% if request.args.get('location') == 'Mumbai' %}selected{% endif %}>Mumbai</option>
+        <option value="Bangalore" {% if request.args.get('location') == 'Bangalore' %}selected{% endif %}>Bangalore</option> -->
+        {% for location in locations %}
+        <option value="{{ location }}" {% if request.args.get('location') == location %}selected{% endif %}>
+          {{ location }}
+        </option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <!-- Education -->
+    <div class="relative">
+      <select name="education" class="appearance-none pl-4 pr-10 py-2 border rounded-full text-gray-700 bg-white">
+        <option value="" {% if not request.args.get('education') %}selected{% endif %}>All Education</option>
+        <!-- <option value="B.Tech CS" {% if request.args.get('education') == 'B.Tech CS' %}selected{% endif %}>B.Tech CS</option>
+        <option value="MBA" {% if request.args.get('education') == 'MBA' %}selected{% endif %}>MBA</option>
+        <option value="M.Tech" {% if request.args.get('education') == 'M.Tech' %}selected{% endif %}>M.Tech</option>
+        <option value="PhD" {% if request.args.get('education') == 'PhD' %}selected{% endif %}>PhD</option> -->
+        {% for education in educations %}
+        <option value="{{ education }}" {% if request.args.get('education') == education %}selected{% endif %}>
+          {{ education }}
+        </option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <!-- Experience -->
+    <div class="relative">
+      <select name="experience" class="appearance-none pl-4 pr-10 py-2 border rounded-full text-gray-700 bg-white">
+        <option value="" {% if not request.args.get('experience') %}selected{% endif %}>Any Experience</option>
+        <option value="0-2" {% if request.args.get('experience') == '0-2' %}selected{% endif %}>0 - 2 years</option>
+        <option value="3-5" {% if request.args.get('experience') == '3-5' %}selected{% endif %}>3 - 5 years</option>
+        <option value="6-10" {% if request.args.get('experience') == '6-10' %}selected{% endif %}>6 - 10 years</option>
+        <option value="10+" {% if request.args.get('experience') == '10+' %}selected{% endif %}>10+ years</option>
+      </select>
+    </div>
+
+    <!-- Search Button -->
+    <button type="submit" class="px-5 py-2 rounded-full bg-blue-600 text-white font-medium">
+      Search
     </button>
   </div>
-  {% endfor %}
-{% else %}
-  <p class="text-gray-500">No mentors available currently.</p>
-{% endif %}
+</form>
 
-  </div>
-</section>
+    </div>
+
+    <!-- Mentors Grid -->
+    <div class="p-6">
+      {% if all_mentors %}
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {% for mentor in all_mentors %}
+        <div class="bg-white rounded-xl border border-gray-200 p-5 transition-all hover:shadow-md">
+          <div class="flex items-center gap-4 mb-4">
+            {% if mentor.profile_picture %}
+              <img src="{{ url_for('static', filename='uploads/' ~ mentor.profile_picture) }}" 
+                   alt="{{ mentor.user.name }}" 
+                   class="w-16 h-16 rounded-full object-cover border-2 border-white shadow">
+            {% else %}
+              <div class="w-16 h-16 rounded-full bg-gradient-to-br from-blue-100 to-blue-200 flex items-center justify-center text-blue-600 border-2 border-white shadow">
+                <span class="text-xl font-semibold">{{ mentor.user.name[0] if mentor.user.name else '?' }}</span>
+              </div>
+            {% endif %}
+            <div>
+              <h3 class="text-lg font-bold text-gray-800">{{ mentor.user.name }}</h3>
+              <p class="text-sm text-gray-600">{{ mentor.profession }} at {{ mentor.organisation }}</p>
+            </div>
+          </div>
+          
+          <div class="space-y-2 mb-4">
+            <div class="flex items-center text-sm text-gray-600">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+              </svg>
+              <span>{{ mentor.location if mentor.location else 'Not specified' }}</span>
+            </div>
+            
+            <div class="flex items-center text-sm text-gray-600">
+              <svg xmlns="http://www.w3.org/2000/svg" 
+                   class="h-4 w-4 mr-2 text-gray-500" 
+                   fill="none" viewBox="0 0 24 24" 
+                   stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                      d="M12 8v4l3 3m6-3a9 9 0 11-18 
+                         0 9 9 0 0118 0z" />
+              </svg>
+              <span>{{ mentor.years_of_experience if mentor.years_of_experience else 'Not specified' }} years experience</span>
+            </div>
+
+
+            
+            <div class="flex items-center text-sm text-gray-600">
+              <svg xmlns="http://www.w3.org/2000/svg" 
+                   class="h-4 w-4 mr-2 text-gray-500" 
+                   fill="none" viewBox="0 0 24 24" 
+                   stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                      d="M5.121 17.804A9.004 9.004 0 0112 
+                         15c2.21 0 4.21.802 5.879 
+                         2.137M15 11a3 3 0 11-6 
+                         0 3 3 0 016 0zM21 
+                         12a9 9 0 11-18 0 
+                         9 9 0 0118 0z" />
+              </svg>
+              <span>{{ mentor.profession if mentor.profession else 'Not specified' }}</span>
+            </div>
+
+          </div>
+          
+          <button class="w-full px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition">
+            Request Mentorship
+          </button>
+        </div>
+        {% endfor %}
+      </div>
+      {% else %}
+      <div class="text-center py-12">
+        <div class="mx-auto w-24 h-24 rounded-full bg-gray-100 flex items-center justify-center mb-4">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+          </svg>
+        </div>
+        <h3 class="text-lg font-medium text-gray-900 mb-1">No mentors available</h3>
+        <p class="text-gray-500">Check back later for new mentor opportunities.</p>
+      </div>
+      {% endif %}
+    </div>
+  </section>
+</main>
 
 
 
 <script>
 function showSection(id) {
+  // Hide all sections
   document.querySelectorAll("section").forEach(sec => sec.classList.add("hidden"));
+  
+  // Show selected section
   document.getElementById(id).classList.remove("hidden");
-  }
-
-
-
-  // Filter Mentees
-    function filterFindMentors() {
-      const input = document.getElementById('findMentorSearch').value.toLowerCase();
-      const cards = document.querySelectorAll('.find-mentor-card');
-    
-      cards.forEach(card => {
-        const name = card.querySelector('.find-mentor-name').innerText.toLowerCase();
-        const profession = card.querySelector('.find-mentor-profession').innerText.toLowerCase();
-        const location = card.querySelector('.find-mentor-location').innerText.toLowerCase();
-        const email = card.querySelector('.find-mentor-email').innerText.toLowerCase();
-      
-        if(name.includes(input) || profession.includes(input) || location.includes(input) || email.includes(input)) {
-          card.style.display = 'flex';
-        } else {
-          card.style.display = 'none';
-        }
-      });
+  
+  // Update active navigation button
+  document.querySelectorAll('.nav-btn').forEach(btn => {
+    btn.classList.remove('active');
+  });
+  
+  // Find the button that corresponds to this section and activate it
+  const buttons = document.querySelectorAll('.nav-btn');
+  buttons.forEach(btn => {
+    if (btn.textContent.trim() === 'Overview' && id === 'dashboard') {
+      btn.classList.add('active');
+    } else if (btn.textContent.trim() === 'My Mentors' && id === 'mymentors') {
+      btn.classList.add('active');
+    } else if (btn.textContent.trim() === 'Find Mentors' && id === 'findmentor') {
+      btn.classList.add('active');
     }
+  });
+}
 
+// ✅ Auto-open correct section using Jinja-injected variable
+document.addEventListener("DOMContentLoaded", function() {
+  var activeSection = "{{ active_section|default('dashboard') }}";
+  showSection(activeSection);
+});
 </script>
+
 
 {% endblock %}
