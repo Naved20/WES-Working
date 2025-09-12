@@ -389,10 +389,10 @@ def supervisordashboard():
 
 def get_filter_options():
     return {
-        "professions": [row.profession for row in MentorProfile.query.with_entities(MentorProfile.profession).distinct() if row.profession],
-        "locations": [row.location for row in MentorProfile.query.with_entities(MentorProfile.location).distinct() if row.location],
-        "educations": [row.education for row in MentorProfile.query.with_entities(MentorProfile.education).distinct() if row.education],
-        "experiences": [row.years_of_experience for row in MentorProfile.query.with_entities(MentorProfile.years_of_experience).distinct() if row.years_of_experience],
+        "professions": sorted({row.profession for row in MentorProfile.query.with_entities(MentorProfile.profession).distinct() if row.profession}),
+        "locations": sorted({row.location for row in MentorProfile.query.with_entities(MentorProfile.location).distinct() if row.location}),
+        "educations": sorted({row.education for row in MentorProfile.query.with_entities(MentorProfile.education).distinct() if row.education}),
+        "experiences": sorted({row.years_of_experience for row in MentorProfile.query.with_entities(MentorProfile.years_of_experience).distinct() if row.years_of_experience}),
     }
 
 @app.route("/find_mentor", methods=["GET"])
