@@ -249,21 +249,27 @@ def signin():
 @app.route("/mentordashboard")
 def mentordashboard():
     if "email" in session and session.get("user_type") == "1":
-        # fetch current mentor
-        user = User.query.filter_by(email=session["email"]).first()
+        # Fetch current mentor
+        mentor = User.query.filter_by(email=session["email"]).first()
 
-        # fetch all mentees (approved ones only if needed)
-        all_mentees = MenteeProfile.query.all()
+        all_mentees = MenteeProfile.query.filter_by().all()
+
+        # Unique filter values from mentees
+        streams = [row.stream for row in MenteeProfile.query.with_entities(MenteeProfile.stream).distinct() if row.stream]
+        schools = [row.school_college_name for row in MenteeProfile.query.with_entities(MenteeProfile.school_college_name).distinct() if row.school_college_name]
+        goals = [row.goal for row in MenteeProfile.query.with_entities(MenteeProfile.goal).distinct() if row.goal]
 
         return render_template(
             "mentordashboard.html",
-            show_sidebar=True,
-            user_email=session["email"],
             all_mentees=all_mentees,
-            active_section="dashboard"
+            streams=streams,
+            schools=schools,
+            goals=goals,
+            active_section="findmentees",
+            show_sidebar=True
         )
-    return redirect(url_for("signin"))
 
+    return redirect(url_for("signin"))
 
 
 @app.route("/menteedashboard")
@@ -272,7 +278,8 @@ def menteedashboard():
         # Fetch current mentee
         user = User.query.filter_by(email=session["email"]).first()
 
-        # Mentors already registered (you can filter by approved status if needed)
+
+
         all_mentors = MentorProfile.query.filter_by().all()
 
         # unique filter value from db
@@ -327,63 +334,6 @@ def supervisordashboard():
     return redirect(url_for("signin"))
 
 
-
-# def get_filter_options():
-#     return {
-#         "professions": [row.profession for row in MentorProfile.query.with_entities(MentorProfile.profession).distinct() if row.profession],
-#         "locations": [row.location for row in MentorProfile.query.with_entities(MentorProfile.location).distinct() if row.location],
-#         "educations": [row.education for row in MentorProfile.query.with_entities(MentorProfile.education).distinct() if row.education],
-#         "experiences": [row.years_of_experience for row in MentorProfile.query.with_entities(MentorProfile.years_of_experience).distinct() if row.years_of_experience],
-#     }
-
-
-
-
-
-# #-------------------filter requests-------------------
-# @app.route("/find_mentor", methods=["GET"])
-# def find_mentor():
-#     query = MentorProfile.query  # assuming Mentor is your model
-
-#     profession = request.args.get("profession")
-#     location = request.args.get("location")
-#     education = request.args.get("education")
-#     experience = request.args.get("experience")
-
-#     if profession:
-#         query = query.filter_by(profession=profession)
-#     if location:
-#         query = query.filter_by(location=location)
-#     if education:
-#         query = query.filter_by(education=education)
-#     if experience:
-#         if experience == "0-2":
-#             query = query.filter(cast(MentorProfile.years_of_experience, Integer). between(0, 2))
-#         elif experience == "3-5":
-#             query = query.filter(cast(MentorProfile.years_of_experience, Integer). between(3, 5))
-#         elif experience == "6-10":
-#             query = query.filter(cast(MentorProfile.years_of_experience, Integer). between(6, 10))
-#         elif experience == "10+":
-#             query = query.filter(cast(MentorProfile.years_of_experience, Integer) >= 10)
-
-#     mentors = query.all()
-
-#     options = get_filter_options()
-    
-#     return render_template(
-#         "menteedashboard.html",
-#         all_mentors=mentors,
-#         professions=profession["professions"],
-#         locations=location["locations"],
-#         educations=education["educations"],
-#         experiences=experience["experiences"], 
-#         selected_profession=profession,
-#         selected_location=location,
-#         selected_education=education,
-#         selected_experience=experience,
-#         active_section="findmentor",
-#         show_sidebar=True
-#     )
 
 
 

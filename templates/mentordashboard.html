@@ -1,146 +1,448 @@
 {% extends "base2.html" %}
-{% block title %} Mentor Dashboard {% endblock %}
+{% block title %}Mentor Dashboard{% endblock %}
 {% block user %}Mentor{% endblock %}
 
-
-
+{% block profiledrop %}{% endblock %}
 
 {% block content %}
-<div class="   flex-1">
 
+<style>
+  .nav-btn {
+    background: transparent;
+    color: #6b7280;
+  }
+  
+  .nav-btn.active, .nav-btn:hover {
+    background: white;
+    color: #111827;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  }
+</style>
+
+<!-- Main Content Container -->
+<main class="max-w-7xl mx-auto px-2 sm:px-3 lg:px-3 py-2">
+  
   <!-- Dashboard Section -->
-  <div id="section-dashboard" class="hidden">
-    <h1 class="text-2xl font-bold mb-4">Dashboard</h1>
-    <p>Welcome to your dashboard.</p>
-  </div>
-
-  <!-- Mentees Section -->
-  <div id="section-mentees" class="hidden">
-    <h1 class="text-2xl font-bold mb-4">My Mentees</h1>
-
-        <!-- Example meeting request card -->
-    <section class="flex flex-wrap gap-8">
-        
-        {% for i in range(6) %}
-
-        <div class="bg-white border rounded-lg shadow p-4 max-w-sm">
-      <div class="flex items-center mb-2">
-        <img src="{{ url_for('static', filename='img/logo.jpg') }}" alt="Profile" class="w-10 h-10 rounded-full mr-3">
-        <div>
-          <p class="font-bold text-gray-800">Name</p>
-          <p class="text-sm text-gray-500">School</p>
-        </div>
-      </div>
-      <p class="text-gray-700 mb-3">Hello, I’d like to meet you tomorrow</p>
-
-        <button class="mt-4 w-full px-3 py-2 rounded-lg bg-gray-500 text-white font-medium hover:bg-green-600 transition">
-        Chat with Mentee
-       </button>
-
-       
-        </div>
-        
-        {% endfor %}
-        
-    </section>
-
-  </div>
-
-  <!-- Upcoming Meetings Section -->
-  <div id="section-upcoming" class="hidden">
-    <h1 class="text-2xl font-bold mb-4">Upcoming Meeting Requests</h1>
+  <section id="dashboard" class="p-6 bg-white rounded-xl shadow-sm">
+    <div class="mb-8">
+      <h2 class="text-xl font-semibold text-gray-800 mb-2">Welcome back!</h2>
+      <p class="text-gray-600">Here's your mentorship summary and upcoming sessions.</p>
+    </div>
     
-    <!-- Example meeting request card -->
-    <section class="flex flex-wrap gap-8">
-
-        {% for i in range(6) %}
-
-        <div class="bg-white border rounded-lg shadow p-4 max-w-sm">
-      <div class="flex items-center mb-2">
-        <img src="{{ url_for('static', filename='img/logo.jpg') }}" alt="Profile" class="w-10 h-10 rounded-full mr-3">
-        <div>
-          <p class="font-bold text-gray-800">Name</p>
-          <p class="text-sm text-gray-500">School</p>
+    <!-- Stats Overview -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+      <div class="bg-blue-50 p-5 rounded-xl border border-blue-100">
+        <div class="flex items-center">
+          <div class="rounded-full bg-blue-100 p-3 mr-4">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+            </svg>
+          </div>
+          <div>
+            <p class="text-sm font-medium text-gray-500">Active Mentees</p>
+            <p class="text-2xl font-bold text-gray-800">{{ my_mentees|length if my_mentees else 0 }}</p>
+          </div>
         </div>
       </div>
-      <p class="text-gray-700 mb-3">Hello, I’d like to meet you tomorrow</p>
-      <div class="flex gap-2">
-        <button class="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400">Accept</button>
-        <button class="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400">Deny</button>
-      </div>
+      
+      <div class="bg-green-50 p-5 rounded-xl border border-green-100">
+        <div class="flex items-center">
+          <div class="rounded-full bg-green-100 p-3 mr-4">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+            </svg>
+          </div>
+          <div>
+            <p class="text-sm font-medium text-gray-500">Completed Sessions</p>
+            <p class="text-2xl font-bold text-gray-800">{{ completed_sessions if completed_sessions else 0 }}</p>
+          </div>
         </div>
-        
-        {% endfor %}
-        
-    </section>
-  </div>
-</div>
-
-<!-- find a mentee section -->
-
-<div id="section-findmentee" class="hidden">
-  <h1 class="text-2xl font-bold mb-4 text-gray-800">Find New Mentees</h1>
-
-  <!-- Search Input -->
-  <input type="text" id="findMenteeSearch" placeholder="Search mentees by name, profession, location, email..."
-         class="w-full p-2 mb-6 border border-gray-300 rounded"
-         onkeyup="filterFindMentees()">
-
-  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6" id="allMenteesGrid">
-{% if all_mentees %}
-  {% for mentee in all_mentees %}
-  <div class="find-mentee-card bg-white p-5 rounded-lg shadow hover:shadow-lg transition-shadow flex flex-col">
-    <div class="flex items-center mb-4">
-      {% if mentee.profile_picture %}
-        <img src="{{ url_for('static', filename='uploads/' ~ mentee.profile_picture) }}" 
-             alt="{{ mentee.user.name }}" 
-             class="w-16 h-16 rounded-full object-cover mr-4">
-      {% else %}
-        <div class="w-16 h-16 rounded-full bg-gray-200 flex items-center justify-center text-gray-500 mr-4">N/A</div>
-      {% endif %}
-      <div class="flex flex-col">
-        <h2 class="text-lg font-semibold find-mentee-name">{{ mentee.user.name }}</h2>
-        <p class="text-gray-500 text-sm find-mentee-school">{{ mentee.school_college_name }}</p>
+      </div>
+      
+      <div class="bg-purple-50 p-5 rounded-xl border border-purple-100">
+        <div class="flex items-center">
+          <div class="rounded-full bg-purple-100 p-3 mr-4">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>
+          </div>
+          <div>
+            <p class="text-sm font-medium text-gray-500">Upcoming Sessions</p>
+            <p class="text-2xl font-bold text-gray-800">{{ upcoming_sessions if upcoming_sessions else 0 }}</p>
+          </div>
+        </div>
       </div>
     </div>
-    <p class="text-gray-500"><span class="font-semibold">Stream:</span> 
-       <span class="find-mentee-stream">{{ mentee.stream }}</span></p>
-    <p class="text-gray-500"><span class="font-semibold">Goal:</span> 
-       <span class="find-mentee-goal">{{ mentee.goal }}</span></p>
-    <p class="text-gray-700"><span class="font-semibold">Email:</span> 
-       <span class="find-mentee-email">{{ mentee.user.email }}</span></p>
-    <button class="mt-4 w-full px-3 py-2 rounded-lg bg-gray-500 text-white font-medium hover:bg-green-600 transition">
-      Connect with Mentee
-    </button>
-  </div>
-  {% endfor %}
-{% endif %}
+    
+    <!-- Upcoming Sessions -->
+    <div class="mb-8">
+      <div class="flex justify-between items-center mb-4">
+        <h3 class="text-lg font-semibold text-gray-800">Upcoming Sessions</h3>
+        <a href="#" class="text-sm text-blue-600 hover:text-blue-800 font-medium">View all</a>
+      </div>
+      <div class="bg-gray-50 rounded-lg border border-gray-200 p-4">
+        {% if upcoming_sessions_list and upcoming_sessions_list|length > 0 %}
+          {% for session in upcoming_sessions_list %}
+          <div class="flex justify-between items-center py-3 border-b border-gray-200 last:border-b-0">
+            <div>
+              <p class="font-medium">{{ session.mentee_name }}</p>
+              <p class="text-sm text-gray-500">{{ session.date }} at {{ session.time }}</p>
+            </div>
+            <button class="px-3 py-1 bg-blue-100 text-blue-700 rounded-lg text-sm">Details</button>
+          </div>
+          {% endfor %}
+        {% else %}
+          <p class="text-gray-500 text-center py-4">No upcoming sessions scheduled</p>
+        {% endif %}
+      </div>
+    </div>
+    
+    <!-- Recent Activity -->
+    <div>
+      <div class="flex justify-between items-center mb-4">
+        <h3 class="text-lg font-semibold text-gray-800">Recent Activity</h3>
+        <a href="#" class="text-sm text-blue-600 hover:text-blue-800 font-medium">View all</a>
+      </div>
+      <div class="space-y-3">
+        {% if recent_activities and recent_activities|length > 0 %}
+          {% for activity in recent_activities %}
+          <div class="flex items-start p-3 bg-gray-50 rounded-lg">
+            <div class="rounded-full bg-blue-100 p-2 mr-3 mt-1">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <div>
+              <p class="text-sm font-medium">{{ activity.message }}</p>
+              <p class="text-xs text-gray-500">{{ activity.time }}</p>
+            </div>
+          </div>
+          {% endfor %}
+        {% else %}
+          <div class="flex items-start p-3 bg-gray-50 rounded-lg">
+            <div class="rounded-full bg-blue-100 p-2 mr-3 mt-1">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <div>
+              <p class="text-sm font-medium">No recent activity</p>
+              <p class="text-xs text-gray-500">Your activity will appear here</p>
+            </div>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </section>
+
+  <!-- My Mentees Section -->
+  <section id="mymentees" class="hidden p-6 bg-white rounded-xl shadow-sm">
+    <div class="mb-6">
+      <h2 class="text-xl font-semibold text-gray-800 mb-2">My Mentees</h2>
+      <p class="text-gray-600">Manage your current mentorship relationships</p>
+    </div>
+    
+    {% if my_mentees and my_mentees|length > 0 %}
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      {% for mentee in my_mentees %}
+      <div class="bg-white rounded-xl border border-gray-200 p-5 transition-all hover:shadow-md">
+        <div class="flex items-center gap-4 mb-4">
+          {% if mentee.profile_picture %}
+            <img src="{{ url_for('static', filename='uploads/' ~ mentee.profile_picture) }}" 
+                 alt="{{ mentee.user.name }}" 
+                 class="w-16 h-16 rounded-full object-cover border-2 border-white shadow">
+          {% else %}
+            <div class="w-16 h-16 rounded-full bg-gradient-to-br from-blue-100 to-blue-200 flex items-center justify-center text-blue-600 border-2 border-white shadow">
+              <span class="text-xl font-semibold">{{ mentee.user.name[0] if mentee.user.name else '?' }}</span>
+            </div>
+          {% endif %}
+          <div>
+            <h3 class="text-lg font-bold text-gray-800">{{ mentee.user.name }}</h3>
+            <p class="text-sm text-gray-600">{{ mentee.stream }} at {{ mentee.school_college_name }}</p>
+          </div>
+        </div>
+        
+        <div class="space-y-2 mb-4">
+          <div class="flex items-center text-sm text-gray-600">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <span>Next session: {{ mentee.next_session if mentee.next_session else 'Not scheduled' }}</span>
+          </div>
+          
+          <div class="flex items-center text-sm text-gray-600">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <span>Goal: {{ mentee.goal if mentee.goal else 'Not specified' }}</span>
+          </div>
+        </div>
+        
+        <div class="flex space-x-2">
+          <button class="flex-1 px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition">
+            Message
+          </button>
+          <button class="px-4 py-2 bg-white border border-gray-300 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-50 transition">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
+            </svg>
+          </button>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}
+    <div class="text-center py-12">
+      <div class="mx-auto w-24 h-24 rounded-full bg-gray-100 flex items-center justify-center mb-4">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+        </svg>
+      </div>
+      <h3 class="text-lg font-medium text-gray-900 mb-1">No mentees yet</h3>
+      <p class="text-gray-500 mb-6">You haven't connected with any mentees yet.</p>
+    </div>
+    {% endif %}
+  </section>
+
+  <!-- Meeting Requests Section -->
+  <section id="meetingrequests" class="hidden p-6 bg-white rounded-xl shadow-sm">
+    <div class="mb-6">
+      <h2 class="text-xl font-semibold text-gray-800 mb-2">Meeting Requests</h2>
+      <p class="text-gray-600">Review and manage meeting requests from mentees</p>
+    </div>
+    
+    {% if meeting_requests and meeting_requests|length > 0 %}
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      {% for request in meeting_requests %}
+      <div class="bg-white rounded-xl border border-gray-200 p-5 transition-all hover:shadow-md">
+        <div class="flex items-center gap-4 mb-4">
+          {% if request.mentee_profile_picture %}
+            <img src="{{ url_for('static', filename='uploads/' ~ request.mentee_profile_picture) }}" 
+                 alt="{{ request.mentee_name }}" 
+                 class="w-16 h-16 rounded-full object-cover border-2 border-white shadow">
+          {% else %}
+            <div class="w-16 h-16 rounded-full bg-gradient-to-br from-blue-100 to-blue-200 flex items-center justify-center text-blue-600 border-2 border-white shadow">
+              <span class="text-xl font-semibold">{{ request.mentee_name[0] if request.mentee_name else '?' }}</span>
+            </div>
+          {% endif %}
+          <div>
+            <h3 class="text-lg font-bold text-gray-800">{{ request.mentee_name }}</h3>
+            <p class="text-sm text-gray-600">{{ request.mentee_stream }} at {{ request.mentee_school }}</p>
+          </div>
+        </div>
+        
+        <div class="space-y-2 mb-4">
+          <div class="flex items-center text-sm text-gray-600">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>
+            <span>{{ request.date }} at {{ request.time }}</span>
+          </div>
+          
+          <div class="text-sm text-gray-600">
+            <p class="font-medium">Message:</p>
+            <p class="mt-1">{{ request.message }}</p>
+          </div>
+        </div>
+        
+        <div class="flex space-x-2">
+          <button class="flex-1 px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-lg hover:bg-green-700 transition">
+            Accept
+          </button>
+          <button class="flex-1 px-4 py-2 bg-red-600 text-white text-sm font-medium rounded-lg hover:bg-red-700 transition">
+            Decline
+          </button>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}
+    <div class="text-center py-12">
+      <div class="mx-auto w-24 h-24 rounded-full bg-gray-100 flex items-center justify-center mb-4">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+        </svg>
+      </div>
+      <h3 class="text-lg font-medium text-gray-900 mb-1">No meeting requests</h3>
+      <p class="text-gray-500">You don't have any pending meeting requests.</p>
+    </div>
+    {% endif %}
+  </section>
+
+  <!-- Find Mentees Section -->
+  <section id="findmentees" class="hidden bg-white rounded-xl shadow-sm overflow-hidden">
+    <div class="p-6 border-b border-gray-200">
+      <h2 class="text-xl font-semibold text-gray-800 mb-2">Find Mentees</h2>
+      <p class="text-gray-600">Browse and connect with potential mentees</p>
+    </div>
+    
+    <div class="p-6 bg-gray-50 border-b border-gray-200">
+      <!-- Search Input -->
+      <input type="text" id="findMenteeSearch" placeholder="Search mentees by name, stream, school..."
+             class="w-full p-3 mb-4 border border-gray-300 rounded-lg"
+             onkeyup="filterMentees()">
+      
+      <!-- Filters -->
+      <form method="GET" action="">
+        <div class="flex flex-wrap items-center gap-3">
+          <!-- Stream -->
+          <div class="relative">
+            <select name="stream" class="appearance-none pl-4 pr-10 py-2 border rounded-full text-gray-700 bg-white">
+              <option value="" {% if not request.args.get('stream') %}selected{% endif %}>All Streams</option>
+              {% for stream in streams %}
+              <option value="{{ stream }}" {% if request.args.get('stream') == stream %}selected{% endif %}>
+                {{ stream }}
+              </option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <!-- School -->
+          <div class="relative">
+            <select name="school" class="appearance-none pl-4 pr-10 py-2 border rounded-full text-gray-700 bg-white">
+              <option value="" {% if not request.args.get('school') %}selected{% endif %}>All Schools</option>
+              {% for school in schools %}
+              <option value="{{ school }}" {% if request.args.get('school') == school %}selected{% endif %}>
+                {{ school }}
+              </option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <!-- Goal -->
+          <div class="relative">
+            <select name="goal" class="appearance-none pl-4 pr-10 py-2 border rounded-full text-gray-700 bg-white">
+              <option value="" {% if not request.args.get('goal') %}selected{% endif %}>All Goals</option>
+              {% for goal in goals %}
+              <option value="{{ goal }}" {% if request.args.get('goal') == goal %}selected{% endif %}>
+                {{ goal }}
+              </option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <!-- Search Button -->
+          <button type="submit" class="px-5 py-2 rounded-full bg-blue-600 text-white font-medium">
+            Search
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Mentees Grid -->
+    <div class="p-6">
+      {% if all_mentees and all_mentees|length > 0 %}
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="menteesContainer">
+        {% for mentee in all_mentees %}
+        <div class="mentee-card bg-white rounded-xl border border-gray-200 p-5 transition-all hover:shadow-md">
+          <div class="flex items-center gap-4 mb-4">
+            {% if mentee.profile_picture %}
+              <img src="{{ url_for('static', filename='uploads/' ~ mentee.profile_picture) }}" 
+                   alt="{{ mentee.user.name }}" 
+                   class="w-16 h-16 rounded-full object-cover border-2 border-white shadow">
+            {% else %}
+              <div class="w-16 h-16 rounded-full bg-gradient-to-br from-blue-100 to-blue-200 flex items-center justify-center text-blue-600 border-2 border-white shadow">
+                <span class="text-xl font-semibold">{{ mentee.user.name[0] if mentee.user.name else '?' }}</span>
+              </div>
+            {% endif %}
+            <div>
+              <h3 class="text-lg font-bold text-gray-800 mentee-name">{{ mentee.user.name }}</h3>
+              <p class="text-sm text-gray-600 mentee-stream">{{ mentee.stream }} at {{ mentee.school_college_name }}</p>
+            </div>
+          </div>
+          
+          <div class="space-y-2 mb-4">
+            <div class="flex items-center text-sm text-gray-600 mentee-school">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+              </svg>
+              <span>{{ mentee.school_college_name if mentee.school_college_name else 'Not specified' }}</span>
+            </div>
+            
+            <div class="flex items-center text-sm text-gray-600">
+              <svg xmlns="http://www.w3.org/2000/svg" 
+                   class="h-4 w-4 mr-2 text-gray-500" 
+                   fill="none" viewBox="0 0 24 24" 
+                   stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                      d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+              </svg>
+              <span>Goal: {{ mentee.goal if mentee.goal else 'Not specified' }}</span>
+            </div>
+          </div>
+          
+          <button class="w-full px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition">
+            Connect with Mentee
+          </button>
+        </div>
+        {% endfor %}
+      </div>
+      {% else %}
+      <div class="text-center py-12">
+        <div class="mx-auto w-24 h-24 rounded-full bg-gray-100 flex items-center justify-center mb-4">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+          </svg>
+        </div>
+        <h3 class="text-lg font-medium text-gray-900 mb-1">No mentees available</h3>
+        <p class="text-gray-500">Check back later for new mentee opportunities.</p>
+      </div>
+      {% endif %}
+    </div>
+  </section>
+</main>
+
 <script>
-
-  function filterFindMentees() {
-    const input = document.getElementById('findMenteeSearch').value.toLowerCase();
-    ducument.querySelectorAll('.find-mentee-card').forEach(card => {
-      const name = card.querySelector('.find-mentee-name').innerText.toLowerCase();
-      const profession = card.querySelector('.find-mentee-profession').innerText.toLowerCase();
-      const location = card.querySelector('.find-mentee-location').innerText.toLowerCase();
-      const email = card.querySelector('.find-mentee-email').innerText.toLowerCase();
-      card.style.display = (name.includes(input) || profession.includes(input) || location.includes(input) || email.includes(input))
-             ? '' : 'none';
-
-     
-      });
-    }
+function showSection(id) {
+  // Hide all sections
+  document.querySelectorAll("section").forEach(sec => sec.classList.add("hidden"));
   
+  // Show selected section
+  document.getElementById(id).classList.remove("hidden");
+  
+  // Update active navigation button
+  document.querySelectorAll('.nav-btn').forEach(btn => {
+    btn.classList.remove('active');
+  });
+  
+  // Find the button that corresponds to this section and activate it
+  const buttons = document.querySelectorAll('.nav-btn');
+  buttons.forEach(btn => {
+    if (btn.textContent.trim() === 'Overview' && id === 'dashboard') {
+      btn.classList.add('active');
+    } else if (btn.textContent.trim() === 'My Mentees' && id === 'mymentees') {
+      btn.classList.add('active');
+    } else if (btn.textContent.trim() === 'Meeting Requests' && id === 'meetingrequests') {
+      btn.classList.add('active');
+    } else if (btn.textContent.trim() === 'Find Mentees' && id === 'findmentees') {
+      btn.classList.add('active');
+    }
+  });
+}
 
-  function showSection(section) {
-    // Hide all
-    document.querySelectorAll('[id^="section-"]').forEach(el => el.classList.add('hidden'));
 
-    // Show selected
-    document.getElementById('section-' + section).classList.remove('hidden');
-  }
+// ✅ Auto-open correct section using Jinja-injected variable
+document.addEventListener("DOMContentLoaded", function() {
+  var activeSection = "{{ active_section|default('dashboard') }}";
+  showSection(activeSection);
+});
 
-  // default open Dashboard
-  showSection('dashboard');
+function filterMentees() {
+  const input = document.getElementById('findMenteeSearch').value.toLowerCase();
+  const menteeCards = document.querySelectorAll('.mentee-card');
+  
+  menteeCards.forEach(card => {
+    const name = card.querySelector('.mentee-name').textContent.toLowerCase();
+    const stream = card.querySelector('.mentee-stream').textContent.toLowerCase();
+    const school = card.querySelector('.mentee-school').textContent.toLowerCase();
+    
+    if (name.includes(input) || stream.includes(input) || school.includes(input)) {
+      card.style.display = 'block';
+    } else {
+      card.style.display = 'none';
+    }
+  });
+}
 </script>
+
 {% endblock %}
