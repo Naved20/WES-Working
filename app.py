@@ -1,11 +1,15 @@
-from flask import Flask, redirect, url_for, render_template, request, session, flash
+from flask import Flask, redirect, url_for, render_template, request, session, flash, jsonify
 from datetime import timedelta
 from flask_sqlalchemy import SQLAlchemy
+from flask_login import UserMixin, login_user, LoginManager, login_required, logout_user, current_user
 from sqlalchemy import cast, Integer
 from werkzeug.security import generate_password_hash, check_password_hash
 import os
 from werkzeug.utils import secure_filename
 from datetime import datetime
+from functools import wraps
+
+
 
 
 app = Flask(__name__)
@@ -23,6 +27,17 @@ os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+
+
+login_manager = LoginManager()
+login_manager.init_app(app)
+login_manager.login_view = "signin" 
+
+# --- User Loader ---
+@login_manager.user_loader
+def load_user(user_id):
+    return User.query.get(int(user_id))
 
 
 #--------------User_type Code------------------------
@@ -51,6 +66,16 @@ from flask_migrate import Migrate
 migrate = Migrate(app, db)
 
 
+
+
+def mentor_login_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if session.get("user_type") != "1":
+            flash("Please login as mentor first!", "error")
+            return redirect(url_for("signin"))
+        return f(*args, **kwargs)
+    return decorated_function
 
 
 
@@ -150,6 +175,63 @@ class SupervisorProfile(db.Model):
     user = db.relationship("User", backref="supervisor_profile", uselist=False)
 
 
+# -----------get mentee deatls for mentor when request comes----------------
+@app.route("/get_mentee_details/<int:request_id>", methods=["GET"])
+@login_required
+def get_mentee_details(request_id):
+    # Ensure the logged-in user is a mentor and the request is for them
+    if session.get("user_type") != "1":
+        return jsonify({"error": "Unauthorized access."}), 403
+
+    # Fetch the mentorship request
+    mentorship_request = MentorshipRequest.query.get(request_id)
+    if not mentorship_request:
+        return jsonify({"error": "Request not found."}), 404
+
+    # Fetch mentee's details using the relationships
+    mentee_user = mentorship_request.mentee.user
+    mentee_profile = mentorship_request.mentee.mentee_profile
+
+    if not mentee_user or not mentee_profile:
+        return jsonify({"error": "Mentee details not found."}), 404
+
+    # Construct the data to be returned as JSON
+    mentee_data = {
+        "name": mentee_user.name,
+        "email": mentee_user.email,
+        "stream": mentee_profile.stream,
+        "school": mentee_profile.school_college_name,
+        "contact": mentee_profile.whatsapp_number,
+        "goal": mentee_profile.goal,
+        "purpose": mentorship_request.why_need_mentor
+    }
+
+    return jsonify(mentee_data)
+
+
+#------------------mentorship request table-------------------
+class MentorshipRequest(db.Model):
+    __tablename__ = "mentorship_requests"
+    id = db.Column(db.Integer, primary_key=True)
+    mentee_id = db.Column(db.Integer, db.ForeignKey("signup_details.id"), nullable=False)
+    mentor_id = db.Column(db.Integer, db.ForeignKey("signup_details.id"), nullable=False)
+    status = db.Column(db.String(20), default="pending") 
+    # Details from the form
+    meeting_time = db.Column(db.String(50), nullable=False)
+    timezone = db.Column(db.String(100))
+    meeting_type = db.Column(db.String(50)) # 'special' or 'anchor'
+    purpose_type = db.Column(db.String(50)) # 'long' or 'short'
+    why_need_mentor = db.Column(db.Text, nullable=False)
+    
+    # Request status tracking
+    mentor_status = db.Column(db.String(20), default="pending") # 'pending', 'accepted', 'rejected'
+    supervisor_status = db.Column(db.String(20), default="pending") # 'pending', 'approved', 'rejected'
+    
+    # Relationships for easy access
+    mentee = db.relationship("User", foreign_keys=[mentee_id], backref="sent_requests")
+    mentor = db.relationship("User", foreign_keys=[mentor_id], backref="received_requests")
+
+
 
 
 
@@ -245,6 +327,8 @@ def signin():
    
     return render_template("signin.html")
 
+
+
 # ------------------ DASHBOARDS ------------------
 @app.route("/mentordashboard")
 def mentordashboard():
@@ -252,24 +336,49 @@ def mentordashboard():
         # Fetch current mentor
         mentor = User.query.filter_by(email=session["email"]).first()
 
-        all_mentees = MenteeProfile.query.filter_by().all()
+        if not mentor:
+            flash("Mentor profile not found.", "error")
+            return redirect(url_for("signin"))
+
+        # ✅ Fetch incoming mentorship requests for this mentor
+        incoming_requests = MentorshipRequest.query.filter_by(
+            mentor_id=mentor.id
+        ).order_by(MentorshipRequest.id.desc()).all()
+
+        # Fetch all mentees
+        all_mentees = MenteeProfile.query.all()
 
         # Unique filter values from mentees
         streams = [row.stream for row in MenteeProfile.query.with_entities(MenteeProfile.stream).distinct() if row.stream]
         schools = [row.school_college_name for row in MenteeProfile.query.with_entities(MenteeProfile.school_college_name).distinct() if row.school_college_name]
         goals = [row.goal for row in MenteeProfile.query.with_entities(MenteeProfile.goal).distinct() if row.goal]
 
+        # Mentor profile info
+        mentor_info = {
+            "full_name": mentor.name,  # Use .name if that's your column
+            "username": mentor.email,
+            "date_time": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        }
+
         return render_template(
-            "mentordashboard.html",
+            "mentordashboard.html",   # ✅ use only one template name
             all_mentees=all_mentees,
             streams=streams,
             schools=schools,
             goals=goals,
+            incoming_requests=incoming_requests,
+            mentor_info=mentor_info,
             active_section="findmentees",
             show_sidebar=True
         )
 
     return redirect(url_for("signin"))
+
+
+
+
+
+
 
 
 @app.route("/menteedashboard")
@@ -317,9 +426,10 @@ def supervisordashboard():
         mentors = MentorProfile.query.all()
         mentees = MenteeProfile.query.all()
 
-        # Fetch pending requests
-        mentor_requests = MentorProfile.query.filter_by(status='pending').all()
-        mentee_requests = MenteeProfile.query.filter_by(status='pending').all()
+
+
+        # New: Fetch all pending mentorship requests
+        all_requests = MentorshipRequest.query.all()
 
         return render_template(
             "supervisordashboard.html",
@@ -327,8 +437,7 @@ def supervisordashboard():
             user_email=session["email"],
             mentors=mentors,
             mentees=mentees,
-            mentor_requests=mentor_requests,
-            mentee_requests=mentee_requests,
+            all_requests=all_requests,
             active_section="dashboard"
         )
     return redirect(url_for("signin"))
@@ -372,8 +481,6 @@ def find_mentor():
             query = query.filter(cast(MentorProfile.years_of_experience, Integer) >= 10)
 
     mentors = query.all()
-
-    # --- Always get full dropdown options from DB ---
     options = get_filter_options()
 
     return render_template(
@@ -386,7 +493,86 @@ def find_mentor():
         active_section="findmentor",
         show_sidebar=True
     )
+    
 
+
+# ------------------- HANDLE MENTORSHIP REQUEST ------------------
+@app.route("/request_mentorship", methods=["POST"])
+def request_mentorship():
+    if "email" not in session or session.get("user_type") != "2":
+        return jsonify({"success": False, "message": "Unauthorized"}), 401
+
+    try:
+        data = request.json
+        mentor_id = data.get("mentor_id")
+        meeting_time = data.get("meeting_time")
+        timezone = data.get("timezone")
+        meeting_type = data.get("meeting_type")
+        purpose_type = data.get("purpose_type")
+        why_need_mentor = data.get("why_need_mentor")
+
+        if not all([mentor_id, meeting_time, why_need_mentor]):
+            return jsonify({"success": False, "message": "Missing required fields"}), 400
+
+        mentee = User.query.filter_by(email=session["email"]).first()
+        
+        new_request = MentorshipRequest(
+            mentee_id=mentee.id,
+            mentor_id=mentor_id,
+            meeting_time=meeting_time,
+            timezone=timezone,
+            meeting_type=meeting_type,
+            purpose_type=purpose_type,
+            why_need_mentor=why_need_mentor
+        )
+        db.session.add(new_request)
+        db.session.commit()
+
+        return jsonify({"success": True, "message": "Mentorship request sent successfully!"}), 200
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"success": False, "message": str(e)}), 500
+
+
+@app.route("/mentor_response", methods=["POST"])
+def mentor_response():
+    # Get form data
+    request_id = request.form.get("request_id")
+    action = request.form.get("action")
+
+    if not request_id or not action:
+        flash("Invalid request!", "error")
+        return redirect(url_for("mentordashboard"))
+
+    # Fetch mentorship request
+    mentorship_request = MentorshipRequest.query.get(int(request_id))
+    if not mentorship_request:
+        flash("Request not found!", "error")
+        return redirect(url_for("mentordashboard"))
+
+    # Ensure mentor is logged in
+    mentor = None
+    if "email" in session and session.get("user_type") == "1":
+        mentor = User.query.filter_by(email=session["email"]).first()
+
+    if not mentor or mentorship_request.mentor_id != mentor.id:
+        flash("This is not your request or you are not logged in as mentor!", "error")
+        return redirect(url_for("mentordashboard"))
+
+    # Update status
+    mentorship_request.mentor_status = "accepted" if action == "accept" else "rejected"
+
+    try:
+        db.session.commit()
+        flash(f"Request {action}ed successfully!", "success")
+    except Exception as e:
+        db.session.rollback()
+        flash("Something went wrong while updating the request.", "error")
+        print("DB Commit Error:", e)
+
+    # Always redirect to mentor dashboard
+    return redirect(url_for("mentordashboard"))
 
 
 

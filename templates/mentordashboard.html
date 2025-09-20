@@ -204,70 +204,94 @@
     {% endif %}
   </section>
 
-  <!-- Meeting Requests Section -->
-  <section id="meetingrequests" class="hidden p-6 bg-white rounded-xl shadow-sm">
-    <div class="mb-6">
-      <h2 class="text-xl font-semibold text-gray-800 mb-2">Meeting Requests</h2>
-      <p class="text-gray-600">Review and manage meeting requests from mentees</p>
-    </div>
-    
-    {% if meeting_requests and meeting_requests|length > 0 %}
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      {% for request in meeting_requests %}
-      <div class="bg-white rounded-xl border border-gray-200 p-5 transition-all hover:shadow-md">
-        <div class="flex items-center gap-4 mb-4">
-          {% if request.mentee_profile_picture %}
-            <img src="{{ url_for('static', filename='uploads/' ~ request.mentee_profile_picture) }}" 
-                 alt="{{ request.mentee_name }}" 
-                 class="w-16 h-16 rounded-full object-cover border-2 border-white shadow">
-          {% else %}
-            <div class="w-16 h-16 rounded-full bg-gradient-to-br from-blue-100 to-blue-200 flex items-center justify-center text-blue-600 border-2 border-white shadow">
-              <span class="text-xl font-semibold">{{ request.mentee_name[0] if request.mentee_name else '?' }}</span>
-            </div>
-          {% endif %}
-          <div>
-            <h3 class="text-lg font-bold text-gray-800">{{ request.mentee_name }}</h3>
-            <p class="text-sm text-gray-600">{{ request.mentee_stream }} at {{ request.mentee_school }}</p>
-          </div>
-        </div>
+            <!-- mentorship request Section -->
+<section id="meetingrequests" class="p-6 bg-white rounded-xl shadow-sm">
+  <div class="mb-6">
+    <h2 class="text-2xl font-semibold text-gray-800 mb-2">Mentor connect request</h2>
+    <p class="text-gray-600">Review and manage Mentor connect requests from your mentees</p>
+  </div>
+
+  {% if incoming_requests and incoming_requests|length > 0 %}
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    {% for request in incoming_requests %}
+    <div class="bg-white rounded-xl border border-gray-200 p-5 transition-all hover:shadow-lg">
+      
+      <!-- Mentee Info -->
+      <div class="flex items-center gap-4 mb-4">
         
-        <div class="space-y-2 mb-4">
-          <div class="flex items-center text-sm text-gray-600">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        {% if request.mentee.mentee_profile.profile_picture %}
+        <img src="{{ url_for('static', filename='uploads/' ~ request.mentee.mentee_profile.profile_picture) }}" 
+             alt="{{ request.mentee.name }}" 
+             class="w-16 h-16 rounded-full object-cover border-2 border-white shadow">
+        {% else %}
+        <div class="w-16 h-16 rounded-full bg-gradient-to-br from-blue-100 to-blue-200 flex items-center justify-center text-blue-600 border-2 border-white shadow">
+          <span class="text-xl font-semibold">{{ request.mentee.name[0] if request.mentee.name else '?' }}</span>
+        </div>
+        {% endif %}
+
+        <div class="flex flex-col">
+          <p class="font-semibold text-gray-800">{{ request.mentee.name or 'Unnamed' }}</p>
+          <p class="text-sm text-gray-500">{{ request.mentee.email or '' }}</p>
+        </div>
+      </div>
+
+      <!-- Meeting Details -->
+      <div class="space-y-2 mb-4">
+        <div class="flex items-center text-sm text-gray-600">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+          </svg>
+          <span>Time: {{ request.meeting_time or 'Not specified' }}</span>
+        </div>
+
+        <div class="text-sm text-gray-600">
+          <p class="font-medium">Purpose:</p>
+          <p class="mt-1">{{ request.why_need_mentor or 'No purpose provided' }}</p>
+        </div>
+      </div>
+
+ <!-- Action Buttons -->
+<div class="flex gap-5">
+
+  <!-- Accept Button -->
+<form action="{{ url_for('mentor_response') }}" method="POST" class="flex-1">
+  <input type="hidden" name="request_id" value="{{ request.id }}">
+  <input type="hidden" name="action" value="accept">
+  <button type="submit" class="w-full px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-lg hover:bg-green-700 transition">
+    Accept
+  </button>
+</form>
+
+<!-- Decline Button -->
+<form action="{{ url_for('mentor_response') }}" method="POST" class="flex-1">
+  <input type="hidden" name="request_id" value="{{ request.id }}">
+  <input type="hidden" name="action" value="decline">
+  <button type="submit" class="w-full px-4 py-2 bg-red-600 text-white text-sm font-medium rounded-lg hover:bg-red-700 transition">
+    Decline
+  </button>
+</form>
+
+
+     </div>
+      
+
+          </div>
+          {% endfor %}
+        </div>
+      
+        {% else %}
+        <div class="text-center py-12">
+          <div class="mx-auto w-24 h-24 rounded-full bg-gray-100 flex items-center justify-center mb-4">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
             </svg>
-            <span>{{ request.date }} at {{ request.time }}</span>
           </div>
-          
-          <div class="text-sm text-gray-600">
-            <p class="font-medium">Message:</p>
-            <p class="mt-1">{{ request.message }}</p>
-          </div>
+          <h3 class="text-lg font-medium text-gray-900 mb-1">No meeting requests</h3>
+          <p class="text-gray-500">You don't have any pending meeting requests.</p>
         </div>
-        
-        <div class="flex space-x-2">
-          <button class="flex-1 px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-lg hover:bg-green-700 transition">
-            Accept
-          </button>
-          <button class="flex-1 px-4 py-2 bg-red-600 text-white text-sm font-medium rounded-lg hover:bg-red-700 transition">
-            Decline
-          </button>
-        </div>
-      </div>
-      {% endfor %}
-    </div>
-    {% else %}
-    <div class="text-center py-12">
-      <div class="mx-auto w-24 h-24 rounded-full bg-gray-100 flex items-center justify-center mb-4">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-        </svg>
-      </div>
-      <h3 class="text-lg font-medium text-gray-900 mb-1">No meeting requests</h3>
-      <p class="text-gray-500">You don't have any pending meeting requests.</p>
-    </div>
-    {% endif %}
-  </section>
+        {% endif %}
+      </section>
+
 
   <!-- Find Mentees Section -->
   <section id="findmentees" class="hidden bg-white rounded-xl shadow-sm overflow-hidden">
@@ -443,6 +467,37 @@ function filterMentees() {
     }
   });
 }
+
+
+document.querySelectorAll('.btn-accept').forEach(btn => {
+    btn.addEventListener('click', async () => {
+        const requestId = btn.dataset.id;
+        const res = await fetch("/mentor_response", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ request_id: requestId, action: "accept" })
+        });
+        const data = await res.json();
+        alert(data.message);
+        location.reload();
+    });
+});
+
+document.querySelectorAll('.btn-decline').forEach(btn => {
+    btn.addEventListener('click', async () => {
+        const requestId = btn.dataset.id;
+        const res = await fetch("/mentor_response", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ request_id: requestId, action: "decline" })
+        });
+        const data = await res.json();
+        alert(data.message);
+        location.reload();
+    });
+});
+
+
 </script>
 
 {% endblock %}

@@ -340,29 +340,24 @@
           </div>
           
           <div class="flex space-x-2">
-            <form method="POST" action="">
-              <button type="submit" class="flex-1 px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition">
+              <button type="submit" onclick="openRequestModal('{{ mentor.user_id }}')" class="flex-1 px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition">
                 Request Mentorship
               </button>
-            </form>
             <button onclick="openProfileModal(
-                  '{{ mentor.user.name }}',
-                  '{{ mentor.profession }}',
-                  '{{ mentor.organisation }}',
-                  '{{ mentor.location }}',
-                  '{{ mentor.years_of_experience }}',
-                  '{{ mentor.profile_picture }}',
-                  '{{ mentor.user.email }}',
-                  '{{ mentor.education }}',
-                  '{{ mentor.language }}',
-                  '{{ mentor.preferred_communication }}',
-                  '{{ mentor.social_link }}',
-                  '{{ mentor.why_mentor }}'
-                                             )" 
-                     class="flex-1 px-4 py-2 bg-gray-100 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-200 transition">
-                      View Profile
+                '{{ mentor.user.name }}',
+                '{{ mentor.profession }}',
+                '{{ mentor.organisation }}',
+                '{{ mentor.location }}',
+                '{{ mentor.years_of_experience }}',
+                '{{ mentor.profile_picture }}',
+                '{{ mentor.user.email }}',
+                '{{ mentor.education }}',
+                '{{ mentor.language }}',
+                '{{ mentor.preferred_communication }}',
+                '{{ mentor.why_mentor }}'
+            )" class="flex-1 px-4 py-2 bg-gray-100 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-200 transition">
+                View Profile
             </button>
-
          </div>
 
           
@@ -385,8 +380,7 @@
 
 
 
-      <!-- Profile Modal -->
-<!-- Profile Modal -->
+                          <!-- Profile Modal -->
 <div id="profileModal" class="fixed inset-0 hidden bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
   <div class="bg-white rounded-2xl shadow-xl w-full max-w-3xl max-h-[90vh] overflow-y-auto relative">
     
@@ -504,15 +498,75 @@
       <!-- Footer Buttons -->
       <div class="flex flex-col sm:flex-row justify-end gap-3 pt-4 border-t border-gray-100">
         <button onclick="closeProfileModal()" class="px-5 py-2.5 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors duration-200 font-medium">Close</button>
-        <button class="px-5 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200 font-medium shadow-sm flex items-center justify-center">
-          <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path>
-          </svg>
-          Request Mentorship
-        </button>
+
       </div>
     </div>
   </div>
+</div>
+
+
+                           <!-- form for request mentors -->
+
+
+<div id="requestModal" class="fixed inset-0 hidden bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+    <div class="bg-white rounded-2xl shadow-xl w-full max-w-lg relative">
+        <div class="p-8">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6">Request Mentorship</h2>
+            <form id="mentorshipRequestForm" class="space-y-4">
+                <input type="hidden" id="mentorIdInput" name="mentor_id">
+                
+                <div>
+                    <label for="meeting_time" class="block text-sm font-medium text-gray-700">Preferred Meeting Time</label>
+                    <input type="datetime-local" id="meeting_time" name="meeting_time" required
+                           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                </div>
+                
+                <div>
+                    <label for="timezone" class="block text-sm font-medium text-gray-700">Time Zone</label>
+                    <select id="timezone" name="timezone" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                        <option value="UTC">UTC</option>
+                        <option value="IST">IST (Indian Standard Time)</option>
+                        <option value="EST">EST (Eastern Standard Time)</option>
+                        <option value="PST">PST (Pacific Standard Time)</option>
+                    </select>
+                </div>
+
+                <div class="flex space-x-4">
+                    <div class="flex-1">
+                        <label for="meeting_type" class="block text-sm font-medium text-gray-700">Meeting Type</label>
+                        <select id="meeting_type" name="meeting_type" required
+                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                            <option value="special">Special</option>
+                            <option value="anchor">Anchor</option>
+                        </select>
+                    </div>
+                    <div class="flex-1">
+                        <label for="purpose_type" class="block text-sm font-medium text-gray-700">Purpose</label>
+                        <select id="purpose_type" name="purpose_type" required
+                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                            <option value="long">Long-term</option>
+                            <option value="short">Short-term</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div>
+                    <label for="why_need_mentor" class="block text-sm font-medium text-gray-700">Why do you need this mentor?</label>
+                    <textarea id="why_need_mentor" name="why_need_mentor" rows="4" required
+                              class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"></textarea>
+                </div>
+                
+                <div class="flex justify-end space-x-4 mt-6">
+                    <button type="button" onclick="closeRequestModal()" class="px-4 py-2 text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition">
+                        Cancel
+                    </button>
+                    <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
+                        Send Request
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
 </div>
 
 
@@ -569,36 +623,85 @@ function filterMentors() {
 
 
 
-function openProfileModal(name, profession, organisation, location, experience, profilePic, email, whatsapp, education, language, availability, frequency, communication, socialLink, whyMentor) {
-  document.getElementById('modalName').innerText = name;
-  document.getElementById('modalProfession').innerText = profession || "Not specified";
-  document.getElementById('modalOrganisation').innerText = organisation || "Not specified";
-  document.getElementById('modalLocation').innerText = location || "Not specified";
-  document.getElementById('modalExperience').innerText = experience || "Not specified";
+function openProfileModal(name, profession, organisation, location, experience, profilePic, email, education, language, communication, whyMentor) {
+    document.getElementById('modalName').innerText = name;
+    document.getElementById('modalProfession').innerText = profession || "Not specified";
+    document.getElementById('modalOrganisation').innerText = organisation || "Not specified";
+    document.getElementById('modalLocation').innerText = location || "Not specified";
+    document.getElementById('modalExperience').innerText = experience || "Not specified";
+    document.getElementById('modalEmail').innerText = email || "Not specified";
+    document.getElementById('modalEducation').innerText = education || "Not specified";
+    document.getElementById('modalLanguage').innerText = language || "Not specified";
+    document.getElementById('modalCommunication').innerText = communication || "Not specified";
+    document.getElementById('modalWhyMentor').innerText = whyMentor || "Not specified";
 
-  document.getElementById('modalEmail').innerText = email || "Not specified";
-  document.getElementById('modalEducation').innerText = education || "Not specified";
-  document.getElementById('modalLanguage').innerText = language || "Not specified";
-  document.getElementById('modalCommunication').innerText = communication || "Not specified";
+    // Profile picture logic
+    if (profilePic) {
+        document.getElementById('modalProfilePic').src = "/static/uploads/" + profilePic;
+    } else {
+        document.getElementById('modalProfilePic').src = "https://via.placeholder.com/100";
+    }
 
- 
-
-  document.getElementById('modalWhyMentor').innerText = whyMentor || "Not specified";
-
-  // Profile picture
-  if (profilePic) {
-    document.getElementById('modalProfilePic').src = "/static/uploads/" + profilePic;
-  } else {
-    document.getElementById('modalProfilePic').src = "https://via.placeholder.com/100";
-  }
-
-  document.getElementById('profileModal').classList.remove('hidden');
+    document.getElementById('profileModal').classList.remove('hidden');
 }
+
+function closeProfileModal() {
+    document.getElementById('profileModal').classList.add('hidden');
+}
+
 
 function closeProfileModal() {
   document.getElementById('profileModal').classList.add('hidden');
 }
 
+
+
+
+// menteedashboard.html
+// ... (after your existing script functions) ...
+
+function openRequestModal(mentorId) {
+    document.getElementById('mentorIdInput').value = mentorId;
+    document.getElementById('requestModal').classList.remove('hidden');
+}
+
+function closeRequestModal() {
+    document.getElementById('requestModal').classList.add('hidden');
+    document.getElementById('mentorshipRequestForm').reset(); // Reset form fields
+}
+
+// Handle the form submission with AJAX
+document.getElementById('mentorshipRequestForm').addEventListener('submit', function(e) {
+    e.preventDefault(); // Prevent default form submission
+
+    const form = e.target;
+    const formData = new FormData(form);
+    const jsonData = {};
+    formData.forEach((value, key) => {
+        jsonData[key] = value;
+    });
+
+    fetch('/request_mentorship', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(jsonData),
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert(data.message); // Show success message
+            closeRequestModal();
+        } else {
+            alert('Error: ' + data.message); // Show error message
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('An error occurred while sending the request.');
+    });
+});
 
 </script>
 
