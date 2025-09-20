@@ -8,6 +8,8 @@ import os
 from werkzeug.utils import secure_filename
 from datetime import datetime
 from functools import wraps
+from sqlalchemy import or_
+
 
 
 
@@ -226,6 +228,8 @@ class MentorshipRequest(db.Model):
     # Request status tracking
     mentor_status = db.Column(db.String(20), default="pending") # 'pending', 'accepted', 'rejected'
     supervisor_status = db.Column(db.String(20), default="pending") # 'pending', 'approved', 'rejected'
+    final_status = db.Column(db.String(20), default="pending") # 'pending', 'approved', 'rejected'
+
     
     # Relationships for easy access
     mentee = db.relationship("User", foreign_keys=[mentee_id], backref="sent_requests")
@@ -340,7 +344,7 @@ def mentordashboard():
             flash("Mentor profile not found.", "error")
             return redirect(url_for("signin"))
 
-        # ✅ Fetch incoming mentorship requests for this mentor
+        # Fetch incoming mentorship requests for this mentor
         incoming_requests = MentorshipRequest.query.filter_by(
             mentor_id=mentor.id
         ).order_by(MentorshipRequest.id.desc()).all()
@@ -352,6 +356,12 @@ def mentordashboard():
         streams = [row.stream for row in MenteeProfile.query.with_entities(MenteeProfile.stream).distinct() if row.stream]
         schools = [row.school_college_name for row in MenteeProfile.query.with_entities(MenteeProfile.school_college_name).distinct() if row.school_college_name]
         goals = [row.goal for row in MenteeProfile.query.with_entities(MenteeProfile.goal).distinct() if row.goal]
+
+        # Get a specific mentee for the profile section (if needed)
+        # For example, get the first mentee from the requests if available
+        example_mentee = None
+        if incoming_requests and incoming_requests[0].mentee:
+            example_mentee = incoming_requests[0].mentee
 
         # Mentor profile info
         mentor_info = {
@@ -369,17 +379,11 @@ def mentordashboard():
             incoming_requests=incoming_requests,
             mentor_info=mentor_info,
             active_section="findmentees",
-            show_sidebar=True
+            show_sidebar=True,
+            mentee=example_mentee  # Pass the mentee variable to the template
         )
 
     return redirect(url_for("signin"))
-
-
-
-
-
-
-
 
 @app.route("/menteedashboard")
 def menteedashboard():
@@ -426,10 +430,12 @@ def supervisordashboard():
         mentors = MentorProfile.query.all()
         mentees = MenteeProfile.query.all()
 
-
-
-        # New: Fetch all pending mentorship requests
+        # Fetch all mentorship requests
         all_requests = MentorshipRequest.query.all()
+        
+        # Fetch pending mentor and mentee profile approvals
+        mentor_requests = MentorProfile.query.filter_by(status="pending").all()
+        mentee_requests = MenteeProfile.query.filter_by(status="pending").all()
 
         return render_template(
             "supervisordashboard.html",
@@ -438,21 +444,12 @@ def supervisordashboard():
             mentors=mentors,
             mentees=mentees,
             all_requests=all_requests,
+            mentor_requests=mentor_requests,
+            mentee_requests=mentee_requests,
             active_section="dashboard"
         )
     return redirect(url_for("signin"))
 
-
-
-
-
-def get_filter_options():
-    return {
-        "professions": sorted({row.profession for row in MentorProfile.query.with_entities(MentorProfile.profession).distinct() if row.profession}),
-        "locations": sorted({row.location for row in MentorProfile.query.with_entities(MentorProfile.location).distinct() if row.location}),
-        "educations": sorted({row.education for row in MentorProfile.query.with_entities(MentorProfile.education).distinct() if row.education}),
-        "experiences": sorted({row.years_of_experience for row in MentorProfile.query.with_entities(MentorProfile.years_of_experience).distinct() if row.years_of_experience}),
-    }
 
 @app.route("/find_mentor", methods=["GET"])
 def find_mentor():
@@ -481,7 +478,14 @@ def find_mentor():
             query = query.filter(cast(MentorProfile.years_of_experience, Integer) >= 10)
 
     mentors = query.all()
-    options = get_filter_options()
+    
+    # Get filter options directly instead of calling the function
+    options = {
+        "professions": sorted({row.profession for row in MentorProfile.query.with_entities(MentorProfile.profession).distinct() if row.profession}),
+        "locations": sorted({row.location for row in MentorProfile.query.with_entities(MentorProfile.location).distinct() if row.location}),
+        "educations": sorted({row.education for row in MentorProfile.query.with_entities(MentorProfile.education).distinct() if row.education}),
+        "experiences": sorted({row.years_of_experience for row in MentorProfile.query.with_entities(MentorProfile.years_of_experience).distinct() if row.years_of_experience}),
+    }
 
     return render_template(
         "menteedashboard.html",
@@ -493,7 +497,6 @@ def find_mentor():
         active_section="findmentor",
         show_sidebar=True
     )
-    
 
 
 # ------------------- HANDLE MENTORSHIP REQUEST ------------------
@@ -573,6 +576,9 @@ def mentor_response():
 
     # Always redirect to mentor dashboard
     return redirect(url_for("mentordashboard"))
+
+
+
 
 
 
@@ -902,6 +908,95 @@ def supervisorprofile():
         additional_info=profile.additional_info if profile else "",
         profile_picture=profile.profile_picture if profile else None
     )
+
+
+# ------------------ APPROVE/REJECT MENTORSHIP REQUESTS ------------------
+@app.route("/supervisor_response", methods=["POST"])
+def supervisor_response():
+    if "email" not in session or session.get("user_type") != "0":
+        return jsonify({"success": False, "message": "Unauthorized"}), 401
+    
+    request_id = request.form.get("request_id")
+    action = request.form.get("action")
+    
+    if not request_id or not action:
+        flash("Invalid request!", "error")
+        return redirect(url_for("supervisordashboard"))
+    
+    # Fetch mentorship request
+    mentorship_request = MentorshipRequest.query.get(int(request_id))
+    if not mentorship_request:
+        flash("Request not found!", "error")
+        return redirect(url_for("supervisordashboard"))
+    
+    # Update status based on action
+    if action == "approve":
+        mentorship_request.supervisor_status = "approved"
+        mentorship_request.final_status = "approved"
+        flash("Mentorship request approved!", "success")
+    elif action == "reject":
+        mentorship_request.supervisor_status = "rejected"
+        mentorship_request.final_status = "rejected"
+        flash("Mentorship request rejected!", "success")
+    else:
+        flash("Invalid action!", "error")
+        return redirect(url_for("supervisordashboard"))
+    
+    try:
+        db.session.commit()
+    except Exception as e:
+        db.session.rollback()
+        flash("Something went wrong while updating the request.", "error")
+        print("DB Commit Error:", e)
+    
+    return redirect(url_for("supervisordashboard"))
+
+# ------------------ APPROVE/REJECT PROFILE REQUESTS ------------------
+@app.route("/approve_profile", methods=["POST"])
+def approve_profile():
+    if "email" not in session or session.get("user_type") != "0":
+        return jsonify({"success": False, "message": "Unauthorized"}), 401
+    
+    profile_type = request.form.get("profile_type")
+    profile_id = request.form.get("profile_id")
+    action = request.form.get("action")
+    
+    if not all([profile_type, profile_id, action]):
+        flash("Invalid request!", "error")
+        return redirect(url_for("supervisordashboard"))
+    
+    # Handle mentor profile approval/rejection
+    if profile_type == "mentor":
+        profile = MentorProfile.query.get(int(profile_id))
+    elif profile_type == "mentee":
+        profile = MenteeProfile.query.get(int(profile_id))
+    else:
+        flash("Invalid profile type!", "error")
+        return redirect(url_for("supervisordashboard"))
+    
+    if not profile:
+        flash("Profile not found!", "error")
+        return redirect(url_for("supervisordashboard"))
+    
+    # Update status based on action
+    if action == "approve":
+        profile.status = "approved"
+        flash(f"{profile_type.capitalize()} profile approved!", "success")
+    elif action == "reject":
+        profile.status = "rejected"
+        flash(f"{profile_type.capitalize()} profile rejected!", "success")
+    else:
+        flash("Invalid action!", "error")
+        return redirect(url_for("supervisordashboard"))
+    
+    try:
+        db.session.commit()
+    except Exception as e:
+        db.session.rollback()
+        flash("Something went wrong while updating the profile.", "error")
+        print("DB Commit Error:", e)
+    
+    return redirect(url_for("supervisordashboard"))
 
 
 

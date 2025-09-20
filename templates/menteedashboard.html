@@ -598,7 +598,7 @@ function showSection(id) {
   });
 }
 
-// ✅ Auto-open correct section using Jinja-injected variable
+//  Auto-open correct section using Jinja-injected variable
 document.addEventListener("DOMContentLoaded", function() {
   var activeSection = "{{ active_section|default('dashboard') }}";
   showSection(activeSection);
