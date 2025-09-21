@@ -248,7 +248,7 @@
         </div>
       </div>
 
-      <!-- Mentor Info -->
+                         <!-- Mentor Info -->
       <div class="flex items-center gap-4 mb-4">
         {% if request.mentor.mentor_profile and request.mentor.mentor_profile.profile_picture %}
         <img src="{{ url_for('static', filename='uploads/' ~ request.mentor.mentor_profile.profile_picture) }}" 

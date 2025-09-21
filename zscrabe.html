@@ -1,0 +1,628 @@
+<!-- this is woking code of mentor dashboard or find my mentee work kar raha hai and request nahi dikha rahi hai 
+  -->
+
+
+
+
+{% extends "base2.html" %}
+{% block title %}Mentor Dashboard{% endblock %}
+{% block user %}Mentor{% endblock %}
+
+{% block profiledrop %}{% endblock %}
+
+{% block content %}
+
+<style>
+  .nav-btn {
+    background: transparent;
+    color: #6b7280;
+  }
+  
+  .nav-btn.active, .nav-btn:hover {
+    background: white;
+    color: #111827;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  }
+</style>
+
+            <!-- Main Content Container -->
+  <main class="max-w-7xl mx-auto px-2 sm:px-3 lg:px-3 py-2">
+  
+            <!-- Dashboard Section -->
+  <section id="dashboard" class="p-6 bg-white rounded-xl shadow-sm">
+    <div class="mb-8">
+      <h2 class="text-xl font-semibold text-gray-800 mb-2">Welcome back!</h2>
+      <p class="text-gray-600">Here's your mentorship summary and upcoming sessions.</p>
+    </div>
+    
+    <!-- Stats Overview -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+      <div class="bg-blue-50 p-5 rounded-xl border border-blue-100">
+        <div class="flex items-center">
+          <div class="rounded-full bg-blue-100 p-3 mr-4">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+            </svg>
+          </div>
+          <div>
+            <p class="text-sm font-medium text-gray-500">Active Mentees</p>
+            <p class="text-2xl font-bold text-gray-800">{{ my_mentees|length if my_mentees else 0 }}</p>
+          </div>
+        </div>
+      </div>
+      
+      <div class="bg-green-50 p-5 rounded-xl border border-green-100">
+        <div class="flex items-center">
+          <div class="rounded-full bg-green-100 p-3 mr-4">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+            </svg>
+          </div>
+          <div>
+            <p class="text-sm font-medium text-gray-500">Completed Sessions</p>
+            <p class="text-2xl font-bold text-gray-800">{{ completed_sessions if completed_sessions else 0 }}</p>
+          </div>
+        </div>
+      </div>
+      
+      <div class="bg-purple-50 p-5 rounded-xl border border-purple-100">
+        <div class="flex items-center">
+          <div class="rounded-full bg-purple-100 p-3 mr-4">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>
+          </div>
+          <div>
+            <p class="text-sm font-medium text-gray-500">Upcoming Sessions</p>
+            <p class="text-2xl font-bold text-gray-800">{{ upcoming_sessions if upcoming_sessions else 0 }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Upcoming Sessions -->
+    <div class="mb-8">
+      <div class="flex justify-between items-center mb-4">
+        <h3 class="text-lg font-semibold text-gray-800">Upcoming Sessions</h3>
+        <a href="#" class="text-sm text-blue-600 hover:text-blue-800 font-medium">View all</a>
+      </div>
+      <div class="bg-gray-50 rounded-lg border border-gray-200 p-4">
+        {% if upcoming_sessions_list and upcoming_sessions_list|length > 0 %}
+          {% for session in upcoming_sessions_list %}
+          <div class="flex justify-between items-center py-3 border-b border-gray-200 last:border-b-0">
+            <div>
+              <p class="font-medium">{{ session.mentee_name }}</p>
+              <p class="text-sm text-gray-500">{{ session.date }} at {{ session.time }}</p>
+            </div>
+            <button class="px-3 py-1 bg-blue-100 text-blue-700 rounded-lg text-sm">Details</button>
+          </div>
+          {% endfor %}
+        {% else %}
+          <p class="text-gray-500 text-center py-4">No upcoming sessions scheduled</p>
+        {% endif %}
+      </div>
+    </div>
+    
+    <!-- Recent Activity -->
+    <div>
+      <div class="flex justify-between items-center mb-4">
+        <h3 class="text-lg font-semibold text-gray-800">Recent Activity</h3>
+        <a href="#" class="text-sm text-blue-600 hover:text-blue-800 font-medium">View all</a>
+      </div>
+      <div class="space-y-3">
+        {% if recent_activities and recent_activities|length > 0 %}
+          {% for activity in recent_activities %}
+          <div class="flex items-start p-3 bg-gray-50 rounded-lg">
+            <div class="rounded-full bg-blue-100 p-2 mr-3 mt-1">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <div>
+              <p class="text-sm font-medium">{{ activity.message }}</p>
+              <p class="text-xs text-gray-500">{{ activity.time }}</p>
+            </div>
+          </div>
+          {% endfor %}
+        {% else %}
+          <div class="flex items-start p-3 bg-gray-50 rounded-lg">
+            <div class="rounded-full bg-blue-100 p-2 mr-3 mt-1">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <div>
+              <p class="text-sm font-medium">No recent activity</p>
+              <p class="text-xs text-gray-500">Your activity will appear here</p>
+            </div>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </section>
+
+            <!-- My Mentees Section -->
+  <section id="mymentees" class="hidden p-6 bg-white rounded-xl shadow-sm">
+    <div class="mb-6">
+      <h2 class="text-xl font-semibold text-gray-800 mb-2">My Mentees</h2>
+      <p class="text-gray-600">Manage your current mentorship relationships</p>
+    </div>
+    
+    {% if my_mentees and my_mentees|length > 0 %}
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      {% for mentee in my_mentees %}
+      <div class="bg-white rounded-xl border border-gray-200 p-5 transition-all hover:shadow-md">
+        <div class="flex items-center gap-4 mb-4">
+          {% if mentee.profile_picture %}
+            <img src="{{ url_for('static', filename='uploads/' ~ mentee.profile_picture) }}" 
+                 alt="{{ mentee.user.name }}" 
+                 class="w-16 h-16 rounded-full object-cover border-2 border-white shadow">
+          {% else %}
+            <div class="w-16 h-16 rounded-full bg-gradient-to-br from-blue-100 to-blue-200 flex items-center justify-center text-blue-600 border-2 border-white shadow">
+              <span class="text-xl font-semibold">{{ mentee.user.name[0] if mentee.user.name else '?' }}</span>
+            </div>
+          {% endif %}
+          <div>
+            <h3 class="text-lg font-bold text-gray-800">{{ mentee.user.name }}</h3>
+            <p class="text-sm text-gray-600">{{ mentee.stream }} at {{ mentee.school_college_name }}</p>
+          </div>
+        </div>
+        
+        <div class="space-y-2 mb-4">
+          <div class="flex items-center text-sm text-gray-600">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <span>Next session: {{ mentee.next_session if mentee.next_session else 'Not scheduled' }}</span>
+          </div>
+          
+          <div class="flex items-center text-sm text-gray-600">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <span>Goal: {{ mentee.goal if mentee.goal else 'Not specified' }}</span>
+          </div>
+        </div>
+        
+        <div class="flex space-x-2">
+          <button class="flex-1 px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition">
+            Message
+          </button>
+          <button class="px-4 py-2 bg-white border border-gray-300 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-50 transition">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
+            </svg>
+          </button>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}
+    <div class="text-center py-12">
+      <div class="mx-auto w-24 h-24 rounded-full bg-gray-100 flex items-center justify-center mb-4">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+        </svg>
+      </div>
+      <h3 class="text-lg font-medium text-gray-900 mb-1">No mentees yet</h3>
+      <p class="text-gray-500 mb-6">You haven't connected with any mentees yet.</p>
+    </div>
+    {% endif %}
+  </section>
+
+            <!-- mentorship request Section -->
+<section id="meetingrequests" class="p-6 bg-white rounded-xl shadow-sm">
+  <div class="mb-6">
+    <h2 class="text-2xl font-semibold text-gray-800 mb-2">Mentor Connect Requests</h2>
+    <p class="text-gray-600">Review and manage mentorship requests from your mentees</p>
+  </div>
+
+  {% if incoming_requests and incoming_requests|length > 0 %}
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    {% for request in incoming_requests %}
+    <div class="relative bg-white rounded-xl border border-gray-200 p-5 transition-all hover:shadow-lg">
+
+                      <!-- Mentee Info -->
+      <div class="flex items-center gap-4 mb-4">
+        {% if request.mentee.mentee_profile and request.mentee.mentee_profile.profile_picture %}
+        <img src="{{ url_for('static', filename='uploads/' ~ request.mentee.mentee_profile.profile_picture) }}" 
+             alt="{{ request.mentee.name }}" 
+             class="w-16 h-16 rounded-full object-cover border-2 border-white shadow">
+        {% else %}
+        <div class="w-16 h-16 rounded-full bg-gradient-to-br from-blue-100 to-blue-200 flex items-center justify-center text-blue-600 border-2 border-white shadow">
+          <span class="text-xl font-semibold">{{ request.mentee.name[0] if request.mentee.name else '?' }}</span>
+        </div>
+        {% endif %}
+
+        <div class="flex flex-col">
+          <p class="font-semibold text-gray-800">{{ request.mentee.name or 'Unnamed' }}</p>
+          <p class="text-sm text-gray-500">{{ request.mentee.email or '' }}</p>
+        </div>
+      </div>
+
+      <!-- Meeting Details -->
+      <div class="space-y-2 mb-4">
+        <div class="flex items-center text-sm text-gray-600">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+          </svg>
+          <span>Time: {{ request.meeting_time or 'Not specified' }}</span>
+        </div>
+
+        <div class="text-sm text-gray-600">
+          <p class="font-medium">Purpose:</p>
+          <p class="mt-1">{{ request.why_need_mentor or 'No purpose provided' }}</p>
+        </div>
+
+        <div class="text-sm text-gray-600">
+          <p class="font-medium">Status:</p>
+          <p class="mt-1">
+            <span class="{% if request.mentor_status == 'accepted' %}text-green-600{% elif request.mentor_status == 'rejected' %}text-red-600{% else %}text-yellow-600{% endif %}">
+              {{ request.mentor_status|title }}
+            </span>
+          </p>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      {% if request.mentor_status == 'pending' %}
+      <div class="flex gap-5">
+        <!-- Accept Button -->
+        <form action="{{ url_for('mentor_response') }}" method="POST" class="flex-1">
+          <input type="hidden" name="request_id" value="{{ request.id }}">
+          <input type="hidden" name="action" value="accept">
+          <button type="submit" class="w-full px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-lg hover:bg-green-700 transition">
+            Accept
+          </button>
+        </form>
+
+        <!-- Decline Button -->
+        <form action="{{ url_for('mentor_response') }}" method="POST" class="flex-1">
+          <input type="hidden" name="request_id" value="{{ request.id }}">
+          <input type="hidden" name="action" value="decline">
+          <button type="submit" class="w-full px-4 py-2 bg-red-600 text-white text-sm font-medium rounded-lg hover:bg-red-700 transition">
+            Decline
+          </button>
+        </form>
+      </div>
+      {% else %}
+      <div class="text-center py-2">
+        <span class="text-sm {% if request.mentor_status == 'accepted' %}text-green-600{% else %}text-red-600{% endif %}">
+          Already {{ request.mentor_status }}
+        </span>
+      </div>
+      {% endif %}
+    </div>
+    {% endfor %}
+  </div>
+  
+  {% else %}
+  <div class="text-center py-12">
+    <div class="mx-auto w-2 h-24 rounded-full bg-gray-100 flex items-center justify-center mb-4">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+      </svg>
+    </div>
+    <h3 class="text-lg font-medium text-gray-900 mb-1">No meeting requests</h3>
+    <p class="text-gray-500">You don't have any pending meeting requests.</p>
+  </div>
+  {% endif %}
+</section>
+
+            <!-- Find Mentees Section -->
+<section id="findmentees" class="hidden bg-white rounded-xl shadow-sm overflow-hidden">
+    <div class="p-6 border-b border-gray-200">
+      <h2 class="text-xl font-semibold text-gray-800 mb-2">Find Mentees</h2>
+      <p class="text-gray-600">Browse and connect with potential mentees</p>
+    </div>
+    
+    <div class="p-6 bg-gray-50 border-b border-gray-200">
+      <!-- Search Input -->
+      <input type="text" id="findMenteeSearch" placeholder="Search mentees by name, stream, school..."
+             class="w-full p-3 mb-4 border border-gray-300 rounded-lg"
+             onkeyup="filterMentees()">
+
+      <!-- Filters -->
+      <form method="GET" action="{{ url_for('find_mentees') }}" class="mb-4">
+        <div class="flex flex-wrap items-center gap-3">
+          <!-- Stream -->
+          <div class="relative">
+            <select name="stream" class="appearance-none pl-4 pr-10 py-2 border rounded-full text-gray-700 bg-white">
+              <option value="" {% if not request.args.get('stream') %}selected{% endif %}>All Streams</option>
+              {% for stream in streams %}
+              <option value="{{ stream }}" {% if request.args.get('stream') == stream %}selected{% endif %}>
+                {{ stream }}
+              </option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <!-- School -->
+          <div class="relative">
+            <select name="school" class="appearance-none pl-4 pr-10 py-2 border rounded-full text-gray-700 bg-white">
+              <option value="" {% if not request.args.get('school') %}selected{% endif %}>All Schools</option>
+              {% for school in schools %}
+              <option value="{{ school }}" {% if request.args.get('school') == school %}selected{% endif %}>
+                {{ school }}
+              </option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <!-- Goal -->
+          <div class="relative">
+            <select name="goal" class="appearance-none pl-4 pr-10 py-2 border rounded-full text-gray-700 bg-white">
+              <option value="" {% if not request.args.get('goal') %}selected{% endif %}>All Goals</option>
+              {% for goal in goals %}
+              <option value="{{ goal }}" {% if request.args.get('goal') == goal %}selected{% endif %}>
+                {{ goal }}
+              </option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <!-- Search Button -->
+          <button type="submit" class="px-5 py-2 rounded-full bg-blue-600 text-white font-medium">
+            Search
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Mentees Grid -->
+    <div class="p-6">
+      {% if all_mentees and all_mentees|length > 0 %}
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="menteesContainer">
+        {% for mentee in all_mentees %}
+        <div class="mentee-card bg-white rounded-xl border border-gray-200 p-5 transition-all hover:shadow-md">
+          <div class="flex items-center gap-4 mb-4">
+            {% if mentee.profile_picture %}
+              <img src="{{ url_for('static', filename='uploads/' ~ mentee.profile_picture) }}" 
+                   alt="{{ mentee.user.name }}" 
+                   class="w-16 h-16 rounded-full object-cover border-2 border-white shadow">
+            {% else %}
+              <div class="w-16 h-16 rounded-full bg-gradient-to-br from-blue-100 to-blue-200 flex items-center justify-center text-blue-600 border-2 border-white shadow">
+                <span class="text-xl font-semibold">{{ mentee.user.name[0] if mentee.user.name else '?' }}</span>
+              </div>
+            {% endif %}
+            <div>
+              <h3 class="text-lg font-bold text-gray-800 mentee-name">{{ mentee.user.name }}</h3>
+              <p class="text-sm text-gray-600 mentee-stream">{{ mentee.stream }} at {{ mentee.school_college_name }}</p>
+            </div>
+          </div>
+          
+          <div class="space-y-2 mb-4">
+            <div class="flex items-center text-sm text-gray-600 mentee-school">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+              </svg>
+              <span>{{ mentee.school_college_name if mentee.school_college_name else 'Not specified' }}</span>
+            </div>
+            
+            <div class="flex items-center text-sm text-gray-600">
+              <svg xmlns="http://www.w3.org/2000/svg" 
+                   class="h-4 w-4 mr-2 text-gray-500" 
+                   fill="none" viewBox="0 0 24 24" 
+                   stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                      d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+              </svg>
+              <span>Goal: {{ mentee.goal if mentee.goal else 'Not specified' }}</span>
+            </div>
+          </div>
+          
+          <button class="w-full px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition">
+            Connect with Mentee
+          </button>
+        </div>
+        {% endfor %}
+      </div>
+      {% else %}
+      <div class="text-center py-12">
+        <div class="mx-auto w-24 h-24 rounded-full bg-gray-100 flex items-center justify-center mb-4">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+          </svg>
+        </div>
+        <h3 class="text-lg font-medium text-gray-900 mb-1">No mentees available</h3>
+        <p class="text-gray-500">Check back later for new mentee opportunities.</p>
+      </div>
+      {% endif %}
+    </div>
+  </section>
+
+</main>
+
+<script>
+
+function showSection(id) {
+  // Hide all sections
+  document.querySelectorAll("section").forEach(sec => sec.classList.add("hidden"));
+  
+  // Show selected section
+  document.getElementById(id).classList.remove("hidden");
+  
+  // Update active navigation button
+  document.querySelectorAll('.nav-btn').forEach(btn => {
+    btn.classList.remove('active');
+  });
+  
+  // Find the button that corresponds to this section and activate it
+  const buttons = document.querySelectorAll('.nav-btn');
+  buttons.forEach(btn => {
+    if (btn.textContent.trim() === 'Overview' && id === 'dashboard') {
+      btn.classList.add('active');
+    } else if (btn.textContent.trim() === 'My Mentees' && id === 'mymentees') {
+      btn.classList.add('active');
+    } else if (btn.textContent.trim() === 'Meeting Requests' && id === 'meetingrequests') {
+      btn.classList.add('active');
+    } else if (btn.textContent.trim() === 'Find Mentees' && id === 'findmentees') {
+      btn.classList.add('active');
+    }
+  });
+}
+
+//  Auto-open correct section using Jinja-injected variable
+document.addEventListener("DOMContentLoaded", function() {
+  var activeSection = "{{ active_section|default('dashboard') }}";
+  showSection(activeSection);
+});
+
+function filterMentees() {
+  const input = document.getElementById('findMenteeSearch').value.toLowerCase();
+  const menteeCards = document.querySelectorAll('.mentee-card');
+  
+  menteeCards.forEach(card => {
+    const name = card.querySelector('.mentee-name').textContent.toLowerCase();
+    const stream = card.querySelector('.mentee-stream').textContent.toLowerCase();
+    const school = card.querySelector('.mentee-school').textContent.toLowerCase();
+    
+    if (name.includes(input) || stream.includes(input) || school.includes(input)) {
+      card.style.display = 'block';
+    } else {
+      card.style.display = 'none';
+    }
+  });
+}
+
+document.querySelectorAll('.btn-accept').forEach(btn => {
+    btn.addEventListener('click', async () => {
+        const requestId = btn.dataset.id;
+        const res = await fetch("/mentor_response", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ request_id: requestId, action: "accept" })
+        });
+        const data = await res.json();
+        alert(data.message);
+        location.reload();
+    });
+});
+
+document.querySelectorAll('.btn-decline').forEach(btn => {
+    btn.addEventListener('click', async () => {
+        const requestId = btn.dataset.id;
+        const res = await fetch("/mentor_response", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ request_id: requestId, action: "decline" })
+        });
+        const data = await res.json();
+        alert(data.message);
+        location.reload();
+    });
+});
+
+</script>
+
+{% endblock %}
+
+
+
+
+
+@app.route("/mentordashboard")
+def mentordashboard():
+    if "email" in session and session.get("user_type") == "1":
+        # Fetch current mentor
+        mentor = User.query.filter_by(email=session["email"]).first()
+
+        if not mentor:
+            flash("Mentor profile not found.", "error")
+            return redirect(url_for("signin"))
+
+        # Fetch incoming mentorship requests for this mentor
+        incoming_requests = MentorshipRequest.query.filter_by(
+            mentor_id=mentor.id
+        ).order_by(MentorshipRequest.id.desc()).all()
+
+        # Fetch all mentees
+        all_mentees = MenteeProfile.query.all()
+
+        # Unique filter values from mentees
+        streams = [row.stream for row in MenteeProfile.query.with_entities(MenteeProfile.stream).distinct() if row.stream]
+        schools = [row.school_college_name for row in MenteeProfile.query.with_entities(MenteeProfile.school_college_name).distinct() if row.school_college_name]
+        goals = [row.goal for row in MenteeProfile.query.with_entities(MenteeProfile.goal).distinct() if row.goal]
+
+        # Get a specific mentee for the profile section (if needed)
+        # For example, get the first mentee from the requests if available
+        example_mentee = None
+        if incoming_requests and incoming_requests[0].mentee:
+            example_mentee = incoming_requests[0].mentee
+
+        # Mentor profile info
+        mentor_info = {
+            "full_name": mentor.name,  # Use .name if that's your column
+            "username": mentor.email,
+            "date_time": datetime.now().strftime("%d-%m-%Y %H:%M:%S")
+        }
+
+        return render_template(
+            "mentordashboard.html",   # ✅ use only one template name
+            all_mentees=all_mentees,
+            streams=streams,
+            schools=schools,
+            goals=goals,
+            incoming_requests=incoming_requests,
+            mentor_info=mentor_info,
+            active_section="findmentees",
+            show_sidebar=True,
+            mentee=example_mentee  # Pass the mentee variable to the template
+        )
+
+    return redirect(url_for("signin"))
+
+
+
+
+
+
+
+    
+@app.route("/find_mentor", methods=["GET"])
+def find_mentor():
+    query = MentorProfile.query
+
+    profession = request.args.get("profession")
+    location = request.args.get("location")
+    education = request.args.get("education")
+    experience = request.args.get("experience")
+
+    # --- Apply filters ---
+    if profession:
+        query = query.filter_by(profession=profession)
+    if location:
+        query = query.filter_by(location=location)
+    if education:
+        query = query.filter_by(education=education)
+    if experience:
+        if experience == "0-2":
+            query = query.filter(cast(MentorProfile.years_of_experience, Integer).between(0, 2))
+        elif experience == "3-5":
+            query = query.filter(cast(MentorProfile.years_of_experience, Integer).between(3, 5))
+        elif experience == "6-10":
+            query = query.filter(cast(MentorProfile.years_of_experience, Integer).between(6, 10))
+        elif experience == "10+":
+            query = query.filter(cast(MentorProfile.years_of_experience, Integer) >= 10)
+
+    mentors = query.all()
+    
+    # Get filter options directly instead of calling the function
+    options = {
+        "professions": sorted({row.profession for row in MentorProfile.query.with_entities(MentorProfile.profession).distinct() if row.profession}),
+        "locations": sorted({row.location for row in MentorProfile.query.with_entities(MentorProfile.location).distinct() if row.location}),
+        "educations": sorted({row.education for row in MentorProfile.query.with_entities(MentorProfile.education).distinct() if row.education}),
+        "experiences": sorted({row.years_of_experience for row in MentorProfile.query.with_entities(MentorProfile.years_of_experience).distinct() if row.years_of_experience}),
+    }
+
+    return render_template(
+        "menteedashboard.html",
+        all_mentors=mentors,
+        professions=options["professions"],
+        locations=options["locations"],
+        educations=options["educations"],
+        experiences=options["experiences"],
+        active_section="findmentor",
+        show_sidebar=True
+    )
+

@@ -204,7 +204,7 @@
     {% endif %}
   </section>
 
-            <!-- mentorship request Section -->
+ <!-- mentorship request Section -->
 <section id="meetingrequests" class="p-6 bg-white rounded-xl shadow-sm">
   <div class="mb-6">
     <h2 class="text-2xl font-semibold text-gray-800 mb-2">Mentor Connect Requests</h2>
@@ -216,23 +216,34 @@
     {% for request in incoming_requests %}
     <div class="relative bg-white rounded-xl border border-gray-200 p-5 transition-all hover:shadow-lg">
 
-      <!-- Mentee Info -->
-      <div class="flex items-center gap-4 mb-4">
+    
+<!-- Mentee Info -->
+<div class="flex items-center gap-4 mb-4">
+    {% if request.mentee %}
         {% if request.mentee.mentee_profile and request.mentee.mentee_profile.profile_picture %}
-        <img src="{{ url_for('static', filename='uploads/' ~ request.mentee.mentee_profile.profile_picture) }}" 
-             alt="{{ request.mentee.name }}" 
-             class="w-16 h-16 rounded-full object-cover border-2 border-white shadow">
+            <!-- Show mentee profile picture -->
+            <img src="{{ url_for('static', filename='uploads/' ~ request.mentee.mentee_profile.profile_picture) }}" 
+                 alt="{{ request.mentee.name or 'Unnamed' }}" 
+                 class="w-16 h-16 rounded-full object-cover border-2 border-white shadow">
         {% else %}
-        <div class="w-16 h-16 rounded-full bg-gradient-to-br from-blue-100 to-blue-200 flex items-center justify-center text-blue-600 border-2 border-white shadow">
-          <span class="text-xl font-semibold">{{ request.mentee.name[0] if request.mentee.name else '?' }}</span>
-        </div>
+            <!-- Show initials if no profile picture -->
+            <div class="w-16 h-16 rounded-full bg-gradient-to-br from-blue-100 to-blue-200 flex items-center justify-center text-blue-600 border-2 border-white shadow">
+                <span class="text-xl font-semibold">{{ request.mentee.name[0] if request.mentee.name else '?' }}</span>
+            </div>
         {% endif %}
-
-        <div class="flex flex-col">
-          <p class="font-semibold text-gray-800">{{ request.mentee.name or 'Unnamed' }}</p>
-          <p class="text-sm text-gray-500">{{ request.mentee.email or '' }}</p>
+    {% else %}
+        <!-- Show default avatar if mentee is missing -->
+        <div class="w-16 h-16 rounded-full bg-gray-200 flex items-center justify-center text-gray-500 border-2 border-white shadow">
+            <span class="text-xl font-semibold">?</span>
         </div>
-      </div>
+    {% endif %}
+
+    <div class="flex flex-col">
+        <p class="font-semibold text-gray-800">{{ request.mentee.name if request.mentee else 'Unnamed' }}</p>
+        <p class="text-sm text-gray-500">{{ request.mentee.email if request.mentee else '' }}</p>
+    </div>
+</div>
+
 
       <!-- Meeting Details -->
       <div class="space-y-2 mb-4">
@@ -302,6 +313,8 @@
   </div>
   {% endif %}
 </section>
+
+
 
             <!-- Find Mentees Section -->
 <section id="findmentees" class="hidden bg-white rounded-xl shadow-sm overflow-hidden">
