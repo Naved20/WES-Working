@@ -9,9 +9,7 @@ from werkzeug.utils import secure_filename
 from datetime import datetime
 from functools import wraps
 from sqlalchemy import or_
-
-
-
+from datetime import datetime
 
 
 app = Flask(__name__)
@@ -30,8 +28,6 @@ os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-
-
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = "signin" 
@@ -41,34 +37,13 @@ login_manager.login_view = "signin"
 def load_user(user_id):
     return User.query.get(int(user_id))
 
-
-#--------------User_type Code------------------------
-# -------------supervisor = "0"----------------------
-# -------------mentor = "1"--------------------------
-# -------------mantee = "2"--------------------------
-
-#---------------DATABASE CONFIGURATION----------------
-
-# db_url = os.getenv("DATABASE_URL", "sqlite:///mentors_connect.db")
-
-# #render gives 'postgres://' but SQLAlchemy needs 'postgresql://'
-# if db_url.startswith("postgres://"):
-#     db_url = db_url.replace("postgres://", "postgresql://", 1)
-
-# app.config["SQLALCHEMY_DATABASE_URI"] = db_url
-# app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-
+# Database configuration
 app.config["SQLALCHEMY_DATABASE_URI"] ="sqlite:///mentors_connect.db"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
-
 db = SQLAlchemy(app)
-
 from flask_migrate import Migrate
 migrate = Migrate(app, db)
-
-
-
 
 def mentor_login_required(f):
     @wraps(f)
@@ -78,8 +53,6 @@ def mentor_login_required(f):
             return redirect(url_for("signin"))
         return f(*args, **kwargs)
     return decorated_function
-
-
 
 #--------------USER MODEL----------------
 class User(db.Model):
@@ -95,7 +68,6 @@ class User(db.Model):
 
     def __repr__(self):
         return f"<user {self.name}>"
-
 
 #------------table mentors details-------------------
 
@@ -123,10 +95,6 @@ class MentorProfile(db.Model):
     profile_picture = db.Column(db.String(100)) 
     years_of_experience = db.Column(db.String(100))     
     status = db.Column(db.String(20), default="pending") 
-
-
-
-
 
 #------------next table mentee details-------------------
 class MenteeProfile(db.Model):
@@ -157,7 +125,6 @@ class MenteeProfile(db.Model):
     status = db.Column(db.String(20), default="pending")  # Add this
     user = db.relationship("User", backref="mentee_profile", uselist=False)
 
-
 #------------next table supervisor details-------------------
 class SupervisorProfile(db.Model):
     __tablename__ = "supervisor_profile"
@@ -175,7 +142,6 @@ class SupervisorProfile(db.Model):
 
     # One-to-one relationship with User
     user = db.relationship("User", backref="supervisor_profile", uselist=False)
-
 
 # -----------get mentee deatls for mentor when request comes----------------
 @app.route("/get_mentee_details/<int:request_id>", methods=["GET"])
@@ -210,7 +176,6 @@ def get_mentee_details(request_id):
 
     return jsonify(mentee_data)
 
-
 #------------------mentorship request table-------------------
 class MentorshipRequest(db.Model):
     __tablename__ = "mentorship_requests"
@@ -235,20 +200,12 @@ class MentorshipRequest(db.Model):
     mentee = db.relationship("User", foreign_keys=[mentee_id], backref="sent_requests")
     mentor = db.relationship("User", foreign_keys=[mentor_id], backref="received_requests")
 
-
-
-
-
-
-
 #-------------HOME----------------
 @app.route("/")
 def home():
     return render_template("index.html")
 
-
 #--------------SIGNUP----------------
-
 @app.route("/signup", methods=["GET", "POST"])
 def signup():
     if request.method == "POST":
@@ -291,9 +248,7 @@ def signup():
     # agar request GET ho to signup form dikhana
     return render_template("signup.html")
 
-
 #--------------SIGNIN----------------
-
 @app.route("/signin", methods=["GET", "POST"])
 def signin():
     if request.method == "POST":
@@ -330,8 +285,6 @@ def signin():
 
    
     return render_template("signin.html")
-
-
 
 # ------------------ DASHBOARDS ------------------
 @app.route("/mentordashboard")
@@ -385,6 +338,8 @@ def mentordashboard():
 
     return redirect(url_for("signin"))
 
+
+
 @app.route("/menteedashboard")
 def menteedashboard():
     if "email" in session and session.get("user_type") == "2":
@@ -422,7 +377,6 @@ def menteedashboard():
     return redirect(url_for("signin"))
 
 
-
 @app.route("/supervisordashboard")
 def supervisordashboard():
     if "email" in session and session.get("user_type") == "0":
@@ -449,7 +403,6 @@ def supervisordashboard():
             active_section="dashboard"
         )
     return redirect(url_for("signin"))
-
 
 @app.route("/find_mentor", methods=["GET"])
 def find_mentor():
@@ -499,6 +452,9 @@ def find_mentor():
     )
 
 
+
+
+
 # ------------------- HANDLE MENTORSHIP REQUEST ------------------
 @app.route("/request_mentorship", methods=["POST"])
 def request_mentorship():
@@ -536,7 +492,6 @@ def request_mentorship():
     except Exception as e:
         db.session.rollback()
         return jsonify({"success": False, "message": str(e)}), 500
-
 
 @app.route("/mentor_response", methods=["POST"])
 def mentor_response():
@@ -577,11 +532,6 @@ def mentor_response():
     # Always redirect to mentor dashboard
     return redirect(url_for("mentordashboard"))
 
-
-
-
-
-
 #------------------- PROFILE PICTURE AT TOP ------------------
 @app.context_processor
 def inject_user_profile_pic():
@@ -601,15 +551,12 @@ def inject_user_profile_pic():
         return dict(current_user_profile_pic=profile_pic)
     return dict(current_user_profile_pic=None)
 
-
 # ------------------ LOGOUT ------------------
 @app.route("/logout")
 def logout():
     session.clear()   
     flash("You have been logged out!", "info")
     return redirect(url_for("signin"))
-
-
 
 # ------------------ editmentorprofile ------------------
 @app.route("/editmentorprofile", methods=["GET", "POST"])
@@ -679,9 +626,6 @@ def editmentorprofile():
         profile_picture=profile.profile_picture if profile else None 
     )
 
-
-
-
 #-----------------edit mentee profile-------------------
 @app.route("/editmenteeprofile", methods=["GET", "POST"])
 def editmenteeprofile():
@@ -749,7 +693,6 @@ def editmenteeprofile():
         profile_picture=profile.profile_picture if profile else None
     )
 
-
 #----------------edit supervisor profile-------------------
 @app.route("/edit_supervisor_profile", methods=["GET", "POST"])
 def editsupervisorprofile():
@@ -793,9 +736,7 @@ def editsupervisorprofile():
         profile_picture=profile.profile_picture if profile else None
     )
 
-
 # ------------------ PROFILE ------------------
-
 @app.route("/profile")
 def profile():
     if "email" not in session:
@@ -811,7 +752,6 @@ def profile():
         return redirect(url_for("supervisorprofile"))
 
 #--------------route for all profiles----------------
-
 @app.route("/mentor_profile")
 def mentorprofile(): 
     if "email" in session and session.get("user_type") == "1":
@@ -840,9 +780,6 @@ def mentorprofile():
             profile_picture=profile.profile_picture if profile else None
         )
     return redirect(url_for("signin"))
-
-
-from datetime import datetime
 
 @app.route("/mentee_profile")
 def menteeprofile():
@@ -880,8 +817,6 @@ def menteeprofile():
         )
     return redirect(url_for("signin"))
 
-
-
 @app.route("/supervisor_profile")
 def supervisorprofile():
     # Ensure user is logged in and is a supervisor
@@ -908,7 +843,6 @@ def supervisorprofile():
         additional_info=profile.additional_info if profile else "",
         profile_picture=profile.profile_picture if profile else None
     )
-
 
 # ------------------ APPROVE/REJECT MENTORSHIP REQUESTS ------------------
 @app.route("/supervisor_response", methods=["POST"])
@@ -998,9 +932,5 @@ def approve_profile():
     
     return redirect(url_for("supervisordashboard"))
 
-
-
-
 if __name__ == "__main__":
     app.run(debug=True)
-
