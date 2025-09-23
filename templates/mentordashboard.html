@@ -1,9 +1,7 @@
 {% extends "base2.html" %}
 {% block title %}Mentor Dashboard{% endblock %}
 {% block user %}Mentor{% endblock %}
-
 {% block profiledrop %}{% endblock %}
-
 {% block content %}
 
 <style>
@@ -18,7 +16,6 @@
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   }
 </style>
-
             <!-- Main Content Container -->
   <main class="max-w-7xl mx-auto px-2 sm:px-3 lg:px-3 py-2">
   
@@ -204,79 +201,117 @@
     {% endif %}
   </section>
 
- <!-- mentorship request Section -->
-<section id="meetingrequests" class="p-6 bg-white rounded-xl shadow-sm">
+   <!--mentorship request Section -->
+<section id="meetingrequests" class="hidden p-6 bg-white rounded-xl shadow-sm">
   <div class="mb-6">
     <h2 class="text-2xl font-semibold text-gray-800 mb-2">Mentor Connect Requests</h2>
     <p class="text-gray-600">Review and manage mentorship requests from your mentees</p>
   </div>
 
+
+
   {% if incoming_requests and incoming_requests|length > 0 %}
   <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
     {% for request in incoming_requests %}
     <div class="relative bg-white rounded-xl border border-gray-200 p-5 transition-all hover:shadow-lg">
+      
+      <!-- Status Badge -->
+      <div class="absolute top-3 right-3">
+        {% if request.mentor_status == 'accepted' %}
+          <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+            Accepted
+          </span>
+        {% elif request.mentor_status == 'rejected' %}
+          <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+            Rejected
+          </span>
+        {% else %}
+          <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+            Pending
+          </span>
+        {% endif %}
+      </div>
 
-    
-<!-- Mentee Info -->
-<div class="flex items-center gap-4 mb-4">
-    {% if request.mentee %}
-        {% if request.mentee.mentee_profile and request.mentee.mentee_profile.profile_picture %}
-            <!-- Show mentee profile picture -->
-            <img src="{{ url_for('static', filename='uploads/' ~ request.mentee.mentee_profile.profile_picture) }}" 
+      <!-- Mentee Info -->
+      <div class="flex items-center gap-4 mb-4 pr-16">
+        {% if request.mentee %}
+          <!-- Check if mentee has a profile and profile picture -->
+          {% set mentee_profile = None %}
+          {% for profile in request.mentee.mentee_profile %}
+            {% set mentee_profile = profile %}
+          {% endfor %}
+          
+          {% if mentee_profile and mentee_profile.profile_picture %}
+            <img src="{{ url_for('static', filename='uploads/' ~ mentee_profile.profile_picture) }}" 
                  alt="{{ request.mentee.name or 'Unnamed' }}" 
                  class="w-16 h-16 rounded-full object-cover border-2 border-white shadow">
-        {% else %}
-            <!-- Show initials if no profile picture -->
+          {% else %}
             <div class="w-16 h-16 rounded-full bg-gradient-to-br from-blue-100 to-blue-200 flex items-center justify-center text-blue-600 border-2 border-white shadow">
-                <span class="text-xl font-semibold">{{ request.mentee.name[0] if request.mentee.name else '?' }}</span>
+              <span class="text-xl font-semibold">{{ request.mentee.name[0] if request.mentee.name else '?' }}</span>
             </div>
-        {% endif %}
-    {% else %}
-        <!-- Show default avatar if mentee is missing -->
-        <div class="w-16 h-16 rounded-full bg-gray-200 flex items-center justify-center text-gray-500 border-2 border-white shadow">
+          {% endif %}
+          
+          <div class="flex flex-col">
+            <p class="font-semibold text-gray-800">{{ request.mentee.name if request.mentee.name else 'Unnamed' }}</p>
+            <p class="text-sm text-gray-500">{{ request.mentee.email if request.mentee.email else 'No email' }}</p>
+          </div>
+        {% else %}
+          <!-- Fallback if mentee data is missing -->
+          <div class="w-16 h-16 rounded-full bg-gray-200 flex items-center justify-center text-gray-500 border-2 border-white shadow">
             <span class="text-xl font-semibold">?</span>
-        </div>
-    {% endif %}
-
-    <div class="flex flex-col">
-        <p class="font-semibold text-gray-800">{{ request.mentee.name if request.mentee else 'Unnamed' }}</p>
-        <p class="text-sm text-gray-500">{{ request.mentee.email if request.mentee else '' }}</p>
-    </div>
-</div>
-
+          </div>
+          <div class="flex flex-col">
+            <p class="font-semibold text-gray-800">Unknown Mentee</p>
+            <p class="text-sm text-gray-500">Data not available</p>
+          </div>
+        {% endif %}
+      </div>
 
       <!-- Meeting Details -->
-      <div class="space-y-2 mb-4">
-        <div class="flex items-center text-sm text-gray-600">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <div class="space-y-3 mb-4">
+        <div class="flex items-start text-sm text-gray-600">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2 mt-0.5 text-gray-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
           </svg>
-          <span>Time: {{ request.meeting_time or 'Not specified' }}</span>
+          <div>
+            <span class="font-medium">Meeting Time:</span><br>
+            <span>{{ request.meeting_time or 'Not specified' }}</span>
+            {% if request.timezone %}
+              <span class="text-xs text-gray-500">({{ request.timezone }})</span>
+            {% endif %}
+          </div>
         </div>
 
-        <div class="text-sm text-gray-600">
-          <p class="font-medium">Purpose:</p>
-          <p class="mt-1">{{ request.why_need_mentor or 'No purpose provided' }}</p>
+        {% if request.meeting_type %}
+        <div class="flex items-center text-sm text-gray-600">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 4V2a1 1 0 011-1h8a1 1 0 011 1v2h3a1 1 0 011 1v1a1 1 0 01-1 1H4a1 1 0 01-1-1V5a1 1 0 011-1h3z" />
+          </svg>
+          <span>Type: {{ request.meeting_type|title }}</span>
         </div>
+        {% endif %}
 
         <div class="text-sm text-gray-600">
-          <p class="font-medium">Status:</p>
-          <p class="mt-1">
-            <span class="{% if request.mentor_status == 'accepted' %}text-green-600{% elif request.mentor_status == 'rejected' %}text-red-600{% else %}text-yellow-600{% endif %}">
-              {{ request.mentor_status|title }}
-            </span>
-          </p>
+          <div class="flex items-start">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2 mt-0.5 text-gray-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <div>
+              <span class="font-medium">Purpose:</span><br>
+              <span class="text-xs">{{ request.why_need_mentor or 'No purpose provided' }}</span>
+            </div>
+          </div>
         </div>
       </div>
 
       <!-- Action Buttons -->
       {% if request.mentor_status == 'pending' %}
-      <div class="flex gap-5">
+      <div class="flex gap-2">
         <!-- Accept Button -->
         <form action="{{ url_for('mentor_response') }}" method="POST" class="flex-1">
           <input type="hidden" name="request_id" value="{{ request.id }}">
           <input type="hidden" name="action" value="accept">
-          <button type="submit" class="w-full px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-lg hover:bg-green-700 transition">
+          <button type="submit" class="w-full px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-lg hover:bg-green-700 transition duration-200">
             Accept
           </button>
         </form>
@@ -285,15 +320,15 @@
         <form action="{{ url_for('mentor_response') }}" method="POST" class="flex-1">
           <input type="hidden" name="request_id" value="{{ request.id }}">
           <input type="hidden" name="action" value="decline">
-          <button type="submit" class="w-full px-4 py-2 bg-red-600 text-white text-sm font-medium rounded-lg hover:bg-red-700 transition">
+          <button type="submit" class="w-full px-4 py-2 bg-red-600 text-white text-sm font-medium rounded-lg hover:bg-red-700 transition duration-200">
             Decline
           </button>
         </form>
       </div>
       {% else %}
       <div class="text-center py-2">
-        <span class="text-sm {% if request.mentor_status == 'accepted' %}text-green-600{% else %}text-red-600{% endif %}">
-          Already {{ request.mentor_status }}
+        <span class="text-sm font-medium {% if request.mentor_status == 'accepted' %}text-green-600{% else %}text-red-600{% endif %}">
+          Request {{ request.mentor_status }}
         </span>
       </div>
       {% endif %}
@@ -303,9 +338,9 @@
   
   {% else %}
   <div class="text-center py-12">
-    <div class="mx-auto w-2 h-24 rounded-full bg-gray-100 flex items-center justify-center mb-4">
+    <div class="mx-auto w-24 h-24 rounded-full bg-gray-100 flex items-center justify-center mb-4">
       <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2 2v12a2 2 0 002 2z" />
       </svg>
     </div>
     <h3 class="text-lg font-medium text-gray-900 mb-1">No meeting requests</h3>
@@ -313,8 +348,6 @@
   </div>
   {% endif %}
 </section>
-
-
 
             <!-- Find Mentees Section -->
 <section id="findmentees" class="hidden bg-white rounded-xl shadow-sm overflow-hidden">
@@ -437,9 +470,7 @@
       {% endif %}
     </div>
   </section>
-
 </main>
-
 <script>
 function showSection(id) {
   // Hide all sections
@@ -468,7 +499,6 @@ function showSection(id) {
   });
 }
 
-
 //  Auto-open correct section using Jinja-injected variable
 document.addEventListener("DOMContentLoaded", function() {
   var activeSection = "{{ active_section|default('dashboard') }}";
@@ -491,7 +521,6 @@ function filterMentees() {
     }
   });
 }
-
 
 document.querySelectorAll('.btn-accept').forEach(btn => {
     btn.addEventListener('click', async () => {
@@ -521,7 +550,16 @@ document.querySelectorAll('.btn-decline').forEach(btn => {
     });
 });
 
+function testMeetingRequests() {
+    console.log("Testing meeting requests section...");
+    const section = document.getElementById('meetingrequests');
+    if (section) {
+        console.log("Section found!");
+        section.classList.remove('hidden');
+    } else {
+        console.log("Section NOT found!");
+    }
+}
 
 </script>
-
 {% endblock %}

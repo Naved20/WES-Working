@@ -84,8 +84,65 @@
            class="w-full p-3 mb-4 border border-gray-300 rounded-lg"
            onkeyup="filterMentors()">
 
+            <!-- Filters -->
+      <form method="GET" action="{{ url_for('supervisordashboard') }}">
+        <div class="flex flex-wrap items-center gap-3">
+          <!-- Profession -->
+          <div class="relative">
+            <select name="profession" class="appearance-none pl-4 pr-10 py-2 border rounded-full text-gray-700 bg-white">
+              <option value="" {% if not request.args.get('profession') %}selected{% endif %}>All Professions</option>
+              {% for profession in professions %}
+              <option value="{{ profession }}" {% if request.args.get('profession') == profession %}selected{% endif %}>
+                {{ profession }}
+              </option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <!-- Location -->
+          <div class="relative">
+            <select name="location" class="appearance-none pl-4 pr-10 py-2 border rounded-full text-gray-700 bg-white">
+              <option value="" {% if not request.args.get('location') %}selected{% endif %}>All Locations</option>
+              {% for location in locations %}
+              <option value="{{ location }}" {% if request.args.get('location') == location %}selected{% endif %}>
+                {{ location }}
+              </option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <!-- Education -->
+          <div class="relative">
+            <select name="education" class="appearance-none pl-4 pr-10 py-2 border rounded-full text-gray-700 bg-white">
+              <option value="" {% if not request.args.get('education') %}selected{% endif %}>All Education</option>
+              {% for education in educations %}
+              <option value="{{ education }}" {% if request.args.get('education') == education %}selected{% endif %}>
+                {{ education }}
+              </option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <!-- Experience -->
+          <div class="relative">
+            <select name="experience" class="appearance-none pl-4 pr-10 py-2 border rounded-full text-gray-700 bg-white">
+              <option value="" {% if not request.args.get('experience') %}selected{% endif %}>Any Experience</option>
+              <option value="0-2" {% if request.args.get('experience') == '0-2' %}selected{% endif %}>0 - 2 years</option>
+              <option value="3-5" {% if request.args.get('experience') == '3-5' %}selected{% endif %}>3 - 5 years</option>
+              <option value="6-10" {% if request.args.get('experience') == '6-10' %}selected{% endif %}>6 - 10 years</option>
+              <option value="10+" {% if request.args.get('experience') == '10+' %}selected{% endif %}>10+ years</option>
+            </select>
+          </div>
+
+          <!-- Search Button -->
+          <button type="submit" class="px-5 py-2 rounded-full bg-blue-600 text-white font-medium">
+            Search
+          </button>
+        </div>
+      </form>  
+
     {% if mentors and mentors|length > 0 %}
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="mentorsGrid">
+    <div class="grid p-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="mentorsGrid">
       {% for mentor in mentors %}
       <div class="mentor-card bg-white rounded-xl border border-gray-200 p-5 transition-all hover:shadow-md">
         <div class="flex items-center gap-4 mb-4">
@@ -157,8 +214,54 @@
            class="w-full p-3 mb-4 border border-gray-300 rounded-lg"
            onkeyup="filterMentees()">
 
+          <!-- Filters -->
+      <form method="GET" action="{{ url_for('supervisordashboard') }}">
+        <div class="flex flex-wrap items-center gap-3">
+          <!-- Stream -->
+          <div class="relative">
+            <select name="stream" class="appearance-none pl-4 pr-10 py-2 border rounded-full text-gray-700 bg-white">
+              <option value="" {% if not request.args.get('stream') %}selected{% endif %}>All Streams</option>
+              {% for stream in mentee_streams %}
+                <option value="{{ stream }}" {% if request.args.get('stream') == stream %}selected{% endif %}>
+                  {{ stream }}
+                </option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <!-- School -->
+          <div class="relative">
+            <select name="school" class="appearance-none pl-4 pr-10 py-2 border rounded-full text-gray-700 bg-white">
+              <option value="" {% if not request.args.get('school') %}selected{% endif %}>All Schools</option>
+              {% for school in mentee_schools %}
+                <option value="{{ school }}" {% if request.args.get('school') == school %}selected{% endif %}>
+                  {{ school }}
+                </option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <!-- Goal -->
+          <div class="relative">
+            <select name="goal" class="appearance-none pl-4 pr-10 py-2 border rounded-full text-gray-700 bg-white">
+              <option value="" {% if not request.args.get('goal') %}selected{% endif %}>All Goals</option>
+              {% for goal in mentee_goals %}
+                <option value="{{ goal }}" {% if request.args.get('goal') == goal %}selected{% endif %}>
+                  {{ goal }}
+                </option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <!-- Search Button -->
+          <button type="submit" class="px-5 py-2 rounded-full bg-blue-600 text-white font-medium">
+            Search
+          </button>
+        </div>
+      </form>
+
     {% if mentees and mentees|length > 0 %}
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="menteesGrid">
+    <div class="grid p-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="menteesGrid">
       {% for mentee in mentees %}
       <div class="mentee-card bg-white rounded-xl border border-gray-200 p-5 transition-all hover:shadow-md">
         <div class="flex items-center gap-4 mb-4">
