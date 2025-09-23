@@ -12,9 +12,6 @@ from sqlalchemy import or_
 from datetime import datetime
 
 
-
-
-
 app = Flask(__name__)
 app.secret_key = "1234"
 app.permanent_session_lifetime = timedelta(days=10)
@@ -375,6 +372,60 @@ def mentordashboard():
         mentee=example_mentee
     )
 
+@app.route("/mentor_mentorship_request", methods=["GET", "POST"])
+def mentor_mentorship_request():
+    if "email" not in session or session.get("user_type") != "1":  # Only mentors
+        return redirect(url_for("signin"))
+
+    mentor_id = session.get("user_id")
+
+    # ------------------- mentee requests -------------------
+            # Fetch current mentor
+    mentor = User.query.filter_by(email=session["email"]).first()
+
+    if not mentor:
+            flash("Mentor profile not found.", "error")
+            return redirect(url_for("signin"))
+
+        # Fetch incoming mentorship requests for this mentor
+    incoming_requests = MentorshipRequest.query.filter_by(
+            mentor_id=mentor.id
+        ).all()
+
+        # Fetch all mentees
+    all_mentees = MenteeProfile.query.all()
+
+        # Unique filter values from mentees
+    streams = [row.stream for row in MenteeProfile.query.with_entities(MenteeProfile.stream).distinct() if row.stream]
+    schools = [row.school_college_name for row in MenteeProfile.query.with_entities(MenteeProfile.school_college_name).distinct() if row.school_college_name]
+    goals = [row.goal for row in MenteeProfile.query.with_entities(MenteeProfile.goal).distinct() if row.goal]
+
+        # Get a specific mentee for the profile section (if needed)
+        # For example, get the first mentee from the requests if available
+    example_mentee = None
+    if incoming_requests and incoming_requests[0].mentee:
+            example_mentee = incoming_requests[0].mentee
+
+        # Mentor profile info
+    mentor_info = {
+            "full_name": mentor.name, 
+            "username": mentor.email,
+            "date_time": datetime.now().strftime("%d-%m-%Y %H:%M:%S")
+        }
+    return render_template(
+        "mentor_mentorship_request.html",
+        mentorship_requests=incoming_requests,
+        all_mentees=all_mentees,
+        streams=streams,   
+        schools=schools,
+        goals=goals,
+        incoming_requests=incoming_requests,
+        mentor_info=mentor_info,
+        active_section="meetingrequests",
+        show_sidebar=True,
+        mentee=example_mentee
+    )
+
 @app.route("/menteedashboard")
 def menteedashboard():
     if "email" in session and session.get("user_type") == "2":
@@ -402,7 +453,6 @@ def menteedashboard():
             locations=[row.location for row in MentorProfile.query.with_entities(MentorProfile.location).distinct() if row.location],
             educations=[row.education for row in MentorProfile.query.with_entities(MentorProfile.education).distinct() if row.education],
             experiences=[row.years_of_experience for row in MentorProfile.query.with_entities(MentorProfile.years_of_experience).distinct() if row.years_of_experience],
-            active_section="findmentor",
             show_sidebar=True
         )
 
@@ -503,15 +553,17 @@ def supervisordashboard():
         active_section="dashboard",
         source_page=source_page
     )
-
+    
 
 #-------- find function------------
 @app.route("/find_mentor", methods=["GET"])
 def find_mentor():
     query = MentorProfile.query
 
-    source_page = request.args.get("from", "mentees")
+    source_page = request.args.get("from", "mentor")
 
+
+    source_page = request.args.get("from", "mentees")
     profession = request.args.get("profession")
     location = request.args.get("location")
     education = request.args.get("education")
@@ -545,21 +597,20 @@ def find_mentor():
     }
 
         # Dynamic render/redirect based on source
-    if source_page == "supervisor":
+    if source_page == "supervisor_find_mentor":
         return render_template(
-        "supervisordashboard.html",
+        "supervisor_find_mentor.html",
         all_mentors=mentors,
         professions=options["professions"],
         locations=options["locations"],
         educations=options["educations"],
         experiences=options["experiences"],
-        active_section="mentees",
         show_sidebar=True
         )
     else:  # default mentor
 
         return render_template(
-        "menteedashboard.html",
+        "mentee_find_mentors.html",
         all_mentors=mentors,
         professions=options["professions"],
         locations=options["locations"],
@@ -571,7 +622,7 @@ def find_mentor():
 
 @app.route("/find_mentees", methods=["GET"])
 def find_mentees():
-    if "email" not in session or session.get("user_type") != "1":  # Only mentors can access
+    if "email" not in session or session.get("user_type") != "1": 
         return redirect(url_for("signin"))
 
     # Base query
@@ -612,7 +663,7 @@ def find_mentees():
     # Dynamic render/redirect based on source
     if source_page == "supervisor":
         return render_template(
-            "supervisordashboard.html",
+            "supervisor_find_mentee.html",
             all_mentees=filtered_mentees,
             streams=streams,
             schools=schools,
@@ -622,7 +673,7 @@ def find_mentees():
         )
     else:  # default mentor
         return render_template(
-            "mentordashboard.html",
+            "mentor_find_mentees.html",
             all_mentees=filtered_mentees,
             streams=streams,
             schools=schools,
@@ -631,7 +682,178 @@ def find_mentees():
             show_sidebar=True
         )
 
+# mentee dashboard to my mentors
+@app.route("/my_mentors")
+def my_mentors():
+    if "email" not in session or session.get("user_type") != "2":
+        return redirect(url_for("signin"))
 
+    # Fetch current mentee
+    mentee = User.query.filter_by(email=session["email"]).first()
+
+    if not mentee:
+        flash("Mentee profile not found.", "error")
+        return redirect(url_for("signin"))
+
+    # Fetch accepted mentorship requests for this mentee
+    accepted_requests = MentorshipRequest.query.filter_by(
+        mentee_id=mentee.id,
+        mentor_status="accepted",
+        supervisor_status="approved",
+        final_status="approved"
+    ).all()
+
+    # Extract unique mentors from the accepted requests
+    mentors = {req.mentor for req in accepted_requests}
+
+    return render_template(
+        "mentee_my_mentors.html",
+        mentors=mentors,
+        show_sidebar=True
+    )
+
+# mentor dashboard to my mentees
+@app.route("/my_mentees")
+def my_mentees():
+    if "email" not in session or session.get("user_type") != "1":
+        return redirect(url_for("signin"))
+
+    # Fetch current mentor
+    mentor = User.query.filter_by(email=session["email"]).first()
+
+    if not mentor:
+        flash("Mentor profile not found.", "error")
+        return redirect(url_for("signin"))
+
+    # Fetch accepted mentorship requests for this mentor
+    accepted_requests = MentorshipRequest.query.filter_by(
+        mentor_id=mentor.id,
+        mentor_status="accepted",
+        supervisor_status="approved",
+        final_status="approved"
+    ).all()
+
+    # Extract unique mentees from the accepted requests
+    mentees = {req.mentee for req in accepted_requests}
+
+    return render_template(
+        "mentor_my_mentees.html",
+        mentees=mentees,
+        show_sidebar=True,
+    )
+
+
+
+@app.route("/supervisor_find_mentor")
+def supervisor_find_mentor():
+    if "email" not in session or session.get("user_type") != "0":
+        return redirect(url_for("signin"))
+
+    mentor_query = MentorProfile.query
+    profession = request.args.get("profession")
+    location = request.args.get("location")
+    education = request.args.get("education")
+    experience = request.args.get("experience")
+
+    if profession:
+        mentor_query = mentor_query.filter_by(profession=profession)
+    if location:
+        mentor_query = mentor_query.filter_by(location=location)
+    if education:
+        mentor_query = mentor_query.filter_by(education=education)
+    if experience:
+        if experience == "0-2":
+            mentor_query = mentor_query.filter(cast(MentorProfile.years_of_experience, Integer).between(0, 2))
+        elif experience == "3-5":
+            mentor_query = mentor_query.filter(cast(MentorProfile.years_of_experience, Integer).between(3, 5))
+        elif experience == "6-10":
+            mentor_query = mentor_query.filter(cast(MentorProfile.years_of_experience, Integer).between(6, 10))
+        elif experience == "10+":
+            mentor_query = mentor_query.filter(cast(MentorProfile.years_of_experience, Integer) >= 10)
+
+    mentors = mentor_query.all()
+
+    options = {
+        "professions": sorted({row[0] for row in MentorProfile.query.with_entities(MentorProfile.profession).distinct() if row[0]}),
+        "locations": sorted({row[0] for row in MentorProfile.query.with_entities(MentorProfile.location).distinct() if row[0]}),
+        "educations": sorted({row[0] for row in MentorProfile.query.with_entities(MentorProfile.education).distinct() if row[0]}),
+        "experiences": sorted({row[0] for row in MentorProfile.query.with_entities(MentorProfile.years_of_experience).distinct() if row[0]}),
+    }
+
+    return render_template(
+        "supervisor_find_mentor.html",
+        mentors=mentors,
+        professions=options["professions"],
+        locations=options["locations"],
+        educations=options["educations"],
+        experiences=options["experiences"],
+        active_section="mentors",
+        show_sidebar=True
+        
+    )
+
+
+@app.route("/supervisor_find_mentee")
+def supervisor_find_mentee():
+    if "email" not in session or session.get("user_type") != "0":
+        return redirect(url_for("signin"))
+
+    mentee_query = MenteeProfile.query.join(User, MenteeProfile.user_id == User.id)
+    search_query = request.args.get("search", "").lower()
+    stream_filter = request.args.get("stream", "")
+    school_filter = request.args.get("school", "")
+    goal_filter = request.args.get("goal", "")
+
+    if search_query:
+        mentee_query = mentee_query.filter(
+            or_(
+                User.name.ilike(f"%{search_query}%"),
+                MenteeProfile.stream.ilike(f"%{search_query}%"),
+                MenteeProfile.school_college_name.ilike(f"%{search_query}%")
+            )
+        )
+    if stream_filter:
+        mentee_query = mentee_query.filter(MenteeProfile.stream == stream_filter)
+    if school_filter:
+        mentee_query = mentee_query.filter(MenteeProfile.school_college_name == school_filter)
+    if goal_filter:
+        mentee_query = mentee_query.filter(MenteeProfile.goal == goal_filter)
+
+    all_mentees = mentee_query.all()
+
+    mentee_streams = sorted({row[0] for row in MenteeProfile.query.with_entities(MenteeProfile.stream).distinct() if row[0]})
+    mentee_schools = sorted({row[0] for row in MenteeProfile.query.with_entities(MenteeProfile.school_college_name).distinct() if row[0]})
+    mentee_goals = sorted({row[0] for row in MenteeProfile.query.with_entities(MenteeProfile.goal).distinct() if row[0]})
+
+    return render_template(
+        "supervisor_find_mentee.html",
+        mentees=all_mentees,
+        mentee_streams=mentee_streams,
+        mentee_schools=mentee_schools,
+        mentee_goals=mentee_goals,
+        active_section="mentees",
+        show_sidebar=True
+
+    )
+
+# supervisor view requests
+@app.route("/requests")
+def view_requests():
+    if "email" not in session or session.get("user_type") != "0":
+        return redirect(url_for("signin"))
+
+    all_requests = MentorshipRequest.query.all()
+    mentor_requests = MentorProfile.query.filter_by(status="pending").all()
+    mentee_requests = MenteeProfile.query.filter_by(status="pending").all()
+
+    return render_template(
+        "supervisor_request.html",
+        all_requests=all_requests,
+        mentor_requests=mentor_requests,
+        mentee_requests=mentee_requests,
+        active_section="requests",
+        show_sidebar=True
+    )
 
 
 # ------------------- HANDLE MENTORSHIP REQUEST ------------------
@@ -672,7 +894,6 @@ def request_mentorship():
         db.session.rollback()
         return jsonify({"success": False, "message": str(e)}), 500
 
-
 @app.route("/mentor_response", methods=["POST"])
 def mentor_response():
     # Get form data
@@ -710,7 +931,7 @@ def mentor_response():
         print("DB Commit Error:", e)
 
     # Always redirect to mentor dashboard
-    return redirect(url_for("mentordashboard"))
+    return redirect(url_for("mentor_mentorship_request"))
 
 #------------------- PROFILE PICTURE AT TOP ------------------
 @app.context_processor

@@ -1,0 +1,232 @@
+{% extends "base2.html" %}
+{% block title %}Supervisor Dashboard{% endblock %}
+{% block user %}Supervisor{% endblock %}
+
+{% block profiledrop %}{% endblock %}
+
+{% block content %}
+
+<style>
+  .nav-btn {
+    background: transparent;
+    color: #6b7280;
+    transition: all 0.2s;
+  }
+  
+  .nav-btn.active, .nav-btn:hover {
+    background: white;
+    color: #111827;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  }
+</style>
+
+<main class="max-w-7xl mx-auto px-2 sm:px-3 lg:px-3 py-2">
+
+  <section id="mentors" class="p-6 bg-white rounded-xl shadow-sm">
+    <div class="mb-6">
+      <h2 class="text-xl font-semibold text-gray-800 mb-2">All Mentors</h2>
+      <p class="text-gray-600">View and manage all registered mentors.</p>
+    </div>
+    
+    <input type="text" id="mentorSearch" placeholder="Search mentors by name, profession, location..."
+           class="w-full p-3 mb-4 border border-gray-300 rounded-lg"
+           onkeyup="filterMentors()">
+
+            <!-- Filters -->
+      <form method="GET" action="{{ url_for('supervisordashboard') }}">
+        <div class="flex flex-wrap items-center gap-3">
+          <!-- Profession -->
+          <div class="relative">
+            <select name="profession" class="appearance-none pl-4 pr-10 py-2 border rounded-full text-gray-700 bg-white">
+              <option value="" {% if not request.args.get('profession') %}selected{% endif %}>All Professions</option>
+              {% for profession in professions %}
+              <option value="{{ profession }}" {% if request.args.get('profession') == profession %}selected{% endif %}>
+                {{ profession }}
+              </option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <!-- Location -->
+          <div class="relative">
+            <select name="location" class="appearance-none pl-4 pr-10 py-2 border rounded-full text-gray-700 bg-white">
+              <option value="" {% if not request.args.get('location') %}selected{% endif %}>All Locations</option>
+              {% for location in locations %}
+              <option value="{{ location }}" {% if request.args.get('location') == location %}selected{% endif %}>
+                {{ location }}
+              </option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <!-- Education -->
+          <div class="relative">
+            <select name="education" class="appearance-none pl-4 pr-10 py-2 border rounded-full text-gray-700 bg-white">
+              <option value="" {% if not request.args.get('education') %}selected{% endif %}>All Education</option>
+              {% for education in educations %}
+              <option value="{{ education }}" {% if request.args.get('education') == education %}selected{% endif %}>
+                {{ education }}
+              </option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <!-- Experience -->
+          <div class="relative">
+            <select name="experience" class="appearance-none pl-4 pr-10 py-2 border rounded-full text-gray-700 bg-white">
+              <option value="" {% if not request.args.get('experience') %}selected{% endif %}>Any Experience</option>
+              <option value="0-2" {% if request.args.get('experience') == '0-2' %}selected{% endif %}>0 - 2 years</option>
+              <option value="3-5" {% if request.args.get('experience') == '3-5' %}selected{% endif %}>3 - 5 years</option>
+              <option value="6-10" {% if request.args.get('experience') == '6-10' %}selected{% endif %}>6 - 10 years</option>
+              <option value="10+" {% if request.args.get('experience') == '10+' %}selected{% endif %}>10+ years</option>
+            </select>
+          </div>
+
+          <!-- Search Button -->
+          <button type="submit" class="px-5 py-2 rounded-full bg-blue-600 text-white font-medium">
+            Search
+          </button>
+        </div>
+      </form>  
+
+    {% if mentors and mentors|length > 0 %}
+    <div class="grid p-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="mentorsGrid">
+      {% for mentor in mentors %}
+      <div class="mentor-card bg-white rounded-xl border border-gray-200 p-5 transition-all hover:shadow-md">
+        <div class="flex items-center gap-4 mb-4">
+          {% if mentor.profile_picture %}
+            <img src="{{ url_for('static', filename='uploads/' ~ mentor.profile_picture) }}" 
+                 alt="{{ mentor.user.name }}" 
+                 class="w-16 h-16 rounded-full object-cover border-2 border-white shadow">
+          {% else %}
+            <div class="w-16 h-16 rounded-full bg-gradient-to-br from-blue-100 to-blue-200 flex items-center justify-center text-blue-600 border-2 border-white shadow">
+              <span class="text-xl font-semibold">{{ mentor.user.name[0] if mentor.user.name else '?' }}</span>
+            </div>
+          {% endif %}
+          <div>
+            <h3 class="text-lg font-bold text-gray-800 mentor-name">{{ mentor.user.name }}</h3>
+            <p class="text-sm text-gray-600 mentor-profession">{{ mentor.profession }} at {{ mentor.organisation }}</p>
+          </div>
+        </div>
+        
+        <div class="space-y-2 mb-4">
+          <div class="flex items-center text-sm text-gray-600 mentor-location">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+            </svg>
+            <span>{{ mentor.location if mentor.location else 'Not specified' }}</span>
+          </div>
+          
+          <div class="flex items-center text-sm text-gray-600 mentor-email">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>
+            <span>{{ mentor.user.email }}</span>
+          </div>
+        </div>
+        
+        <div class="flex space-x-2">
+          <button class="flex-1 px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition">
+            View Profile
+          </button>
+          <button class="px-4 py-2 bg-white border border-gray-300 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-50 transition">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
+            </svg>
+          </button>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}
+    <div class="text-center py-12">
+      <div class="mx-auto w-24 h-24 rounded-full bg-gray-100 flex items-center justify-center mb-4">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+        </svg>
+      </div>
+      <h3 class="text-lg font-medium text-gray-900 mb-1">No mentors found</h3>
+      <p class="text-gray-500">There are no mentors registered in the system yet.</p>
+    </div>
+    {% endif %}
+  </section>
+
+</main>
+
+<script>
+function showSection(id) {
+  // Hide all sections
+  document.querySelectorAll("section").forEach(sec => sec.classList.add("hidden"));
+  
+  // Show selected section
+  document.getElementById(id).classList.remove("hidden");
+  
+  // Update active navigation button
+  document.querySelectorAll('.nav-btn').forEach(btn => {
+    btn.classList.remove('active');
+  });
+  
+  // Find the button that corresponds to this section and activate it
+  const buttons = document.querySelectorAll('.nav-btn');
+  buttons.forEach(btn => {
+    const btnText = btn.textContent.trim();
+    if (btnText === 'Dashboard' && id === 'dashboard') {
+      btn.classList.add('active');
+    } else if (btnText === 'Mentors' && id === 'mentors') {
+      btn.classList.add('active');
+    } else if (btnText === 'Mentees' && id === 'mentees') {
+      btn.classList.add('active');
+    } else if (btnText === 'Requests' && id === 'requests') {
+      btn.classList.add('active');
+    }
+  });
+}
+
+// Auto-open correct section using Jinja-injected variable
+document.addEventListener("DOMContentLoaded", function() {
+  // Assuming a context variable `active_section` is passed from the backend
+  var activeSection = "{{ active_section|default('dashboard') }}";
+  showSection(activeSection);
+});
+
+// Client-side filtering for Mentors
+function filterMentors() {
+  const input = document.getElementById('mentorSearch').value.toLowerCase();
+  const cards = document.querySelectorAll('.mentor-card');
+
+  cards.forEach(card => {
+    const name = card.querySelector('.mentor-name').innerText.toLowerCase();
+    const profession = card.querySelector('.mentor-profession').innerText.toLowerCase();
+    const email = card.querySelector('.mentor-email').innerText.toLowerCase();
+    const location = card.querySelector('.mentor-location').innerText.toLowerCase();
+
+    if(name.includes(input) || profession.includes(input) || email.includes(input) || location.includes(input)) {
+      card.style.display = 'block';
+    } else {
+      card.style.display = 'none';
+    }
+  });
+}
+
+// Client-side filtering for Mentees
+function filterMentees() {
+  const input = document.getElementById('menteeSearch').value.toLowerCase();
+  const cards = document.querySelectorAll('.mentee-card');
+
+  cards.forEach(card => {
+    const name = card.querySelector('.mentee-name').innerText.toLowerCase();
+    const school = card.querySelector('.mentee-school').innerText.toLowerCase();
+    const goal = card.querySelector('.mentee-goal').innerText.toLowerCase();
+    const email = card.querySelector('.mentee-email').innerText.toLowerCase();
+
+    if(name.includes(input) || school.includes(input) || goal.includes(input) || email.includes(input)) {
+      card.style.display = 'block';
+    } else {
+      card.style.display = 'none';
+    }
+  });
+}
+</script>
+
+{% endblock %}

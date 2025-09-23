@@ -116,61 +116,61 @@
 
     {% if session.get('user_type') == '0' %}
         <!-- Supervisor Dashboard -->
-        <a href="javascript:void(0)" onclick="showSection('dashboard')" id="link-dashboard"
+        <a href="{{ url_for ('supervisordashboard')}}"
            class="block px-4 py-2 text-white  hover:bg-gray-600 rounded-md">
            📊 Dashboard
         </a>
         
-        <a href="javascript:void(0)" onclick="showSection('mentors')" id="link-mentors"
+        <a href="{{ url_for ('supervisor_find_mentor')}}"
            class="block px-4 py-2 text-white  hover:bg-gray-600 rounded-md">
            🎓 Mentors
         </a>
         
-        <a href="javascript:void(0)" onclick="showSection('mentees')" id="link-mentees"
+        <a href="{{ url_for ('supervisor_find_mentee')}}"
            class="block px-4 py-2 text-white  hover:bg-gray-600 rounded-md">
            👥 Mentees
         </a>
         
-        <a href="javascript:void(0)" onclick="showSection('requests')" id="link-requests"
+        <a href="{{ url_for ('view_requests')}}"
            class="block px-4 py-2 text-white  hover:bg-gray-600 rounded-md">
            📩 Requests
         </a>
 
     {% elif session.get('user_type') == '1' %}
         <!-- Mentor Dashboard -->
-        <a href="javascript:void(0)" onclick="showSection('dashboard')" id="link-dashboard"
+        <a href="{{ url_for ('mentordashboard')}}"
            class="block px-4 py-2 text-white  hover:bg-gray-600 rounded-md">
            📊 Dashboard
         </a>
         
-        <a href="javascript:void(0)" onclick="showSection('mymentees')" id="link-mymentees"
+        <a href="{{ url_for ('my_mentees')}}"
            class="block px-4 py-2 text-white  hover:bg-gray-600 rounded-md">
            👥 My Mentees
         </a>
         
-        <a href="javascript:void(0)" onclick="showSection('meetingrequests')" id="link-meetingrequests"
+        <a href="{{ url_for ('mentor_mentorship_request')}}"
            class="block px-4 py-2 text-white  hover:bg-gray-600 rounded-md">
            📅 Mentor connect Request
         </a>
         
-        <a href="javascript:void(0)" onclick="showSection('findmentees')" id="link-findmentees"
+        <a href="{{ url_for ('find_mentees')}}"
            class="block px-4 py-2 text-white  hover:bg-gray-600 rounded-md">
            🔍 Find Mentee
         </a>
 
     {% elif session.get('user_type') == '2' %}
         <!-- Mentee Dashboard -->
-        <a href="javascript:void(0)" onclick="showSection('dashboard')" id="link-dashboard"
+        <a href="{{ url_for ('menteedashboard')}}"
            class="block px-4 py-2 text-white  hover:bg-gray-600 rounded-md">
            📊 Dashboard
         </a>
         
-        <a href="javascript:void(0)" onclick="showSection('mymentors')" id="link-mentors"
+        <a href="{{ url_for ('my_mentors')}}"
            class="block px-4 py-2 text-white  hover:bg-gray-600 rounded-md">
            🎓 My Mentors
         </a>
         
-        <a href="javascript:void(0)" onclick="showSection('findmentor')" id="link-findmentor"
+        <a href="{{ url_for ('find_mentor')}}"
            class="block px-4 py-2 text-white  hover:bg-gray-600 rounded-md">
            🔍 Find Mentor
         </a>

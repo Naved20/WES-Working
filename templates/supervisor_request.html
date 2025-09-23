@@ -1,0 +1,298 @@
+{% extends "base2.html" %}
+{% block title %}Supervisor Dashboard{% endblock %}
+{% block user %}Supervisor{% endblock %}
+
+{% block profiledrop %}{% endblock %}
+
+{% block content %}
+
+<style>
+  .nav-btn {
+    background: transparent;
+    color: #6b7280;
+    transition: all 0.2s;
+  }
+  
+  .nav-btn.active, .nav-btn:hover {
+    background: white;
+    color: #111827;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  }
+</style>
+
+<main class="max-w-7xl mx-auto px-2 sm:px-3 lg:px-3 py-2">
+
+<!-- Mentorship Requests Section -->
+<section id="requests" class="p-6 bg-white rounded-xl shadow-sm">
+  <div class="mb-6">
+    <h2 class="text-2xl font-semibold text-gray-800 mb-2">Mentorship Requests</h2>
+    <p class="text-gray-600">Review and approve or reject mentorship requests between mentors and mentees.</p>
+  </div>
+
+  {% if all_requests and all_requests|length > 0 %}
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    {% for request in all_requests %}
+    <div class="relative bg-white rounded-xl border border-gray-200 p-5 transition-all hover:shadow-lg">
+      <!-- Mentee Info -->
+      <div class="flex items-center gap-4 mb-4">
+        {% if request.mentee.mentee_profile and request.mentee.mentee_profile.profile_picture %}
+        <img src="{{ url_for('static', filename='uploads/' ~ request.mentee.mentee_profile.profile_picture) }}" 
+             alt="{{ request.mentee.name }}" 
+             class="w-16 h-16 rounded-full object-cover border-2 border-white shadow">
+        {% else %}
+        <div class="w-16 h-16 rounded-full bg-gradient-to-br from-blue-100 to-blue-200 flex items-center justify-center text-blue-600 border-2 border-white shadow">
+          <span class="text-xl font-semibold">{{ request.mentee.name[0] if request.mentee.name else '?' }}</span>
+        </div>
+        {% endif %}
+
+        <div class="flex flex-col">
+          <p class="font-semibold text-gray-800">{{ request.mentee.name or 'Unnamed' }}</p>
+          <p class="text-sm text-gray-500">Mentee</p>
+        </div>
+      </div>
+
+                         <!-- Mentor Info -->
+      <div class="flex items-center gap-4 mb-4">
+        {% if request.mentor.mentor_profile and request.mentor.mentor_profile.profile_picture %}
+        <img src="{{ url_for('static', filename='uploads/' ~ request.mentor.mentor_profile.profile_picture) }}" 
+             alt="{{ request.mentor.name }}" 
+             class="w-16 h-16 rounded-full object-cover border-2 border-white shadow">
+        {% else %}
+        <div class="w-16 h-16 rounded-full bg-gradient-to-br from-green-100 to-green-200 flex items-center justify-center text-green-600 border-2 border-white shadow">
+          <span class="text-xl font-semibold">{{ request.mentor.name[0] if request.mentor.name else '?' }}</span>
+        </div>
+        {% endif %}
+
+        <div class="flex flex-col">
+          <p class="font-semibold text-gray-800">{{ request.mentor.name or 'Unnamed' }}</p>
+          <p class="text-sm text-gray-500">Mentor</p>
+        </div>
+      </div>
+
+      <!-- Meeting Details -->
+      <div class="space-y-2 mb-4">
+        <div class="flex items-center text-sm text-gray-600">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+          </svg>
+          <span>Time: {{ request.meeting_time or 'Not specified' }}</span>
+        </div>
+
+        <div class="text-sm text-gray-600">
+          <p class="font-medium">Purpose:</p>
+          <p class="mt-1">{{ request.why_need_mentor or 'No purpose provided' }}</p>
+        </div>
+
+        <div class="text-sm text-gray-600">
+          <p class="font-medium">Status:</p>
+          <p class="mt-1">
+            Mentor: <span class="{% if request.mentor_status == 'accepted' %}text-green-600{% elif request.mentor_status == 'rejected' %}text-red-600{% else %}text-yellow-600{% endif %}">{{ request.mentor_status }}</span>
+            <br>
+            Supervisor: <span class="{% if request.supervisor_status == 'approved' %}text-green-600{% elif request.supervisor_status == 'rejected' %}text-red-600{% else %}text-yellow-600{% endif %}">{{ request.supervisor_status }}</span>
+          </p>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      {% if request.supervisor_status == 'pending' %}
+      <div class="flex gap-5">
+        <!-- Approve Button -->
+        <form action="{{ url_for('supervisor_response') }}" method="POST" class="flex-1">
+          <input type="hidden" name="request_id" value="{{ request.id }}">
+          <input type="hidden" name="action" value="approve">
+          <button type="submit" class="w-full px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-lg hover:bg-green-700 transition">
+            Approve
+          </button>
+        </form>
+
+        <!-- Reject Button -->
+        <form action="{{ url_for('supervisor_response') }}" method="POST" class="flex-1">
+          <input type="hidden" name="request_id" value="{{ request.id }}">
+          <input type="hidden" name="action" value="reject">
+          <button type="submit" class="w-full px-4 py-2 bg-red-600 text-white text-sm font-medium rounded-lg hover:bg-red-700 transition">
+            Reject
+          </button>
+        </form>
+      </div>
+      {% else %}
+      <div class="text-center py-2">
+        <span class="text-sm {% if request.supervisor_status == 'approved' %}text-green-600{% else %}text-red-600{% endif %}">
+          Already {{ request.supervisor_status }}
+        </span>
+      </div>
+      {% endif %}
+    </div>
+    {% endfor %}
+  </div>
+  
+  {% else %}
+  <div class="text-center py-12">
+    <div class="mx-auto w-24 h-24 rounded-full bg-gray-100 flex items-center justify-center mb-4">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+      </svg>
+    </div>
+    <h3 class="text-lg font-medium text-gray-900 mb-1">No mentorship requests</h3>
+    <p class="text-gray-500">There are no mentorship requests to review.</p>
+  </div>
+  {% endif %}
+</section>
+
+<!-- Profile Approval Requests Section -->
+<section id="profile-requests" class="p-6 bg-white rounded-xl shadow-sm mt-6">
+  <div class="mb-6">
+    <h2 class="text-2xl font-semibold text-gray-800 mb-2">Profile Approval Requests</h2>
+    <p class="text-gray-600">Review and approve or reject mentor and mentee profile requests.</p>
+  </div>
+
+  <div class="mb-8">
+    <h3 class="text-lg font-semibold text-gray-800 mb-4">Mentor Requests</h3>
+    {% if mentor_requests and mentor_requests|length > 0 %}
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      {% for mentor in mentor_requests %}
+      <div class="bg-gray-50 rounded-xl border border-gray-200 p-5">
+        <h4 class="font-bold text-gray-800">{{ mentor.user.name }}</h4>
+        <p class="text-sm text-gray-600 mt-1">{{ mentor.profession }} at {{ mentor.organisation }}</p>
+        <div class="flex items-center text-sm text-gray-500 mt-2">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+          </svg>
+          <span>{{ mentor.user.email }}</span>
+        </div>
+        <div class="mt-4 flex space-x-2">
+          <form action="{{ url_for('approve_profile') }}" method="POST" class="flex-1">
+            <input type="hidden" name="profile_type" value="mentor">
+            <input type="hidden" name="profile_id" value="{{ mentor.id }}">
+            <input type="hidden" name="action" value="approve">
+            <button type="submit" class="w-full px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-lg hover:bg-green-700 transition">Approve</button>
+          </form>
+          <form action="{{ url_for('approve_profile') }}" method="POST" class="flex-1">
+            <input type="hidden" name="profile_type" value="mentor">
+            <input type="hidden" name="profile_id" value="{{ mentor.id }}">
+            <input type="hidden" name="action" value="reject">
+            <button type="submit" class="w-full px-4 py-2 bg-red-600 text-white text-sm font-medium rounded-lg hover:bg-red-700 transition">Reject</button>
+          </form>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}
+      <p class="text-gray-500 text-center py-4 bg-gray-50 rounded-lg border border-gray-200">No mentor requests pending.</p>
+    {% endif %}
+  </div>
+
+  <div>
+    <h3 class="text-lg font-semibold text-gray-800 mb-4">Mentee Requests</h3>
+    {% if mentee_requests and mentee_requests|length > 0 %}
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      {% for mentee in mentee_requests %}
+      <div class="bg-gray-50 rounded-xl border border-gray-200 p-5">
+        <h4 class="font-bold text-gray-800">{{ mentee.user.name }}</h4>
+        <p class="text-sm text-gray-600 mt-1">{{ mentee.school_college_name }}</p>
+        <div class="flex items-center text-sm text-gray-500 mt-2">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13.5m0-13.5C10.835 5.86 9.539 5.378 8 5.255 5.8 4.75 4 6.777 4 9v6a4 4 0 004 4h8a4 4 0 004-4v-6c0-2.223-1.8-4.25-4-3.745-1.539.123-2.835.605-4 1.148z" />
+          </svg>
+          <span>Goal: {{ mentee.goal }}</span>
+        </div>
+        <div class="mt-4 flex space-x-2">
+          <form action="{{ url_for('approve_profile') }}" method="POST" class="flex-1">
+            <input type="hidden" name="profile_type" value="mentee">
+            <input type="hidden" name="profile_id" value="{{ mentee.id }}">
+            <input type="hidden" name="action" value="approve">
+            <button type="submit" class="w-full px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-lg hover:bg-green-700 transition">Approve</button>
+          </form>
+          <form action="{{ url_for('approve_profile') }}" method="POST" class="flex-1">
+            <input type="hidden" name="profile_type" value="mentee">
+            <input type="hidden" name="profile_id" value="{{ mentee.id }}">
+            <input type="hidden" name="action" value="reject">
+            <button type="submit" class="w-full px-4 py-2 bg-red-600 text-white text-sm font-medium rounded-lg hover:bg-red-700 transition">Reject</button>
+          </form>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}
+      <p class="text-gray-500 text-center py-4 bg-gray-50 rounded-lg border border-gray-200">No mentee requests pending.</p>
+    {% endif %}
+  </div>
+</section>
+
+</main>
+
+<script>
+function showSection(id) {
+  // Hide all sections
+  document.querySelectorAll("section").forEach(sec => sec.classList.add("hidden"));
+  
+  // Show selected section
+  document.getElementById(id).classList.remove("hidden");
+  
+  // Update active navigation button
+  document.querySelectorAll('.nav-btn').forEach(btn => {
+    btn.classList.remove('active');
+  });
+  
+  // Find the button that corresponds to this section and activate it
+  const buttons = document.querySelectorAll('.nav-btn');
+  buttons.forEach(btn => {
+    const btnText = btn.textContent.trim();
+    if (btnText === 'Dashboard' && id === 'dashboard') {
+      btn.classList.add('active');
+    } else if (btnText === 'Mentors' && id === 'mentors') {
+      btn.classList.add('active');
+    } else if (btnText === 'Mentees' && id === 'mentees') {
+      btn.classList.add('active');
+    } else if (btnText === 'Requests' && id === 'requests') {
+      btn.classList.add('active');
+    }
+  });
+}
+
+// Auto-open correct section using Jinja-injected variable
+document.addEventListener("DOMContentLoaded", function() {
+  // Assuming a context variable `active_section` is passed from the backend
+  var activeSection = "{{ active_section|default('dashboard') }}";
+  showSection(activeSection);
+});
+
+// Client-side filtering for Mentors
+function filterMentors() {
+  const input = document.getElementById('mentorSearch').value.toLowerCase();
+  const cards = document.querySelectorAll('.mentor-card');
+
+  cards.forEach(card => {
+    const name = card.querySelector('.mentor-name').innerText.toLowerCase();
+    const profession = card.querySelector('.mentor-profession').innerText.toLowerCase();
+    const email = card.querySelector('.mentor-email').innerText.toLowerCase();
+    const location = card.querySelector('.mentor-location').innerText.toLowerCase();
+
+    if(name.includes(input) || profession.includes(input) || email.includes(input) || location.includes(input)) {
+      card.style.display = 'block';
+    } else {
+      card.style.display = 'none';
+    }
+  });
+}
+
+// Client-side filtering for Mentees
+function filterMentees() {
+  const input = document.getElementById('menteeSearch').value.toLowerCase();
+  const cards = document.querySelectorAll('.mentee-card');
+
+  cards.forEach(card => {
+    const name = card.querySelector('.mentee-name').innerText.toLowerCase();
+    const school = card.querySelector('.mentee-school').innerText.toLowerCase();
+    const goal = card.querySelector('.mentee-goal').innerText.toLowerCase();
+    const email = card.querySelector('.mentee-email').innerText.toLowerCase();
+
+    if(name.includes(input) || school.includes(input) || goal.includes(input) || email.includes(input)) {
+      card.style.display = 'block';
+    } else {
+      card.style.display = 'none';
+    }
+  });
+}
+</script>
+
+{% endblock %}
