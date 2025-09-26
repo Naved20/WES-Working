@@ -1,9 +1,7 @@
 {% extends "base2.html" %}
 {% block title %}Mentee Dashboard{% endblock %}
 {% block user %}Mentee{% endblock %}
-
 {% block profiledrop %}{% endblock %}
-
 {% block content %}
 
 <style>
@@ -18,8 +16,6 @@
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   }
 </style>
-
-
 
   <!-- My Mentors Section -->
   <section id="mymentors" class=" p-6 bg-white rounded-xl shadow-sm">
@@ -87,14 +83,13 @@
       </div>
       <h3 class="text-lg font-medium text-gray-900 mb-1">No mentors yet</h3>
       <p class="text-gray-500 mb-6">You haven't connected with any mentors yet.</p>
-      <button onclick="showSection('findmentor')" class="px-5 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition">
+     <a href="{{ url_for ('find_mentor')}}"> 
+      <button class="px-5 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition">
         Find Mentors
       </button>
+    </a>
     </div>
     {% endif %}
   </section>
-
-
-  
   
 {% endblock %}

@@ -156,11 +156,12 @@ class MentorshipRequest(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     mentee_id = db.Column(db.Integer, db.ForeignKey("signup_details.id"), nullable=False)
     mentor_id = db.Column(db.Integer, db.ForeignKey("signup_details.id"), nullable=False)
+    
     # Details from the form
-    meeting_time = db.Column(db.String(50), nullable=False)
-    timezone = db.Column(db.String(100))
-    meeting_type = db.Column(db.String(50)) # 'special' or 'anchor'
-    purpose_type = db.Column(db.String(50)) # 'long' or 'short'
+    purpose = db.Column(db.String(1000))  # career guidance / interview prep / skill development / others
+    mentor_type = db.Column(db.String(20))   # anchor / special
+    term = db.Column(db.String(20))          # short / long
+    duration_months = db.Column(db.Integer)  # auto set depending on rules
     why_need_mentor = db.Column(db.Text, nullable=False)
     
     # Request status tracking
@@ -392,6 +393,10 @@ def mentor_mentorship_request():
             mentor_id=mentor.id
         ).all()
 
+
+    mentee_id = request.args.get("mentee_id")  # or request.form.get("mentee_id")
+    mentee = MenteeProfile.query.get(mentee_id)
+
         # Fetch all mentees
     all_mentees = MenteeProfile.query.all()
 
@@ -401,7 +406,7 @@ def mentor_mentorship_request():
     goals = [row.goal for row in MenteeProfile.query.with_entities(MenteeProfile.goal).distinct() if row.goal]
 
         # Get a specific mentee for the profile section (if needed)
-        # For example, get the first mentee from the requests if available
+        # For example, get the  first mentee from the requests if available
     example_mentee = None
     if incoming_requests and incoming_requests[0].mentee:
             example_mentee = incoming_requests[0].mentee
@@ -410,8 +415,17 @@ def mentor_mentorship_request():
     mentor_info = {
             "full_name": mentor.name, 
             "username": mentor.email,
-            "date_time": datetime.now().strftime("%d-%m-%Y %H:%M:%S")
+
         }
+
+
+    existing_pending_request = None
+    existing_active_mentorship = None
+
+
+
+
+
     return render_template(
         "mentor_mentorship_request.html",
         mentorship_requests=incoming_requests,
@@ -554,7 +568,6 @@ def supervisordashboard():
         source_page=source_page
     )
     
-
 #-------- find function------------
 @app.route("/find_mentor", methods=["GET"])
 def find_mentor():
@@ -695,7 +708,7 @@ def my_mentors():
         flash("Mentee profile not found.", "error")
         return redirect(url_for("signin"))
 
-    # Fetch accepted mentorship requests for this mentee
+    # A fully approved request means: Mentor accepted AND Supervisor approved AND system final approval is done.
     accepted_requests = MentorshipRequest.query.filter_by(
         mentee_id=mentee.id,
         mentor_status="accepted",
@@ -703,12 +716,16 @@ def my_mentors():
         final_status="approved"
     ).all()
 
-    # Extract unique mentors from the accepted requests
-    mentors = {req.mentor for req in accepted_requests}
+    my_mentors = []
+    for req in accepted_requests:
+        # req.mentor is the Mentor's User object.
+        # req.mentor.mentor_profile is the MentorProfile object attached to that User.
+        if req.mentor and req.mentor.mentor_profile:
+             my_mentors.append(req.mentor.mentor_profile)
 
     return render_template(
         "mentee_my_mentors.html",
-        mentors=mentors,
+        my_mentors=my_mentors,
         show_sidebar=True
     )
 
@@ -733,16 +750,23 @@ def my_mentees():
         final_status="approved"
     ).all()
 
-    # Extract unique mentees from the accepted requests
-    mentees = {req.mentee for req in accepted_requests}
+    # Extract mentees with their full profile data
+    my_mentees_data = []
+    for req in accepted_requests:
+        if req.mentee:
+            # Get the mentee's profile
+            mentee_profile = MenteeProfile.query.filter_by(user_id=req.mentee.id).first()
+            if mentee_profile:
+                my_mentees_data.append({
+                    'user': req.mentee,  # User info (name, email)
+                    'profile': mentee_profile  # MenteeProfile info
+                })
 
     return render_template(
         "mentor_my_mentees.html",
-        mentees=mentees,
+        my_mentees=my_mentees_data,
         show_sidebar=True,
     )
-
-
 
 @app.route("/supervisor_find_mentor")
 def supervisor_find_mentor():
@@ -791,7 +815,6 @@ def supervisor_find_mentor():
         show_sidebar=True
         
     )
-
 
 @app.route("/supervisor_find_mentee")
 def supervisor_find_mentee():
@@ -855,7 +878,6 @@ def view_requests():
         show_sidebar=True
     )
 
-
 # ------------------- HANDLE MENTORSHIP REQUEST ------------------
 @app.route("/request_mentorship", methods=["POST"])
 def request_mentorship():
@@ -865,34 +887,75 @@ def request_mentorship():
     try:
         data = request.json
         mentor_id = data.get("mentor_id")
-        meeting_time = data.get("meeting_time")
-        timezone = data.get("timezone")
-        meeting_type = data.get("meeting_type")
-        purpose_type = data.get("purpose_type")
+        purpose = data.get("purpose")
+        mentor_type = data.get("mentor_type")
+        term = data.get("term")
+        duration_months = data.get("duration_months")
         why_need_mentor = data.get("why_need_mentor")
 
-        if not all([mentor_id, meeting_time, why_need_mentor]):
+        # Validate required fields
+        if not all([mentor_id, purpose, mentor_type, term, duration_months, why_need_mentor]):
             return jsonify({"success": False, "message": "Missing required fields"}), 400
 
+        # Validate duration_months is a positive integer
+        try:
+            duration_months = int(duration_months)
+            if duration_months <= 0:
+                return jsonify({"success": False, "message": "Duration must be a positive number"}), 400
+        except (ValueError, TypeError):
+            return jsonify({"success": False, "message": "Invalid duration value"}), 400
+
+        # Get mentee (current user)
         mentee = User.query.filter_by(email=session["email"]).first()
+        if not mentee:
+            return jsonify({"success": False, "message": "User not found"}), 404
+
+        # Verify mentor exists
+        mentor = User.query.get(mentor_id)
+        if not mentor:
+            return jsonify({"success": False, "message": "Mentor not found"}), 404
+
+        # Check if user is trying to request themselves as mentor
+        if mentee.id == mentor_id:
+            return jsonify({"success": False, "message": "Cannot request mentorship from yourself"}), 400
+
+        # Check for existing pending request to same mentor
+        existing_request = MentorshipRequest.query.filter_by(
+            mentee_id=mentee.id,
+            mentor_id=mentor_id,
+            final_status="pending"
+        ).first()
         
+        if existing_request:
+            return jsonify({"success": False, "message": "You already have a pending request with this mentor"}), 400
+
+        # Create new mentorship request
         new_request = MentorshipRequest(
             mentee_id=mentee.id,
             mentor_id=mentor_id,
-            meeting_time=meeting_time,
-            timezone=timezone,
-            meeting_type=meeting_type,
-            purpose_type=purpose_type,
-            why_need_mentor=why_need_mentor
+            purpose=purpose,
+            mentor_type=mentor_type,
+            term=term,
+            duration_months=duration_months,
+            why_need_mentor=why_need_mentor,
+            mentor_status="pending",
+            supervisor_status="pending",
+            final_status="pending"
         )
+        
         db.session.add(new_request)
         db.session.commit()
 
-        return jsonify({"success": True, "message": "Mentorship request sent successfully!"}), 200
+        return jsonify({
+            "success": True, 
+            "message": "Mentorship request sent successfully!",
+            "request_id": new_request.id
+        }), 200
 
     except Exception as e:
         db.session.rollback()
-        return jsonify({"success": False, "message": str(e)}), 500
+        app.logger.error(f"Error in request_mentorship: {str(e)}")
+        return jsonify({"success": False, "message": "Internal server error"}), 500
 
 @app.route("/mentor_response", methods=["POST"])
 def mentor_response():

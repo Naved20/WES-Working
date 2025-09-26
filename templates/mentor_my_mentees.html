@@ -28,21 +28,33 @@
     
     {% if my_mentees and my_mentees|length > 0 %}
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      {% for mentee in my_mentees %}
+      {% for mentee_data in my_mentees %}
+      {% set mentee = mentee_data.user %}
+      {% set profile = mentee_data.profile %}
       <div class="bg-white rounded-xl border border-gray-200 p-5 transition-all hover:shadow-md">
         <div class="flex items-center gap-4 mb-4">
-          {% if mentee.profile_picture %}
-            <img src="{{ url_for('static', filename='uploads/' ~ mentee.profile_picture) }}" 
-                 alt="{{ mentee.user.name }}" 
+          {% if profile.profile_picture %}
+            <img src="{{ url_for('static', filename='uploads/' ~ profile.profile_picture) }}" 
+                 alt="{{ mentee.name }}" 
                  class="w-16 h-16 rounded-full object-cover border-2 border-white shadow">
           {% else %}
             <div class="w-16 h-16 rounded-full bg-gradient-to-br from-blue-100 to-blue-200 flex items-center justify-center text-blue-600 border-2 border-white shadow">
-              <span class="text-xl font-semibold">{{ mentee.user.name[0] if mentee.user.name else '?' }}</span>
+              <span class="text-xl font-semibold">{{ mentee.name[0] if mentee.name else '?' }}</span>
             </div>
           {% endif %}
           <div>
-            <h3 class="text-lg font-bold text-gray-800">{{ mentee.user.name }}</h3>
-            <p class="text-sm text-gray-600">{{ mentee.stream }} at {{ mentee.school_college_name }}</p>
+            <h3 class="text-lg font-bold text-gray-800">{{ mentee.name }}</h3>
+            <p class="text-sm text-gray-600">
+              {% if profile.stream and profile.school_college_name %}
+                {{ profile.stream }} at {{ profile.school_college_name }}
+              {% elif profile.stream %}
+                {{ profile.stream }}
+              {% elif profile.school_college_name %}
+                {{ profile.school_college_name }}
+              {% else %}
+                Mentee
+              {% endif %}
+            </p>
           </div>
         </div>
         
@@ -51,14 +63,21 @@
             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
-            <span>Next session: {{ mentee.next_session if mentee.next_session else 'Not scheduled' }}</span>
+            <span>Class: {{ profile.class_year if profile.class_year else 'Not specified' }}</span>
           </div>
           
           <div class="flex items-center text-sm text-gray-600">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
-            <span>Goal: {{ mentee.goal if mentee.goal else 'Not specified' }}</span>
+            <span>Goal: {{ profile.goal if profile.goal else 'Not specified' }}</span>
+          </div>
+
+          <div class="flex items-center text-sm text-gray-600">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+            </svg>
+            <span>Email: {{ mentee.email }}</span>
           </div>
         </div>
         
@@ -84,6 +103,11 @@
       </div>
       <h3 class="text-lg font-medium text-gray-900 mb-1">No mentees yet</h3>
       <p class="text-gray-500 mb-6">You haven't connected with any mentees yet.</p>
+      <a href="{{ url_for('find_mentees') }}">
+        <button class="px-5 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition">
+          Find Mentees
+        </button>
+      </a>
     </div>
     {% endif %}
   </section>
