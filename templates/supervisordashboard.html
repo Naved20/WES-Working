@@ -460,13 +460,13 @@
           <span>{{ mentor.user.email }}</span>
         </div>
         <div class="mt-4 flex space-x-2">
-          <form action="{{ url_for('approve_profile') }}" method="POST" class="flex-1">
+          <form action="{{ url_for('supervisor_response') }}" method="POST" class="flex-1">
             <input type="hidden" name="profile_type" value="mentor">
             <input type="hidden" name="profile_id" value="{{ mentor.id }}">
             <input type="hidden" name="action" value="approve">
             <button type="submit" class="w-full px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-lg hover:bg-green-700 transition">Approve</button>
           </form>
-          <form action="{{ url_for('approve_profile') }}" method="POST" class="flex-1">
+          <form action="{{ url_for('supervisor_response') }}" method="POST" class="flex-1">
             <input type="hidden" name="profile_type" value="mentor">
             <input type="hidden" name="profile_id" value="{{ mentor.id }}">
             <input type="hidden" name="action" value="reject">
@@ -496,13 +496,13 @@
           <span>Goal: {{ mentee.goal }}</span>
         </div>
         <div class="mt-4 flex space-x-2">
-          <form action="{{ url_for('approve_profile') }}" method="POST" class="flex-1">
+          <form action="{{ url_for('supervisor_response') }}" method="POST" class="flex-1">
             <input type="hidden" name="profile_type" value="mentee">
             <input type="hidden" name="profile_id" value="{{ mentee.id }}">
             <input type="hidden" name="action" value="approve">
             <button type="submit" class="w-full px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-lg hover:bg-green-700 transition">Approve</button>
           </form>
-          <form action="{{ url_for('approve_profile') }}" method="POST" class="flex-1">
+          <form action="{{ url_for('supervisor_response') }}" method="POST" class="flex-1">
             <input type="hidden" name="profile_type" value="mentee">
             <input type="hidden" name="profile_id" value="{{ mentee.id }}">
             <input type="hidden" name="action" value="reject">
@@ -517,6 +517,7 @@
     {% endif %}
   </div>
 </section>
+
 
 </main>
 

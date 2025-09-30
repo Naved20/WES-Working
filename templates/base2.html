@@ -136,6 +136,11 @@
            📩 Requests
         </a>
 
+        <a href=""
+           class="block px-4 py-2 text-white  hover:bg-gray-600 rounded-md">
+            🗓️ Meeting
+        </a>
+
     {% elif session.get('user_type') == '1' %}
         <!-- Mentor Dashboard -->
         <a href="{{ url_for ('mentordashboard')}}"
@@ -150,12 +155,17 @@
         
         <a href="{{ url_for ('mentor_mentorship_request')}}"
            class="block px-4 py-2 text-white  hover:bg-gray-600 rounded-md">
-           📅 Mentee connect Request
+           🧑‍💻 connect Request
         </a>
         
         <a href="{{ url_for ('find_mentees')}}"
            class="block px-4 py-2 text-white  hover:bg-gray-600 rounded-md">
            🔍 Find Mentee
+        </a>
+
+        <a href="#"
+           class="block px-4 py-2 text-white  hover:bg-gray-600 rounded-md">
+            🗓️ Meeting
         </a>
 
     {% elif session.get('user_type') == '2' %}
@@ -173,6 +183,10 @@
         <a href="{{ url_for ('find_mentor')}}"
            class="block px-4 py-2 text-white  hover:bg-gray-600 rounded-md">
            🔍 Find Mentor
+        </a>
+        <a href="{{ url_for ('mentee_meeting_details')}}"
+           class="block px-4 py-2 text-white  hover:bg-gray-600 rounded-md">
+            🗓️ Meeting
         </a>
     {% endif %}
 </aside>
