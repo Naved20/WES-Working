@@ -284,12 +284,7 @@
   </div>
 </div>
 
-
   </section>
-
-
-
-
 
 </main>
 
@@ -322,81 +317,81 @@ function showSection(id) {
   });
 }
 
-// Auto-open correct section using Jinja-injected variable
-document.addEventListener("DOMContentLoaded", function() {
-  // Assuming a context variable `active_section` is passed from the backend
-  var activeSection = "{{ active_section|default('dashboard') }}";
-  showSection(activeSection);
-});
-
-// Client-side filtering for Mentors
-function filterMentors() {
-  const input = document.getElementById('mentorSearch').value.toLowerCase();
-  const cards = document.querySelectorAll('.mentor-card');
-
-  cards.forEach(card => {
-    const name = card.querySelector('.mentor-name').innerText.toLowerCase();
-    const profession = card.querySelector('.mentor-profession').innerText.toLowerCase();
-    const email = card.querySelector('.mentor-email').innerText.toLowerCase();
-    const location = card.querySelector('.mentor-location').innerText.toLowerCase();
-
-    if(name.includes(input) || profession.includes(input) || email.includes(input) || location.includes(input)) {
-      card.style.display = 'block';
-    } else {
-      card.style.display = 'none';
-    }
+  // Auto-open correct section using Jinja-injected variable
+  document.addEventListener("DOMContentLoaded", function() {
+    // Assuming a context variable `active_section` is passed from the backend
+    var activeSection = "{{ active_section|default('dashboard') }}";
+    showSection(activeSection);
   });
-}
 
-// Client-side filtering for Mentees
-function filterMentees() {
-  const input = document.getElementById('menteeSearch').value.toLowerCase();
-  const cards = document.querySelectorAll('.mentee-card');
+  // Client-side filtering for Mentors
+  function filterMentors() {
+    const input = document.getElementById('mentorSearch').value.toLowerCase();
+    const cards = document.querySelectorAll('.mentor-card');
 
-  cards.forEach(card => {
-    const name = card.querySelector('.mentee-name').innerText.toLowerCase();
-    const school = card.querySelector('.mentee-school').innerText.toLowerCase();
-    const goal = card.querySelector('.mentee-goal').innerText.toLowerCase();
-    const email = card.querySelector('.mentee-email').innerText.toLowerCase();
+    cards.forEach(card => {
+      const name = card.querySelector('.mentor-name').innerText.toLowerCase();
+      const profession = card.querySelector('.mentor-profession').innerText.toLowerCase();
+      const email = card.querySelector('.mentor-email').innerText.toLowerCase();
+      const location = card.querySelector('.mentor-location').innerText.toLowerCase();
 
-    if(name.includes(input) || school.includes(input) || goal.includes(input) || email.includes(input)) {
-      card.style.display = 'block';
-    } else {
-      card.style.display = 'none';
-    }
-  });
-}
+      if(name.includes(input) || profession.includes(input) || email.includes(input) || location.includes(input)) {
+        card.style.display = 'block';
+      } else {
+        card.style.display = 'none';
+      }
+    });
+  }
 
-function openRequestModal(mentorId) {
-  document.getElementById('mentorIdInput').value = mentorId;
-  document.getElementById('requestModal').classList.remove('hidden');
-}
+  // Client-side filtering for Mentees
+  function filterMentees() {
+    const input = document.getElementById('menteeSearch').value.toLowerCase();
+    const cards = document.querySelectorAll('.mentee-card');
+
+    cards.forEach(card => {
+      const name = card.querySelector('.mentee-name').innerText.toLowerCase();
+      const school = card.querySelector('.mentee-school').innerText.toLowerCase();
+      const goal = card.querySelector('.mentee-goal').innerText.toLowerCase();
+      const email = card.querySelector('.mentee-email').innerText.toLowerCase();
+
+      if(name.includes(input) || school.includes(input) || goal.includes(input) || email.includes(input)) {
+        card.style.display = 'block';
+      } else {
+        card.style.display = 'none';
+      }
+    });
+  }
+
+  function openRequestModal(mentorId) {
+    document.getElementById('mentorIdInput').value = mentorId;
+    document.getElementById('requestModal').classList.remove('hidden');
+  }
 
 
 
 
-// Profile modal
-function openProfileModal(name, profession, organisation, location, experience, profilePic, email, education, language, communication, whyMentor) {
-  document.getElementById('modalName').innerText = name;
-  document.getElementById('modalProfession').innerText = profession || "Not specified";
-  document.getElementById('modalOrganisation').innerText = organisation || "Not specified";
-  document.getElementById('modalLocation').innerText = location || "Not specified";
-  document.getElementById('modalExperience').innerText = experience || "Not specified";
-  document.getElementById('modalEmail').innerText = email || "Not specified";
-  document.getElementById('modalEducation').innerText = education || "Not specified";
-  document.getElementById('modalLanguage').innerText = language || "Not specified";
-  document.getElementById('modalCommunication').innerText = communication || "Not specified";
-  document.getElementById('modalWhyMentor').innerText = whyMentor || "Not specified";
+  // Profile modal
+  function openProfileModal(name, profession, organisation, location, experience, profilePic, email, education, language, communication, whyMentor) {
+    document.getElementById('modalName').innerText = name;
+    document.getElementById('modalProfession').innerText = profession || "Not specified";
+    document.getElementById('modalOrganisation').innerText = organisation || "Not specified";
+    document.getElementById('modalLocation').innerText = location || "Not specified";
+    document.getElementById('modalExperience').innerText = experience || "Not specified";
+    document.getElementById('modalEmail').innerText = email || "Not specified";
+    document.getElementById('modalEducation').innerText = education || "Not specified";
+    document.getElementById('modalLanguage').innerText = language || "Not specified";
+    document.getElementById('modalCommunication').innerText = communication || "Not specified";
+    document.getElementById('modalWhyMentor').innerText = whyMentor || "Not specified";
 
-  document.getElementById('modalProfilePic').src = profilePic
-    ? "/static/uploads/" + profilePic
-    : "https://via.placeholder.com/100";
+    document.getElementById('modalProfilePic').src = profilePic
+      ? "/static/uploads/" + profilePic
+      : "https://via.placeholder.com/100";
 
-  document.getElementById('profileModal').classList.remove('hidden');
-}
-function closeProfileModal() {
-  document.getElementById('profileModal').classList.add('hidden');
-}
-</script>
+    document.getElementById('profileModal').classList.remove('hidden');
+  }
+  function closeProfileModal() {
+    document.getElementById('profileModal').classList.add('hidden');
+  }
+  </script>
 
 {% endblock %}
