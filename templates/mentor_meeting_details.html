@@ -1,0 +1,278 @@
+{% extends "base2.html" %}
+{% block title %}Meeting Requests{% endblock %}
+{% block user %}Mentor{% endblock %}
+{% block profiledrop %}{% endblock %}
+{% block content %}
+
+<div class="p-6 bg-white rounded-xl shadow-md">
+  <h2 class="text-2xl font-semibold mb-4 text-gray-800">📅 Meeting Requests</h2>
+  
+  <!-- Filters Section -->
+  <div class="mb-6 flex flex-wrap gap-4">
+    <!-- Month Filter -->
+    <div>
+      <label for="monthFilter" class="block text-sm font-medium text-gray-700 mb-2">Filter by Month:</label>
+      <select id="monthFilter" class="w-48 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+        <option value="all">All Months</option>
+        <!-- Options will be populated dynamically -->
+      </select>
+    </div>
+  </div>
+
+  {% if meetings and meetings|length > 0 %}
+    <!-- Upcoming Meetings Section -->
+    <div class="mb-10">
+      <h3 class="text-xl font-semibold mb-4 text-gray-800 border-b pb-2">Upcoming Meetings</h3>
+      
+      <div id="upcomingMeetings" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {% for meeting in meetings %}
+          <div class="meeting-card upcoming-meeting bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow duration-300" 
+               data-month="{{ meeting.meeting_date.month - 1 }}"
+               data-date="{{ meeting.meeting_date.strftime('%Y-%m-%d') }}">
+            <div class="p-5">
+              <!-- Title only - no status badges -->
+              <h4 class="text-lg font-semibold text-gray-800 mb-3">{{ meeting.meeting_title }}</h4>
+              
+              <div class="space-y-2 text-sm text-gray-600">
+                <div class="flex items-center">
+                  <svg class="w-4 h-4 mr-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                  </svg>
+                  {{ meeting.meeting_date.strftime('%Y-%m-%d') }}
+                </div>
+                
+                <div class="flex items-center">
+                  <svg class="w-4 h-4 mr-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                  </svg>
+                  {{ meeting.meeting_time.strftime('%I:%M %p') }} ({{ meeting.meeting_duration }} mins)
+                </div>
+                
+                <!-- Mentee Details (changed from mentor details) -->
+                <div class="flex items-start">
+                  <svg class="w-4 h-4 mr-2 text-gray-400 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                  </svg>
+                  <div>
+                    <span class="font-medium">{{ meeting.requester.name }}</span>
+                    <div class="text-xs text-gray-500">{{ meeting.requester.email }}</div>
+                  </div>
+                </div>
+                
+                <!-- Meeting Link - Always show if available -->
+                {% if meeting.meet_link %}
+                  <div class="flex items-center mt-3 pt-3 border-t border-gray-100">
+                    <svg class="w-4 h-4 mr-2 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                    </svg>
+                    <a href="{{ meeting.meet_link }}" target="_blank" class="text-blue-600 hover:underline font-medium">
+                      Join Meeting
+                    </a>
+                  </div>
+                {% else %}
+                  <div class="flex items-center mt-3 pt-3 border-t border-gray-100">
+                    <svg class="w-4 h-4 mr-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                    </svg>
+                    <span class="text-gray-500 text-sm">
+                      Meeting link will be provided soon
+                    </span>
+                  </div>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+      
+      <div id="noUpcomingMeetings" class="text-center text-gray-600 py-10 bg-gray-50 rounded-lg hidden">
+        <p class="text-lg">No upcoming meetings.</p>
+        <p class="text-sm text-gray-500">All meetings are in the past.</p>
+      </div>
+    </div>
+    
+    <!-- Past Meetings Section -->
+    <div>
+      <div class="flex justify-between items-center mb-4">
+        <h3 class="text-xl font-semibold text-gray-800">Past Meetings</h3>
+        <div class="flex items-center space-x-4">
+          <span class="text-sm text-gray-500" id="pastMeetingsCount">0 meetings</span>
+        </div>
+      </div>
+      
+      <!-- Past Meetings List -->
+      <div id="pastMeetings" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <!-- Past meetings will be populated by JavaScript -->
+      </div>
+      
+      <div id="noPastMeetings" class="text-center text-gray-600 py-10 bg-gray-50 rounded-lg hidden">
+        <p class="text-lg">No past meetings.</p>
+        <p class="text-sm text-gray-500">All meetings are upcoming.</p>
+      </div>
+      
+      <div id="pastMeetingsLimit" class="mt-4 text-center text-sm text-gray-500 hidden">
+        Showing the 20 most recent past meetings
+        <button id="loadMorePast" class="ml-2 px-3 py-1 text-xs bg-blue-100 text-blue-700 hover:bg-blue-200 rounded-md transition-colors">
+          Load More
+        </button>
+      </div>
+    </div>
+  {% else %}
+    <div class="text-center text-gray-600 py-10">
+      <p class="text-lg">No meeting requests found.</p>
+      <p class="text-sm text-gray-500">You haven't received any meeting requests yet.</p>
+    </div>
+  {% endif %}
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const monthFilter = document.getElementById('monthFilter');
+    const meetingCards = document.querySelectorAll('.meeting-card');
+    const upcomingContainer = document.getElementById('upcomingMeetings');
+    const pastContainer = document.getElementById('pastMeetings');
+    const noUpcomingMsg = document.getElementById('noUpcomingMeetings');
+    const noPastMsg = document.getElementById('noPastMeetings');
+    const pastLimitMsg = document.getElementById('pastMeetingsLimit');
+    const pastMeetingsCount = document.getElementById('pastMeetingsCount');
+    const loadMorePast = document.getElementById('loadMorePast');
+    
+    let allPastMeetings = [];
+    let displayedPastCount = 20;
+    let availableMonths = new Set();
+
+    // Initialize available months from meetings
+    function initializeAvailableMonths() {
+      meetingCards.forEach(card => {
+        const month = card.getAttribute('data-month');
+        availableMonths.add(parseInt(month));
+      });
+
+      const monthNames = [
+        "January", "February", "March", "April", "May", "June",
+        "July", "August", "September", "October", "November", "December"
+      ];
+
+      // Clear existing options except "All Months"
+      while (monthFilter.children.length > 1) {
+        monthFilter.removeChild(monthFilter.lastChild);
+      }
+
+      // Add available months to filter
+      Array.from(availableMonths).sort((a, b) => a - b).forEach(monthIndex => {
+        const option = document.createElement('option');
+        option.value = monthIndex;
+        option.textContent = monthNames[monthIndex];
+        monthFilter.appendChild(option);
+      });
+    }
+
+    // Sort meeting cards by ascending date
+    const cardsArray = Array.from(meetingCards);
+    cardsArray.sort((a, b) => {
+      const dateA = new Date(a.getAttribute('data-date'));
+      const dateB = new Date(b.getAttribute('data-date'));
+      return dateA - dateB; // ascending
+    });
+
+    // Separate upcoming and past meetings using sorted cards
+    function organizeMeetings() {
+      const now = new Date();
+      const upcomingCards = [];
+      allPastMeetings = [];
+
+      cardsArray.forEach(card => {
+        const dateStr = card.getAttribute('data-date');
+        const meetingDate = new Date(dateStr);
+
+        if (meetingDate >= now) {
+          upcomingCards.push(card);
+        } else {
+          allPastMeetings.push(card);
+        }
+      });
+
+      // Clear containers
+      upcomingContainer.innerHTML = '';
+      pastContainer.innerHTML = '';
+
+      // Display upcoming meetings (ascending)
+      if (upcomingCards.length > 0) {
+        upcomingCards.forEach(card => upcomingContainer.appendChild(card));
+        noUpcomingMsg.classList.add('hidden');
+      } else {
+        noUpcomingMsg.classList.remove('hidden');
+      }
+
+      // Display past meetings
+      displayPastMeetings();
+
+      // Update count
+      pastMeetingsCount.textContent = `${allPastMeetings.length} past meeting${allPastMeetings.length !== 1 ? 's' : ''}`;
+      applyFilters();
+    }
+
+    // Display past meetings with limit
+    function displayPastMeetings() {
+      pastContainer.innerHTML = '';
+      const displayPastCards = allPastMeetings.slice(0, displayedPastCount);
+
+      if (displayPastCards.length > 0) {
+        displayPastCards.forEach(card => {
+          card.classList.add('opacity-80');
+          pastContainer.appendChild(card);
+        });
+        noPastMsg.classList.add('hidden');
+
+        if (allPastMeetings.length > 20) {
+          pastLimitMsg.classList.remove('hidden');
+          loadMorePast.textContent = `Load More (${allPastMeetings.length - displayedPastCount} remaining)`;
+        } else {
+          pastLimitMsg.classList.add('hidden');
+        }
+      } else {
+        noPastMsg.classList.remove('hidden');
+        pastLimitMsg.classList.add('hidden');
+      }
+    }
+
+    // Apply filters
+    function applyFilters() {
+      const selectedMonth = monthFilter.value;
+      let upcomingVisible = false;
+      let pastVisible = false;
+
+      const upcomingCards = upcomingContainer.querySelectorAll('.meeting-card');
+      upcomingCards.forEach(card => {
+        const matchesMonth = selectedMonth === 'all' || card.getAttribute('data-month') === selectedMonth;
+        card.style.display = matchesMonth ? 'block' : 'none';
+        if (matchesMonth) upcomingVisible = true;
+      });
+
+      const pastCards = pastContainer.querySelectorAll('.meeting-card');
+      pastCards.forEach(card => {
+        const matchesMonth = selectedMonth === 'all' || card.getAttribute('data-month') === selectedMonth;
+        card.style.display = matchesMonth ? 'block' : 'none';
+        if (matchesMonth) pastVisible = true;
+      });
+
+      noUpcomingMsg.classList.toggle('hidden', upcomingVisible);
+      noPastMsg.classList.toggle('hidden', pastVisible);
+    }
+
+    // Load more past meetings
+    loadMorePast.addEventListener('click', function() {
+      displayedPastCount += 10;
+      displayPastMeetings();
+      applyFilters();
+    });
+
+    monthFilter.addEventListener('change', applyFilters);
+
+    // Initialize
+    initializeAvailableMonths();
+    organizeMeetings();
+  });
+</script>
+
+{% endblock %}

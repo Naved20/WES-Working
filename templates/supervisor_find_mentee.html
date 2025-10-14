@@ -117,14 +117,26 @@
         </div>
         
         <div class="flex space-x-2">
-          <button class="flex-1 px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition">
+        <button 
+            class="view-profile-btn w-full px-4 py-2 bg-gray-100 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-200 transition"
+            data-mentee='{{ {
+                "name": mentee.user.name,
+                "stream": mentee.stream,
+                "school": mentee.school_college_name,
+                "goal": mentee.goal,
+                "dob": mentee.dob,
+                "mobileNumber": mentee.mobile_number,
+                "whatsappNumber": mentee.whatsapp_number,
+                "parentName": mentee.parent_name,
+                "parentMobile": mentee.parent_mobile,
+                "comments": mentee.comments,
+                "profilePic": mentee.profile_picture,
+                "classYear": mentee.class_year,
+                "favouriteSubject": mentee.favourite_subject
+            }|tojson }}'>
             View Profile
-          </button>
-          <button class="px-4 py-2 bg-white border border-gray-300 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-50 transition">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
-            </svg>
-          </button>
+        </button>
+          
         </div>
       </div>
       {% endfor %}
@@ -140,6 +152,147 @@
       <p class="text-gray-500">There are no mentees registered in the system yet.</p>
     </div>
     {% endif %}
+
+
+
+
+    
+<!-- Mentee Profile Modal -->
+<div id="menteeProfileModal" class="fixed inset-0 hidden bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+  <div class="bg-white rounded-2xl shadow-xl w-full max-w-3xl max-h-[90vh] overflow-y-auto relative">
+
+    <!-- Close Button -->
+    <button onclick="closeMenteeProfileModal()" 
+      class="absolute top-5 right-5 text-gray-400 hover:text-gray-600 transition-colors duration-200 text-xl bg-white rounded-full p-1 shadow-sm z-10">
+      ✕
+    </button>
+
+    <!-- Header -->
+    <div class="sticky top-0 bg-white z-10 px-8 pt-8 pb-4 border-b border-gray-100">
+      <h2 class="text-2xl font-bold text-gray-800 flex items-center">
+        <svg class="w-6 h-6 text-blue-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+        </svg>
+        Mentee Profile
+      </h2>
+    </div>
+
+    <!-- Content -->
+    <div class="p-8">
+      <!-- Profile Picture + Basic Info -->
+      <div class="flex flex-col md:flex-row items-center gap-6 mb-8">
+        <div class="relative">
+          <img id="menteeModalProfilePic" src="" alt="Profile Picture" class="w-28 h-28 rounded-full object-cover border-4 border-blue-50 shadow-sm">
+        </div>
+        <div class="text-center md:text-left">
+          <h3 id="menteeModalName" class="text-2xl font-bold text-gray-800 mb-1"></h3>
+          <p id="menteeModalStream" class="text-gray-600 mb-1"></p>
+          <p id="menteeModalGoal" class="text-gray-500 mb-1"></p>
+        </div>
+      </div>
+
+      <!-- Details Grid -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-gray-700 mb-8">
+        <div class="space-y-4">
+          <div class="flex items-start">
+            <svg class="w-5 h-5 text-gray-400 mr-3 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                    d="M8 9a3 3 0 016 0v1a3 3 0 01-6 0V9z" />
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                    d="M12 14v7m0 0h4m-4 0H8" />
+            </svg>
+            <div>
+              <p class="font-medium text-gray-600">Date of Birth</p>
+              <p id="menteeModalDOB" class="text-gray-800"></p>
+            </div>
+          </div>
+
+          <div class="flex items-start">
+            <svg class="w-5 h-5 text-gray-400 mr-3 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                    d="M12 14l9-5-9-5-9 5 9 5z"></path>
+            </svg>
+            <div>
+              <p class="font-medium text-gray-600">Class / Year</p>
+              <p id="menteeModalClass" class="text-gray-800"></p>
+            </div>
+          </div>
+
+          <div class="flex items-start">
+            <svg class="w-5 h-5 text-gray-400 mr-3 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M12 20h9"></path>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M12 4h9M4 9h16M4 15h16"></path>
+            </svg>
+            <div>
+              <p class="font-medium text-gray-600">Favourite Subject</p>
+              <p id="menteeModalSubject" class="text-gray-800"></p>
+            </div>
+          </div>
+        </div>
+
+        <div class="space-y-4">
+          <div class="flex items-start">
+            <svg class="w-5 h-5 text-gray-400 mr-3 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M16 12a4 4 0 01-8 0V6a4 4 0 118 0v6zM12 14v7"></path>
+            </svg>
+            <div>
+              <p class="font-medium text-gray-600">Parent Name</p>
+              <p id="menteeModalParentName" class="text-gray-800"></p>
+            </div>
+          </div>
+
+          <div class="flex items-start">
+            <svg class="w-5 h-5 text-gray-400 mr-3 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"></path>
+            </svg>
+            <div>
+              <p class="font-medium text-gray-600">Parent Mobile</p>
+              <p id="menteeModalParentMobile" class="text-gray-800"></p>
+            </div>
+          </div>
+
+          <div class="flex items-start">
+            <svg class="w-5 h-5 text-gray-400 mr-3 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M3 10h18M3 14h18M7 10v4m10-4v4"></path>
+            </svg>
+            <div>
+              <p class="font-medium text-gray-600">Mobile / WhatsApp</p>
+              <p id="menteeModalMobile" class="text-gray-800"></p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Comments -->
+      <div class="mb-8">
+        <h4 class="font-semibold text-gray-800 flex items-center mb-4">
+          <svg class="w-5 h-5 text-blue-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+          </svg>
+          Comments
+        </h4>
+        <div class="bg-gray-50 p-5 rounded-lg border border-gray-100">
+          <p id="menteeModalComments" class="text-gray-600 italic"></p>
+        </div>
+      </div>
+
+      <!-- Footer Buttons -->
+      <div class="flex flex-col sm:flex-row justify-end gap-3 pt-4 border-t border-gray-100">
+        <button onclick="closeMenteeProfileModal()" class="px-5 py-2.5 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors duration-200 font-medium">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
   </section>
 
 
@@ -218,6 +371,44 @@ function filterMentees() {
     }
   });
 }
+
+
+function openMenteeProfileModal(mentee) {
+    document.getElementById('menteeModalName').innerText = mentee.name || "Not specified";
+    document.getElementById('menteeModalStream').innerText = (mentee.stream ? mentee.stream + " at " : "") + (mentee.school || "Not specified");
+    document.getElementById('menteeModalGoal').innerText = "Goal: " + (mentee.goal || "Not specified");
+    document.getElementById('menteeModalDOB').innerText = mentee.dob || "Not specified";
+    document.getElementById('menteeModalClass').innerText = mentee.classYear || "Not specified";
+    document.getElementById('menteeModalSubject').innerText = mentee.favouriteSubject || "Not specified";
+    document.getElementById('menteeModalParentName').innerText = mentee.parentName || "Not specified";
+    document.getElementById('menteeModalParentMobile').innerText = mentee.parentMobile || "Not specified";
+    document.getElementById('menteeModalMobile').innerText = mentee.mobileNumber || mentee.whatsappNumber || "Not specified";
+    document.getElementById('menteeModalComments').innerText = mentee.comments || "None";
+    document.getElementById('menteeModalProfilePic').src = mentee.profilePic ? "/static/uploads/" + mentee.profilePic : "https://via.placeholder.com/100";
+
+    document.getElementById('menteeProfileModal').classList.remove('hidden');
+}
+
+
+
+
+
+function closeMenteeProfileModal() {
+    document.getElementById('menteeProfileModal').classList.add('hidden');
+}
+
+// Attach click listener to all "View Profile" buttons
+document.addEventListener("DOMContentLoaded", function() {
+  document.querySelectorAll(".view-profile-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const mentee = JSON.parse(btn.dataset.mentee);
+      openMenteeProfileModal(mentee);
+    });
+  });
+});
+
+
+
 </script>
 
 {% endblock %}

@@ -136,10 +136,14 @@
            📩 Requests
         </a>
 
-        <a href=""
-           class="block px-4 py-2 text-white  hover:bg-gray-600 rounded-md">
-            🗓️ Meeting
-        </a>
+        <!-- <a href=""
+        class="block px-4 py-2 text-white  hover:bg-gray-600 rounded-md">
+        🗓️ Meeting
+    </a> -->
+    <a href="{{ url_for ('supervisor_meeting_details')}}"
+       class="block px-4 py-2 text-white  hover:bg-gray-600 rounded-md">
+        🤝 Meeting Details
+    </a>
 
     {% elif session.get('user_type') == '1' %}
         <!-- Mentor Dashboard -->
@@ -155,17 +159,21 @@
         
         <a href="{{ url_for ('mentor_mentorship_request')}}"
            class="block px-4 py-2 text-white  hover:bg-gray-600 rounded-md">
-           🧑‍💻 connect Request
+           🧑‍💻 Connect Request
         </a>
         
         <a href="{{ url_for ('find_mentees')}}"
-           class="block px-4 py-2 text-white  hover:bg-gray-600 rounded-md">
-           🔍 Find Mentee
+        class="block px-4 py-2 text-white  hover:bg-gray-600 rounded-md">
+        🔍 Find Mentee
         </a>
 
-        <a href="#"
+        <!-- <a href="#"
            class="block px-4 py-2 text-white  hover:bg-gray-600 rounded-md">
             🗓️ Meeting
+        </a> -->
+        <a href="{{ url_for ('mentor_meeting_details')}}"
+           class="block px-4 py-2 text-white  hover:bg-gray-600 rounded-md">
+            🤝 Meeting Details
         </a>
 
     {% elif session.get('user_type') == '2' %}
@@ -186,8 +194,12 @@
         </a>
         <a href="{{ url_for ('mentee_meeting_details')}}"
            class="block px-4 py-2 text-white  hover:bg-gray-600 rounded-md">
-            🗓️ Meeting
+            🤝 Meeting Details
         </a>
+        <!-- <a href="{{ url_for ('mentee_calendar')}}"
+           class="block px-4 py-2 text-white  hover:bg-gray-600 rounded-md">
+            🗓️ calendar
+        </a> -->
     {% endif %}
 </aside>
 
