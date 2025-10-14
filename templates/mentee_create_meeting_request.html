@@ -1,0 +1,103 @@
+{% extends "base2.html" %}
+{% block title %}Create Meeting Request{% endblock %}
+{% block user %}Mentee{% endblock %}
+{% block profiledrop %}{% endblock %}
+
+{% block content %}
+<div class="container" style="max-width:500px; margin:40px auto; text-align:center;">
+  <h2 class="text-xl font-semibold mb-3">Meeting via Google Meet</h2>
+
+  {% if mentor %}
+    <p style="margin-bottom:10px;">
+      Meeting will include mentor: <b>{{ mentor.name }}</b> ({{ mentor.email }})
+    </p>
+    <input type="hidden" id="mentor_id" value="{{ mentor.id }}">
+  {% else %}
+    <p style="color:red;">⚠ No mentor selected!</p>
+  {% endif %}
+
+<div style="display:flex; flex-direction:column; gap:10px; align-items:center;">
+  <input type="text" id="title" placeholder="Meeting Title" required
+    style="padding:8px; width:90%; border:1px solid #ccc; border-radius:6px;">
+
+  <input type="date" id="date" required
+    style="padding:8px; width:90%; border:1px solid #ccc; border-radius:6px;">
+
+  <input type="time" id="start_time" required
+    style="padding:8px; width:90%; border:1px solid #ccc; border-radius:6px;">
+
+  <select id="duration" required
+    style="padding:8px; width:90%; border:1px solid #ccc; border-radius:6px;">
+    <option value="">Select Duration</option>
+    <option value="15">15 minutes</option>
+    <option value="30">30 minutes</option>
+    <option value="45">45 minutes</option>
+    <option value="60">1 hour</option>
+  </select>
+
+  <button onclick="createMeeting()" 
+    style="padding:10px 18px; background:#2563eb; color:white; border:none; border-radius:6px; cursor:pointer;">
+    Create Meeting
+  </button>
+</div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+async function createMeeting() {
+  const title = document.getElementById("title").value.trim();
+  const date = document.getElementById("date").value;
+  const start_time = document.getElementById("start_time").value;
+  const duration = document.getElementById("duration").value;
+  const mentor_id = document.getElementById("mentor_id").value;
+
+  if (!title || !date || !start_time || !duration) {
+    Swal.fire("Error", "Please fill all fields!", "error");
+    return;
+  }
+
+  // 🌀 Show loading state
+  Swal.fire({
+    title: "Creating Meeting...",
+    html: "Please wait while we connect to Google Calendar ⏳",
+    allowOutsideClick: false,
+    didOpen: () => {
+      Swal.showLoading();
+    }
+  });
+
+  try {
+    const response = await fetch("/create_meeting_ajax", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ title, date, start_time, duration, mentor_id })
+    });
+
+    const data = await response.json();
+
+    if (response.ok) {
+      Swal.fire({
+        title: "✅ Meeting Created!",
+        html: `
+          <b>${data.title}</b><br>
+          <p>${data.start} → ${data.end}</p>
+          <p>Mentee: ${data.mentee_email}<br>Mentor: ${data.mentor_email}</p>
+          <a href="${data.meet_link}" target="_blank">${data.meet_link}</a>
+        `,
+        icon: "success",
+        confirmButtonText: "OK"
+      });
+    } else {
+      Swal.fire("Error", data.error || "Something went wrong!", "error");
+    }
+
+  } catch (error) {
+    Swal.fire("Error", "Network or server issue!", "error");
+    console.error(error);
+  }
+}
+</script>
+
+{% endblock %}

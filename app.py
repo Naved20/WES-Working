@@ -4,12 +4,19 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin, login_user, LoginManager, login_required, logout_user, current_user
 from sqlalchemy import cast, Integer
 from werkzeug.security import generate_password_hash, check_password_hash
-import os
 from werkzeug.utils import secure_filename
 from datetime import datetime
 from functools import wraps
 from sqlalchemy import or_
 from datetime import datetime
+import os
+import json 
+from google_auth_oauthlib.flow import Flow
+from google.oauth2 import id_token
+from google.auth.transport import requests as grequests
+from google.oauth2 import service_account
+from googleapiclient.discovery import build
+import datetime as dt
 
 
 app = Flask(__name__)
@@ -28,8 +35,6 @@ os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-
-
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = "signin" 
@@ -40,6 +45,14 @@ def load_user(user_id):
     return User.query.get(int(user_id))
 
 
+# ----------config---------- 
+os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"  # ONLY for local dev (http). Remove in production.
+CLIENT_SECRETS_FILE = "client_secret.json"
+SCOPES = ["openid", "https://www.googleapis.com/auth/userinfo.email", "https://www.googleapis.com/auth/userinfo.profile",]
+REDIRECT_URI = "http://127.0.0.1:5000/callback"
+
+
+
 #--------------User_type Code------------------------
 # -------------supervisor = "0"----------------------
 # -------------mentor = "1"--------------------------
@@ -48,12 +61,9 @@ def load_user(user_id):
 app.config["SQLALCHEMY_DATABASE_URI"] ="sqlite:///mentors_connect.db"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
-
 db = SQLAlchemy(app)
-
 from flask_migrate import Migrate
 migrate = Migrate(app, db)
-
 
 def mentor_login_required(f):
     @wraps(f)
@@ -177,25 +187,26 @@ class MentorshipRequest(db.Model):
 class MeetingRequest(db.Model):
     __tablename__ = "meeting_requests"
     id = db.Column(db.Integer, primary_key=True)
-    
-    # Who created the request
+
+    # Who created the request (requester) and who it's for
     requester_id = db.Column(db.Integer, db.ForeignKey("signup_details.id"), nullable=False)
-    
-    # Who the request is for (mentor/mentee)
     requested_to_id = db.Column(db.Integer, db.ForeignKey("signup_details.id"), nullable=False)
-    
+
     # Meeting details
     meeting_title = db.Column(db.String(200), nullable=False)
     meeting_description = db.Column(db.Text)
     meeting_date = db.Column(db.Date, nullable=False)
-    meeting_time = db.Column(db.Time, nullable=False)
+    meeting_time = db.Column(db.Time, nullable=False)   # start time
     meeting_duration = db.Column(db.Integer, default=60)  # in minutes
-    
+
+    # Google Calendar info
+    meet_link = db.Column(db.String(500), nullable=True)
+    gcal_event_id = db.Column(db.String(200), nullable=True)
+
     # Status tracking
     status = db.Column(db.String(20), default="pending")  # 'pending', 'approved', 'rejected'
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
-    
     # Relationships
     requester = db.relationship("User", foreign_keys=[requester_id], backref="sent_meeting_requests")
     requested_to = db.relationship("User", foreign_keys=[requested_to_id], backref="received_meeting_requests")
@@ -695,6 +706,7 @@ def find_mentees():
         query = query.filter(MenteeProfile.goal == goal_filter)
 
     filtered_mentees = query.all()
+    
 
     # Get filter options directly
     streams = sorted({m.stream for m in MenteeProfile.query.with_entities(MenteeProfile.stream).distinct() if m.stream})
@@ -758,20 +770,16 @@ def my_mentors():
         show_sidebar=True
     )
 
-# mentor dashboard to my mentees
 @app.route("/my_mentees")
 def my_mentees():
     if "email" not in session or session.get("user_type") != "1":
         return redirect(url_for("signin"))
 
-    # Fetch current mentor
     mentor = User.query.filter_by(email=session["email"]).first()
-
     if not mentor:
         flash("Mentor profile not found.", "error")
         return redirect(url_for("signin"))
 
-    # Fetch accepted mentorship requests for this mentor
     accepted_requests = MentorshipRequest.query.filter_by(
         mentor_id=mentor.id,
         mentor_status="accepted",
@@ -779,22 +787,38 @@ def my_mentees():
         final_status="approved"
     ).all()
 
-    # Extract mentees with their full profile data
     my_mentees_data = []
     for req in accepted_requests:
         if req.mentee:
-            # Get the mentee's profile
             mentee_profile = MenteeProfile.query.filter_by(user_id=req.mentee.id).first()
             if mentee_profile:
                 my_mentees_data.append({
-                    'user': req.mentee,  # User info (name, email)
-                    'profile': mentee_profile  # MenteeProfile info
+                    "user": {
+                        "name": req.mentee.name,
+                        "email": req.mentee.email
+                    },
+                    "profile": {
+                        "dob": mentee_profile.dob,
+                        "school_college_name": mentee_profile.school_college_name,
+                        "mobile_number": mentee_profile.mobile_number,
+                        "whatsapp_number": mentee_profile.whatsapp_number,
+                        "govt_private": mentee_profile.govt_private,
+                        "stream": mentee_profile.stream,
+                        "class_year": mentee_profile.class_year,
+                        "favourite_subject": mentee_profile.favourite_subject,
+                        "goal": mentee_profile.goal,
+                        "parent_name": mentee_profile.parent_name,
+                        "parent_mobile": mentee_profile.parent_mobile,
+                        "comments": mentee_profile.comments,
+                        "terms_agreement": mentee_profile.terms_agreement,
+                        "profile_picture": mentee_profile.profile_picture
+                    }
                 })
 
     return render_template(
         "mentor_my_mentees.html",
         my_mentees=my_mentees_data,
-        show_sidebar=True,
+        show_sidebar=True
     )
 
 @app.route("/supervisor_find_mentor")
@@ -912,19 +936,113 @@ def view_requests():
         show_sidebar=True
     )
 
-@app.route("/mentee Meeting Details")
-def mentee_meeting_details():
+@app.route("/mentee calendar")
+def mentee_calendar():
     if "email" not in session or session.get("user_type") != "2":
         return redirect(url_for("signin"))
     return render_template(
-        "mentee_meeting_details.html",
+        "mentee_calendar.html",
         show_sidebar=True
         )
+# ---------------meeting details----------------
+@app.route("/mentee_meeting_details")
+def mentee_meeting_details():
+    if "email" not in session or session.get("user_type") != "2":
+        return redirect(url_for("signin"))
+
+    # Get logged-in mentee
+    mentee = User.query.filter_by(email=session["email"]).first()
+
+    # Fetch all meetings created by this mentee
+    meetings = MeetingRequest.query.filter_by(requester_id=mentee.id).order_by(
+        MeetingRequest.meeting_date.desc(),
+        MeetingRequest.meeting_time.desc()
+    ).all()
+
+    return render_template(
+        "mentee_meeting_details.html",
+        show_sidebar=True,
+        meetings=meetings
+    )
+
+
+@app.route("/mentor_meeting_details")
+def mentor_meeting_details():
+    if "email" not in session or session.get("user_type") != "1":
+        return redirect(url_for("signin"))
+
+    # Get logged-in mentee
+    mentor = User.query.filter_by(email=session["email"]).first()
+
+    # Fetch all meetings created by this mentee
+    meetings = MeetingRequest.query.filter_by(requested_to_id=mentor.id).order_by(
+        MeetingRequest.meeting_date.desc(),
+        MeetingRequest.meeting_time.desc()
+    ).all()
+
+    return render_template(
+        "mentor_meeting_details.html",
+        show_sidebar=True,
+        meetings=meetings
+    )
+
+
+# ---------------- Supervisor - All Meeting Details ----------------
+@app.route("/supervisor_meeting_details")
+def supervisor_meeting_details():
+    if "email" not in session or session.get("user_type") != "0":
+        return redirect(url_for("signin"))
+
+    # Fetch all meetings in ascending order (oldest first)
+    meetings = (
+        MeetingRequest.query
+        .order_by(MeetingRequest.meeting_date.asc(), MeetingRequest.meeting_time.asc())
+        .all()
+    )
+
+    # Get current date for timing calculations
+    from datetime import datetime, date
+    today = date.today()
+    now = datetime.now()
+
+    # Prepare formatted meeting data with mentee & mentor info
+    meeting_data = []
+    for meeting in meetings:
+        mentee = User.query.get(meeting.requester_id)
+        mentor = User.query.get(meeting.requested_to_id)
+
+        # Calculate timing category
+        meeting_datetime = datetime.combine(meeting.meeting_date, meeting.meeting_time)
+        is_upcoming = meeting_datetime > now
+
+        meeting_data.append({
+            "id": meeting.id,
+            "title": meeting.meeting_title,
+            "description": meeting.meeting_description,
+            "date": meeting.meeting_date.strftime("%d-%m-%Y"),
+            "time": meeting.meeting_time.strftime("%I:%M %p"),
+            "duration": meeting.meeting_duration,
+            "status": meeting.status,
+            "mentee_name": mentee.name if mentee else "Unknown",
+            "mentee_email": mentee.email if mentee else "N/A",
+            "mentor_name": mentor.name if mentor else "Unknown",
+            "mentor_email": mentor.email if mentor else "N/A",
+            "created_at": meeting.created_at.strftime("%d-%m-%Y %I:%M %p") if meeting.created_at else "",
+            "is_upcoming": is_upcoming,
+            "meet_link": meeting.meet_link,
+        })
+
+    return render_template(
+        "supervisor_meeting_details.html",
+        show_sidebar=True,
+        meetings=meeting_data
+    )
+
 
 
 # ------------------- HANDLE MENTORSHIP REQUEST ------------------
 @app.route("/request_mentorship", methods=["POST"])
-def request_mentorship():
+def request_mentorship(): 
     if "email" not in session or session.get("user_type") != "2":
         return jsonify({"success": False, "message": "Unauthorized"}), 401
 
@@ -962,16 +1080,21 @@ def request_mentorship():
         # Check if user is trying to request themselves as mentor
         if mentee.id == mentor_id:
             return jsonify({"success": False, "message": "Cannot request mentorship from yourself"}), 400
-
+    
         # Check for existing pending request to same mentor
         existing_request = MentorshipRequest.query.filter_by(
             mentee_id=mentee.id,
             mentor_id=mentor_id,
-            final_status="pending"
-        ).first()
+            
+        ).all()
         
-        if existing_request:
-            return jsonify({"success": False, "message": "You already have a pending request with this mentor"}), 400
+        # loop through existing requests to check status
+        for req in existing_request:
+            if req.mentor_status == "pending" or req.supervisor_status == "pending":
+                return jsonify({"success": False, "message": "You already have a pending request with this mentor."}), 400
+            if req.mentor_status == "accepted" and req.supervisor_status == "approved" and req.final_status == "approved":
+                return jsonify({"success": False, "message": "You are already assigned to this mentor."}), 400
+
 
         # Create new mentorship request
         new_request = MentorshipRequest(
@@ -1040,7 +1163,7 @@ def mentor_response():
     # Always redirect to mentor dashboard
     return redirect(url_for("mentor_mentorship_request"))
 
-#------------------- PROFILE PICTURE AT TOP ------------------
+#--------------x----- PROFILE PICTURE AT TOP ------------------
 @app.context_processor
 def inject_user_profile_pic():
     if "email" in session:
@@ -1058,13 +1181,6 @@ def inject_user_profile_pic():
                 profile_pic = profile.profile_picture if profile else None
         return dict(current_user_profile_pic=profile_pic)
     return dict(current_user_profile_pic=None)
-
-# ------------------ LOGOUT ------------------
-@app.route("/logout")
-def logout():
-    session.clear()   
-    flash("You have been logged out!", "info")
-    return redirect(url_for("signin"))
 
 # ------------------ editmentorprofile ------------------
 @app.route("/editmentorprofile", methods=["GET", "POST"])
@@ -1393,5 +1509,150 @@ def supervisor_response():
     
     return redirect(url_for("supervisordashboard"))
 
+
+# ---------- Google Calendar Service Account Config ----------
+SCOPES = ["https://www.googleapis.com/auth/calendar"]
+SERVICE_ACCOUNT_FILE = "service_account.json"
+DELEGATED_EMAIL = "info@wazireducationsociety.com"  # Organization calendar email
+
+def get_calendar_service():
+    """Return Google Calendar API service using service account"""
+    creds = service_account.Credentials.from_service_account_file(
+        SERVICE_ACCOUNT_FILE, scopes=SCOPES
+    )
+    delegated_creds = creds.with_subject(DELEGATED_EMAIL)
+    service = build("calendar", "v3", credentials=delegated_creds)
+    return service
+ 
+#-------------------creat meeting request---------------------------------
+@app.route("/mentee_create_meeting_request/<int:mentor_id>", methods=["GET"])
+def mentee_create_meeting_request(mentor_id):
+    if "email" not in session:
+        return redirect(url_for("signin"))
+
+    mentee = User.query.filter_by(email=session["email"]).first()
+    mentor = User.query.get(mentor_id)
+    # sendUpdates="all"
+
+
+    if not mentor:
+        flash("Mentor not found", "error")
+        return redirect(url_for("mentors_list"))  # change to your actual route
+
+    return render_template(
+        "mentee_create_meeting_request.html",
+        mentee=mentee,
+        mentor=mentor
+    )
+
+
+@app.route("/create_meeting_ajax", methods=["POST"])
+def create_meeting_ajax():
+    if "email" not in session:
+        return jsonify({"error": "Unauthorized"}), 401
+
+    data = request.get_json()
+    title = data.get("title")
+    date = data.get("date")
+    start_time = data.get("start_time")
+    duration = data.get("duration")  # duration in minutes
+    mentor_id = data.get("mentor_id")
+
+    if not all([title, date, start_time, duration, mentor_id]):
+        return jsonify({"error": "Please fill all fields"}), 400
+
+    mentee = User.query.filter_by(email=session["email"]).first()
+    mentor = User.query.get(int(mentor_id))
+
+    if not mentee or not mentor:
+        return jsonify({"error": "Mentee or Mentor not found"}), 404
+
+    # Calculate start and end datetime
+    start_datetime = dt.datetime.strptime(f"{date} {start_time}", "%Y-%m-%d %H:%M")
+    end_datetime = start_datetime + dt.timedelta(minutes=int(duration))
+
+    start_str = start_datetime.isoformat()
+    end_str = end_datetime.isoformat()
+
+    service = get_calendar_service()
+    event = {
+        "summary": title,
+        "description": f"Meeting created by {mentee.name} ({mentee.email})",
+        "start": {"dateTime": start_str, "timeZone": "Asia/Kolkata"},
+        "end": {"dateTime": end_str, "timeZone": "Asia/Kolkata"},
+        "attendees": [
+            {"email": mentee.email},
+            {"email": mentor.email}
+        ],
+        "conferenceData": {
+            "createRequest": {
+                "conferenceSolutionKey": {"type": "hangoutsMeet"},
+                "requestId": f"meet-{int(dt.datetime.utcnow().timestamp())}"
+            }
+        }
+    }
+
+
+
+
+    event = service.events().insert(
+        calendarId="primary",
+        body=event,
+        conferenceDataVersion=1,
+        sendUpdates="all"
+    ).execute()
+
+    meet_link = event.get("hangoutLink")
+    gcal_event_id = event.get("id")
+
+    # save in db 
+    meeting = MeetingRequest(
+            requester_id=mentee.id,
+            requested_to_id=mentor.id,
+            meeting_title=title,
+            meeting_date=start_datetime.date(),
+            meeting_time=start_datetime.time(),
+            meeting_duration=int(duration),
+            meet_link=meet_link,
+            gcal_event_id=gcal_event_id,
+            status="pending"
+    )
+
+    db.session.add(meeting)
+    db.session.commit()
+
+
+
+    return jsonify({
+        "message": "Meeting Created ✅",
+        "meet_link": event.get("hangoutLink"),
+        "title": title,
+        "start": start_str,
+        "end": end_str,
+        "mentee_email": mentee.email,
+        "mentor_email": mentor.email
+    })
+
+
+
+
+# ------------------ LOGOUT ------------------
+@app.route("/logout")
+def logout():
+    session.clear()   
+    flash("You have been logged out!", "info")
+    return redirect(url_for("signin"))
+
+
 if __name__ == "__main__":
     app.run(debug=True)
+
+
+
+
+
+
+
+
+
+

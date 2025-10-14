@@ -389,29 +389,8 @@
 
 
   <script>
-function showSection(id) {
-  document.querySelectorAll("section").forEach(sec => sec.classList.add("hidden"));
-  document.getElementById(id).classList.remove("hidden");
 
-  document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
 
-  const buttons = document.querySelectorAll('.nav-btn');
-  buttons.forEach(btn => {
-    if (btn.textContent.trim() === 'Overview' && id === 'dashboard') {
-      btn.classList.add('active');
-    } else if (btn.textContent.trim() === 'My Mentors' && id === 'mymentors') {
-      btn.classList.add('active');
-    } else if (btn.textContent.trim() === 'Find Mentors' && id === 'findmentor') {
-      btn.classList.add('active');
-    }
-  });
-}
-
-// Auto-open correct section
-document.addEventListener("DOMContentLoaded", function() {
-  var activeSection = "{{ active_section|default('dashboard') }}";
-  showSection(activeSection);
-});
 
 // Filter mentors
 function filterMentors() {
