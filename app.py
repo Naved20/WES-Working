@@ -98,22 +98,45 @@ class MentorProfile(db.Model):
     # foregin key link to User table
     user_id= db.Column(db.Integer, db.ForeignKey("signup_details.id"),nullable=False)
 
-    #  mentor's details
+    # Personal & Professional Details
     profession = db.Column(db.String(100))
+    skills = db.Column(db.Text)  # New field - comma separated skills
+    role = db.Column(db.String(100))  # New field - job role/position
+    industry_sector = db.Column(db.String(100))  # New field - industry/sector
     organisation = db.Column(db.String(150))
+    years_of_experience = db.Column(db.String(100))     
+    
+    # Contact Information
     whatsapp = db.Column(db.String(20))
-    location = db.Column(db.String(100))
+    location = db.Column(db.String(100))  # New field - country
+    
+    # Education & Background
     education = db.Column(db.String(150))
-    language = db.Column(db.String(100))
+    language = db.Column(db.String(100))  # Can store multiple languages comma separated
+    
+    # Social Links
+    linkedin_link = db.Column(db.String(200))  # New field
+    github_link = db.Column(db.String(200))  # New field
+    portfolio_link = db.Column(db.String(200))  # New field
+    other_social_link = db.Column(db.String(200))
+    
+    # Mentorship Preferences
+    mentorship_topics = db.Column(db.Text)  # New field - topics they can mentor on
+    mentorship_type_preference = db.Column(db.String(200))  # New field - school, women, etc.
+    preferred_communication = db.Column(db.String(100))  # online, offline, hybrid
     availability = db.Column(db.String(100))
     connect_frequency = db.Column(db.String(100))
-    preferred_communication = db.Column(db.String(100))
-    social_link = db.Column(db.String(200))
-    why_mentor = db.Column(db.Text)
+    preferred_duration = db.Column(db.String(100))  # New field - 1 month, 6 months, etc.
+    
+    # Mentor Philosophy
+    why_mentor = db.Column(db.Text)  # Changed from "why become mentor" to "why mentor"
+    mentorship_philosophy = db.Column(db.Text)  # New field
+    mentorship_motto = db.Column(db.String(300))  # New field
+    
+    # Additional Information
     additional_info = db.Column(db.Text)
     profile_picture = db.Column(db.String(100)) 
-    years_of_experience = db.Column(db.String(100))     
-    status = db.Column(db.String(20), default="pending") 
+    status = db.Column(db.String(20), default="pending")
 
 #------------next table mentee details-------------------
 class MenteeProfile(db.Model):
@@ -210,6 +233,88 @@ class MeetingRequest(db.Model):
     # Relationships
     requester = db.relationship("User", foreign_keys=[requester_id], backref="sent_meeting_requests")
     requested_to = db.relationship("User", foreign_keys=[requested_to_id], backref="received_meeting_requests")
+
+
+
+# Context processor to make profile_complete available in all templates
+@app.context_processor
+def inject_profile_complete():
+    profile_complete = True  # Default to True (no popup)
+    
+    if "email" in session and session.get("user_type") in ["1", "2"]:
+        user = User.query.filter_by(email=session["email"]).first()
+        if user:
+            profile_complete = check_profile_complete(user.id, session.get("user_type"))
+            print(f"🔍 Context Processor - User: {user.email}, Type: {session.get('user_type')}, Profile Complete: {profile_complete}")
+        else:
+            print(f"❌ Context Processor - User not found for email: {session['email']}")
+    else:
+        print(f"ℹ️ Context Processor - Not a mentor/mentee or not logged in. User type: {session.get('user_type')}")
+    
+    return dict(profile_complete=profile_complete)
+
+
+# ---------- Profile Completion Check Function ----------
+def check_profile_complete(user_id, user_type):
+    """
+    Check if user profile is complete
+    Returns True if profile exists and has basic data, False if empty/not created
+    """
+    print(f"🔍 Checking profile completion for user_id: {user_id}, user_type: {user_type}")
+    
+    if user_type == "1":  # Mentor
+        profile = MentorProfile.query.filter_by(user_id=user_id).first()
+        print(f"📊 Mentor profile found: {profile is not None}")
+        if profile:
+            # Check if profile has at least some basic data filled
+            has_basic_info = any([
+                profile.profession, 
+                profile.organisation, 
+                profile.whatsapp,
+                profile.location,
+                profile.education,
+                profile.years_of_experience
+            ])
+            print(f"✅ Mentor profile complete: {has_basic_info}")
+            return has_basic_info
+        print("❌ No mentor profile found")
+        return False
+    
+    elif user_type == "2":  # Mentee
+        profile = MenteeProfile.query.filter_by(user_id=user_id).first()
+        print(f"📊 Mentee profile found: {profile is not None}")
+        if profile:
+            # Check if profile has at least some basic data filled
+            has_basic_info = any([
+                profile.dob,
+                profile.school_college_name, 
+                profile.mobile_number,
+                profile.stream,
+                profile.class_year,
+                profile.goal
+            ])
+            print(f"✅ Mentee profile complete: {has_basic_info}")
+            return has_basic_info
+        print("❌ No mentee profile found")
+        return False
+    
+    elif user_type == "0":  # Supervisor
+        profile = SupervisorProfile.query.filter_by(user_id=user_id).first()
+        print(f"📊 Supervisor profile found: {profile is not None}")
+        if profile:
+            has_basic_info = any([
+                profile.organisation,
+                profile.whatsapp,
+                profile.location,
+                profile.role
+            ])
+            print(f"✅ Supervisor profile complete: {has_basic_info}")
+            return has_basic_info
+        print("❌ No supervisor profile found")
+        return False
+    
+    print(f"⚠️ Unknown user type: {user_type}")
+    return True  # Default to True for unknown types (no popup)
 
 #-------------HOME----------------
 @app.route("/")
@@ -331,9 +436,17 @@ def mentordashboard():
 
     mentor_id = session.get("user_id")
 
+    
+    # ------------------- Check Profile Completion -------------------
+    user = User.query.filter_by(email=session["email"]).first()
+    profile_complete = check_profile_complete(user.id, "1")
+
+
+
     # ------------------- mentee requests -------------------
             # Fetch current mentor
     mentor = User.query.filter_by(email=session["email"]).first()
+
 
     if not mentor:
             flash("Mentor profile not found.", "error")
@@ -408,7 +521,8 @@ def mentordashboard():
         mentor_info=mentor_info,
         active_section="dashboard",
         show_sidebar=True,
-        mentee=example_mentee
+        mentee=example_mentee,
+        profile_complete=profile_complete
     )
 
 @app.route("/mentor_mentorship_request", methods=["GET", "POST"])
@@ -417,6 +531,9 @@ def mentor_mentorship_request():
         return redirect(url_for("signin"))
 
     mentor_id = session.get("user_id")
+
+    user = User.query.filter_by(email=session["email"]).first()
+    profile_complete = check_profile_complete(user.id, "1")
 
     # ------------------- mentee requests -------------------
             # Fetch current mentor
@@ -477,7 +594,8 @@ def mentor_mentorship_request():
         mentor_info=mentor_info,
         active_section="meetingrequests",
         show_sidebar=True,
-        mentee=example_mentee
+        mentee=example_mentee,
+        profile_complete=profile_complete
     )
 
 @app.route("/menteedashboard")
@@ -485,6 +603,10 @@ def menteedashboard():
     if "email" in session and session.get("user_type") == "2":
         # Fetch current mentee
         user = User.query.filter_by(email=session["email"]).first()
+
+        profile_complete = check_profile_complete(user.id, "2")
+
+        all_mentors = MentorProfile.query.filter_by().all()
 
 
 
@@ -507,7 +629,8 @@ def menteedashboard():
             locations=[row.location for row in MentorProfile.query.with_entities(MentorProfile.location).distinct() if row.location],
             educations=[row.education for row in MentorProfile.query.with_entities(MentorProfile.education).distinct() if row.education],
             experiences=[row.years_of_experience for row in MentorProfile.query.with_entities(MentorProfile.years_of_experience).distinct() if row.years_of_experience],
-            show_sidebar=True
+            show_sidebar=True,
+            profile_complete=profile_complete
         )
 
 
@@ -519,6 +642,11 @@ def menteedashboard():
 def supervisordashboard():
     if "email" not in session or session.get("user_type") != "0":
         return redirect(url_for("signin"))
+
+    user = User.query.filter_by(email=session["email"]).first()
+    profile_complete = check_profile_complete(user.id, "0")
+
+
 
     source_page = request.args.get("from", "supervisor")
 
@@ -605,7 +733,8 @@ def supervisordashboard():
         mentee_schools=mentee_schools,
         mentee_goals=mentee_goals,
         active_section="dashboard",
-        source_page=source_page
+        source_page=source_page,
+        profile_complete=profile_complete
     )
     
 #-------- find function------------
@@ -744,6 +873,7 @@ def my_mentors():
 
     # Fetch current mentee
     mentee = User.query.filter_by(email=session["email"]).first()
+    profile_complete = check_profile_complete(mentee.id, "2")
 
     if not mentee:
         flash("Mentee profile not found.", "error")
@@ -767,8 +897,10 @@ def my_mentors():
     return render_template(
         "mentee_my_mentors.html",
         my_mentors=my_mentors,
-        show_sidebar=True
+        show_sidebar=True,
+        profile_complete=profile_complete
     )
+
 
 @app.route("/my_mentees")
 def my_mentees():
@@ -776,6 +908,8 @@ def my_mentees():
         return redirect(url_for("signin"))
 
     mentor = User.query.filter_by(email=session["email"]).first()
+    profile_complete = check_profile_complete(mentor.id, "1")
+    
     if not mentor:
         flash("Mentor profile not found.", "error")
         return redirect(url_for("signin"))
@@ -811,14 +945,16 @@ def my_mentees():
                         "parent_mobile": mentee_profile.parent_mobile,
                         "comments": mentee_profile.comments,
                         "terms_agreement": mentee_profile.terms_agreement,
-                        "profile_picture": mentee_profile.profile_picture
+                        "profile_picture": mentee_profile.profile_picture,
+                        "profile_complete": mentee_profile.profile_complete
                     }
                 })
 
     return render_template(
         "mentor_my_mentees.html",
         my_mentees=my_mentees_data,
-        show_sidebar=True
+        show_sidebar=True,
+        profile_complete=profile_complete  # ADD THIS LINE
     )
 
 @app.route("/supervisor_find_mentor")
@@ -1208,7 +1344,7 @@ def editmentorprofile():
         profile.availability = request.form.get("availability_month")
         profile.connect_frequency = request.form.get("connect_frequency")
         profile.preferred_communication = request.form.get("preferred_communication")
-        profile.social_link = request.form.get("social_link")
+        profile.other_social_link = request.form.get("other_social_link")
         profile.why_mentor = request.form.get("mentor_reason")
         profile.years_of_experience = request.form.get("experience")  # new field
         profile.additional_info = request.form.get("additional_info")  # optional
@@ -1243,7 +1379,7 @@ def editmentorprofile():
         availability_month=profile.availability if profile else "",
         connect_frequency=profile.connect_frequency if profile else "",
         preferred_communication=profile.preferred_communication if profile else "",
-        social_link=profile.social_link if profile else "",
+        other_social_link=profile.other_social_link if profile else "",
         mentor_reason=profile.why_mentor if profile else "",
         additional_info=profile.additional_info if profile else "",
         experience=profile.years_of_experience if profile else "",
@@ -1386,22 +1522,30 @@ def mentorprofile():
         return render_template(
             "mentorprofile.html",
             show_sidebar=False,
-            full_name=user.name,
-            email=user.email,
-            profession=profile.profession if profile else "",
-            organisation_or_college=profile.organisation if profile else "",
-            whatsapp_number=profile.whatsapp if profile else "",
-            location=profile.location if profile else "",
-            education=profile.education if profile else "",
-            language=profile.language if profile else "",
-            availability_month=profile.availability if profile else "",
-            connect_frequency=profile.connect_frequency if profile else "",
-            preferred_communication=profile.preferred_communication if profile else "",
-            social_link=profile.social_link if profile else "",
-            mentor_reason=profile.why_mentor if profile else "",
-            additional_info=profile.additional_info if profile else "",
-            experience=profile.years_of_experience if profile else "",
-            profile_picture=profile.profile_picture if profile else None
+        full_name=user.name,
+        email=user.email,
+        profession=profile.profession if profile else "",
+        organisation=profile.organisation if profile else "",
+        whatsapp=profile.whatsapp if profile else "",
+        location=profile.location if profile else "",
+        education=profile.education if profile else "",
+        language=profile.language if profile else "",
+        availability=profile.availability if profile else "",
+        connect_frequency=profile.connect_frequency if profile else "",
+        preferred_communication=profile.preferred_communication if profile else "",
+        other_social_link=profile.other_social_link if profile else "",
+        why_mentor=profile.why_mentor if profile else "",
+        additional_info=profile.additional_info if profile else "",
+        years_of_experience=profile.years_of_experience if profile else "",
+        skills=profile.skills if profile else "",
+        linkedin_link=profile.linkedin_link if profile else "",
+        github_link=profile.github_link if profile else "",
+        portfolio_link=profile.portfolio_link if profile else "",
+        mentorship_topics=profile.mentorship_topics if profile else "",
+        mentorship_type_preference=profile.mentorship_type_preference if profile else "",
+        mentorship_philosophy=profile.mentorship_philosophy if profile else "",
+        mentorship_motto=profile.mentorship_motto if profile else "",
+        profile_picture=profile.profile_picture if profile else None
         )
     return redirect(url_for("signin"))
 
@@ -1634,6 +1778,62 @@ def create_meeting_ajax():
     })
 
 
+
+@app.route("/debug_profile")
+def debug_profile():
+    if "email" not in session:
+        return "Not logged in"
+    
+    user = User.query.filter_by(email=session["email"]).first()
+    if not user:
+        return "User not found"
+    
+    user_type = session.get('user_type')
+    profile_complete = check_profile_complete(user.id, user_type)
+    
+    return f"""
+    <h1>Profile Debug Info</h1>
+    <p>User: {user.name} ({user.email})</p>
+    <p>User Type: {user_type}</p>
+    <p>Profile Complete: {profile_complete}</p>
+    <p>Should Show Popup: {user_type in ['1', '2'] and not profile_complete}</p>
+    <a href="/">Back to home</a>
+    """
+
+@app.route("/test_create_profile")
+def test_create_profile():
+    if "email" not in session:
+        return "Not logged in"
+    
+    user = User.query.filter_by(email=session["email"]).first()
+    if not user:
+        return "User not found"
+    
+    user_type = session.get('user_type')
+    
+    if user_type == "1":
+        # Create a basic mentor profile
+        profile = MentorProfile.query.filter_by(user_id=user.id).first()
+        if not profile:
+            profile = MentorProfile(user_id=user.id, profession="Test Profession")
+            db.session.add(profile)
+            db.session.commit()
+            return "Mentor profile created! Profile should now be complete."
+        else:
+            return "Mentor profile already exists"
+    
+    elif user_type == "2":
+        # Create a basic mentee profile
+        profile = MenteeProfile.query.filter_by(user_id=user.id).first()
+        if not profile:
+            profile = MenteeProfile(user_id=user.id, school_college_name="Test School")
+            db.session.add(profile)
+            db.session.commit()
+            return "Mentee profile created! Profile should now be complete."
+        else:
+            return "Mentee profile already exists"
+    
+    return "Not a mentor or mentee"
 
 
 # ------------------ LOGOUT ------------------
