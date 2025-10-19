@@ -10,7 +10,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <!--titel icon-->
+    <!-- title icon -->
     <link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('static', filename='img/logo.jpg') }}">
 
     <style>
@@ -18,17 +18,38 @@
             font-family: 'Inter', sans-serif;
             background-color: #f3f4f6;
         }
+        .animate-scale-in {
+            animation: scaleIn 0.2s ease-out;
+        }
+        @keyframes scaleIn {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+        /* Ensure popup is on top */
+        .popup-z-index {
+            z-index: 9999;
+        }
     </style>
 </head>
-<body class="flex flex-col h-screen overflow-hidden ">
+<body class="flex flex-col h-screen overflow-hidden">
     
+    <!-- Debug Info - Remove in production -->
+    <div class="fixed top-0 right-0 bg-red-500 text-white p-2 text-xs z-50 hidden">
+        Debug: user_type={{ session.get('user_type') }}, profile_complete={{ profile_complete }}
+    </div>
 
     <!-- Navbar -->
     <nav class="bg-white shadow-sm p-4 flex justify-between items-center z-10">
         <!-- Logo -->
         <div class="flex items-center space-x-2">
-             <a href="
-             {% if session.get('user_type') == '0' %}
+            <a href="
+            {% if session.get('user_type') == '0' %}
                 {{ url_for('supervisordashboard') }}
             {% elif session.get('user_type') == '1' %}
                 {{ url_for('mentordashboard') }}
@@ -37,228 +58,267 @@
             {% else %}
                 {{ url_for('home') }}
             {% endif %}
-             " class="flex items-center">
-            <img src="{{ url_for('static', filename='img/logo.jpg') }}" alt="LOGO" class="h-12 w-12 rounded-full mr-3">
-           
-            <span class="text-xl font-semibold text-gray-800">{% block user %}{% endblock %}</span>
+            " class="flex items-center">
+                <img src="{{ url_for('static', filename='img/logo.jpg') }}" alt="LOGO" class="h-12 w-12 rounded-full mr-3">
+                <span class="text-xl font-semibold text-gray-800">{% block user %}{% endblock %}</span>
             </a>
         </div>
 
-            <!-- Toggle Sidebar Button (only on mobile) -->
-             {% if show_sidebar %}
-                <button id="sidebarToggle" class="md:hidden text-gray-700 p-2 rounded-lg hover:bg-gray-200">
-                  <!-- Hamburger Icon -->
-                  <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <!-- Toggle Sidebar Button (only on mobile) -->
+        {% if show_sidebar %}
+            <button id="sidebarToggle" class="md:hidden text-gray-700 p-2 rounded-lg hover:bg-gray-200">
+                <!-- Hamburger Icon -->
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                           d="M4 6h16M4 12h16M4 18h16"/>
-                  </svg>
-                </button>
-            {% endif %}
+                </svg>
+            </button>
+        {% endif %}
+
         <!-- Profile Dropdown -->
         <div class="relative">
             <button id="profile-dropdown-btn" class="group flex items-center space-x-2 p-2 rounded-full hover:bg-gray-600 hover:text-white transition-colors duration-200 focus:outline-none focus:ring focus:ring-blue-300">
                 <!-- Top right profile image -->
-                    <div class="top-right-profile">
-                        {% if current_user_profile_pic %}
-                            <img src="{{ url_for('static', filename='uploads/' + current_user_profile_pic) }}" 
-                                 alt="Profile Picture" class="w-10 h-10 rounded-full object-cover">
-                        {% else %}
-                            <img src="{{ url_for('static', filename='uploads/default.png') }}" 
-                                 alt="Profile Picture" class="w-10 h-10 rounded-full object-cover">
-                        {% endif %}
-                    </div>
+                <div class="top-right-profile">
+                    {% if current_user_profile_pic and current_user_profile_pic != 'default.png' %}
+                        <img src="{{ url_for('static', filename='uploads/' + current_user_profile_pic) }}" 
+                             alt="Profile Picture" class="w-10 h-10 rounded-full object-cover">
+                    {% else %}
+                        <img src="{{ url_for('static', filename='uploads/default.png') }}" 
+                             alt="Profile Picture" class="w-10 h-10 rounded-full object-cover">
+                    {% endif %}
+                </div>
 
                 <span class="text-sm font-medium text-gray-700 group-hover:text-white hidden sm:block">{{ session.get('email') }}</span>
-
             </button>
 
             <!-- Dropdown menu -->
             <div id="profile-menu" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 ring-1 ring-black ring-opacity-5 focus:outline-none transition-transform transform origin-top-right">
+                <a href="{{ url_for('profile')}}" 
+                   class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                   👤 My Profile
+                </a>
 
-            <a href="{{ url_for('profile')}}" 
-                 class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                 👤 My Profile
-            </a>
+                <a href="#" 
+                   class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                   ⚙️ Settings
+                </a>
 
-            <a href="#" 
-               class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-               ⚙️ Settings
-            </a>
-
-            <a href="{{ url_for('logout')}}" 
-               class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-               🚪 Sign out
-            </a>
-    
-
-
+                <a href="{{ url_for('logout')}}" 
+                   class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                   🚪 Sign out
+                </a>
             </div>
-
-
-
         </div>
     </nav>
 
     <!-- Main Container for Sidebar and Content -->
     <div class="flex flex-1 overflow-hidden">
-        
-
-    <!-- Sidebar -->
-    <div class="flex flex-1 overflow-hidden">
         {% if show_sidebar %}
-    
+            <!-- Sidebar -->
+            <aside id="sidebar"
+                   class="fixed inset-y-0 left-0 w-64 bg-gray-900 shadow-md p-4 space-y-2 overflow-y-auto 
+                          transform -translate-x-full transition-transform duration-200 ease-in-out 
+                          md:relative md:translate-x-0 z-20">
 
-        <!-- Sidebar -->
-<aside id="sidebar"
-       class="fixed inset-y-0 left-0 w-64 bg-gray-900 shadow-md p-4 space-y-2 overflow-y-auto 
-              transform -translate-x-full transition-transform duration-200 ease-in-out 
-              md:relative md:translate-x-0 z-20">
+                {% if session.get('user_type') == '0' %}
+                    <!-- Supervisor Dashboard -->
+                    <a href="{{ url_for('supervisordashboard')}}"
+                       class="block px-4 py-2 text-white hover:bg-gray-600 rounded-md">
+                       📊 Dashboard
+                    </a>
+                    
+                    <a href="{{ url_for('supervisor_find_mentor')}}"
+                       class="block px-4 py-2 text-white hover:bg-gray-600 rounded-md">
+                       🎓 Mentors
+                    </a>
+                    
+                    <a href="{{ url_for('supervisor_find_mentee')}}"
+                       class="block px-4 py-2 text-white hover:bg-gray-600 rounded-md">
+                       👥 Mentees
+                    </a>
+                    
+                    <a href="{{ url_for('view_requests')}}"
+                       class="block px-4 py-2 text-white hover:bg-gray-600 rounded-md">
+                       📩 Requests
+                    </a>
 
-    {% if session.get('user_type') == '0' %}
-        <!-- Supervisor Dashboard -->
-        <a href="{{ url_for ('supervisordashboard')}}"
-           class="block px-4 py-2 text-white  hover:bg-gray-600 rounded-md">
-           📊 Dashboard
-        </a>
-        
-        <a href="{{ url_for ('supervisor_find_mentor')}}"
-           class="block px-4 py-2 text-white  hover:bg-gray-600 rounded-md">
-           🎓 Mentors
-        </a>
-        
-        <a href="{{ url_for ('supervisor_find_mentee')}}"
-           class="block px-4 py-2 text-white  hover:bg-gray-600 rounded-md">
-           👥 Mentees
-        </a>
-        
-        <a href="{{ url_for ('view_requests')}}"
-           class="block px-4 py-2 text-white  hover:bg-gray-600 rounded-md">
-           📩 Requests
-        </a>
+                    <a href="{{ url_for('supervisor_meeting_details')}}"
+                       class="block px-4 py-2 text-white hover:bg-gray-600 rounded-md">
+                        🤝 Meeting Details
+                    </a>
 
-        <!-- <a href=""
-        class="block px-4 py-2 text-white  hover:bg-gray-600 rounded-md">
-        🗓️ Meeting
-    </a> -->
-    <a href="{{ url_for ('supervisor_meeting_details')}}"
-       class="block px-4 py-2 text-white  hover:bg-gray-600 rounded-md">
-        🤝 Meeting Details
-    </a>
+                {% elif session.get('user_type') == '1' %}
+                    <!-- Mentor Dashboard -->
+                    <a href="{{ url_for('mentordashboard')}}"
+                       class="block px-4 py-2 text-white hover:bg-gray-600 rounded-md">
+                       📊 Dashboard
+                    </a>
+                    
+                    <a href="{{ url_for('my_mentees')}}"
+                       class="block px-4 py-2 text-white hover:bg-gray-600 rounded-md">
+                       👥 My Mentees
+                    </a>
+                    
+                    <a href="{{ url_for('mentor_mentorship_request')}}"
+                       class="block px-4 py-2 text-white hover:bg-gray-600 rounded-md">
+                       🧑‍💻 Connect Request
+                    </a>
+                    
+                    <a href="{{ url_for('find_mentees')}}"
+                       class="block px-4 py-2 text-white hover:bg-gray-600 rounded-md">
+                       🔍 Find Mentee
+                    </a>
 
-    {% elif session.get('user_type') == '1' %}
-        <!-- Mentor Dashboard -->
-        <a href="{{ url_for ('mentordashboard')}}"
-           class="block px-4 py-2 text-white  hover:bg-gray-600 rounded-md">
-           📊 Dashboard
-        </a>
-        
-        <a href="{{ url_for ('my_mentees')}}"
-           class="block px-4 py-2 text-white  hover:bg-gray-600 rounded-md">
-           👥 My Mentees
-        </a>
-        
-        <a href="{{ url_for ('mentor_mentorship_request')}}"
-           class="block px-4 py-2 text-white  hover:bg-gray-600 rounded-md">
-           🧑‍💻 Connect Request
-        </a>
-        
-        <a href="{{ url_for ('find_mentees')}}"
-        class="block px-4 py-2 text-white  hover:bg-gray-600 rounded-md">
-        🔍 Find Mentee
-        </a>
+                    <a href="{{ url_for('mentor_meeting_details')}}"
+                       class="block px-4 py-2 text-white hover:bg-gray-600 rounded-md">
+                        🤝 Meeting Details
+                    </a>
 
-        <!-- <a href="#"
-           class="block px-4 py-2 text-white  hover:bg-gray-600 rounded-md">
-            🗓️ Meeting
-        </a> -->
-        <a href="{{ url_for ('mentor_meeting_details')}}"
-           class="block px-4 py-2 text-white  hover:bg-gray-600 rounded-md">
-            🤝 Meeting Details
-        </a>
+                {% elif session.get('user_type') == '2' %}
+                    <!-- Mentee Dashboard -->
+                    <a href="{{ url_for('menteedashboard')}}"
+                       class="block px-4 py-2 text-white hover:bg-gray-600 rounded-md">
+                       📊 Dashboard
+                    </a>
+                    
+                    <a href="{{ url_for('my_mentors')}}"
+                       class="block px-4 py-2 text-white hover:bg-gray-600 rounded-md">
+                       🎓 My Mentors
+                    </a>
+                    
+                    <a href="{{ url_for('find_mentor')}}"
+                       class="block px-4 py-2 text-white hover:bg-gray-600 rounded-md">
+                       🔍 Find Mentor
+                    </a>
+                    <a href="{{ url_for('mentee_meeting_details')}}"
+                       class="block px-4 py-2 text-white hover:bg-gray-600 rounded-md">
+                        🤝 Meeting Details
+                    </a>
+                {% endif %}
+            </aside>
 
-    {% elif session.get('user_type') == '2' %}
-        <!-- Mentee Dashboard -->
-        <a href="{{ url_for ('menteedashboard')}}"
-           class="block px-4 py-2 text-white  hover:bg-gray-600 rounded-md">
-           📊 Dashboard
-        </a>
-        
-        <a href="{{ url_for ('my_mentors')}}"
-           class="block px-4 py-2 text-white  hover:bg-gray-600 rounded-md">
-           🎓 My Mentors
-        </a>
-        
-        <a href="{{ url_for ('find_mentor')}}"
-           class="block px-4 py-2 text-white  hover:bg-gray-600 rounded-md">
-           🔍 Find Mentor
-        </a>
-        <a href="{{ url_for ('mentee_meeting_details')}}"
-           class="block px-4 py-2 text-white  hover:bg-gray-600 rounded-md">
-            🤝 Meeting Details
-        </a>
-        <!-- <a href="{{ url_for ('mentee_calendar')}}"
-           class="block px-4 py-2 text-white  hover:bg-gray-600 rounded-md">
-            🗓️ calendar
-        </a> -->
-    {% endif %}
-</aside>
-
-<!-- Overlay (SEPARATE) -->
-<div id="overlay" class="fixed inset-0 bg-black bg-opacity-50 hidden z-10 md:hidden"></div>
-
+            <!-- Overlay (SEPARATE) -->
+            <div id="overlay" class="fixed inset-0 bg-black bg-opacity-50 hidden z-10 md:hidden"></div>
         {% endif %}
 
+        <!-- Main Content Area -->
+        <main class="flex-1 p-8 overflow-y-auto pb-40">
+            {% block content %}{% endblock %}
+        </main>
+    </div>
 
-    <!-- Main Content Area -->
-    <main class="flex-1 p-8 overflow-y-auto pb-40">
-        {% block content %}{% endblock %}
-    </main>
-</div>
-
-
-    </div> 
-
+    <!-- Profile Completion Popup -->
+    {% if session.get('user_type') in ['1', '2'] and profile_complete == False %}
+    <div id="profile-complete-popup" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center popup-z-index">
+        <div class="bg-white p-6 rounded-lg shadow-xl max-w-md w-full mx-4 animate-scale-in">
+            <div class="flex items-center mb-4">
+                <div class="bg-yellow-100 p-2 rounded-full mr-3">
+                    <svg class="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+                    </svg>
+                </div>
+                <h3 class="text-lg font-semibold text-gray-800">Complete Your Profile</h3>
+            </div>
+            
+            <p class="text-sm text-gray-600 mb-4">
+                {% if session.get('user_type') == '1' %}
+                    Your mentor profile is incomplete. Please complete your profile to access all features and connect with mentees.
+                {% else %}
+                    Your mentee profile is incomplete. Please complete your profile to access all features and connect with mentors.
+                {% endif %}
+            </p>
+            
+            <div class="mt-6 flex justify-end space-x-3">
+                <button id="remind-later-btn" type="button" class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 transition-colors duration-200">
+                    Remind Me Later
+                </button>
+                <a href="{{ url_for('profile') }}" 
+                   class="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 transition-colors duration-200">
+                    Complete Profile Now
+                </a>
+            </div>
+        </div>
+    </div>
+    {% endif %}
 
     <script>
+        // Profile Dropdown Functionality
         const profileBtn = document.getElementById('profile-dropdown-btn');
         const profileMenu = document.getElementById('profile-menu');
         let isMenuOpen = false;
 
-        profileBtn.addEventListener('click', (event) => {
-            event.stopPropagation();
-            isMenuOpen = !isMenuOpen;
-            if (isMenuOpen) {
-                profileMenu.classList.remove('hidden');
-                profileMenu.classList.add('animate-scale-in');
+        if (profileBtn && profileMenu) {
+            profileBtn.addEventListener('click', (event) => {
+                event.stopPropagation();
+                isMenuOpen = !isMenuOpen;
+                if (isMenuOpen) {
+                    profileMenu.classList.remove('hidden');
+                    profileMenu.classList.add('animate-scale-in');
+                } else {
+                    profileMenu.classList.add('hidden');
+                    profileMenu.classList.remove('animate-scale-in');
+                }
+            });
+
+            // Close the dropdown if the user clicks outside of it
+            document.addEventListener('click', (event) => {
+                if (isMenuOpen && !profileMenu.contains(event.target) && event.target !== profileBtn) {
+                    isMenuOpen = false;
+                    profileMenu.classList.add('hidden');
+                    profileMenu.classList.remove('animate-scale-in');
+                }
+            });
+        }
+
+        // Sidebar Functionality
+        const sidebar = document.getElementById("sidebar");
+        const toggleBtn = document.getElementById("sidebarToggle");
+        const overlay = document.getElementById("overlay");
+
+        if (toggleBtn && sidebar && overlay) {
+            toggleBtn.addEventListener("click", () => {
+                sidebar.classList.toggle("-translate-x-full");
+                overlay.classList.toggle("hidden");
+            });
+
+            overlay.addEventListener("click", () => {
+                sidebar.classList.add("-translate-x-full");
+                overlay.classList.add("hidden");
+            });
+        }
+
+        // Profile Completion Popup Handling
+        document.addEventListener('DOMContentLoaded', function() {
+            const profilePopup = document.getElementById('profile-complete-popup');
+            const remindLaterBtn = document.getElementById('remind-later-btn');
+            
+            console.log('Profile popup element:', profilePopup); // Debug log
+            
+            if (profilePopup && remindLaterBtn) {
+                // Show the popup immediately
+                profilePopup.classList.remove('hidden');
+                console.log('Popup should be visible now');
+                
+                remindLaterBtn.addEventListener('click', function() {
+                    profilePopup.classList.add('hidden');
+                    // Use sessionStorage for temporary storage (clears when browser closes)
+                    sessionStorage.setItem('profileRemindLater', 'true');
+                    console.log('Popup hidden, remind later set');
+                });
+                
+                // Check if user previously chose "Remind Me Later" in this session
+                if (sessionStorage.getItem('profileRemindLater') === 'true') {
+                    profilePopup.classList.add('hidden');
+                    console.log('Popup hidden due to previous remind later choice');
+                }
             } else {
-                profileMenu.classList.add('hidden');
-                profileMenu.classList.remove('animate-scale-in');
+                console.log('Popup elements not found:', {
+                    popup: !!profilePopup,
+                    button: !!remindLaterBtn
+                });
             }
         });
-
-        // Close the dropdown if the user clicks outside of it
-        document.addEventListener('click', (event) => {
-            if (isMenuOpen && !profileMenu.contains(event.target) && event.target !== profileBtn) {
-                isMenuOpen = false;
-                profileMenu.classList.add('hidden');
-                profileMenu.classList.remove('animate-scale-in');
-            }
-        });
-  
-      const sidebar = document.getElementById("sidebar");
-      const toggleBtn = document.getElementById("sidebarToggle");
-      const overlay = document.getElementById("overlay");
-        
-      toggleBtn.addEventListener("click", () => {
-        sidebar.classList.toggle("-translate-x-full");
-        overlay.classList.toggle("hidden");
-      });
-    
-      overlay.addEventListener("click", () => {
-        sidebar.classList.add("-translate-x-full");
-        overlay.classList.add("hidden");
-      });
-</script>
-
+    </script>
 </body>
 </html>
