@@ -49,7 +49,7 @@ def load_user(user_id):
 os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"  # ONLY for local dev (http). Remove in production.
 CLIENT_SECRETS_FILE = "client_secret.json"
 SCOPES = ["openid", "https://www.googleapis.com/auth/userinfo.email", "https://www.googleapis.com/auth/userinfo.profile",]
-REDIRECT_URI = "http://127.0.0.1:5000/callback"
+REDIRECT_URI = "http://127.0.0.1:8000/callback"
 
 
 
