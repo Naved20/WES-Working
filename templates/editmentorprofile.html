@@ -4,228 +4,452 @@
 {% block user %}Edit Mentor Profile{% endblock %}
 
 {% block Sidebar %}
-    <a href="{{ url_for('profile')}}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">👤 My Profile</a>
-    <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">⚙️ Settings</a>
-    <a href="{{ url_for('logout')}}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">🚪 Sign out</a>
+    <a href="{{ url_for('profile')}}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition duration-150 ease-in-out">👤 My Profile</a>
+    <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition duration-150 ease-in-out">⚙️ Settings</a>
+    <a href="{{ url_for('logout')}}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition duration-150 ease-in-out">🚪 Sign out</a>
 {% endblock %}
 
 {% block content %}
-<div class="max-w-6xl mx-auto mt-8 p-6 bg-gray-50 rounded-lg shadow-lg">
-    <form action="{{ url_for('editmentorprofile') }}" method="POST" enctype="multipart/form-data" class="space-y-6">
+<div class="max-w-6xl mx-auto mt-8 p-6 bg-gradient-to-br from-gray-50 to-blue-50 rounded-2xl shadow-2xl">
+    <form action="{{ url_for('editmentorprofile') }}" method="POST" enctype="multipart/form-data" class="space-y-8">
         <!-- Profile Header -->
-        <div class="flex flex-col items-center md:flex-row md:items-center md:justify-start space-y-4 md:space-y-0 md:space-x-6 mb-8">
+        <div class="flex flex-col items-center md:flex-row md:items-center md:justify-start space-y-6 md:space-y-0 md:space-x-8 mb-8 p-6 bg-white rounded-xl shadow-md">
             <!-- Profile Picture Upload -->
-            <div>
-                {% if profile_picture %}
-                <img src="{{ url_for('static', filename='uploads/' + profile_picture) }}" 
-                     alt="Profile Picture" 
-                     class="w-32 h-32 md:w-40 md:h-40 object-cover rounded-full shadow-md border-2 border-gray-200 mb-2">
-                {% else %}
-                <div class="w-32 h-32 md:w-40 md:h-40 flex items-center justify-center bg-gray-200 text-gray-500 rounded-full text-lg font-semibold mb-2">
-                    No Picture
+            <div class="text-center">
+                <div class="relative inline-block">
+                    {% if profile_picture %}
+                    <img src="{{ url_for('static', filename='uploads/' + profile_picture) }}" 
+                         alt="Profile Picture" 
+                         class="w-32 h-32 md:w-40 md:h-40 object-cover rounded-full shadow-lg border-4 border-blue-200 hover:border-blue-400 transition duration-300">
+                    {% else %}
+                    <div class="w-32 h-32 md:w-40 md:h-40 flex items-center justify-center bg-gradient-to-br from-blue-100 to-purple-100 text-blue-600 rounded-full text-lg font-semibold shadow-lg border-4 border-blue-200">
+                        <i class="fas fa-user text-4xl"></i>
+                    </div>
+                    {% endif %}
+                    <div class="absolute bottom-2 right-2 bg-blue-500 text-white p-2 rounded-full shadow-lg">
+                        <i class="fas fa-camera text-sm"></i>
+                    </div>
                 </div>
-                {% endif %}
-                <input type="file" name="profile_picture" class="block text-sm text-gray-600">
-                <p class="text-xs text-gray-500 mt-1">Max size: 2MB, Formats: JPG, PNG, GIF</p>
+                <div class="mt-4">
+                    <label class="bg-blue-500 text-white px-4 py-2 rounded-lg cursor-pointer hover:bg-blue-600 transition duration-300 inline-block">
+                        <i class="fas fa-upload mr-2"></i>Upload Photo
+                        <input type="file" name="profile_picture" class="hidden" onchange="previewImage(this)">
+                    </label>
+                </div>
+                <p class="text-xs text-gray-500 mt-2">Max size: 2MB • JPG, PNG, GIF</p>
             </div>
 
             <!-- Basic Information -->
-            <div class="text-center md:text-left w-full">
-                <label class="block text-gray-700 font-semibold">Full Name</label>
-                <input type="text" name="full_name" value="{{ full_name }}" class="w-full p-2 border rounded-lg" readonly>
-
-                <label class="block text-gray-700 font-semibold mt-2">Email</label>
-                <input type="email" name="email" value="{{ email }}" class="w-full p-2 border rounded-lg" readonly>
+            <div class="text-center md:text-left w-full space-y-4">
+                <div>
+                    <label class="block text-gray-700 font-bold text-lg mb-2">Full Name</label>
+                    <input type="text" name="full_name" value="{{ full_name }}" class="w-full p-3 border-2 border-gray-200 rounded-xl bg-gray-50 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition duration-300" readonly>
+                </div>
+                <div>
+                    <label class="block text-gray-700 font-bold text-lg mb-2">Email</label>
+                    <input type="email" name="email" value="{{ email }}" class="w-full p-3 border-2 border-gray-200 rounded-xl bg-gray-50 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition duration-300" readonly>
+                </div>
             </div>
         </div>
 
         <!-- Professional Information -->
-        <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-            <h3 class="text-2xl font-semibold text-gray-700 mb-4">Professional Information</h3>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                    <label class="block text-gray-700 font-semibold">Profession *</label>
-                    <input type="text" name="profession" value="{{ profession }}" class="w-full p-2 border rounded-lg" >
+        <div class="bg-white p-8 rounded-2xl shadow-lg border border-blue-100">
+            <h3 class="text-3xl font-bold text-gray-800 mb-6 pb-3 border-b-2 border-blue-100">
+                <i class="fas fa-briefcase text-blue-500 mr-3"></i>Professional Information
+            </h3>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-gray-700 font-semibold mb-2">Profession *</label>
+                        <select name="profession" class="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition duration-300">
+                            <option value="">Select Your Profession</option>
+                            <optgroup label="Technology">
+                                <option value="Software Engineer" {% if profession == 'Software Engineer' %}selected{% endif %}>Software Engineer</option>
+                                <option value="Data Scientist" {% if profession == 'Data Scientist' %}selected{% endif %}>Data Scientist</option>
+                                <option value="AI/ML Engineer" {% if profession == 'AI/ML Engineer' %}selected{% endif %}>AI/ML Engineer</option>
+                                <option value="Web Developer" {% if profession == 'Web Developer' %}selected{% endif %}>Web Developer</option>
+                                <option value="DevOps Engineer" {% if profession == 'DevOps Engineer' %}selected{% endif %}>DevOps Engineer</option>
+                                <option value="Cybersecurity Analyst" {% if profession == 'Cybersecurity Analyst' %}selected{% endif %}>Cybersecurity Analyst</option>
+                            </optgroup>
+                            <optgroup label="Healthcare">
+                                <option value="Doctor" {% if profession == 'Doctor' %}selected{% endif %}>Doctor</option>
+                                <option value="Surgeon" {% if profession == 'Surgeon' %}selected{% endif %}>Surgeon</option>
+                                <option value="Dentist" {% if profession == 'Dentist' %}selected{% endif %}>Dentist</option>
+                                <option value="Pharmacist" {% if profession == 'Pharmacist' %}selected{% endif %}>Pharmacist</option>
+                                <option value="Medical Researcher" {% if profession == 'Medical Researcher' %}selected{% endif %}>Medical Researcher</option>
+                            </optgroup>
+                            <optgroup label="Business">
+                                <option value="Business Consultant" {% if profession == 'Business Consultant' %}selected{% endif %}>Business Consultant</option>
+                                <option value="Product Manager" {% if profession == 'Product Manager' %}selected{% endif %}>Product Manager</option>
+                                <option value="Marketing Manager" {% if profession == 'Marketing Manager' %}selected{% endif %}>Marketing Manager</option>
+                                <option value="Financial Analyst" {% if profession == 'Financial Analyst' %}selected{% endif %}>Financial Analyst</option>
+                                <option value="Entrepreneur" {% if profession == 'Entrepreneur' %}selected{% endif %}>Entrepreneur</option>
+                            </optgroup>
+                            <optgroup label="Education">
+                                <option value="Professor" {% if profession == 'Professor' %}selected{% endif %}>Professor</option>
+                                <option value="Teacher" {% if profession == 'Teacher' %}selected{% endif %}>Teacher</option>
+                                <option value="Education Consultant" {% if profession == 'Education Consultant' %}selected{% endif %}>Education Consultant</option>
+                                <option value="Researcher" {% if profession == 'Researcher' %}selected{% endif %}>Researcher</option>
+                            </optgroup>
+                            <option value="Other">Other (Please specify)</option>
+                        </select>
+                    </div>
 
-                    <label class="block text-gray-700 font-semibold mt-2">Skills *</label>
-                    <textarea name="skills" class="w-full p-2 border rounded-lg" rows="3" placeholder="e.g., Python, Machine Learning, Career Guidance, Interview Preparation" >{{ skills }}</textarea>
-                    <p class="text-xs text-gray-500">Separate skills with commas</p>
+                    <div>
+                        <label class="block text-gray-700 font-semibold mb-2">Skills *</label>
+                        <textarea name="skills" class="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition duration-300" rows="3" placeholder="Python, Machine Learning, Career Guidance, Interview Preparation...">{{ skills }}</textarea>
+                        <p class="text-sm text-gray-500 mt-1"><i class="fas fa-info-circle mr-1"></i>Separate skills with commas</p>
+                    </div>
 
-                    <label class="block text-gray-700 font-semibold mt-2">Role/Position *</label>
-                    <input type="text" name="role" value="{{ role }}" class="w-full p-2 border rounded-lg" placeholder="e.g., Senior Software Engineer, Product Manager" >
+                    <div>
+                        <label class="block text-gray-700 font-semibold mb-2">Role/Position *</label>
+                        <input type="text" name="role" value="{{ role }}" class="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition duration-300" placeholder="Senior Software Engineer, Product Manager...">
+                    </div>
                 </div>
-                <div>
-                    <label class="block text-gray-700 font-semibold">Industry/Sector *</label>
-                    <select name="industry_sector" class="w-full p-2 border rounded-lg" >
-                        <option value="">Select Industry</option>
-                        <option value="Technology" {% if industry_sector == 'Technology' %}selected{% endif %}>Technology</option>
-                        <option value="Healthcare" {% if industry_sector == 'Healthcare' %}selected{% endif %}>Healthcare</option>
-                        <option value="Education" {% if industry_sector == 'Education' %}selected{% endif %}>Education</option>
-                        <option value="Finance" {% if industry_sector == 'Finance' %}selected{% endif %}>Finance</option>
-                        <option value="Business" {% if industry_sector == 'Business' %}selected{% endif %}>Business</option>
-                        <option value="Creative Arts" {% if industry_sector == 'Creative Arts' %}selected{% endif %}>Creative Arts</option>
-                        <option value="Science & Research" {% if industry_sector == 'Science & Research' %}selected{% endif %}>Science & Research</option>
-                        <option value="Government" {% if industry_sector == 'Government' %}selected{% endif %}>Government</option>
-                        <option value="Non-Profit" {% if industry_sector == 'Non-Profit' %}selected{% endif %}>Non-Profit</option>
-                        <option value="Other" {% if industry_sector == 'Other' %}selected{% endif %}>Other</option>
-                    </select>
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-gray-700 font-semibold mb-2">Industry/Sector *</label>
+                        <select name="industry_sector" class="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition duration-300">
+                            <option value="">Select Industry</option>
+                            <option value="Technology" {% if industry_sector == 'Technology' %}selected{% endif %}>💻 Technology</option>
+                            <option value="Healthcare" {% if industry_sector == 'Healthcare' %}selected{% endif %}>🏥 Healthcare</option>
+                            <option value="Education" {% if industry_sector == 'Education' %}selected{% endif %}>🎓 Education</option>
+                            <option value="Finance" {% if industry_sector == 'Finance' %}selected{% endif %}>💰 Finance</option>
+                            <option value="Business" {% if industry_sector == 'Business' %}selected{% endif %}>💼 Business</option>
+                            <option value="Creative Arts" {% if industry_sector == 'Creative Arts' %}selected{% endif %}>🎨 Creative Arts</option>
+                            <option value="Science & Research" {% if industry_sector == 'Science & Research' %}selected{% endif %}>🔬 Science & Research</option>
+                            <option value="Government" {% if industry_sector == 'Government' %}selected{% endif %}>🏛️ Government</option>
+                            <option value="Non-Profit" {% if industry_sector == 'Non-Profit' %}selected{% endif %}>🤝 Non-Profit</option>
+                            <option value="Manufacturing" {% if industry_sector == 'Manufacturing' %}selected{% endif %}>🏭 Manufacturing</option>
+                            <option value="Retail" {% if industry_sector == 'Retail' %}selected{% endif %}>🛍️ Retail</option>
+                            <option value="Hospitality" {% if industry_sector == 'Hospitality' %}selected{% endif %}>🏨 Hospitality</option>
+                            <option value="Other" {% if industry_sector == 'Other' %}selected{% endif %}>🔶 Other</option>
+                        </select>
+                    </div>
 
-                    <label class="block text-gray-700 font-semibold mt-2">Organisation/Company *</label>
-                    <input type="text" name="organisation" value="{{ organisation }}" class="w-full p-2 border rounded-lg" >
+                    <div>
+                        <label class="block text-gray-700 font-semibold mb-2">Organisation/Company *</label>
+                        <input type="text" name="organisation" value="{{ organisation }}" class="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition duration-300">
+                    </div>
 
-                    <label class="block text-gray-700 font-semibold mt-2">Years of Experience *</label>
-                    <select name="years_of_experience" class="w-full p-2 border rounded-lg" >
-                        <option value="">Select Experience</option>
-                        <option value="0-2" {% if years_of_experience == '0-2' %}selected{% endif %}>0-2 years</option>
-                        <option value="3-5" {% if years_of_experience == '3-5' %}selected{% endif %}>3-5 years</option>
-                        <option value="6-10" {% if years_of_experience == '6-10' %}selected{% endif %}>6-10 years</option>
-                        <option value="11-15" {% if years_of_experience == '11-15' %}selected{% endif %}>11-15 years</option>
-                        <option value="15+" {% if years_of_experience == '15+' %}selected{% endif %}>15+ years</option>
-                    </select>
+                    <div>
+                        <label class="block text-gray-700 font-semibold mb-2">Years of Experience *</label>
+                        <select name="years_of_experience" class="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition duration-300">
+                            <option value="">Select Experience</option>
+                            <option value="0-2" {% if years_of_experience == '0-2' %}selected{% endif %}>0-2 years (Beginner)</option>
+                            <option value="3-5" {% if years_of_experience == '3-5' %}selected{% endif %}>3-5 years (Intermediate)</option>
+                            <option value="6-10" {% if years_of_experience == '6-10' %}selected{% endif %}>6-10 years (Experienced)</option>
+                            <option value="11-15" {% if years_of_experience == '11-15' %}selected{% endif %}>11-15 years (Senior)</option>
+                            <option value="15+" {% if years_of_experience == '15+' %}selected{% endif %}>15+ years (Expert)</option>
+                        </select>
+                    </div>
                 </div>
             </div>
         </div>
 
         <!-- Contact & Location Information -->
-        <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-            <h3 class="text-2xl font-semibold text-gray-700 mb-4">Contact & Location</h3>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                    <label class="block text-gray-700 font-semibold">WhatsApp Number *</label>
-                    <input type="text" name="whatsapp" value="{{ whatsapp }}" class="w-full p-2 border rounded-lg" >
+        <div class="bg-white p-8 rounded-2xl shadow-lg border border-blue-100">
+            <h3 class="text-3xl font-bold text-gray-800 mb-6 pb-3 border-b-2 border-blue-100">
+                <i class="fas fa-map-marker-alt text-green-500 mr-3"></i>Contact & Location
+            </h3>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-gray-700 font-semibold mb-2">WhatsApp Number *</label>
+                        <input type="text" name="whatsapp" value="{{ whatsapp }}" class="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition duration-300">
+                    </div>
 
-                    <label class="block text-gray-700 font-semibold mt-2">Country *</label>
-                    <input type="text" name="location" value="{{ location }}" class="w-full p-2 border rounded-lg" >
+                    <div>
+                        <label class="block text-gray-700 font-semibold mb-2">Country *</label>
+                        <select name="country" class="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition duration-300">
+                            <option value="">Select Country</option>
+                            <option value="India" {% if location == 'India' %}selected{% endif %}>🇮🇳 India</option>
+                            <option value="USA" {% if location == 'USA' %}selected{% endif %}>🇺🇸 United States</option>
+                            <option value="UK" {% if location == 'UK' %}selected{% endif %}>🇬🇧 United Kingdom</option>
+                            <option value="Canada" {% if location == 'Canada' %}selected{% endif %}>🇨🇦 Canada</option>
+                            <option value="Australia" {% if location == 'Australia' %}selected{% endif %}>🇦🇺 Australia</option>
+                            <option value="Germany" {% if location == 'Germany' %}selected{% endif %}>🇩🇪 Germany</option>
+                            <option value="France" {% if location == 'France' %}selected{% endif %}>🇫🇷 France</option>
+                            <option value="Japan" {% if location == 'Japan' %}selected{% endif %}>🇯🇵 Japan</option>
+                            <option value="Singapore" {% if location == 'Singapore' %}selected{% endif %}>🇸🇬 Singapore</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
 
-                    <label class="block text-gray-700 font-semibold mt-2">Language(s) *</label>
-                    <select name="language" class="w-full p-2 border rounded-lg" multiple >
-                        <option value="English" {% if 'English' in language %}selected{% endif %}>English</option>
-                        <option value="Hindi" {% if 'Hindi' in language %}selected{% endif %}>Hindi</option>
-                        <option value="Spanish" {% if 'Spanish' in language %}selected{% endif %}>Spanish</option>
-                        <option value="French" {% if 'French' in language %}selected{% endif %}>French</option>
-                        <option value="German" {% if 'German' in language %}selected{% endif %}>German</option>
-                        <option value="Chinese" {% if 'Chinese' in language %}selected{% endif %}>Chinese</option>
-                        <option value="Japanese" {% if 'Japanese' in language %}selected{% endif %}>Japanese</option>
-                        <option value="Other" {% if 'Other' in language %}selected{% endif %}>Other</option>
-                    </select>
-                    <p class="text-xs text-gray-500">Hold Ctrl/Cmd to select multiple languages</p>
+                    <div>
+                        <label class="block text-gray-700 font-semibold mb-2">Language(s) *</label>
+                        <select name="language" class="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition duration-300" multiple>
+                            <optgroup label="Popular Languages">
+                                <option value="English" {% if 'English' in (language | default([], true)) %}selected{% endif %}>🇬🇧 English</option>
+                                <option value="Hindi" {% if 'Hindi' in (language | default([], true)) %}selected{% endif %}>🇮🇳 Hindi</option>
+                                <option value="Spanish" {% if 'Spanish' in (language | default([], true)) %}selected{% endif %}>🇪🇸 Spanish</option>
+                                <option value="French" {% if 'French' in (language | default([], true)) %}selected{% endif %}>🇫🇷 French</option>
+                                <option value="German" {% if 'German' in (language | default([], true)) %}selected{% endif %}>🇩🇪 German</option>
+                            </optgroup>
+                            <optgroup label="Other Languages">
+                                <option value="Chinese" {% if 'Chinese' in (language | default([], true)) %}selected{% endif %}>🇨🇳 Chinese (Mandarin)</option>
+                                <option value="Japanese" {% if 'Japanese' in (language | default([], true)) %}selected{% endif %}>🇯🇵 Japanese</option>
+                                <option value="Arabic" {% if 'Arabic' in (language | default([], true)) %}selected{% endif %}>🇸🇦 Arabic</option>
+                                <option value="Portuguese" {% if 'Portuguese' in (language | default([], true)) %}selected{% endif %}>🇵🇹 Portuguese</option>
+                                <option value="Russian" {% if 'Russian' in (language | default([], true)) %}selected{% endif %}>🇷🇺 Russian</option>
+                                <option value="Italian" {% if 'Italian' in (language | default([], true)) %}selected{% endif %}>🇮🇹 Italian</option>
+                                <option value="Korean" {% if 'Korean' in (language | default([], true)) %}selected{% endif %}>🇰🇷 Korean</option>
+                                <option value="Dutch" {% if 'Dutch' in (language | default([], true)) %}selected{% endif %}>🇳🇱 Dutch</option>
+                                <option value="Turkish" {% if 'Turkish' in (language | default([], true)) %}selected{% endif %}>🇹🇷 Turkish</option>
+                                <option value="Tamil" {% if 'Tamil' in (language | default([], true)) %}selected{% endif %}>🇮🇳 Tamil</option>
+                                <option value="Telugu" {% if 'Telugu' in (language | default([], true)) %}selected{% endif %}>🇮🇳 Telugu</option>
+                                <option value="Marathi" {% if 'Marathi' in (language | default([], true)) %}selected{% endif %}>🇮🇳 Marathi</option>
+                                <option value="Bengali" {% if 'Bengali' in (language | default([], true)) %}selected{% endif %}>🇧🇩 Bengali</option>
+                            </optgroup>
+                        </select>
+                        <p class="text-sm text-gray-500 mt-1"><i class="fas fa-mouse-pointer mr-1"></i>Hold Ctrl/Cmd to select multiple languages</p>
+                    </div>
                 </div>
-                <div>
-                    <label class="block text-gray-700 font-semibold">City *</label>
-                    <input type="text" name="location" value="{{ location }}" class="w-full p-2 border rounded-lg" >
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-gray-700 font-semibold mb-2">City *</label>
+                        <input type="text" name="city" value="{{ location }}" class="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition duration-300">
+                    </div>
 
-                    <label class="block text-gray-700 font-semibold mt-2">Education *</label>
-                    <input type="text" name="education" value="{{ education }}" class="w-full p-2 border rounded-lg" placeholder="e.g., B.Tech Computer Science, MBA" >
+                    <div>
+                        <label class="block text-gray-700 font-semibold mb-2">Education *</label>
+                        <select name="education" class="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition duration-300">
+                            <option value="">Select Education</option>
+                            <optgroup label="Undergraduate">
+                                <option value="B.Tech" {% if education == 'B.Tech' %}selected{% endif %}>B.Tech</option>
+                                <option value="B.E." {% if education == 'B.E.' %}selected{% endif %}>B.E.</option>
+                                <option value="B.Sc" {% if education == 'B.Sc' %}selected{% endif %}>B.Sc</option>
+                                <option value="B.Com" {% if education == 'B.Com' %}selected{% endif %}>B.Com</option>
+                                <option value="BA" {% if education == 'BA' %}selected{% endif %}>BA</option>
+                                <option value="MBBS" {% if education == 'MBBS' %}selected{% endif %}>MBBS</option>
+                                <option value="B.Arch" {% if education == 'B.Arch' %}selected{% endif %}>B.Arch</option>
+                            </optgroup>
+                            <optgroup label="Postgraduate">
+                                <option value="M.Tech" {% if education == 'M.Tech' %}selected{% endif %}>M.Tech</option>
+                                <option value="MBA" {% if education == 'MBA' %}selected{% endif %}>MBA</option>
+                                <option value="M.Sc" {% if education == 'M.Sc' %}selected{% endif %}>M.Sc</option>
+                                <option value="MA" {% if education == 'MA' %}selected{% endif %}>MA</option>
+                                <option value="MD" {% if education == 'MD' %}selected{% endif %}>MD</option>
+                                <option value="MS" {% if education == 'MS' %}selected{% endif %}>MS</option>
+                            </optgroup>
+                            <optgroup label="Doctorate">
+                                <option value="PhD" {% if education == 'PhD' %}selected{% endif %}>PhD</option>
+                                <option value="Postdoc" {% if education == 'Postdoc' %}selected{% endif %}>Postdoc</option>
+                            </optgroup>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
                 </div>
             </div>
         </div>
 
         <!-- Social Links -->
-        <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-            <h3 class="text-2xl font-semibold text-gray-700 mb-4">Social Links</h3>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                    <label class="block text-gray-700 font-semibold">LinkedIn Profile</label>
-                    <input type="url" name="linkedin_link" value="{{ linkedin_link }}" class="w-full p-2 border rounded-lg" placeholder="https://linkedin.com/in/yourprofile">
+        <div class="bg-white p-8 rounded-2xl shadow-lg border border-blue-100">
+            <h3 class="text-3xl font-bold text-gray-800 mb-6 pb-3 border-b-2 border-blue-100">
+                <i class="fas fa-share-alt text-purple-500 mr-3"></i>Social Links
+            </h3>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-gray-700 font-semibold mb-2">
+                            <i class="fab fa-linkedin text-blue-600 mr-2"></i>LinkedIn Profile
+                        </label>
+                        <input type="url" name="linkedin_link" value="{{ linkedin_link }}" class="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition duration-300" placeholder="https://linkedin.com/in/yourprofile">
+                    </div>
 
-                    <label class="block text-gray-700 font-semibold mt-2">GitHub Profile</label>
-                    <input type="url" name="github_link" value="{{ github_link }}" class="w-full p-2 border rounded-lg" placeholder="https://github.com/yourusername">
+                    <div>
+                        <label class="block text-gray-700 font-semibold mb-2">
+                            <i class="fab fa-github text-gray-800 mr-2"></i>GitHub Profile
+                        </label>
+                        <input type="url" name="github_link" value="{{ github_link }}" class="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition duration-300" placeholder="https://github.com/yourusername">
+                    </div>
                 </div>
-                <div>
-                    <label class="block text-gray-700 font-semibold">Portfolio Website</label>
-                    <input type="url" name="portfolio_link" value="{{ portfolio_link }}" class="w-full p-2 border rounded-lg" placeholder="https://yourportfolio.com">
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-gray-700 font-semibold mb-2">
+                            <i class="fas fa-globe text-green-600 mr-2"></i>Portfolio Website
+                        </label>
+                        <input type="url" name="portfolio_link" value="{{ portfolio_link }}" class="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition duration-300" placeholder="https://yourportfolio.com">
+                    </div>
 
-                    <label class="block text-gray-700 font-semibold mt-2">Other Social Link</label>
-                    <input type="url" name="other_social_link" value="{{ other_social_link }}" class="w-full p-2 border rounded-lg" placeholder="https://">
+                    <div>
+                        <label class="block text-gray-700 font-semibold mb-2">
+                            <i class="fas fa-link text-gray-600 mr-2"></i>Other Social Link
+                        </label>
+                        <input type="url" name="other_social_link" value="{{ other_social_link }}" class="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition duration-300" placeholder="https://">
+                    </div>
                 </div>
             </div>
         </div>
 
         <!-- Mentorship Preferences -->
-        <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-            <h3 class="text-2xl font-semibold text-gray-700 mb-4">Mentorship Preferences</h3>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                    <label class="block text-gray-700 font-semibold">Mentorship Topics *</label>
-                    <textarea name="mentorship_topics" class="w-full p-2 border rounded-lg" rows="3" placeholder="e.g., Career Guidance, Technical Skills, Interview Preparation, Leadership" >{{ mentorship_topics }}</textarea>
-                    <p class="text-xs text-gray-500">List topics you can mentor on</p>
+        <div class="bg-white p-8 rounded-2xl shadow-lg border border-blue-100">
+            <h3 class="text-3xl font-bold text-gray-800 mb-6 pb-3 border-b-2 border-blue-100">
+                <i class="fas fa-hands-helping text-yellow-500 mr-3"></i>Mentorship Preferences
+            </h3>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-gray-700 font-semibold mb-2">Mentorship Topics *</label>
+                        <select name="mentorship_topics" class="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition duration-300" multiple>
+                            <optgroup label="Career Development">
+                                <option value="Career Guidance" {% if 'Career Guidance' in mentorship_topics %}selected{% endif %}>🎯 Career Guidance</option>
+                                <option value="Career Transition" {% if 'Career Transition' in mentorship_topics %}selected{% endif %}>🔄 Career Transition</option>
+                                <option value="Interview Preparation" {% if 'Interview Preparation' in mentorship_topics %}selected{% endif %}>📝 Interview Preparation</option>
+                                <option value="Resume Building" {% if 'Resume Building' in mentorship_topics %}selected{% endif %}>📄 Resume Building</option>
+                                <option value="Job Search Strategy" {% if 'Job Search Strategy' in mentorship_topics %}selected{% endif %}>🔍 Job Search Strategy</option>
+                                <option value="Salary Negotiation" {% if 'Salary Negotiation' in mentorship_topics %}selected{% endif %}>💰 Salary Negotiation</option>
+                            </optgroup>
+                            <optgroup label="Technical Skills">
+                                <option value="Programming" {% if 'Programming' in mentorship_topics %}selected{% endif %}>💻 Programming</option>
+                                <option value="Data Science" {% if 'Data Science' in mentorship_topics %}selected{% endif %}>📊 Data Science</option>
+                                <option value="Machine Learning" {% if 'Machine Learning' in mentorship_topics %}selected{% endif %}>🤖 Machine Learning</option>
+                                <option value="Web Development" {% if 'Web Development' in mentorship_topics %}selected{% endif %}>🌐 Web Development</option>
+                                <option value="Mobile Development" {% if 'Mobile Development' in mentorship_topics %}selected{% endif %}>📱 Mobile Development</option>
+                                <option value="Cloud Computing" {% if 'Cloud Computing' in mentorship_topics %}selected{% endif %}>☁️ Cloud Computing</option>
+                                <option value="Cybersecurity" {% if 'Cybersecurity' in mentorship_topics %}selected{% endif %}>🔒 Cybersecurity</option>
+                            </optgroup>
+                            <optgroup label="Professional Skills">
+                                <option value="Leadership" {% if 'Leadership' in mentorship_topics %}selected{% endif %}>🌟 Leadership</option>
+                                <option value="Project Management" {% if 'Project Management' in mentorship_topics %}selected{% endif %}>📊 Project Management</option>
+                                <option value="Public Speaking" {% if 'Public Speaking' in mentorship_topics %}selected{% endif %}>🎤 Public Speaking</option>
+                                <option value="Communication Skills" {% if 'Communication Skills' in mentorship_topics %}selected{% endif %}>💬 Communication Skills</option>
+                                <option value="Time Management" {% if 'Time Management' in mentorship_topics %}selected{% endif %}>⏰ Time Management</option>
+                                <option value="Team Collaboration" {% if 'Team Collaboration' in mentorship_topics %}selected{% endif %}>👥 Team Collaboration</option>
+                            </optgroup>
+                            <optgroup label="Academic & Research">
+                                <option value="Research Methodology" {% if 'Research Methodology' in mentorship_topics %}selected{% endif %}>🔬 Research Methodology</option>
+                                <option value="Academic Writing" {% if 'Academic Writing' in mentorship_topics %}selected{% endif %}>✍️ Academic Writing</option>
+                                <option value="Thesis Guidance" {% if 'Thesis Guidance' in mentorship_topics %}selected{% endif %}>📚 Thesis Guidance</option>
+                                <option value="Study Abroad" {% if 'Study Abroad' in mentorship_topics %}selected{% endif %}>✈️ Study Abroad</option>
+                                <option value="Competitive Exams" {% if 'Competitive Exams' in mentorship_topics %}selected{% endif %}>📝 Competitive Exams</option>
+                            </optgroup>
+                            <optgroup label="Entrepreneurship">
+                                <option value="Startup Guidance" {% if 'Startup Guidance' in mentorship_topics %}selected{% endif %}>🚀 Startup Guidance</option>
+                                <option value="Business Planning" {% if 'Business Planning' in mentorship_topics %}selected{% endif %}>📈 Business Planning</option>
+                                <option value="Funding & Investment" {% if 'Funding & Investment' in mentorship_topics %}selected{% endif %}>💸 Funding & Investment</option>
+                                <option value="Marketing Strategy" {% if 'Marketing Strategy' in mentorship_topics %}selected{% endif %}>📢 Marketing Strategy</option>
+                                <option value="Product Management" {% if 'Product Management' in mentorship_topics %}selected{% endif %}>📦 Product Management</option>
+                            </optgroup>
+                            <optgroup label="Personal Development">
+                                <option value="Personal Growth" {% if 'Personal Growth' in mentorship_topics %}selected{% endif %}>🌱 Personal Growth</option>
+                                <option value="Mindset & Motivation" {% if 'Mindset & Motivation' in mentorship_topics %}selected{% endif %}>💪 Mindset & Motivation</option>
+                                <option value="Work-Life Balance" {% if 'Work-Life Balance' in mentorship_topics %}selected{% endif %}>⚖️ Work-Life Balance</option>
+                                <option value="Networking Skills" {% if 'Networking Skills' in mentorship_topics %}selected{% endif %}>🤝 Networking Skills</option>
+                                <option value="Personal Branding" {% if 'Personal Branding' in mentorship_topics %}selected{% endif %}>🌟 Personal Branding</option>
+                            </optgroup>
+                        </select>
+                        <p class="text-sm text-gray-500 mt-1"><i class="fas fa-mouse-pointer mr-1"></i>Hold Ctrl/Cmd to select multiple topics</p>
+                    </div>
 
-                    <label class="block text-gray-700 font-semibold mt-2">Mentorship Type Preference *</label>
-                    <select name="mentorship_type_preference" class="w-full p-2 border rounded-lg" multiple >
-                        <option value="School Students" {% if 'School Students' in mentorship_type_preference %}selected{% endif %}>School Students</option>
-                        <option value="College Students" {% if 'College Students' in mentorship_type_preference %}selected{% endif %}>College Students</option>
-                        <option value="Women" {% if 'Women' in mentorship_type_preference %}selected{% endif %}>Women</option>
-                        <option value="Underrepresented Groups" {% if 'Underrepresented Groups' in mentorship_type_preference %}selected{% endif %}>Underrepresented Groups</option>
-                        <option value="Career Changers" {% if 'Career Changers' in mentorship_type_preference %}selected{% endif %}>Career Changers</option>
-                        <option value="Early Professionals" {% if 'Early Professionals' in mentorship_type_preference %}selected{% endif %}>Early Professionals</option>
-                        <option value="Entrepreneurs" {% if 'Entrepreneurs' in mentorship_type_preference %}selected{% endif %}>Entrepreneurs</option>
-                        <option value="All" {% if 'All' in mentorship_type_preference %}selected{% endif %}>All</option>
-                    </select>
-                    <p class="text-xs text-gray-500">Hold Ctrl/Cmd to select multiple preferences</p>
+                    <div>
+                        <label class="block text-gray-700 font-semibold mb-2">Mentorship Type Preference *</label>
+                        <select name="mentorship_type_preference" class="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition duration-300" multiple>
+                            <optgroup label="Student Groups">
+                                <option value="School Students" {% if 'School Students' in mentorship_type_preference %}selected{% endif %}>🎒 School Students (6th-12th)</option>
+                                <option value="College Students" {% if 'College Students' in mentorship_type_preference %}selected{% endif %}>🎓 College Students (Undergraduate)</option>
+                                <option value="Graduate Students" {% if 'Graduate Students' in mentorship_type_preference %}selected{% endif %}>🎓 Graduate Students (Postgraduate)</option>
+                                <option value="PhD Scholars" {% if 'PhD Scholars' in mentorship_type_preference %}selected{% endif %}>🔬 PhD Scholars</option>
+                            </optgroup>
+                            <optgroup label="Professional Groups">
+                                <option value="Early Professionals" {% if 'Early Professionals' in mentorship_type_preference %}selected{% endif %}>👨‍💼 Early Professionals (0-3 years)</option>
+                                <option value="Mid-Level Professionals" {% if 'Mid-Level Professionals' in mentorship_type_preference %}selected{% endif %}>💼 Mid-Level Professionals (4-8 years)</option>
+                                <option value="Senior Professionals" {% if 'Senior Professionals' in mentorship_type_preference %}selected{% endif %}>👔 Senior Professionals (8+ years)</option>
+                                <option value="Career Changers" {% if 'Career Changers' in mentorship_type_preference %}selected{% endif %}>🔄 Career Changers</option>
+                            </optgroup>
+                            <optgroup label="Special Groups">
+                                <option value="Women" {% if 'Women' in mentorship_type_preference %}selected{% endif %}>👩‍💼 Women Professionals</option>
+                                <option value="Underrepresented Groups" {% if 'Underrepresented Groups' in mentorship_type_preference %}selected{% endif %}>🌈 Underrepresented Groups</option>
+                                <option value="Entrepreneurs" {% if 'Entrepreneurs' in mentorship_type_preference %}selected{% endif %}>💡 Entrepreneurs</option>
+                                <option value="Returning Professionals" {% if 'Returning Professionals' in mentorship_type_preference %}selected{% endif %}>↩️ Returning Professionals</option>
+                                <option value="First Generation Students" {% if 'First Generation Students' in mentorship_type_preference %}selected{% endif %}>🌟 First Generation Students</option>
+                            </optgroup>
+                            <option value="All" {% if 'All' in mentorship_type_preference %}selected{% endif %}>🌍 All Groups</option>
+                        </select>
+                        <p class="text-sm text-gray-500 mt-1"><i class="fas fa-mouse-pointer mr-1"></i>Hold Ctrl/Cmd to select multiple preferences</p>
+                    </div>
                 </div>
-                <div>
-                    <label class="block text-gray-700 font-semibold">Preferred Communication *</label>
-                    <select name="preferred_communication" class="w-full p-2 border rounded-lg" >
-                        <option value="">Select Preference</option>
-                        <option value="Online" {% if preferred_communication == 'Online' %}selected{% endif %}>Online Only</option>
-                        <option value="Offline" {% if preferred_communication == 'Offline' %}selected{% endif %}>Offline Only</option>
-                        <option value="Hybrid" {% if preferred_communication == 'Hybrid' %}selected{% endif %}>Hybrid (Online & Offline)</option>
-                    </select>
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-gray-700 font-semibold mb-2">Preferred Communication *</label>
+                        <select name="preferred_communication" class="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition duration-300">
+                            <option value="">Select Preference</option>
+                            <option value="Online" {% if preferred_communication == 'Online' %}selected{% endif %}>💻 Online Only</option>
+                            <option value="Offline" {% if preferred_communication == 'Offline' %}selected{% endif %}>🏢 Offline Only</option>
+                            <option value="Hybrid" {% if preferred_communication == 'Hybrid' %}selected{% endif %}>🔀 Hybrid (Online & Offline)</option>
+                        </select>
+                    </div>
 
-                    <label class="block text-gray-700 font-semibold mt-2">Availability *</label>
-                    <input type="text" name="availability" value="{{ availability }}" class="w-full p-2 border rounded-lg" placeholder="e.g., Weekends, Evenings, Flexible" >
+                    <div>
+                        <label class="block text-gray-700 font-semibold mb-2">Availability *</label>
+                        <select name="availability" class="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition duration-300">
+                            <option value="">Select Availability</option>
+                            <option value="Weekdays" {% if availability == 'Weekdays' %}selected{% endif %}>📅 Weekdays</option>
+                            <option value="Weekends" {% if availability == 'Weekends' %}selected{% endif %}>🏖️ Weekends</option>
+                            <option value="Evenings" {% if availability == 'Evenings' %}selected{% endif %}>🌙 Evenings</option>
+                            <option value="Flexible" {% if availability == 'Flexible' %}selected{% endif %}>🔄 Flexible</option>
+                        </select>
+                    </div>
 
-                    <label class="block text-gray-700 font-semibold mt-2">Connect Frequency *</label>
-                    <select name="connect_frequency" class="w-full p-2 border rounded-lg" >
-                        <option value="">Select Frequency</option>
-                        <option value="Weekly" {% if connect_frequency == 'Weekly' %}selected{% endif %}>Weekly</option>
-                        <option value="Bi-weekly" {% if connect_frequency == 'Bi-weekly' %}selected{% endif %}>Bi-weekly</option>
-                        <option value="Monthly" {% if connect_frequency == 'Monthly' %}selected{% endif %}>Monthly</option>
-                        <option value="As needed" {% if connect_frequency == 'As needed' %}selected{% endif %}>As needed</option>
-                    </select>
+                    <div>
+                        <label class="block text-gray-700 font-semibold mb-2">Connect Frequency *</label>
+                        <select name="connect_frequency" class="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition duration-300">
+                            <option value="">Select Frequency</option>
+                            <option value="Weekly" {% if connect_frequency == 'Weekly' %}selected{% endif %}>📅 Weekly</option>
+                            <option value="Bi-weekly" {% if connect_frequency == 'Bi-weekly' %}selected{% endif %}>🔄 Bi-weekly</option>
+                            <option value="Monthly" {% if connect_frequency == 'Monthly' %}selected{% endif %}>🗓️ Monthly</option>
+                            <option value="As needed" {% if connect_frequency == 'As needed' %}selected{% endif %}>💬 As needed</option>
+                        </select>
+                    </div>
 
-                    <label class="block text-gray-700 font-semibold mt-2">Preferred Duration *</label>
-                    <select name="preferred_duration" class="w-full p-2 border rounded-lg" >
-                        <option value="">Select Duration</option>
-                        <option value="1 month" {% if preferred_duration == '1 month' %}selected{% endif %}>1 month</option>
-                        <option value="3 months" {% if preferred_duration == '3 months' %}selected{% endif %}>3 months</option>
-                        <option value="6 months" {% if preferred_duration == '6 months' %}selected{% endif %}>6 months</option>
-                        <option value="1 year" {% if preferred_duration == '1 year' %}selected{% endif %}>1 year</option>
-                        <option value="Flexible" {% if preferred_duration == 'Flexible' %}selected{% endif %}>Flexible</option>
-                    </select>
+                    <div>
+                        <label class="block text-gray-700 font-semibold mb-2">Preferred Duration *</label>
+                        <select name="preferred_duration" class="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition duration-300">
+                            <option value="">Select Duration</option>
+                            <option value="1 month" {% if preferred_duration == '1 month' %}selected{% endif %}>1 month</option>
+                            <option value="3 months" {% if preferred_duration == '3 months' %}selected{% endif %}>3 months</option>
+                            <option value="6 months" {% if preferred_duration == '6 months' %}selected{% endif %}>6 months</option>
+                            <option value="1 year" {% if preferred_duration == '1 year' %}selected{% endif %}>1 year</option>
+                            <option value="Flexible" {% if preferred_duration == 'Flexible' %}selected{% endif %}>Flexible</option>
+                        </select>
+                    </div>
                 </div>
             </div>
         </div>
 
         <!-- Mentor Philosophy -->
-        <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-            <h3 class="text-2xl font-semibold text-gray-700 mb-4">Mentor Philosophy</h3>
+        <div class="bg-white p-8 rounded-2xl shadow-lg border border-blue-100">
+            <h3 class="text-3xl font-bold text-gray-800 mb-6 pb-3 border-b-2 border-blue-100">
+                <i class="fas fa-lightbulb text-yellow-500 mr-3"></i>Mentor Philosophy
+            </h3>
             <div class="space-y-4">
                 <div>
-                    <label class="block text-gray-700 font-semibold">Why Mentor? *</label>
-                    <textarea name="why_mentor" class="w-full p-2 border rounded-lg" rows="3" placeholder="Share your motivation for becoming a mentor" >{{ why_mentor }}</textarea>
+                    <label class="block text-gray-700 font-semibold mb-2">Why Mentor? *</label>
+                    <textarea name="why_mentor" class="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition duration-300" rows="3" placeholder="Share your motivation for becoming a mentor...">{{ why_mentor }}</textarea>
                 </div>
                 <div>
-                    <label class="block text-gray-700 font-semibold">Mentorship Philosophy *</label>
-                    <textarea name="mentorship_philosophy" class="w-full p-2 border rounded-lg" rows="3" placeholder="Describe your approach to mentorship" >{{ mentorship_philosophy }}</textarea>
+                    <label class="block text-gray-700 font-semibold mb-2">Mentorship Philosophy *</label>
+                    <textarea name="mentorship_philosophy" class="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition duration-300" rows="3" placeholder="Describe your approach to mentorship...">{{ mentorship_philosophy }}</textarea>
                 </div>
                 <div>
-                    <label class="block text-gray-700 font-semibold">Mentorship Motto *</label>
-                    <input type="text" name="mentorship_motto" value="{{ mentorship_motto }}" class="w-full p-2 border rounded-lg" placeholder="e.g., 'Empower through guidance and support'" >
+                    <label class="block text-gray-700 font-semibold mb-2">Mentorship Motto *</label>
+                    <input type="text" name="mentorship_motto" value="{{ mentorship_motto }}" class="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition duration-300" placeholder="e.g., 'Empower through guidance and support'">
                 </div>
             </div>
         </div>
 
         <!-- Additional Information -->
-        <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-            <h3 class="text-2xl font-semibold text-gray-700 mb-4">Additional Information</h3>
-            <textarea name="additional_info" class="w-full p-2 border rounded-lg" rows="4" placeholder="Any other information you'd like to share">{{ additional_info }}</textarea>
+        <div class="bg-white p-8 rounded-2xl shadow-lg border border-blue-100">
+            <h3 class="text-3xl font-bold text-gray-800 mb-6 pb-3 border-b-2 border-blue-100">
+                <i class="fas fa-info-circle text-blue-500 mr-3"></i>Additional Information
+            </h3>
+            <textarea name="additional_info" class="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition duration-300" rows="4" placeholder="Any other information you'd like to share with potential mentees...">{{ additional_info }}</textarea>
         </div>
 
         <!-- Submit Button -->
-        <div class="text-center">
-            <button type="submit" class="px-8 py-3 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 font-semibold">
-                Save Profile
+        <div class="text-center pt-6">
+            <button type="submit" class="px-12 py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-2xl shadow-2xl hover:from-blue-700 hover:to-purple-700 transform hover:scale-105 transition duration-300 font-bold text-lg">
+                <i class="fas fa-save mr-2"></i>Save Profile Changes
             </button>
         </div>
     </form>
@@ -234,7 +458,51 @@
 <style>
     select[multiple] {
         height: auto;
-        min-height: 100px;
+        min-height: 120px;
+        background-image: none;
+        padding-right: 0.75rem;
+    }
+    
+    select:focus {
+        outline: none;
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+    }
+    
+    .transition {
+        transition: all 0.3s ease;
+    }
+    
+    .shadow-2xl {
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    }
+    
+    optgroup {
+        font-weight: bold;
+        color: #4b5563;
+    }
+    
+    optgroup option {
+        font-weight: normal;
+        padding-left: 1rem;
     }
 </style>
+
+<script>
+    function previewImage(input) {
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = input.closest('.text-center').querySelector('img');
+                if (img) {
+                    img.src = e.target.result;
+                } else {
+                    const div = input.closest('.text-center').querySelector('div');
+                    div.innerHTML = `<img src="${e.target.result}" class="w-32 h-32 md:w-40 md:h-40 object-cover rounded-full shadow-lg border-4 border-blue-200">`;
+                }
+            }
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+</script>
 {% endblock %}
