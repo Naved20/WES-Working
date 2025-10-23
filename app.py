@@ -901,7 +901,6 @@ def my_mentors():
         profile_complete=profile_complete
     )
 
-
 @app.route("/my_mentees")
 def my_mentees():
     if "email" not in session or session.get("user_type") != "1":
@@ -1101,7 +1100,6 @@ def mentee_meeting_details():
         meetings=meetings
     )
 
-
 @app.route("/mentor_meeting_details")
 def mentor_meeting_details():
     if "email" not in session or session.get("user_type") != "1":
@@ -1121,7 +1119,6 @@ def mentor_meeting_details():
         show_sidebar=True,
         meetings=meetings
     )
-
 
 # ---------------- Supervisor - All Meeting Details ----------------
 @app.route("/supervisor_meeting_details")
@@ -1173,8 +1170,6 @@ def supervisor_meeting_details():
         show_sidebar=True,
         meetings=meeting_data
     )
-
-
 
 # ------------------- HANDLE MENTORSHIP REQUEST ------------------
 @app.route("/request_mentorship", methods=["POST"])
@@ -1653,7 +1648,6 @@ def supervisor_response():
     
     return redirect(url_for("supervisordashboard"))
 
-
 # ---------- Google Calendar Service Account Config ----------
 SCOPES = ["https://www.googleapis.com/auth/calendar"]
 SERVICE_ACCOUNT_FILE = "service_account.json"
@@ -1688,7 +1682,6 @@ def mentee_create_meeting_request(mentor_id):
         mentee=mentee,
         mentor=mentor
     )
-
 
 @app.route("/create_meeting_ajax", methods=["POST"])
 def create_meeting_ajax():
@@ -1777,8 +1770,6 @@ def create_meeting_ajax():
         "mentor_email": mentor.email
     })
 
-
-
 @app.route("/debug_profile")
 def debug_profile():
     if "email" not in session:
@@ -1834,7 +1825,6 @@ def test_create_profile():
             return "Mentee profile already exists"
     
     return "Not a mentor or mentee"
-
 
 # ------------------ LOGOUT ------------------
 @app.route("/logout")
