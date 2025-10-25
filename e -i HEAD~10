@@ -1,0 +1,60 @@
+* [33m58917fe[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;32mbackup-before-cleanup[m[33m)[m gitignore
+* [33m158f09a[m gitignore
+* [33md455924[m after git ignore
+* [33m4f3dfe7[m add calender full and add task froentend
+* [33m470d9bd[m add calender full and add task froentend
+* [33mc2d0c22[m add calender full and add task froentend
+* [33m8b0d0f5[m add new credential
+* [33m9bc0a05[m 8000
+* [33m0c2e446[m noop
+* [33mb339a94[m Updated DB with latest data
+* [33m95d67b5[m add profile update alert, update mentor prfile, password alert and dammy data
+* [33m1a3105b[m final live2
+* [33meef3242[m final live2
+* [33m1a2db7c[m final live
+* [33m7069f52[m final live
+* [33ma96ca8a[m Added .gitignore to ignore venv and temp files
+* [33mae6d224[m Removed venv folder from tracking
+* [33m9e94452[m update for aws updates
+* [33md503240[m final befour google api
+* [33m346a987[m my mentee, mentor
+* [33ma53fc11[m splite html pages
+* [33m3e6d52c[m add filter on supervisor sucessfully
+* [33m69a62ba[m mentors connect request not show in mentor dashboard
+* [33md7951fa[m for secure my code
+* [33m27e4a14[m after add aprov and reject
+* [33ma107aa9[m new code
+* [33m51fbecc[m add much more about mentee, mentor and supervisor.view profile of mentor in mentee page
+* [33mb73c354[m after aws deploy make db clean and re deploy
+* [33m4d4bb58[m add new filter
+* [33m5c3156f[m experience
+* [33mb726ad5[m add buttom pedding on base2.html
+* [33mbecaf9d[m add buttom pedding on base2.html
+* [33m9cd72b8[m fix side bar error that have show burger menu in profile page
+* [33m1f1a67c[m solve db error
+* [33m9606ae8[m make it responsive and add side bar
+* [33m50b8d95[m connnect db to render postgersql
+* [33m4cbe8fc[m after remove web: gunicorn app:app
+* [33m8d9c919[m final after remove runtime error
+* [33m1ad5e70[m after clear this
+* [33m92afea8[m Use psycopg2-binary for Render deployment
+* [33m12f086f[m Use Python 3.12 on Render
+* [33mfe55bb3[m Use Python 3.12 on Render
+* [33macd321b[m Use Python 3.12 on Render
+* [33m4062daf[m Use Python 3.12 on Render
+* [33m9dafc60[m add db setting for render
+* [33mcd02adb[m Use Python 3.12 for Render
+* [33m535f6ca[m add db setting for render
+* [33m7a772fa[m add db setting for render
+* [33m379845f[m reset db & add all thing in profile drop down
+* [33m3a0d00f[m add new db
+* [33mc9d5f9b[m Add gunicorn for deployment
+* [33ma0871e0[m Add requirements.txt for Render deployment
+* [33meaa0b56[m add files
+* [33m5dd62ab[m Ignore virtual environment
+* [33mecc77da[m img function will we working
+* [33m5b0cfcc[m add the new files and manator profile edit completed
+* [33m846c226[m add files
+* [33m62e7efd[m add files
+* [33m611cc3b[m add these
+* [33m7e00b43[m first commit
