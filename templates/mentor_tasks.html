@@ -1,0 +1,1003 @@
+{% extends "base2.html" %}
+{% block title %}Manage Tasks{% endblock %}
+{% block user %}Mentor{% endblock %}
+{% block profiledrop %}{% endblock %}
+{% block content %}
+
+<style>
+    .task-card {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+        border-left: 4px solid #3b82f6;
+    }
+    
+    .task-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+    
+    .task-card.urgent {
+        border-left-color: #ef4444;
+    }
+    
+    .task-card.completed {
+        border-left-color: #10b981;
+        opacity: 0.8;
+    }
+    
+    .task-card.upcoming {
+        border-left-color: #f59e0b;
+    }
+    
+    .task-status {
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
+        text-transform: uppercase;
+    }
+    
+    .status-pending {
+        background: #fef3c7;
+        color: #d97706;
+    }
+    
+    .status-in-progress {
+        background: #dbeafe;
+        color: #1d4ed8;
+    }
+    
+    .status-completed {
+        background: #d1fae5;
+        color: #065f46;
+    }
+    
+    .status-overdue {
+        background: #fee2e2;
+        color: #dc2626;
+    }
+    
+    .priority-high {
+        color: #dc2626;
+        font-weight: 600;
+    }
+    
+    .priority-medium {
+        color: #d97706;
+        font-weight: 600;
+    }
+    
+    .priority-low {
+        color: #059669;
+        font-weight: 600;
+    }
+    
+    .progress-bar {
+        background: #e5e7eb;
+        border-radius: 10px;
+        overflow: hidden;
+        height: 8px;
+    }
+    
+    .progress-fill {
+        background: #3b82f6;
+        height: 100%;
+        transition: width 0.3s ease;
+    }
+    
+    .filter-btn {
+        padding: 8px 16px;
+        border: 1px solid #d1d5db;
+        background: white;
+        border-radius: 20px;
+        font-size: 14px;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    
+    .filter-btn.active {
+        background: #3b82f6;
+        color: white;
+        border-color: #3b82f6;
+    }
+    
+    .empty-state {
+        text-align: center;
+        padding: 60px 20px;
+        color: #6b7280;
+    }
+    
+    .empty-state svg {
+        margin: 0 auto 16px;
+        color: #d1d5db;
+    }
+    
+    .task-actions {
+        opacity: 0;
+        transition: opacity 0.2s;
+    }
+    
+    .task-card:hover .task-actions {
+        opacity: 1;
+    }
+    
+    .stats-card {
+        background: white;
+        padding: 20px;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        text-align: center;
+    }
+    
+    .stats-number {
+        font-size: 2rem;
+        font-weight: bold;
+        margin-bottom: 8px;
+    }
+    
+    .stats-label {
+        color: #6b7280;
+        font-size: 0.875rem;
+    }
+    
+    .mentee-tab {
+        padding: 12px 24px;
+        border: none;
+        background: #f3f4f6;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    
+    .mentee-tab.active {
+        background: #3b82f6;
+        color: white;
+    }
+    
+    .mentee-section {
+        display: none;
+    }
+    
+    .mentee-section.active {
+        display: block;
+    }
+    
+    .badge {
+        padding: 2px 8px;
+        border-radius: 12px;
+        font-size: 12px;
+        font-weight: 600;
+    }
+    
+    .badge-primary {
+        background: #dbeafe;
+        color: #1d4ed8;
+    }
+    
+    .badge-success {
+        background: #d1fae5;
+        color: #065f46;
+    }
+    
+    .badge-warning {
+        background: #fef3c7;
+        color: #d97706;
+    }
+</style>
+
+<!-- Main Content Container -->
+<main class="max-w-7xl mx-auto px-2 sm:px-3 lg:px-3 py-2">
+    
+    <!-- Header Section -->
+    <section class="mb-8">
+        <div class="flex justify-between items-center mb-6">
+            <div>
+                <h1 class="text-3xl font-bold text-gray-900 mb-2">📋 Manage Tasks</h1>
+                <p class="text-gray-600">Assign and track tasks for your mentees</p>
+            </div>
+            <div class="flex gap-3">
+                <button onclick="openAssignTaskModal()" class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition flex items-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                    </svg>
+                    Assign New Task
+                </button>
+            </div>
+        </div>
+        
+        <!-- Statistics Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+            <div class="stats-card">
+                <div class="stats-number text-blue-600" id="total-tasks">0</div>
+                <div class="stats-label">Total Tasks Assigned</div>
+            </div>
+            <div class="stats-card">
+                <div class="stats-number text-green-600" id="completed-tasks">0</div>
+                <div class="stats-label">Completed</div>
+            </div>
+            <div class="stats-card">
+                <div class="stats-number text-orange-600" id="pending-tasks">0</div>
+                <div class="stats-label">In Progress</div>
+            </div>
+            <div class="stats-card">
+                <div class="stats-number text-red-600" id="overdue-tasks">0</div>
+                <div class="stats-label">Overdue</div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Mentee Tabs -->
+    <section class="mb-6">
+        <h3 class="text-lg font-semibold text-gray-900 mb-4">Tasks by Mentee</h3>
+        <div class="flex flex-wrap gap-3 mb-6" id="mentee-tabs">
+            <!-- Mentee tabs will be populated by JavaScript -->
+        </div>
+    </section>
+    
+    <!-- Filters and Search -->
+    <section class="mb-6">
+        <div class="flex flex-wrap gap-4 items-center justify-between">
+            <div class="flex flex-wrap gap-2">
+                <button class="filter-btn active" data-filter="all">All Tasks</button>
+                <button class="filter-btn" data-filter="pending">To Do</button>
+                <button class="filter-btn" data-filter="in-progress">In Progress</button>
+                <button class="filter-btn" data-filter="completed">Completed</button>
+                <button class="filter-btn" data-filter="overdue">Overdue</button>
+            </div>
+            
+            <div class="flex gap-3">
+                <div class="relative">
+                    <input type="text" id="task-search" placeholder="Search tasks..." class="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                    <svg class="w-5 h-5 absolute left-3 top-2.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                    </svg>
+                </div>
+                <select id="priority-filter" class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                    <option value="all">All Priorities</option>
+                    <option value="high">High Priority</option>
+                    <option value="medium">Medium Priority</option>
+                    <option value="low">Low Priority</option>
+                </select>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Tasks by Mentee -->
+    <section id="mentee-sections">
+        <!-- Mentee sections will be populated by JavaScript -->
+    </section>
+    
+    <!-- Empty State -->
+    <div id="empty-state" class="empty-state hidden">
+        <svg class="w-24 h-24 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+        </svg>
+        <h3 class="text-xl font-semibold text-gray-600 mb-2">No tasks assigned yet</h3>
+        <p class="text-gray-500 mb-4">Start by assigning tasks to your mentees to help them grow.</p>
+        <button onclick="openAssignTaskModal()" class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
+            Assign First Task
+        </button>
+    </div>
+</main>
+
+<!-- Assign Task Modal -->
+<div id="assign-task-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+    <div class="bg-white rounded-xl p-6 w-full max-w-2xl mx-4 max-h-[90vh] overflow-y-auto">
+        <h3 class="text-xl font-semibold mb-4">Assign New Task</h3>
+        <form id="assign-task-form" class="space-y-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Assign to Mentee</label>
+                    <select id="task-mentee" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" required>
+                        <option value="">Select a mentee</option>
+                        <!-- Mentee options will be populated by JavaScript -->
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Task Category</label>
+                    <select id="task-category" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                        <option value="Programming">Programming</option>
+                        <option value="Career Development">Career Development</option>
+                        <option value="Study">Study</option>
+                        <option value="Project">Project</option>
+                        <option value="Research">Research</option>
+                        <option value="Soft Skills">Soft Skills</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Task Title</label>
+                <input type="text" id="task-title" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="Enter task title" required>
+            </div>
+            
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Description</label>
+                <textarea id="task-description" rows="4" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="Describe the task in detail..." required></textarea>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Due Date</label>
+                    <input type="date" id="task-due-date" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" required>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Priority</label>
+                    <select id="task-priority" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                        <option value="low">Low</option>
+                        <option value="medium" selected>Medium</option>
+                        <option value="high">High</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Estimated Hours</label>
+                    <input type="number" id="task-estimated-hours" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="e.g., 5" min="1">
+                </div>
+            </div>
+            
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Additional Instructions (Optional)</label>
+                <textarea id="task-instructions" rows="2" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="Any specific instructions or resources..."></textarea>
+            </div>
+            
+            <div class="flex items-center gap-2">
+                <input type="checkbox" id="task-reminder" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                <label for="task-reminder" class="text-sm text-gray-700">Send reminder email to mentee</label>
+            </div>
+            
+            <div class="flex justify-end gap-3 mt-6">
+                <button type="button" onclick="closeAssignTaskModal()" class="px-4 py-2 text-gray-600 hover:text-gray-800 transition">Cancel</button>
+                <button type="submit" class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">Assign Task</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Task Details Modal -->
+<div id="task-details-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+    <div class="bg-white rounded-xl p-6 w-full max-w-2xl mx-4 max-h-[90vh] overflow-y-auto">
+        <div class="flex justify-between items-start mb-4">
+            <h3 id="detail-task-title" class="text-xl font-semibold">Task Title</h3>
+            <button onclick="closeTaskDetailsModal()" class="text-gray-400 hover:text-gray-600">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+            </button>
+        </div>
+        
+        <div class="space-y-6">
+            <!-- Task Meta -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                <div>
+                    <span class="font-medium text-gray-500">Mentee:</span>
+                    <span id="detail-task-mentee" class="ml-2 font-medium">John Doe</span>
+                </div>
+                <div>
+                    <span class="font-medium text-gray-500">Status:</span>
+                    <span id="detail-task-status" class="ml-2 status-pending">Pending</span>
+                </div>
+                <div>
+                    <span class="font-medium text-gray-500">Priority:</span>
+                    <span id="detail-task-priority" class="ml-2 priority-high">High</span>
+                </div>
+                <div>
+                    <span class="font-medium text-gray-500">Due Date:</span>
+                    <span id="detail-task-due-date" class="ml-2">2024-01-15</span>
+                </div>
+            </div>
+            
+            <!-- Description -->
+            <div>
+                <h4 class="font-medium text-gray-700 mb-2">Description</h4>
+                <p id="detail-task-description" class="text-gray-600 bg-gray-50 p-4 rounded-lg">Task description will appear here...</p>
+            </div>
+            
+            <!-- Progress -->
+            <div>
+                <h4 class="font-medium text-gray-700 mb-2">Progress</h4>
+                <div class="flex items-center gap-4">
+                    <div class="flex-1">
+                        <div class="progress-bar">
+                            <div id="detail-progress-fill" class="progress-fill" style="width: 0%"></div>
+                        </div>
+                    </div>
+                    <span id="detail-progress-text" class="text-sm font-medium">0%</span>
+                </div>
+            </div>
+            
+            <!-- Mentee Notes -->
+            <div id="mentee-notes-section" class="hidden">
+                <h4 class="font-medium text-gray-700 mb-2">Mentee's Notes</h4>
+                <p id="detail-mentee-notes" class="text-gray-600 bg-yellow-50 p-4 rounded-lg border border-yellow-200">No notes provided by mentee yet.</p>
+            </div>
+            
+            <!-- Actions -->
+            <div class="flex gap-3 pt-4 border-t">
+                <button onclick="sendReminder()" class="px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    Send Reminder
+                </button>
+                <button onclick="editTask()" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">Edit Task</button>
+                <button onclick="deleteTask()" class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition">Delete Task</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Sample data for mentor tasks
+let mentees = [
+    {
+        id: 1,
+        name: "Rahul Sharma",
+        email: "rahul@example.com",
+        stream: "Computer Science",
+        joinDate: "2024-01-01"
+    },
+    {
+        id: 2,
+        name: "Priya Patel",
+        email: "priya@example.com",
+        stream: "Data Science",
+        joinDate: "2024-01-05"
+    },
+    {
+        id: 3,
+        name: "Amit Kumar",
+        email: "amit@example.com",
+        stream: "Web Development",
+        joinDate: "2024-01-10"
+    }
+];
+
+let tasks = [
+    {
+        id: 1,
+        title: "Complete Python Basics Assignment",
+        description: "Finish the Python programming fundamentals assignment covering variables, data types, and basic operations. Submit the code files and a brief report.",
+        dueDate: "2024-01-15",
+        priority: "high",
+        status: "pending",
+        progress: 0,
+        menteeId: 1,
+        menteeName: "Rahul Sharma",
+        category: "Programming",
+        estimatedHours: 8,
+        instructions: "Focus on understanding list comprehensions and dictionary operations.",
+        createdAt: "2024-01-10",
+        lastReminder: null,
+        menteeNotes: ""
+    },
+    {
+        id: 2,
+        title: "Research Career Options in Data Science",
+        description: "Explore different career paths in data science and prepare a comprehensive report on 3 roles that interest you, including required skills and typical career progression.",
+        dueDate: "2024-01-20",
+        priority: "medium",
+        status: "in-progress",
+        progress: 50,
+        menteeId: 2,
+        menteeName: "Priya Patel",
+        category: "Career Research",
+        estimatedHours: 6,
+        instructions: "Include real job postings and salary ranges in your research.",
+        createdAt: "2024-01-08",
+        lastReminder: "2024-01-12",
+        menteeNotes: "Currently researching machine learning engineer and data analyst roles. Found some great resources on Coursera."
+    },
+    {
+        id: 3,
+        title: "Prepare Resume Draft",
+        description: "Create a first draft of your resume focusing on education, technical skills, projects, and any relevant experiences. We'll review this in our next session.",
+        dueDate: "2024-01-12",
+        priority: "high",
+        status: "completed",
+        progress: 100,
+        menteeId: 1,
+        menteeName: "Rahul Sharma",
+        category: "Career Development",
+        estimatedHours: 4,
+        instructions: "Use the template I shared and focus on quantifying your achievements.",
+        createdAt: "2024-01-05",
+        lastReminder: null,
+        menteeNotes: "Completed the draft. Added my college projects and internship experience. Looking forward to feedback."
+    },
+    {
+        id: 4,
+        title: "Read Chapter 3: Data Structures",
+        description: "Complete reading chapter 3 from the recommended textbook 'Data Structures and Algorithms' and prepare a summary of key concepts with examples.",
+        dueDate: "2024-01-18",
+        priority: "medium",
+        status: "pending",
+        progress: 0,
+        menteeId: 3,
+        menteeName: "Amit Kumar",
+        category: "Study",
+        estimatedHours: 5,
+        instructions: "Pay special attention to time complexity analysis.",
+        createdAt: "2024-01-09",
+        lastReminder: null,
+        menteeNotes: ""
+    },
+    {
+        id: 5,
+        title: "Practice Coding Problems - Arrays",
+        description: "Solve 15 array-based coding problems from LeetCode (easy and medium difficulty) to strengthen your problem-solving skills.",
+        dueDate: "2024-01-14",
+        priority: "high",
+        status: "overdue",
+        progress: 30,
+        menteeId: 2,
+        menteeName: "Priya Patel",
+        category: "Programming",
+        estimatedHours: 10,
+        instructions: "Focus on problems involving two-pointer technique and sliding window.",
+        createdAt: "2024-01-07",
+        lastReminder: "2024-01-13",
+        menteeNotes: "Completed 5 problems so far. Finding the two-pointer technique challenging but improving."
+    },
+    {
+        id: 6,
+        title: "Build Portfolio Website",
+        description: "Create a personal portfolio website showcasing your projects, skills, and resume. Use HTML, CSS, and JavaScript.",
+        dueDate: "2024-01-25",
+        priority: "medium",
+        status: "in-progress",
+        progress: 75,
+        menteeId: 3,
+        menteeName: "Amit Kumar",
+        category: "Project",
+        estimatedHours: 15,
+        instructions: "Make it responsive and deploy it using GitHub Pages.",
+        createdAt: "2024-01-11",
+        lastReminder: null,
+        menteeNotes: "Almost done with the main layout. Working on the projects section and contact form."
+    }
+];
+
+let currentFilter = 'all';
+let currentSearch = '';
+let currentPriorityFilter = 'all';
+let currentMenteeTab = 'all';
+
+// Initialize the page
+function initializePage() {
+    renderMenteeTabs();
+    renderTasks();
+    updateStatistics();
+    setupEventListeners();
+    populateMenteeDropdown();
+}
+
+// Render mentee tabs
+function renderMenteeTabs() {
+    const tabsContainer = document.getElementById('mentee-tabs');
+    const sectionsContainer = document.getElementById('mentee-sections');
+    
+    // Create "All Mentees" tab
+    const allTab = document.createElement('button');
+    allTab.className = 'mentee-tab active';
+    allTab.textContent = 'All Mentees';
+    allTab.onclick = () => switchMenteeTab('all');
+    tabsContainer.appendChild(allTab);
+    
+    // Create tabs for each mentee
+    mentees.forEach(mentee => {
+        const tab = document.createElement('button');
+        tab.className = 'mentee-tab';
+        tab.textContent = mentee.name;
+        tab.onclick = () => switchMenteeTab(mentee.id);
+        tabsContainer.appendChild(tab);
+        
+        // Create section for this mentee
+        const section = document.createElement('div');
+        section.id = `mentee-${mentee.id}`;
+        section.className = 'mentee-section';
+        section.innerHTML = `
+            <div class="mb-4">
+                <h4 class="text-lg font-semibold text-gray-900">${mentee.name}</h4>
+                <p class="text-gray-600">${mentee.stream} • Joined ${formatDate(mentee.joinDate)}</p>
+            </div>
+            <div id="tasks-mentee-${mentee.id}" class="space-y-4">
+                <!-- Tasks for this mentee will be populated here -->
+            </div>
+        `;
+        sectionsContainer.appendChild(section);
+    });
+    
+    // Show all section by default
+    document.getElementById('mentee-sections').innerHTML += `
+        <div id="mentee-all" class="mentee-section active">
+            <div class="space-y-6" id="tasks-all">
+                <!-- All tasks will be populated here -->
+            </div>
+        </div>
+    `;
+}
+
+// Switch between mentee tabs
+function switchMenteeTab(menteeId) {
+    currentMenteeTab = menteeId;
+    
+    // Update active tab
+    document.querySelectorAll('.mentee-tab').forEach(tab => {
+        tab.classList.remove('active');
+    });
+    document.querySelectorAll('.mentee-tab').forEach(tab => {
+        if ((menteeId === 'all' && tab.textContent === 'All Mentees') || 
+            (menteeId !== 'all' && tab.textContent === mentees.find(m => m.id === menteeId)?.name)) {
+            tab.classList.add('active');
+        }
+    });
+    
+    // Update active section
+    document.querySelectorAll('.mentee-section').forEach(section => {
+        section.classList.remove('active');
+    });
+    document.getElementById(`mentee-${menteeId}`).classList.add('active');
+    
+    renderTasks();
+}
+
+// Render tasks based on filters and current mentee tab
+function renderTasks() {
+    const emptyState = document.getElementById('empty-state');
+    
+    // Filter tasks
+    let filteredTasks = tasks.filter(task => {
+        const matchesFilter = currentFilter === 'all' || task.status === currentFilter;
+        const matchesSearch = currentSearch === '' || 
+                            task.title.toLowerCase().includes(currentSearch.toLowerCase()) ||
+                            task.description.toLowerCase().includes(currentSearch.toLowerCase());
+        const matchesPriority = currentPriorityFilter === 'all' || task.priority === currentPriorityFilter;
+        const matchesMentee = currentMenteeTab === 'all' || task.menteeId === currentMenteeTab;
+        
+        return matchesFilter && matchesSearch && matchesPriority && matchesMentee;
+    });
+    
+    if (filteredTasks.length === 0) {
+        emptyState.classList.remove('hidden');
+        document.getElementById('mentee-sections').classList.add('hidden');
+        return;
+    }
+    
+    emptyState.classList.add('hidden');
+    document.getElementById('mentee-sections').classList.remove('hidden');
+    
+    // Sort tasks: overdue first, then by due date
+    filteredTasks.sort((a, b) => {
+        if (a.status === 'overdue' && b.status !== 'overdue') return -1;
+        if (b.status === 'overdue' && a.status !== 'overdue') return 1;
+        return new Date(a.dueDate) - new Date(b.dueDate);
+    });
+    
+    // Clear existing tasks
+    document.querySelectorAll('[id^="tasks-"]').forEach(container => {
+        container.innerHTML = '';
+    });
+    
+    // Group tasks by mentee for "All Mentees" view
+    if (currentMenteeTab === 'all') {
+        const tasksByMentee = {};
+        filteredTasks.forEach(task => {
+            if (!tasksByMentee[task.menteeId]) {
+                tasksByMentee[task.menteeId] = [];
+            }
+            tasksByMentee[task.menteeId].push(task);
+        });
+        
+        let allTasksHTML = '';
+        Object.keys(tasksByMentee).forEach(menteeId => {
+            const mentee = mentees.find(m => m.id === parseInt(menteeId));
+            const menteeTasks = tasksByMentee[menteeId];
+            
+            allTasksHTML += `
+                <div class="mb-8">
+                    <div class="flex items-center gap-3 mb-4">
+                        <h3 class="text-xl font-semibold text-gray-900">${mentee.name}</h3>
+                        <span class="badge badge-primary">${menteeTasks.length} tasks</span>
+                    </div>
+                    <div class="space-y-4">
+                        ${menteeTasks.map(task => createTaskHTML(task)).join('')}
+                    </div>
+                </div>
+            `;
+        });
+        
+        document.getElementById('tasks-all').innerHTML = allTasksHTML;
+    } else {
+        // For individual mentee view
+        const menteeTasks = filteredTasks.filter(task => task.menteeId === currentMenteeTab);
+        const container = document.getElementById(`tasks-mentee-${currentMenteeTab}`);
+        container.innerHTML = menteeTasks.map(task => createTaskHTML(task)).join('');
+    }
+}
+
+// Create individual task HTML
+function createTaskHTML(task) {
+    const dueDate = new Date(task.dueDate);
+    const today = new Date();
+    const isOverdue = dueDate < today && task.status !== 'completed';
+    
+    return `
+        <div class="task-card p-6 ${task.status === 'completed' ? 'completed' : ''} ${isOverdue ? 'urgent' : ''}">
+            <div class="flex justify-between items-start mb-3">
+                <div class="flex items-center gap-3">
+                    <h3 class="text-lg font-semibold text-gray-900">${task.title}</h3>
+                    <span class="task-status ${getStatusClass(task.status)}">${getStatusText(task.status)}</span>
+                    ${isOverdue ? '<span class="badge badge-warning">Overdue</span>' : ''}
+                </div>
+                <div class="task-actions flex gap-2">
+                    <button onclick="viewTaskDetails(${task.id})" class="p-2 text-gray-400 hover:text-blue-600 transition">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                        </svg>
+                    </button>
+                    <button onclick="editTask(${task.id})" class="p-2 text-gray-400 hover:text-green-600 transition">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            
+            <p class="text-gray-600 mb-4 line-clamp-2">${task.description}</p>
+            
+            <div class="flex justify-between items-center">
+                <div class="flex items-center gap-4 text-sm text-gray-500">
+                    <div class="flex items-center gap-1">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                        </svg>
+                        <span>Due: ${formatDate(task.dueDate)}</span>
+                    </div>
+                    <span class="priority-${task.priority}">${task.priority.charAt(0).toUpperCase() + task.priority.slice(1)} Priority</span>
+                    <span class="badge badge-primary">${task.category}</span>
+                </div>
+                
+                ${task.status !== 'completed' ? `
+                <div class="flex items-center gap-3">
+                    <div class="w-24">
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: ${task.progress}%"></div>
+                        </div>
+                    </div>
+                    <span class="text-sm font-medium">${task.progress}%</span>
+                </div>
+                ` : `
+                <span class="text-green-600 text-sm font-medium flex items-center gap-1">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                    </svg>
+                    Completed
+                </span>
+                `}
+            </div>
+        </div>
+    `;
+}
+
+// Helper functions
+function getStatusClass(status) {
+    const statusClasses = {
+        'pending': 'status-pending',
+        'in-progress': 'status-in-progress',
+        'completed': 'status-completed',
+        'overdue': 'status-overdue'
+    };
+    return statusClasses[status] || 'status-pending';
+}
+
+function getStatusText(status) {
+    const statusTexts = {
+        'pending': 'To Do',
+        'in-progress': 'In Progress',
+        'completed': 'Completed',
+        'overdue': 'Overdue'
+    };
+    return statusTexts[status] || 'To Do';
+}
+
+function formatDate(dateString) {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', { 
+        month: 'short', 
+        day: 'numeric',
+        year: 'numeric'
+    });
+}
+
+// Update statistics
+function updateStatistics() {
+    const total = tasks.length;
+    const completed = tasks.filter(t => t.status === 'completed').length;
+    const pending = tasks.filter(t => t.status === 'in-progress').length;
+    const overdue = tasks.filter(t => t.status === 'overdue').length;
+    
+    document.getElementById('total-tasks').textContent = total;
+    document.getElementById('completed-tasks').textContent = completed;
+    document.getElementById('pending-tasks').textContent = pending;
+    document.getElementById('overdue-tasks').textContent = overdue;
+}
+
+// Populate mentee dropdown in assign task modal
+function populateMenteeDropdown() {
+    const dropdown = document.getElementById('task-mentee');
+    dropdown.innerHTML = '<option value="">Select a mentee</option>';
+    mentees.forEach(mentee => {
+        const option = document.createElement('option');
+        option.value = mentee.id;
+        option.textContent = `${mentee.name} (${mentee.stream})`;
+        dropdown.appendChild(option);
+    });
+}
+
+// Filter functions
+function filterTasks(filter) {
+    currentFilter = filter;
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.filter === filter);
+    });
+    renderTasks();
+}
+
+function searchTasks(searchTerm) {
+    currentSearch = searchTerm.toLowerCase();
+    renderTasks();
+}
+
+function filterByPriority(priority) {
+    currentPriorityFilter = priority;
+    renderTasks();
+}
+
+// Modal functions
+function openAssignTaskModal() {
+    // Set minimum due date to tomorrow
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    document.getElementById('task-due-date').min = tomorrow.toISOString().split('T')[0];
+    
+    document.getElementById('assign-task-modal').classList.remove('hidden');
+}
+
+function closeAssignTaskModal() {
+    document.getElementById('assign-task-modal').classList.add('hidden');
+    document.getElementById('assign-task-form').reset();
+}
+
+function closeTaskDetailsModal() {
+    document.getElementById('task-details-modal').classList.add('hidden');
+}
+
+// Assign new task
+document.getElementById('assign-task-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const menteeId = parseInt(document.getElementById('task-mentee').value);
+    const title = document.getElementById('task-title').value;
+    const description = document.getElementById('task-description').value;
+    const dueDate = document.getElementById('task-due-date').value;
+    const priority = document.getElementById('task-priority').value;
+    const category = document.getElementById('task-category').value;
+    const estimatedHours = document.getElementById('task-estimated-hours').value;
+    const instructions = document.getElementById('task-instructions').value;
+    
+    const mentee = mentees.find(m => m.id === menteeId);
+    
+    const newTask = {
+        id: tasks.length + 1,
+        title: title,
+        description: description,
+        dueDate: dueDate,
+        priority: priority,
+        status: 'pending',
+        progress: 0,
+        menteeId: menteeId,
+        menteeName: mentee.name,
+        category: category,
+        estimatedHours: parseInt(estimatedHours) || 0,
+        instructions: instructions,
+        createdAt: new Date().toISOString().split('T')[0],
+        lastReminder: null,
+        menteeNotes: ""
+    };
+    
+    tasks.push(newTask);
+    renderTasks();
+    updateStatistics();
+    closeAssignTaskModal();
+    showNotification('Task assigned successfully!', 'success');
+});
+
+// Task actions
+function viewTaskDetails(taskId) {
+    const task = tasks.find(t => t.id === taskId);
+    if (task) {
+        document.getElementById('detail-task-title').textContent = task.title;
+        document.getElementById('detail-task-mentee').textContent = task.menteeName;
+        document.getElementById('detail-task-status').textContent = getStatusText(task.status);
+        document.getElementById('detail-task-status').className = `task-status ${getStatusClass(task.status)}`;
+        document.getElementById('detail-task-priority').textContent = task.priority.charAt(0).toUpperCase() + task.priority.slice(1);
+        document.getElementById('detail-task-priority').className = `priority-${task.priority}`;
+        document.getElementById('detail-task-due-date').textContent = formatDate(task.dueDate);
+        document.getElementById('detail-task-description').textContent = task.description;
+        document.getElementById('detail-progress-fill').style.width = `${task.progress}%`;
+        document.getElementById('detail-progress-text').textContent = `${task.progress}%`;
+        
+        // Show mentee notes if available
+        if (task.menteeNotes) {
+            document.getElementById('mentee-notes-section').classList.remove('hidden');
+            document.getElementById('detail-mentee-notes').textContent = task.menteeNotes;
+        } else {
+            document.getElementById('mentee-notes-section').classList.add('hidden');
+        }
+        
+        document.getElementById('task-details-modal').classList.remove('hidden');
+    }
+}
+
+function sendReminder() {
+    const taskTitle = document.getElementById('detail-task-title').textContent;
+    const task = tasks.find(t => t.title === taskTitle);
+    if (task) {
+        task.lastReminder = new Date().toISOString().split('T')[0];
+        showNotification(`Reminder sent to ${task.menteeName} for "${task.title}"`, 'success');
+        closeTaskDetailsModal();
+    }
+}
+
+function editTask(taskId) {
+    // For now, just show a message - you can implement full edit functionality later
+    showNotification('Edit functionality will be implemented in the next version', 'info');
+}
+
+function deleteTask() {
+    const taskTitle = document.getElementById('detail-task-title').textContent;
+    if (confirm(`Are you sure you want to delete the task "${taskTitle}"?`)) {
+        const taskIndex = tasks.findIndex(t => t.title === taskTitle);
+        if (taskIndex > -1) {
+            tasks.splice(taskIndex, 1);
+            renderTasks();
+            updateStatistics();
+            closeTaskDetailsModal();
+            showNotification('Task deleted successfully', 'success');
+        }
+    }
+}
+
+// Setup event listeners
+function setupEventListeners() {
+    // Filter buttons
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.addEventListener('click', () => filterTasks(btn.dataset.filter));
+    });
+    
+    // Search input
+    document.getElementById('task-search').addEventListener('input', (e) => {
+        searchTasks(e.target.value);
+    });
+    
+    // Priority filter
+    document.getElementById('priority-filter').addEventListener('change', (e) => {
+        filterByPriority(e.target.value);
+    });
+}
+
+// Notification function
+function showNotification(message, type) {
+    // Simple notification - you can enhance this with a proper toast notification
+    alert(message);
+}
+
+// Initialize when page loads
+document.addEventListener('DOMContentLoaded', initializePage);
+</script>
+
+{% endblock %}

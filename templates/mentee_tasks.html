@@ -1,0 +1,731 @@
+{% extends "base2.html" %}
+{% block title %}My Tasks{% endblock %}
+{% block user %}Mentee{% endblock %}
+{% block profiledrop %}{% endblock %}
+{% block content %}
+
+<style>
+    .task-card {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+        border-left: 4px solid #3b82f6;
+    }
+    
+    .task-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+    
+    .task-card.urgent {
+        border-left-color: #ef4444;
+    }
+    
+    .task-card.completed {
+        border-left-color: #10b981;
+        opacity: 0.8;
+    }
+    
+    .task-card.upcoming {
+        border-left-color: #f59e0b;
+    }
+    
+    .task-status {
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
+        text-transform: uppercase;
+    }
+    
+    .status-pending {
+        background: #fef3c7;
+        color: #d97706;
+    }
+    
+    .status-in-progress {
+        background: #dbeafe;
+        color: #1d4ed8;
+    }
+    
+    .status-completed {
+        background: #d1fae5;
+        color: #065f46;
+    }
+    
+    .status-overdue {
+        background: #fee2e2;
+        color: #dc2626;
+    }
+    
+    .priority-high {
+        color: #dc2626;
+        font-weight: 600;
+    }
+    
+    .priority-medium {
+        color: #d97706;
+        font-weight: 600;
+    }
+    
+    .priority-low {
+        color: #059669;
+        font-weight: 600;
+    }
+    
+    .progress-bar {
+        background: #e5e7eb;
+        border-radius: 10px;
+        overflow: hidden;
+        height: 8px;
+    }
+    
+    .progress-fill {
+        background: #3b82f6;
+        height: 100%;
+        transition: width 0.3s ease;
+    }
+    
+    .filter-btn {
+        padding: 8px 16px;
+        border: 1px solid #d1d5db;
+        background: white;
+        border-radius: 20px;
+        font-size: 14px;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    
+    .filter-btn.active {
+        background: #3b82f6;
+        color: white;
+        border-color: #3b82f6;
+    }
+    
+    .empty-state {
+        text-align: center;
+        padding: 60px 20px;
+        color: #6b7280;
+    }
+    
+    .empty-state svg {
+        margin: 0 auto 16px;
+        color: #d1d5db;
+    }
+    
+    .task-actions {
+        opacity: 0;
+        transition: opacity 0.2s;
+    }
+    
+    .task-card:hover .task-actions {
+        opacity: 1;
+    }
+    
+    .stats-card {
+        background: white;
+        padding: 20px;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        text-align: center;
+    }
+    
+    .stats-number {
+        font-size: 2rem;
+        font-weight: bold;
+        margin-bottom: 8px;
+    }
+    
+    .stats-label {
+        color: #6b7280;
+        font-size: 0.875rem;
+    }
+</style>
+
+<!-- Main Content Container -->
+<main class="max-w-7xl mx-auto px-2 sm:px-3 lg:px-3 py-2">
+    
+    <!-- Header Section -->
+    <section class="mb-8">
+        <div class="flex justify-between items-center mb-6">
+            <div>
+                <h1 class="text-3xl font-bold text-gray-900 mb-2">📋 My Tasks</h1>
+                <p class="text-gray-600">Manage your learning tasks and assignments from mentors</p>
+            </div>
+            <div class="flex gap-3">
+                <button onclick="openCreateTaskModal()" class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition flex items-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                    </svg>
+                    Add Personal Task
+                </button>
+            </div>
+        </div>
+        
+        <!-- Statistics Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+            <div class="stats-card">
+                <div class="stats-number text-blue-600" id="total-tasks">12</div>
+                <div class="stats-label">Total Tasks</div>
+            </div>
+            <div class="stats-card">
+                <div class="stats-number text-green-600" id="completed-tasks">7</div>
+                <div class="stats-label">Completed</div>
+            </div>
+            <div class="stats-card">
+                <div class="stats-number text-orange-600" id="pending-tasks">3</div>
+                <div class="stats-label">In Progress</div>
+            </div>
+            <div class="stats-card">
+                <div class="stats-number text-red-600" id="overdue-tasks">2</div>
+                <div class="stats-label">Overdue</div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Filters and Search -->
+    <section class="mb-6">
+        <div class="flex flex-wrap gap-4 items-center justify-between">
+            <div class="flex flex-wrap gap-2">
+                <button class="filter-btn active" data-filter="all">All Tasks</button>
+                <button class="filter-btn" data-filter="pending">To Do</button>
+                <button class="filter-btn" data-filter="in-progress">In Progress</button>
+                <button class="filter-btn" data-filter="completed">Completed</button>
+                <button class="filter-btn" data-filter="overdue">Overdue</button>
+            </div>
+            
+            <div class="flex gap-3">
+                <div class="relative">
+                    <input type="text" id="task-search" placeholder="Search tasks..." class="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                    <svg class="w-5 h-5 absolute left-3 top-2.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                    </svg>
+                </div>
+                <select id="priority-filter" class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                    <option value="all">All Priorities</option>
+                    <option value="high">High Priority</option>
+                    <option value="medium">Medium Priority</option>
+                    <option value="low">Low Priority</option>
+                </select>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Tasks List -->
+    <section>
+        <div id="tasks-container" class="space-y-4">
+            <!-- Tasks will be populated by JavaScript -->
+        </div>
+        
+        <!-- Empty State -->
+        <div id="empty-state" class="empty-state hidden">
+            <svg class="w-24 h-24 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+            </svg>
+            <h3 class="text-xl font-semibold text-gray-600 mb-2">No tasks found</h3>
+            <p class="text-gray-500 mb-4">Get started by creating your first task or check back later for assignments from your mentors.</p>
+            <button onclick="openCreateTaskModal()" class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
+                Create Your First Task
+            </button>
+        </div>
+    </section>
+</main>
+
+<!-- Create Task Modal -->
+<div id="create-task-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+    <div class="bg-white rounded-xl p-6 w-full max-w-md mx-4">
+        <h3 class="text-xl font-semibold mb-4">Create New Task</h3>
+        <form id="create-task-form" class="space-y-4">
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Task Title</label>
+                <input type="text" id="task-title" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="Enter task title" required>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Description</label>
+                <textarea id="task-description" rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="Describe your task..."></textarea>
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Due Date</label>
+                    <input type="date" id="task-due-date" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Priority</label>
+                    <select id="task-priority" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                        <option value="low">Low</option>
+                        <option value="medium">Medium</option>
+                        <option value="high">High</option>
+                    </select>
+                </div>
+            </div>
+            <div class="flex justify-end gap-3 mt-6">
+                <button type="button" onclick="closeCreateTaskModal()" class="px-4 py-2 text-gray-600 hover:text-gray-800 transition">Cancel</button>
+                <button type="submit" class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">Create Task</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Task Details Modal -->
+<div id="task-details-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+    <div class="bg-white rounded-xl p-6 w-full max-w-2xl mx-4 max-h-[90vh] overflow-y-auto">
+        <div class="flex justify-between items-start mb-4">
+            <h3 id="detail-task-title" class="text-xl font-semibold">Task Title</h3>
+            <button onclick="closeTaskDetailsModal()" class="text-gray-400 hover:text-gray-600">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+            </button>
+        </div>
+        
+        <div class="space-y-6">
+            <!-- Task Meta -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                <div>
+                    <span class="font-medium text-gray-500">Status:</span>
+                    <span id="detail-task-status" class="ml-2 status-pending">Pending</span>
+                </div>
+                <div>
+                    <span class="font-medium text-gray-500">Priority:</span>
+                    <span id="detail-task-priority" class="ml-2 priority-high">High</span>
+                </div>
+                <div>
+                    <span class="font-medium text-gray-500">Due Date:</span>
+                    <span id="detail-task-due-date" class="ml-2">2024-01-15</span>
+                </div>
+                <div>
+                    <span class="font-medium text-gray-500">Assigned by:</span>
+                    <span id="detail-task-mentor" class="ml-2">Dr. Sarah Johnson</span>
+                </div>
+            </div>
+            
+            <!-- Description -->
+            <div>
+                <h4 class="font-medium text-gray-700 mb-2">Description</h4>
+                <p id="detail-task-description" class="text-gray-600 bg-gray-50 p-4 rounded-lg">Task description will appear here...</p>
+            </div>
+            
+            <!-- Progress -->
+            <div>
+                <h4 class="font-medium text-gray-700 mb-2">Progress</h4>
+                <div class="flex items-center gap-4">
+                    <div class="flex-1">
+                        <div class="progress-bar">
+                            <div id="detail-progress-fill" class="progress-fill" style="width: 0%"></div>
+                        </div>
+                    </div>
+                    <span id="detail-progress-text" class="text-sm font-medium">0%</span>
+                </div>
+            </div>
+            
+            <!-- Actions -->
+            <div class="flex gap-3 pt-4 border-t">
+                <button onclick="markTaskComplete()" class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                    </svg>
+                    Mark Complete
+                </button>
+                <button onclick="startTaskProgress()" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    Start Progress
+                </button>
+                <button class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition">Edit Task</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Sample task data
+let tasks = [
+    {
+        id: 1,
+        title: "Complete Python Basics Assignment",
+        description: "Finish the Python programming fundamentals assignment covering variables, data types, and basic operations.",
+        dueDate: "2024-01-15",
+        priority: "high",
+        status: "pending",
+        progress: 0,
+        assignedBy: "Dr. Sarah Johnson",
+        createdAt: "2024-01-10",
+        category: "Programming"
+    },
+    {
+        id: 2,
+        title: "Research Career Options in Tech",
+        description: "Explore different career paths in technology and prepare a short report on 3 roles that interest you.",
+        dueDate: "2024-01-20",
+        priority: "medium",
+        status: "in-progress",
+        progress: 50,
+        assignedBy: "Alex Chen",
+        createdAt: "2024-01-08",
+        category: "Career Research"
+    },
+    {
+        id: 3,
+        title: "Prepare Resume Draft",
+        description: "Create a first draft of your resume focusing on education, skills, and any projects or experiences.",
+        dueDate: "2024-01-12",
+        priority: "high",
+        status: "completed",
+        progress: 100,
+        assignedBy: "Maria Rodriguez",
+        createdAt: "2024-01-05",
+        category: "Career Development"
+    },
+    {
+        id: 4,
+        title: "Read Chapter 3: Data Structures",
+        description: "Complete reading chapter 3 from the recommended textbook and summarize key concepts.",
+        dueDate: "2024-01-18",
+        priority: "medium",
+        status: "pending",
+        progress: 0,
+        assignedBy: "Dr. Sarah Johnson",
+        createdAt: "2024-01-09",
+        category: "Study"
+    },
+    {
+        id: 5,
+        title: "Practice Coding Problems",
+        description: "Solve 10 basic coding problems from the practice platform to strengthen programming fundamentals.",
+        dueDate: "2024-01-14",
+        priority: "high",
+        status: "overdue",
+        progress: 30,
+        assignedBy: "Alex Chen",
+        createdAt: "2024-01-07",
+        category: "Programming"
+    },
+    {
+        id: 6,
+        title: "Attend Networking Workshop",
+        description: "Participate in the online networking workshop and prepare 3 key takeaways to discuss with your mentor.",
+        dueDate: "2024-01-25",
+        priority: "low",
+        status: "pending",
+        progress: 0,
+        assignedBy: "James Wilson",
+        createdAt: "2024-01-11",
+        category: "Professional Development"
+    }
+];
+
+let currentFilter = 'all';
+let currentSearch = '';
+let currentPriorityFilter = 'all';
+
+// Initialize the page
+function initializePage() {
+    renderTasks();
+    updateStatistics();
+    setupEventListeners();
+}
+
+// Render tasks based on filters
+function renderTasks() {
+    const container = document.getElementById('tasks-container');
+    const emptyState = document.getElementById('empty-state');
+    
+    // Filter tasks
+    let filteredTasks = tasks.filter(task => {
+        const matchesFilter = currentFilter === 'all' || task.status === currentFilter;
+        const matchesSearch = currentSearch === '' || 
+                            task.title.toLowerCase().includes(currentSearch.toLowerCase()) ||
+                            task.description.toLowerCase().includes(currentSearch.toLowerCase());
+        const matchesPriority = currentPriorityFilter === 'all' || task.priority === currentPriorityFilter;
+        
+        return matchesFilter && matchesSearch && matchesPriority;
+    });
+    
+    if (filteredTasks.length === 0) {
+        container.classList.add('hidden');
+        emptyState.classList.remove('hidden');
+        return;
+    }
+    
+    container.classList.remove('hidden');
+    emptyState.classList.add('hidden');
+    
+    // Sort tasks: overdue first, then by due date
+    filteredTasks.sort((a, b) => {
+        if (a.status === 'overdue' && b.status !== 'overdue') return -1;
+        if (b.status === 'overdue' && a.status !== 'overdue') return 1;
+        return new Date(a.dueDate) - new Date(b.dueDate);
+    });
+    
+    container.innerHTML = '';
+    
+    filteredTasks.forEach(task => {
+        const taskElement = createTaskElement(task);
+        container.appendChild(taskElement);
+    });
+}
+
+// Create individual task element
+function createTaskElement(task) {
+    const taskDiv = document.createElement('div');
+    taskDiv.className = `task-card p-6 ${task.status === 'completed' ? 'completed' : ''} ${task.status === 'overdue' ? 'urgent' : ''}`;
+    
+    const dueDate = new Date(task.dueDate);
+    const today = new Date();
+    const isOverdue = dueDate < today && task.status !== 'completed';
+    
+    taskDiv.innerHTML = `
+        <div class="flex justify-between items-start mb-3">
+            <div class="flex items-center gap-3">
+                <h3 class="text-lg font-semibold text-gray-900">${task.title}</h3>
+                <span class="task-status ${getStatusClass(task.status)}">${getStatusText(task.status)}</span>
+            </div>
+            <div class="task-actions flex gap-2">
+                <button onclick="viewTaskDetails(${task.id})" class="p-2 text-gray-400 hover:text-blue-600 transition">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                    </svg>
+                </button>
+                ${task.status !== 'completed' ? `
+                <button onclick="markTaskAsComplete(${task.id})" class="p-2 text-gray-400 hover:text-green-600 transition">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                    </svg>
+                </button>
+                ` : ''}
+            </div>
+        </div>
+        
+        <p class="text-gray-600 mb-4 line-clamp-2">${task.description}</p>
+        
+        <div class="flex justify-between items-center">
+            <div class="flex items-center gap-4 text-sm text-gray-500">
+                <div class="flex items-center gap-1">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                    </svg>
+                    <span>Due: ${formatDate(task.dueDate)}</span>
+                </div>
+                <div class="flex items-center gap-1">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                    </svg>
+                    <span>${task.assignedBy}</span>
+                </div>
+                <span class="priority-${task.priority}">${task.priority.charAt(0).toUpperCase() + task.priority.slice(1)} Priority</span>
+            </div>
+            
+            ${task.status !== 'completed' ? `
+            <div class="flex items-center gap-3">
+                <div class="w-24">
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: ${task.progress}%"></div>
+                    </div>
+                </div>
+                <span class="text-sm font-medium">${task.progress}%</span>
+            </div>
+            ` : `
+            <span class="text-green-600 text-sm font-medium flex items-center gap-1">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                </svg>
+                Completed
+            </span>
+            `}
+        </div>
+    `;
+    
+    return taskDiv;
+}
+
+// Helper functions
+function getStatusClass(status) {
+    const statusClasses = {
+        'pending': 'status-pending',
+        'in-progress': 'status-in-progress',
+        'completed': 'status-completed',
+        'overdue': 'status-overdue'
+    };
+    return statusClasses[status] || 'status-pending';
+}
+
+function getStatusText(status) {
+    const statusTexts = {
+        'pending': 'To Do',
+        'in-progress': 'In Progress',
+        'completed': 'Completed',
+        'overdue': 'Overdue'
+    };
+    return statusTexts[status] || 'To Do';
+}
+
+function formatDate(dateString) {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', { 
+        month: 'short', 
+        day: 'numeric',
+        year: 'numeric'
+    });
+}
+
+// Update statistics
+function updateStatistics() {
+    const total = tasks.length;
+    const completed = tasks.filter(t => t.status === 'completed').length;
+    const pending = tasks.filter(t => t.status === 'in-progress').length;
+    const overdue = tasks.filter(t => t.status === 'overdue').length;
+    
+    document.getElementById('total-tasks').textContent = total;
+    document.getElementById('completed-tasks').textContent = completed;
+    document.getElementById('pending-tasks').textContent = pending;
+    document.getElementById('overdue-tasks').textContent = overdue;
+}
+
+// Filter functions
+function filterTasks(filter) {
+    currentFilter = filter;
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.filter === filter);
+    });
+    renderTasks();
+}
+
+function searchTasks(searchTerm) {
+    currentSearch = searchTerm.toLowerCase();
+    renderTasks();
+}
+
+function filterByPriority(priority) {
+    currentPriorityFilter = priority;
+    renderTasks();
+}
+
+// Task actions
+function markTaskAsComplete(taskId) {
+    const task = tasks.find(t => t.id === taskId);
+    if (task) {
+        task.status = 'completed';
+        task.progress = 100;
+        renderTasks();
+        updateStatistics();
+        showNotification('Task marked as complete!', 'success');
+    }
+}
+
+function viewTaskDetails(taskId) {
+    const task = tasks.find(t => t.id === taskId);
+    if (task) {
+        document.getElementById('detail-task-title').textContent = task.title;
+        document.getElementById('detail-task-status').textContent = getStatusText(task.status);
+        document.getElementById('detail-task-status').className = `task-status ${getStatusClass(task.status)}`;
+        document.getElementById('detail-task-priority').textContent = task.priority.charAt(0).toUpperCase() + task.priority.slice(1);
+        document.getElementById('detail-task-priority').className = `priority-${task.priority}`;
+        document.getElementById('detail-task-due-date').textContent = formatDate(task.dueDate);
+        document.getElementById('detail-task-mentor').textContent = task.assignedBy;
+        document.getElementById('detail-task-description').textContent = task.description;
+        document.getElementById('detail-progress-fill').style.width = `${task.progress}%`;
+        document.getElementById('detail-progress-text').textContent = `${task.progress}%`;
+        
+        document.getElementById('task-details-modal').classList.remove('hidden');
+    }
+}
+
+// Modal functions
+function openCreateTaskModal() {
+    document.getElementById('create-task-modal').classList.remove('hidden');
+}
+
+function closeCreateTaskModal() {
+    document.getElementById('create-task-modal').classList.add('hidden');
+    document.getElementById('create-task-form').reset();
+}
+
+function closeTaskDetailsModal() {
+    document.getElementById('task-details-modal').classList.add('hidden');
+}
+
+// Create new task
+document.getElementById('create-task-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const title = document.getElementById('task-title').value;
+    const description = document.getElementById('task-description').value;
+    const dueDate = document.getElementById('task-due-date').value;
+    const priority = document.getElementById('task-priority').value;
+    
+    const newTask = {
+        id: tasks.length + 1,
+        title: title,
+        description: description,
+        dueDate: dueDate,
+        priority: priority,
+        status: 'pending',
+        progress: 0,
+        assignedBy: 'Self',
+        createdAt: new Date().toISOString().split('T')[0],
+        category: 'Personal'
+    };
+    
+    tasks.push(newTask);
+    renderTasks();
+    updateStatistics();
+    closeCreateTaskModal();
+    showNotification('Task created successfully!', 'success');
+});
+
+// Setup event listeners
+function setupEventListeners() {
+    // Filter buttons
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.addEventListener('click', () => filterTasks(btn.dataset.filter));
+    });
+    
+    // Search input
+    document.getElementById('task-search').addEventListener('input', (e) => {
+        searchTasks(e.target.value);
+    });
+    
+    // Priority filter
+    document.getElementById('priority-filter').addEventListener('change', (e) => {
+        filterByPriority(e.target.value);
+    });
+}
+
+// Notification function
+function showNotification(message, type) {
+    // Simple notification - you can enhance this with a proper toast notification
+    alert(message);
+}
+
+// Additional modal functions
+function markTaskComplete() {
+    const taskTitle = document.getElementById('detail-task-title').textContent;
+    const taskId = tasks.find(t => t.title === taskTitle)?.id;
+    if (taskId) {
+        markTaskAsComplete(taskId);
+        closeTaskDetailsModal();
+    }
+}
+
+function startTaskProgress() {
+    const taskTitle = document.getElementById('detail-task-title').textContent;
+    const task = tasks.find(t => t.title === taskTitle);
+    if (task && task.status === 'pending') {
+        task.status = 'in-progress';
+        task.progress = 25;
+        renderTasks();
+        updateStatistics();
+        closeTaskDetailsModal();
+        showNotification('Task progress started!', 'success');
+    }
+}
+
+// Initialize when page loads
+document.addEventListener('DOMContentLoaded', initializePage);
+</script>
+
+{% endblock %}

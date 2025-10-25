@@ -925,6 +925,9 @@ def my_mentees():
         if req.mentee:
             mentee_profile = MenteeProfile.query.filter_by(user_id=req.mentee.id).first()
             if mentee_profile:
+                # Use the check_profile_complete function instead of accessing non-existent attribute
+                mentee_profile_complete = check_profile_complete(req.mentee.id, "2")
+                
                 my_mentees_data.append({
                     "user": {
                         "name": req.mentee.name,
@@ -945,7 +948,7 @@ def my_mentees():
                         "comments": mentee_profile.comments,
                         "terms_agreement": mentee_profile.terms_agreement,
                         "profile_picture": mentee_profile.profile_picture,
-                        "profile_complete": mentee_profile.profile_complete
+                        "profile_complete": mentee_profile_complete  # Use the calculated value
                     }
                 })
 
@@ -953,7 +956,7 @@ def my_mentees():
         "mentor_my_mentees.html",
         my_mentees=my_mentees_data,
         show_sidebar=True,
-        profile_complete=profile_complete  # ADD THIS LINE
+        profile_complete=profile_complete
     )
 
 @app.route("/supervisor_find_mentor")
@@ -1071,14 +1074,204 @@ def view_requests():
         show_sidebar=True
     )
 
-@app.route("/mentee calendar")
+@app.route("/mentee_calendar")
 def mentee_calendar():
     if "email" not in session or session.get("user_type") != "2":
         return redirect(url_for("signin"))
+    
+    # Get logged-in mentee
+    mentee = User.query.filter_by(email=session["email"]).first()
+    
+    # Fetch all meetings created by this mentee
+    meetings = MeetingRequest.query.filter_by(requester_id=mentee.id).order_by(
+        MeetingRequest.meeting_date.asc(),
+        MeetingRequest.meeting_time.asc()
+    ).all()
+    
+    # Prepare meeting data for the calendar
+    calendar_meetings = []
+    for meeting in meetings:
+        # Get mentor details
+        mentor = User.query.get(meeting.requested_to_id)
+        
+        # Determine meeting status based on date/time
+        meeting_datetime = datetime.combine(meeting.meeting_date, meeting.meeting_time)
+        now = datetime.now()
+        
+        if meeting.status == "cancelled":
+            status = "cancelled"
+        elif meeting_datetime < now:
+            status = "completed"
+        else:
+            status = "upcoming"
+        
+        calendar_meetings.append({
+            "id": meeting.id,
+            "title": meeting.meeting_title,
+            "date": meeting_datetime,
+            "duration": meeting.meeting_duration,
+            "mentor": mentor.name if mentor else "Unknown Mentor",
+            "type": "Video Call",  # You can add this field to your MeetingRequest model if needed
+            "status": status,
+            "description": meeting.meeting_description or "No description provided",
+            "meet_link": meeting.meet_link
+        })
+    
     return render_template(
         "mentee_calendar.html",
-        show_sidebar=True
-        )
+        show_sidebar=True,
+        meetings=calendar_meetings  # Pass real meetings to template
+    )
+
+
+@app.route("/mentor_calendar")
+def mentor_calendar():
+    if "email" not in session or session.get("user_type") != "1":
+        return redirect(url_for("signin"))
+    
+    # Get logged-in mentor
+    mentor = User.query.filter_by(email=session["email"]).first()
+    
+    # Fetch all meetings where this mentor is the requested_to person
+    meetings = MeetingRequest.query.filter_by(requested_to_id=mentor.id).order_by(
+        MeetingRequest.meeting_date.asc(),
+        MeetingRequest.meeting_time.asc()
+    ).all()
+    
+    # Prepare meeting data for the calendar
+    calendar_meetings = []
+    for meeting in meetings:
+        # Get mentee details
+        mentee = User.query.get(meeting.requester_id)
+        
+        # Determine meeting status based on date/time
+        meeting_datetime = datetime.combine(meeting.meeting_date, meeting.meeting_time)
+        now = datetime.now()
+        
+        if meeting.status == "cancelled":
+            status = "cancelled"
+        elif meeting_datetime < now:
+            status = "completed"
+        else:
+            status = "upcoming"
+        
+        calendar_meetings.append({
+            "id": meeting.id,
+            "title": meeting.meeting_title,
+            "date": meeting_datetime,
+            "duration": meeting.meeting_duration,
+            "mentee": mentee.name if mentee else "Unknown Mentee",
+            "mentee_email": mentee.email if mentee else "",
+            "type": "Video Call",
+            "status": status,
+            "description": meeting.meeting_description or "No description provided",
+            "meet_link": meeting.meet_link
+        })
+    
+    return render_template(
+        "mentor_calendar.html",
+        show_sidebar=True,
+        meetings=calendar_meetings
+    )
+
+
+@app.route("/supervisor_calendar")
+def supervisor_calendar():
+    if "email" not in session or session.get("user_type") != "0":
+        return redirect(url_for("signin"))
+    
+    # Fetch ALL meetings from the database
+    meetings = MeetingRequest.query.order_by(
+        MeetingRequest.meeting_date.asc(),
+        MeetingRequest.meeting_time.asc()
+    ).all()
+    
+    # Prepare meeting data for the calendar
+    calendar_meetings = []
+    for meeting in meetings:
+        # Get mentee and mentor details
+        mentee = User.query.get(meeting.requester_id)
+        mentor = User.query.get(meeting.requested_to_id)
+        
+        # Determine meeting status based on date/time
+        meeting_datetime = datetime.combine(meeting.meeting_date, meeting.meeting_time)
+        now = datetime.now()
+        
+        if meeting.status == "cancelled":
+            status = "cancelled"
+        elif meeting_datetime < now:
+            status = "completed"
+        else:
+            status = "upcoming"
+        
+        calendar_meetings.append({
+            "id": meeting.id,
+            "title": meeting.meeting_title,
+            "date": meeting_datetime,
+            "duration": meeting.meeting_duration,
+            "mentee": mentee.name if mentee else "Unknown Mentee",
+            "mentee_email": mentee.email if mentee else "",
+            "mentor": mentor.name if mentor else "Unknown Mentor",
+            "mentor_email": mentor.email if mentor else "",
+            "type": "Video Call",
+            "status": status,
+            "description": meeting.meeting_description or "No description provided",
+            "meet_link": meeting.meet_link,
+            "created_at": meeting.created_at
+        })
+    
+    return render_template(
+        "supervisor_calendar.html",
+        show_sidebar=True,
+        meetings=calendar_meetings
+    )
+
+
+
+
+    #          task
+
+
+
+
+@app.route("/mentee_tasks")
+def mentee_tasks():
+    if "email" not in session or session.get("user_type") != "2":
+        return redirect(url_for("signin"))
+    
+    # For now, using dummy data - later you can connect to a database
+    return render_template(
+        "mentee_tasks.html",
+        show_sidebar=True,
+        profile_complete=True  # You can use your existing profile_complete check
+    )
+
+
+@app.route("/mentor_tasks")
+def mentor_tasks():
+    if "email" not in session or session.get("user_type") != "1":
+        return redirect(url_for("signin"))
+    
+    # For now, using dummy data - later you can connect to a database
+    return render_template(
+        "mentor_tasks.html",
+        show_sidebar=True,
+        profile_complete=True
+    )
+
+@app.route("/supervisor_tasks")
+def supervisor_tasks():
+    if "email" not in session or session.get("user_type") != "0":
+        return redirect(url_for("signin"))
+    
+    # For now, using dummy data - later you can connect to a database
+    return render_template(
+        "supervisor_tasks.html",
+        show_sidebar=True,
+        profile_complete=True
+    )
+
+
 # ---------------meeting details----------------
 @app.route("/mentee_meeting_details")
 def mentee_meeting_details():
