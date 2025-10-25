@@ -1,6 +1,6 @@
 {% extends "base2.html" %}
-{% block title %}Mentee Calendar{% endblock %}
-{% block user %}Mentee{% endblock %}
+{% block title %}Supervisor Calendar{% endblock %}
+{% block user %}Supervisor{% endblock %}
 {% block profiledrop %}{% endblock %}
 {% block content %}
 
@@ -127,7 +127,7 @@
     border-radius: 12px;
     padding: 24px;
     width: 90%;
-    max-width: 500px;
+    max-width: 600px;
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
   }
   
@@ -164,6 +164,36 @@
     margin: 0 auto 16px;
     color: #d1d5db;
   }
+
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+  
+  .stat-card {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    text-align: center;
+  }
+  
+  .stat-number {
+    font-size: 2rem;
+    font-weight: bold;
+    margin-bottom: 8px;
+  }
+  
+  .stat-label {
+    color: #6b7280;
+    font-size: 0.875rem;
+  }
+  
+  .stat-upcoming { border-left: 4px solid #3b82f6; }
+  .stat-completed { border-left: 4px solid #10b981; }
+  .stat-total { border-left: 4px solid #8b5cf6; }
 </style>
 
 <!-- Main Content Container -->
@@ -172,8 +202,25 @@
   <!-- Calendar Section -->
   <section id="calendar" class="p-6 bg-white rounded-xl shadow-sm">
     <div class="mb-6">
-      <h2 class="text-xl font-semibold text-gray-800 mb-2">My Mentorship Calendar</h2>
-      <p class="text-gray-600">View and manage your scheduled sessions with mentors.</p>
+      <h2 class="text-xl font-semibold text-gray-800 mb-2">Supervisor Calendar - All Meetings</h2>
+      <p class="text-gray-600">View and monitor all scheduled sessions between mentors and mentees.</p>
+    </div>
+    
+    <!-- Statistics Cards -->
+    <div class="stats-grid">
+      <div class="stat-card stat-total">
+        <div class="stat-number" id="total-meetings">0</div>
+        <div class="stat-label">Total Meetings</div>
+      </div>
+      <div class="stat-card stat-upcoming">
+        <div class="stat-number" id="upcoming-meetings">0</div>
+        <div class="stat-label">Upcoming</div>
+      </div>
+      <div class="stat-card stat-completed">
+        <div class="stat-number" id="completed-meetings">0</div>
+        <div class="stat-label">Completed</div>
+      </div>
+
     </div>
     
     <!-- Filter Options -->
@@ -181,6 +228,8 @@
       <button class="filter-btn active" data-type="all">All Sessions</button>
       <button class="filter-btn" data-type="upcoming">Upcoming</button>
       <button class="filter-btn" data-type="completed">Completed</button>
+      <button class="filter-btn" data-type="today">Today</button>
+      <button class="filter-btn" data-type="this_week">This Week</button>
     </div>
     
     <!-- Calendar Container -->
@@ -227,17 +276,18 @@
     
     <!-- Quick Actions -->
     <div class="mt-8 p-4 bg-blue-50 rounded-lg">
-      <h3 class="font-medium text-blue-800 mb-2">Quick Actions</h3>
+      <h3 class="font-medium text-blue-800 mb-2">Supervisor Actions</h3>
       <div class="flex flex-wrap gap-3">
-        <a href="{{ url_for('find_mentor') }}" class="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm hover:bg-blue-700 transition">
-          Find a Mentor
+        <a href="{{ url_for('supervisor_find_mentor') }}" class="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm hover:bg-blue-700 transition">
+          View All Mentors
         </a>
-        <a href="{{ url_for('my_mentors') }}" class="px-4 py-2 bg-purple-600 text-white rounded-lg text-sm hover:bg-purple-700 transition">
-          View My Mentors
+        <a href="{{ url_for('supervisor_find_mentee') }}" class="px-4 py-2 bg-purple-600 text-white rounded-lg text-sm hover:bg-purple-700 transition">
+          View All Mentees
         </a>
-        <a href="{{ url_for('mentee_meeting_details') }}" class="px-4 py-2 bg-green-600 text-white rounded-lg text-sm hover:bg-green-700 transition">
-          View Meeting Details
+        <a href="{{ url_for('supervisor_meeting_details') }}" class="px-4 py-2 bg-green-600 text-white rounded-lg text-sm hover:bg-green-700 transition">
+          View All Meeting Details
         </a>
+
       </div>
     </div>
   </section>
@@ -249,8 +299,14 @@
     <h3 class="text-xl font-semibold mb-4" id="event-title">Session Details</h3>
     <div class="space-y-3">
       <div>
+        <span class="font-medium">Mentee:</span>
+        <span id="event-mentee">John Doe</span>
+        <span id="event-mentee-email" class="text-sm text-gray-500 ml-2">(john@example.com)</span>
+      </div>
+      <div>
         <span class="font-medium">Mentor:</span>
         <span id="event-mentor">Dr. Sarah Johnson</span>
+        <span id="event-mentor-email" class="text-sm text-gray-500 ml-2">(sarah@example.com)</span>
       </div>
       <div>
         <span class="font-medium">Date & Time:</span>
@@ -269,6 +325,10 @@
         <span id="event-status" class="px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">Scheduled</span>
       </div>
       <div>
+        <span class="font-medium">Created:</span>
+        <span id="event-created">January 10, 2023</span>
+      </div>
+      <div>
         <span class="font-medium">Agenda:</span>
         <p id="event-description" class="mt-1">Discussion about career options and guidance for next steps.</p>
       </div>
@@ -276,8 +336,7 @@
     <div class="mt-6 flex justify-end space-x-3">
       <button id="close-event-modal" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition">Close</button>
       <button id="join-meeting-btn" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">Join Meeting</button>
-      <button id="reschedule-btn" class="px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition">Reschedule</button>
-      <button id="cancel-btn" class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition">Cancel Session</button>
+      <button id="view-details-btn" class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition">View Full Details</button>
     </div>
   </div>
 </div>
@@ -298,14 +357,21 @@ function initializeEvents() {
       title: "{{ meeting.title }}",
       date: new Date("{{ meeting.date.strftime('%Y-%m-%dT%H:%M:%S') }}"),
       duration: {{ meeting.duration }},
+      mentee: "{{ meeting.mentee }}",
+      mentee_email: "{{ meeting.mentee_email }}",
       mentor: "{{ meeting.mentor }}",
+      mentor_email: "{{ meeting.mentor_email }}",
       type: "{{ meeting.type }}",
       status: "{{ meeting.status }}",
       description: "{{ meeting.description }}",
-      meet_link: "{{ meeting.meet_link or '' }}"
+      meet_link: "{{ meeting.meet_link or '' }}",
+      created_at: new Date("{{ meeting.created_at.strftime('%Y-%m-%dT%H:%M:%S') }}")
     }{% if not loop.last %},{% endif %}
     {% endfor %}
   ];
+  
+  // Update statistics
+  updateStatistics();
   
   // If no meetings from database, show empty state
   if (events.length === 0) {
@@ -313,12 +379,49 @@ function initializeEvents() {
   }
 }
 
+// Update statistics cards
+function updateStatistics() {
+  const total = events.length;
+  const upcoming = events.filter(e => e.status === 'upcoming').length;
+  const completed = events.filter(e => e.status === 'completed').length;
+  
+  document.getElementById('total-meetings').textContent = total;
+  document.getElementById('upcoming-meetings').textContent = upcoming;
+  document.getElementById('completed-meetings').textContent = completed;
+}
+
 // Filter events based on current filter
 function getFilteredEvents() {
+  const now = new Date();
+  const startOfWeek = new Date(now);
+  startOfWeek.setDate(now.getDate() - now.getDay());
+  startOfWeek.setHours(0, 0, 0, 0);
+  
+  const endOfWeek = new Date(startOfWeek);
+  endOfWeek.setDate(startOfWeek.getDate() + 6);
+  endOfWeek.setHours(23, 59, 59, 999);
+
+  const startOfToday = new Date(now);
+  startOfToday.setHours(0, 0, 0, 0);
+  
+  const endOfToday = new Date(now);
+  endOfToday.setHours(23, 59, 59, 999);
+
   if (currentFilter === 'all') {
     return events;
+  } else if (currentFilter === 'today') {
+    return events.filter(event => {
+      const eventDate = new Date(event.date);
+      return eventDate >= startOfToday && eventDate <= endOfToday;
+    });
+  } else if (currentFilter === 'this_week') {
+    return events.filter(event => {
+      const eventDate = new Date(event.date);
+      return eventDate >= startOfWeek && eventDate <= endOfWeek;
+    });
+  } else {
+    return events.filter(event => event.status === currentFilter);
   }
-  return events.filter(event => event.status === currentFilter);
 }
 
 // Calendar rendering functions
@@ -422,14 +525,19 @@ function renderCalendar() {
 function showEventDetails(event) {
   const modal = document.getElementById('event-details-modal');
   const eventDate = new Date(event.date);
+  const createdDate = new Date(event.created_at);
   
   document.getElementById('event-title').textContent = event.title;
+  document.getElementById('event-mentee').textContent = event.mentee;
+  document.getElementById('event-mentee-email').textContent = event.mentee_email;
   document.getElementById('event-mentor').textContent = event.mentor;
+  document.getElementById('event-mentor-email').textContent = event.mentor_email;
   document.getElementById('event-datetime').textContent = 
     `${eventDate.toLocaleDateString()} at ${eventDate.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}`;
   document.getElementById('event-duration').textContent = `${event.duration} minutes`;
   document.getElementById('event-type').textContent = event.type;
   document.getElementById('event-status').textContent = event.status.charAt(0).toUpperCase() + event.status.slice(1);
+  document.getElementById('event-created').textContent = createdDate.toLocaleDateString();
   document.getElementById('event-description').textContent = event.description;
   
   // Update status color
@@ -443,28 +551,21 @@ function showEventDetails(event) {
   
   // Show/hide buttons based on event status
   const joinBtn = document.getElementById('join-meeting-btn');
-  const rescheduleBtn = document.getElementById('reschedule-btn');
-  const cancelBtn = document.getElementById('cancel-btn');
+  const viewDetailsBtn = document.getElementById('view-details-btn');
   
-  if (event.status === 'upcoming') {
+  if (event.status === 'upcoming' && event.meet_link) {
     joinBtn.style.display = 'inline-block';
-    rescheduleBtn.style.display = 'inline-block';
-    cancelBtn.style.display = 'inline-block';
-    
-    // Show join button only if meeting link exists and meeting is in the future
-    if (event.meet_link && eventDate > new Date()) {
-      joinBtn.style.display = 'inline-block';
-      joinBtn.onclick = function() {
-        window.open(event.meet_link, '_blank');
-      };
-    } else {
-      joinBtn.style.display = 'none';
-    }
+    joinBtn.onclick = function() {
+      window.open(event.meet_link, '_blank');
+    };
   } else {
     joinBtn.style.display = 'none';
-    rescheduleBtn.style.display = 'none';
-    cancelBtn.style.display = 'none';
   }
+  
+  // View details button - could link to supervisor meeting details page
+  viewDetailsBtn.onclick = function() {
+    window.location.href = "{{ url_for('supervisor_meeting_details') }}";
+  };
   
   modal.style.display = 'flex';
 }
@@ -507,20 +608,6 @@ document.addEventListener('DOMContentLoaded', function() {
   // Modal close button
   document.getElementById('close-event-modal').addEventListener('click', function() {
     document.getElementById('event-details-modal').style.display = 'none';
-  });
-  
-  // Reschedule button
-  document.getElementById('reschedule-btn').addEventListener('click', function() {
-    alert('This would open a rescheduling dialog in a real application');
-  });
-  
-  // Cancel button
-  document.getElementById('cancel-btn').addEventListener('click', function() {
-    if (confirm('Are you sure you want to cancel this session?')) {
-      alert('Session cancelled. This would update the database in a real application');
-      document.getElementById('event-details-modal').style.display = 'none';
-      // In a real app, we would update the event status and re-render
-    }
   });
   
   // Close modal when clicking outside

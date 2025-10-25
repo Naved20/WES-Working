@@ -147,8 +147,19 @@
                        class="block px-4 py-2 text-white hover:bg-gray-600 rounded-md">
                         🤝 Meeting Details
                     </a>
+                    <a href="{{ url_for('supervisor_calendar')}}"
+                       class="block px-4 py-2 text-white hover:bg-gray-600 rounded-md">
+                        📅 Calendar
+                    </a>
+                    <a href="{{ url_for('supervisor_tasks')}}"
+                       class="block px-4 py-2 text-white hover:bg-gray-600 rounded-md">
+                        📝 Task
+                    </a>
 
                 {% elif session.get('user_type') == '1' %}
+
+
+
                     <!-- Mentor Dashboard -->
                     <a href="{{ url_for('mentordashboard')}}"
                        class="block px-4 py-2 text-white hover:bg-gray-600 rounded-md">
@@ -174,8 +185,20 @@
                        class="block px-4 py-2 text-white hover:bg-gray-600 rounded-md">
                         🤝 Meeting Details
                     </a>
+                    <a href="{{ url_for('mentor_calendar')}}"
+                       class="block px-4 py-2 text-white hover:bg-gray-600 rounded-md">
+                        📅 Calendar
+                    </a>
+
+                   <a href="{{ url_for('mentor_tasks')}}"
+                       class="block px-4 py-2 text-white hover:bg-gray-600 rounded-md">
+                        📝 Task
+                    </a>                    
 
                 {% elif session.get('user_type') == '2' %}
+
+
+
                     <!-- Mentee Dashboard -->
                     <a href="{{ url_for('menteedashboard')}}"
                        class="block px-4 py-2 text-white hover:bg-gray-600 rounded-md">
@@ -195,6 +218,16 @@
                        class="block px-4 py-2 text-white hover:bg-gray-600 rounded-md">
                         🤝 Meeting Details
                     </a>
+               
+                    <a href="{{ url_for('mentee_calendar')}}"
+                       class="block px-4 py-2 text-white hover:bg-gray-600 rounded-md">
+                        📅 Calendar
+                    </a>
+                   <a href="{{ url_for('mentee_tasks')}}"
+                       class="block px-4 py-2 text-white hover:bg-gray-600 rounded-md">
+                        📝 Task
+                    </a>
+
                 {% endif %}
             </aside>
 
