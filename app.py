@@ -74,7 +74,7 @@ def mentor_login_required(f):
         return f(*args, **kwargs)
     return decorated_function
 
-#--------------USER MODEL----------------
+#-------------- signup details ----------------
 class User(db.Model):
     __tablename__ = "signup_details"
     id = db.Column(db.Integer, primary_key=True)
@@ -244,13 +244,7 @@ def inject_profile_complete():
     if "email" in session and session.get("user_type") in ["1", "2"]:
         user = User.query.filter_by(email=session["email"]).first()
         if user:
-            profile_complete = check_profile_complete(user.id, session.get("user_type"))
-            print(f"🔍 Context Processor - User: {user.email}, Type: {session.get('user_type')}, Profile Complete: {profile_complete}")
-        else:
-            print(f"❌ Context Processor - User not found for email: {session['email']}")
-    else:
-        print(f"ℹ️ Context Processor - Not a mentor/mentee or not logged in. User type: {session.get('user_type')}")
-    
+            profile_complete = check_profile_complete(user.id, session.get("user_type"))    
     return dict(profile_complete=profile_complete)
 
 
@@ -357,12 +351,12 @@ def signup():
             return redirect(url_for("menteedashboard"))
         elif user_type == "0":
             return redirect(url_for("supervisordashboard"))
-        
+
         # agar user_type galat aaya ho
         return redirect(url_for("signin"))
 
     # agar request GET ho to signup form dikhana
-    return render_template("signup.html")
+    return render_template("auth/signup.html")
 
     if request.method == "POST":
         name = request.form.get("name")
@@ -373,12 +367,12 @@ def signup():
         # Basic validation
         if not name or not email or not password or not user_type:
             flash("All fields are required.", "error")
-            return render_template("signup.html")
+            return render_template("auth/signup.html")
         
         # Check for existing user
         if User.query.filter_by(email=email).first():
             flash("Email already registered.", "error")
-            return render_template("signup.html")
+            return render_template("auth/signup.html")
 
         # Hash password
         hashed_password = generate_password_hash(password)
@@ -388,7 +382,7 @@ def signup():
         flash("Signup successful! Please sign in.", "success")
         return redirect(url_for("signin"))
 
-    return render_template("signup.html")
+    return render_template("auth/signup.html")
 
 #--------------SIGNIN----------------
 @app.route("/signin", methods=["GET", "POST"])
@@ -420,13 +414,13 @@ def signin():
             return redirect(url_for("menteedashboard"))
         elif user.user_type == "0":
             return redirect(url_for("supervisordashboard"))
-        
+
         
         
         return redirect(url_for("home"))
 
    
-    return render_template("signin.html")
+    return render_template("auth/signin.html")
 
 # ------------------ DASHBOARDS ------------------
 @app.route("/mentordashboard", methods=["GET", "POST"])
@@ -511,7 +505,7 @@ def mentordashboard():
     goals = sorted({m.goal for m in MenteeProfile.query.distinct() if m.goal})
 
     return render_template(
-        "mentordashboard.html",
+        "mentor/mentordashboard.html",
         mentorship_requests=incoming_requests,
         all_mentees=all_mentees,
         streams=streams,
@@ -584,7 +578,7 @@ def mentor_mentorship_request():
 
 
     return render_template(
-        "mentor_mentorship_request.html",
+        "mentor/mentor_mentorship_request.html",
         mentorship_requests=incoming_requests,
         all_mentees=all_mentees,
         streams=streams,   
@@ -623,7 +617,7 @@ def menteedashboard():
         # This depends if you have a "mentorship" table, for now we just show all mentors
     
         return render_template(
-            "menteedashboard.html",
+            "mentee/menteedashboard.html",
             all_mentors=all_mentors,
             professions=[row.profession for row in MentorProfile.query.with_entities(MentorProfile.profession).distinct() if row.profession],
             locations=[row.location for row in MentorProfile.query.with_entities(MentorProfile.location).distinct() if row.location],
@@ -717,7 +711,7 @@ def supervisordashboard():
     mentee_requests = MenteeProfile.query.filter_by(status="pending").all()
 
     return render_template(
-        "supervisordashboard.html",
+        "supervisor/supervisordashboard.html",
         show_sidebar=True,
         user_email=session["email"],
         mentors=mentors,
@@ -781,7 +775,7 @@ def find_mentor():
         # Dynamic render/redirect based on source
     if source_page == "supervisor_find_mentor":
         return render_template(
-        "supervisor_find_mentor.html",
+        "supervisor/supervisor_find_mentor.html",
         all_mentors=mentors,
         professions=options["professions"],
         locations=options["locations"],
@@ -792,7 +786,7 @@ def find_mentor():
     else:  # default mentor
 
         return render_template(
-        "mentee_find_mentors.html",
+        "mentee/mentee_find_mentors.html",
         all_mentors=mentors,
         professions=options["professions"],
         locations=options["locations"],
@@ -846,7 +840,7 @@ def find_mentees():
     # Dynamic render/redirect based on source
     if source_page == "supervisor":
         return render_template(
-            "supervisor_find_mentee.html",
+            "supervisor/supervisor_find_mentee.html",
             all_mentees=filtered_mentees,
             streams=streams,
             schools=schools,
@@ -856,7 +850,7 @@ def find_mentees():
         )
     else:  # default mentor
         return render_template(
-            "mentor_find_mentees.html",
+            "mentor/mentor_find_mentees.html",
             all_mentees=filtered_mentees,
             streams=streams,
             schools=schools,
@@ -895,7 +889,7 @@ def my_mentors():
              my_mentors.append(req.mentor.mentor_profile)
 
     return render_template(
-        "mentee_my_mentors.html",
+        "mentee/mentee_my_mentors.html",
         my_mentors=my_mentors,
         show_sidebar=True,
         profile_complete=profile_complete
@@ -953,7 +947,7 @@ def my_mentees():
                 })
 
     return render_template(
-        "mentor_my_mentees.html",
+        "mentor/mentor_my_mentees.html",
         my_mentees=my_mentees_data,
         show_sidebar=True,
         profile_complete=profile_complete
@@ -1066,7 +1060,7 @@ def view_requests():
     mentee_requests = MenteeProfile.query.filter_by(status="pending").all()
 
     return render_template(
-        "supervisor_request.html",
+        "supervisor/supervisor_request.html",
         all_requests=pending_mentorship_requests,
         mentor_requests=mentor_requests,
         mentee_requests=mentee_requests,
@@ -1118,7 +1112,7 @@ def mentee_calendar():
         })
     
     return render_template(
-        "mentee_calendar.html",
+        "mentee/mentee_calendar.html",
         show_sidebar=True,
         meetings=calendar_meetings  # Pass real meetings to template
     )
@@ -1169,7 +1163,7 @@ def mentor_calendar():
         })
     
     return render_template(
-        "mentor_calendar.html",
+        "mentor/mentor_calendar.html",
         show_sidebar=True,
         meetings=calendar_meetings
     )
@@ -1221,7 +1215,7 @@ def supervisor_calendar():
         })
     
     return render_template(
-        "supervisor_calendar.html",
+        "supervisor/supervisor_calendar.html",
         show_sidebar=True,
         meetings=calendar_meetings
     )
@@ -1241,7 +1235,7 @@ def mentee_tasks():
     
     # For now, using dummy data - later you can connect to a database
     return render_template(
-        "mentee_tasks.html",
+        "mentee/mentee_tasks.html",
         show_sidebar=True,
         profile_complete=True  # You can use your existing profile_complete check
     )
@@ -1254,7 +1248,7 @@ def mentor_tasks():
     
     # For now, using dummy data - later you can connect to a database
     return render_template(
-        "mentor_tasks.html",
+        "mentor/mentor_tasks.html",
         show_sidebar=True,
         profile_complete=True
     )
@@ -1266,7 +1260,7 @@ def supervisor_tasks():
     
     # For now, using dummy data - later you can connect to a database
     return render_template(
-        "supervisor_tasks.html",
+        "supervisor/supervisor_tasks.html",
         show_sidebar=True,
         profile_complete=True
     )
@@ -1288,7 +1282,7 @@ def mentee_meeting_details():
     ).all()
 
     return render_template(
-        "mentee_meeting_details.html",
+        "mentee/mentee_meeting_details.html",
         show_sidebar=True,
         meetings=meetings
     )
@@ -1308,7 +1302,7 @@ def mentor_meeting_details():
     ).all()
 
     return render_template(
-        "mentor_meeting_details.html",
+        "mentor/mentor_meeting_details.html",
         show_sidebar=True,
         meetings=meetings
     )
@@ -1359,7 +1353,7 @@ def supervisor_meeting_details():
         })
 
     return render_template(
-        "supervisor_meeting_details.html",
+        "supervisor/supervisor_meeting_details.html",
         show_sidebar=True,
         meetings=meeting_data
     )
@@ -1485,7 +1479,7 @@ def mentor_response():
         print("DB Commit Error:", e)
 
     # Always redirect to mentor dashboard
-    return redirect(url_for("mentor_mentorship_request"))
+    return redirect(url_for("mentor/mentor_mentorship_request"))
 
 #--------------x----- PROFILE PICTURE AT TOP ------------------
 @app.context_processor
@@ -1555,7 +1549,7 @@ def editmentorprofile():
 
     # GET request – pre-fill form with existing data
     return render_template(
-        "editmentorprofile.html",
+        "mentor/editmentorprofile.html",
         full_name=user.name,
         email=user.email,
         profession=profile.profession if profile else "",
@@ -1622,7 +1616,7 @@ def editmenteeprofile():
 
     # GET request – pre-fill form with existing data
     return render_template(
-        "editmenteeprofile.html",
+        "mentee/editmenteeprofile.html",
         full_name=user.name,
         email=user.email,
         dob=profile.dob if profile else "",
@@ -1673,7 +1667,7 @@ def editsupervisorprofile():
         return redirect(url_for("supervisorprofile"))
 
     return render_template(
-        "editsupervisorprofile.html",
+        "supervisor/editsupervisorprofile.html",
         full_name=user.name,
         email=user.email,
         organisation_or_college=profile.organisation if profile else "",
@@ -1708,7 +1702,7 @@ def mentorprofile():
         profile = MentorProfile.query.filter_by(user_id=user.id).first()
 
         return render_template(
-            "mentorprofile.html",
+            "mentor/mentorprofile.html",
             show_sidebar=False,
         full_name=user.name,
         email=user.email,
@@ -1752,7 +1746,7 @@ def menteeprofile():
                 dob_formatted = profile.dob   # fallback if already formatted
 
         return render_template(
-            "menteeprofile.html",
+            "mentee/menteeprofile.html",
             show_sidebar=False,
             full_name=user.name,
             email=user.email,
@@ -1788,7 +1782,7 @@ def supervisorprofile():
     profile = SupervisorProfile.query.filter_by(user_id=user.id).first()
 
     return render_template(
-        "supervisorprofile.html",
+        "supervisor/supervisorprofile.html",
         show_sidebar=False,
         full_name=user.name,
         email=user.email,
@@ -1871,7 +1865,7 @@ def mentee_create_meeting_request(mentor_id):
         return redirect(url_for("mentors_list"))  # change to your actual route
 
     return render_template(
-        "mentee_create_meeting_request.html",
+        "mentee/mentee_create_meeting_request.html",
         mentee=mentee,
         mentor=mentor
     )
@@ -2029,13 +2023,3 @@ def logout():
 
 if __name__ == "__main__":
     app.run(debug=True)
-
-
-
-
-
-
-
-
-
-
