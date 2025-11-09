@@ -1892,313 +1892,345 @@ def get_mentor_task_details(task_id):
     except Exception as e:
         return jsonify({"success": False, "message": str(e)})
 
+
+@app.route("/get_supervisor_tasks_data")
+def get_supervisor_tasks_data():
+    if "email" not in session or session.get("user_type") != "0":
+        return jsonify({"success": False, "message": "Unauthorized"})
+    
+    try:
+        # Simple separate queries approach
+        personal_tasks = PersonalTask.query.all()
+        mentee_tasks = MenteeTask.query.all()
+
+        # Format tasks for frontend
+        tasks = []
+        
+        # Process personal tasks
+        for task in personal_tasks:
+            mentee = User.query.get(task.mentee_id)
+            mentor = User.query.get(task.mentor_id) if task.mentor_id else None
+            
+            due_date = task.due_date or datetime.utcnow() + timedelta(days=30)
+            is_critical = task.priority == 'high' and task.status != 'completed'
+            
+            tasks.append({
+                'id': f"personal_{task.id}",
+                'title': task.title,
+                'description': task.description or 'No description provided',
+                'dueDate': due_date.isoformat(),
+                'priority': task.priority,
+                'status': task.status,
+                'progress': task.progress or 0,
+                'mentorName': mentor.name if mentor else 'Self',
+                'menteeName': mentee.name if mentee else 'Unknown',
+                'category': 'Personal Task',
+                'score': None,
+                'isCritical': is_critical,
+                'type': 'personal'
+            })
+        
+        # Process mentee tasks
+        for task in mentee_tasks:
+            master_task = MasterTask.query.get(task.task_id)
+            mentee = User.query.get(task.mentee_id)
+            mentor = User.query.get(task.mentor_id)
+            
+            if master_task and mentee and mentor:
+                due_date = task.due_date or datetime.utcnow() + timedelta(days=30)
+                is_overdue = due_date < datetime.utcnow() and task.status != 'completed'
+                
+                tasks.append({
+                    'id': f"master_{task.id}",
+                    'title': f"{master_task.purpose_of_call} - {master_task.month}",
+                    'description': master_task.mentee_focus or 'No description provided',
+                    'dueDate': due_date.isoformat(),
+                    'priority': 'medium',
+                    'status': task.status,
+                    'progress': task.progress or 0,
+                    'mentorName': mentor.name,
+                    'menteeName': mentee.name,
+                    'category': 'Mentorship Program',
+                    'score': None,
+                    'isCritical': is_overdue,
+                    'type': 'master'
+                })
+
+        # Get unique mentors and mentees
+        mentors = list(set([task['mentorName'] for task in tasks]))
+        mentees = list(set([task['menteeName'] for task in tasks]))
+
+        return jsonify({
+            "success": True,
+            "tasks": tasks,
+            "mentors": mentors,
+            "mentees": mentees
+        })
+        
+    except Exception as e:
+        print(f"Error in get_supervisor_tasks_data: {str(e)}")
+        return jsonify({
+            "success": False,
+            "message": str(e),
+            "tasks": [],
+            "mentors": [],
+            "mentees": []
+        })
+    if "email" not in session or session.get("user_type") != "0":
+        return jsonify({"success": False, "message": "Unauthorized"})
+    
+    try:
+        # Simple separate queries approach
+        personal_tasks = PersonalTask.query.all()
+        mentee_tasks = MenteeTask.query.all()
+
+        # Format tasks for frontend
+        tasks = []
+        
+        # Process personal tasks
+        for task in personal_tasks:
+            mentee = User.query.get(task.mentee_id)
+            mentor = User.query.get(task.mentor_id) if task.mentor_id else None
+            
+            due_date = task.due_date or datetime.utcnow() + timedelta(days=30)
+            is_critical = task.priority == 'high' and task.status != 'completed'
+            
+            tasks.append({
+                'id': f"personal_{task.id}",
+                'title': task.title,
+                'description': task.description or 'No description provided',
+                'dueDate': due_date.isoformat(),
+                'priority': task.priority,
+                'status': task.status,
+                'progress': task.progress or 0,
+                'mentorName': mentor.name if mentor else 'Self',
+                'menteeName': mentee.name if mentee else 'Unknown',
+                'category': 'Personal Task',
+                'score': None,
+                'isCritical': is_critical,
+                'type': 'personal'
+            })
+        
+        # Process mentee tasks
+        for task in mentee_tasks:
+            master_task = MasterTask.query.get(task.task_id)
+            mentee = User.query.get(task.mentee_id)
+            mentor = User.query.get(task.mentor_id)
+            
+            if master_task and mentee and mentor:
+                due_date = task.due_date or datetime.utcnow() + timedelta(days=30)
+                is_overdue = due_date < datetime.utcnow() and task.status != 'completed'
+                
+                tasks.append({
+                    'id': f"master_{task.id}",
+                    'title': f"{master_task.purpose_of_call} - {master_task.month}",
+                    'description': master_task.mentee_focus or 'No description provided',
+                    'dueDate': due_date.isoformat(),
+                    'priority': 'medium',
+                    'status': task.status,
+                    'progress': task.progress or 0,
+                    'mentorName': mentor.name,
+                    'menteeName': mentee.name,
+                    'category': 'Mentorship Program',
+                    'score': None,
+                    'isCritical': is_overdue,
+                    'type': 'master'
+                })
+
+        # Get unique mentors and mentees
+        mentors = list(set([task['mentorName'] for task in tasks]))
+        mentees = list(set([task['menteeName'] for task in tasks]))
+
+        return jsonify({
+            "success": True,
+            "tasks": tasks,
+            "mentors": mentors,
+            "mentees": mentees
+        })
+        
+    except Exception as e:
+        print(f"Error in get_supervisor_tasks_data: {str(e)}")
+        return jsonify({
+            "success": False,
+            "message": str(e),
+            "tasks": [],
+            "mentors": [],
+            "mentees": []
+        })
+    if "email" not in session or session.get("user_type") != "0":
+        return jsonify({"success": False, "message": "Unauthorized"})
+    
+    try:
+        # Get all tasks with proper data
+        personal_tasks_data = db.session.query(
+            PersonalTask,
+            User.name.label('mentee_name'),
+            User.email.label('mentee_email'),
+            User.name.label('mentor_name')
+        ).join(User, PersonalTask.mentee_id == User.id)\
+         .join(User, PersonalTask.mentor_id == User.id)\
+         .all()
+
+        mentee_tasks_data = db.session.query(
+            MenteeTask,
+            MasterTask,
+            User.name.label('mentee_name'),
+            User.email.label('mentee_email'),
+            User.name.label('mentor_name')
+        ).join(MasterTask, MenteeTask.task_id == MasterTask.id)\
+         .join(User, MenteeTask.mentee_id == User.id)\
+         .join(User, MenteeTask.mentor_id == User.id)\
+         .all()
+
+        # Format tasks for frontend
+        tasks = []
+        
+        # Process personal tasks
+        for task, mentee_name, mentee_email, mentor_name in personal_tasks_data:
+            due_date = task.due_date or datetime.utcnow() + timedelta(days=30)
+            is_critical = task.priority == 'high' and task.status != 'completed'
+            
+            tasks.append({
+                'id': f"personal_{task.id}",
+                'title': task.title,
+                'description': task.description or 'No description provided',
+                'dueDate': due_date.isoformat(),
+                'priority': task.priority,
+                'status': task.status,
+                'progress': task.progress or 0,
+                'mentorName': mentor_name,
+                'menteeName': mentee_name,
+                'category': 'Personal Task',
+                'score': None,
+                'isCritical': is_critical,
+                'type': 'personal'
+            })
+        
+        # Process mentee tasks
+        for task, master, mentee_name, mentee_email, mentor_name in mentee_tasks_data:
+            due_date = task.due_date or datetime.utcnow() + timedelta(days=30)
+            is_overdue = due_date < datetime.utcnow() and task.status != 'completed'
+            
+            tasks.append({
+                'id': f"master_{task.id}",
+                'title': f"{master.purpose_of_call} - {master.month}",
+                'description': master.mentee_focus or 'No description provided',
+                'dueDate': due_date.isoformat(),
+                'priority': 'medium',
+                'status': task.status,
+                'progress': task.progress or 0,
+                'mentorName': mentor_name,
+                'menteeName': mentee_name,
+                'category': 'Mentorship Program',
+                'score': None,
+                'isCritical': is_overdue,
+                'type': 'master'
+            })
+
+        # Get unique mentors and mentees
+        mentors = list(set([task['mentorName'] for task in tasks]))
+        mentees = list(set([task['menteeName'] for task in tasks]))
+
+        return jsonify({
+            "success": True,
+            "tasks": tasks,
+            "mentors": mentors,
+            "mentees": mentees
+        })
+        
+    except Exception as e:
+        print(f"Error in get_supervisor_tasks_data: {str(e)}")
+        return jsonify({
+            "success": False,
+            "message": str(e),
+            "tasks": [],
+            "mentors": [],
+            "mentees": []
+        })
 #------------------------------------------------------------------------------------------------------------------- 
 #------------------------------------------------------------------------------------------------------------------- 
 #------------------------------------------------------------------------------------------------------------------- 
 
 
 # ------------------ SUPERVISOR TASK MANAGEMENT ROUTES ------------------
-
 @app.route("/supervisor_tasks")
 def supervisor_tasks():
     if "email" not in session or session.get("user_type") != "0":
         return redirect(url_for("signin"))
     
-    # Get all tasks data for supervisor overview
     try:
-        # Get all personal tasks with mentor and mentee info
-        personal_tasks = PersonalTask.query\
-            .join(User, PersonalTask.mentee_id == User.id)\
-            .join(User, PersonalTask.mentor_id == User.id)\
-            .add_columns(
-                PersonalTask.id,
-                PersonalTask.title,
-                PersonalTask.description,
-                PersonalTask.due_date,
-                PersonalTask.priority,
-                PersonalTask.status,
-                PersonalTask.progress,
-                PersonalTask.created_date,
-                PersonalTask.completed_date,
-                User.name.label('mentee_name'),
-                User.name.label('mentor_name')
-            )\
-            .all()
-
-        # Get all mentee tasks with master task, mentor and mentee info
-        mentee_tasks = MenteeTask.query\
-            .join(MasterTask, MenteeTask.task_id == MasterTask.id)\
-            .join(User, MenteeTask.mentee_id == User.id)\
-            .join(User, MenteeTask.mentor_id == User.id)\
-            .add_columns(
-                MenteeTask.id,
-                MasterTask.purpose_of_call.label('title'),
-                MasterTask.mentee_focus.label('description'),
-                MenteeTask.due_date,
-                db.literal('medium').label('priority'),  # Default for master tasks
-                MenteeTask.status,
-                MenteeTask.progress,
-                MenteeTask.assigned_date.label('created_date'),
-                MenteeTask.completed_date,
-                User.name.label('mentee_name'),
-                User.name.label('mentor_name'),
-                MasterTask.month,
-                MenteeTask.meeting_number,
-                db.literal('master').label('task_type')
-            )\
-            .all()
-
-        # Combine all tasks
+        print("🔍 Starting supervisor_tasks data fetch...")
+        
+        # Get all tasks with proper joins
+        personal_tasks = db.session.query(PersonalTask, User).join(
+            User, PersonalTask.mentee_id == User.id
+        ).all()
+        
+        print(f"📊 Found {len(personal_tasks)} personal tasks")
+        
+        mentee_tasks = db.session.query(MenteeTask, MasterTask, User).join(
+            MasterTask, MenteeTask.task_id == MasterTask.id
+        ).join(
+            User, MenteeTask.mentee_id == User.id
+        ).all()
+        
+        print(f"📊 Found {len(mentee_tasks)} mentee tasks")
+        
+        # Prepare tasks data
         all_tasks = []
         
-        # Add personal tasks
-        for task in personal_tasks:
+        # Process personal tasks
+        for task, user in personal_tasks:
+            mentor = User.query.get(task.mentor_id) if task.mentor_id else None
             all_tasks.append({
-                'id': task.id,
-                'title': task.title,
-                'description': task.description or 'No description',
-                'due_date': task.due_date,
-                'priority': task.priority,
-                'status': task.status,
-                'progress': task.progress or 0,
-                'mentee_name': task.mentee_name,
-                'mentor_name': task.mentor_name,
-                'created_date': task.created_date,
-                'completed_date': task.completed_date,
-                'task_type': 'personal',
-                'category': 'Mentor Assigned'
-            })
-        
-        # Add mentee tasks (master tasks)
-        for task in mentee_tasks:
-            all_tasks.append({
-                'id': task.id,
-                'title': f"{task.title} - Month {task.month}",
-                'description': task.description or 'No description',
-                'due_date': task.due_date,
-                'priority': task.priority,
-                'status': task.status,
-                'progress': task.progress or 0,
-                'mentee_name': task.mentee_name,
-                'mentor_name': task.mentor_name,
-                'created_date': task.created_date,
-                'completed_date': task.completed_date,
-                'task_type': 'master',
-                'category': 'Mentorship Program',
-                'month': task.month,
-                'meeting_number': task.meeting_number
-            })
-
-        # Calculate statistics
-        total_tasks = len(all_tasks)
-        completed_tasks = len([t for t in all_tasks if t['status'] == 'completed'])
-        pending_tasks = len([t for t in all_tasks if t['status'] in ['pending', 'in-progress']])
-        
-        today = datetime.utcnow().date()
-        overdue_tasks = len([t for t in all_tasks if t['due_date'] and t['due_date'].date() < today and t['status'] != 'completed'])
-
-        # Get all mentors and mentees for filters
-        all_mentors = User.query.filter_by(user_type='1').all()
-        all_mentees = User.query.filter_by(user_type='2').all()
-
-        # Get active mentors (those with assigned tasks)
-        active_mentor_ids = set(task['mentor_name'] for task in all_tasks)
-        active_mentors = [mentor for mentor in all_mentors if mentor.name in active_mentor_ids]
-
-        # Get active mentees (those with assigned tasks)
-        active_mentee_ids = set(task['mentee_name'] for task in all_tasks)
-        active_mentees = [mentee for mentee in all_mentees if mentee.name in active_mentee_ids]
-
-        return render_template(
-            "supervisor/supervisor_tasks.html",
-            show_sidebar=True,
-            profile_complete=True,
-            all_tasks=all_tasks,
-            total_tasks=total_tasks,
-            completed_tasks=completed_tasks,
-            pending_tasks=pending_tasks,
-            overdue_tasks=overdue_tasks,
-            active_mentors=active_mentors,
-            active_mentees=active_mentees,
-            today=today
-        )
-
-    except Exception as e:
-        print(f"Error in supervisor_tasks: {str(e)}")
-        # Return empty data in case of error
-        return render_template(
-            "supervisor/supervisor_tasks.html",
-            show_sidebar=True,
-            profile_complete=True,
-            all_tasks=[],
-            total_tasks=0,
-            completed_tasks=0,
-            pending_tasks=0,
-            overdue_tasks=0,
-            active_mentors=[],
-            active_mentees=[],
-            today=datetime.utcnow().date()
-        )
-
-@app.route("/get_supervisor_task_details/<int:task_id>")
-def get_supervisor_task_details(task_id):
-    if "email" not in session or session.get("user_type") != "0":
-        return jsonify({"success": False, "message": "Unauthorized"})
-    
-    try:
-        # Try to find task in personal tasks first
-        personal_task = PersonalTask.query\
-            .join(User, PersonalTask.mentee_id == User.id)\
-            .join(User, PersonalTask.mentor_id == User.id)\
-            .filter(PersonalTask.id == task_id)\
-            .first()
-        
-        if personal_task:
-            task_data = {
-                "id": personal_task.id,
-                "type": "personal",
-                "title": personal_task.title,
-                "description": personal_task.description,
-                "due_date": personal_task.due_date.strftime('%Y-%m-%d') if personal_task.due_date else None,
-                "priority": personal_task.priority,
-                "status": personal_task.status,
-                "progress": personal_task.progress or 0,
-                "mentee_name": personal_task.mentee.name if personal_task.mentee else "Unknown",
-                "mentor_name": personal_task.mentor.name if personal_task.mentor else "Unknown",
-                "created_date": personal_task.created_date.strftime('%Y-%m-%d') if personal_task.created_date else None,
-                "completed_date": personal_task.completed_date.strftime('%Y-%m-%d') if personal_task.completed_date else None,
-                "category": "Mentor Assigned"
-            }
-            return jsonify({"success": True, "task": task_data})
-        
-        # If not found in personal tasks, try mentee tasks
-        mentee_task = MenteeTask.query\
-            .join(MasterTask, MenteeTask.task_id == MasterTask.id)\
-            .join(User, MenteeTask.mentee_id == User.id)\
-            .join(User, MenteeTask.mentor_id == User.id)\
-            .filter(MenteeTask.id == task_id)\
-            .first()
-        
-        if mentee_task:
-            task_data = {
-                "id": mentee_task.id,
-                "type": "master",
-                "title": mentee_task.master_task.purpose_of_call,
-                "description": mentee_task.master_task.mentee_focus,
-                "due_date": mentee_task.due_date.strftime('%Y-%m-%d') if mentee_task.due_date else None,
-                "priority": "medium",
-                "status": mentee_task.status,
-                "progress": mentee_task.progress or 0,
-                "mentee_name": mentee_task.mentee.name if mentee_task.mentee else "Unknown",
-                "mentor_name": mentee_task.mentor.name if mentee_task.mentor else "Unknown",
-                "created_date": mentee_task.assigned_date.strftime('%Y-%m-%d') if mentee_task.assigned_date else None,
-                "completed_date": mentee_task.completed_date.strftime('%Y-%m-%d') if mentee_task.completed_date else None,
-                "category": "Mentorship Program",
-                "month": mentee_task.month,
-                "meeting_number": mentee_task.meeting_number,
-                "mentor_focus": mentee_task.master_task.mentor_focus,
-                "program_actions": mentee_task.master_task.program_incharge_actions
-            }
-            return jsonify({"success": True, "task": task_data})
-        
-        return jsonify({"success": False, "message": "Task not found"})
-        
-    except Exception as e:
-        return jsonify({"success": False, "message": str(e)})
-
-@app.route("/get_supervisor_analytics")
-def get_supervisor_analytics():
-    if "email" not in session or session.get("user_type") != "0":
-        return jsonify({"success": False, "message": "Unauthorized"})
-    
-    try:
-        # Get all tasks for analytics
-        personal_tasks = PersonalTask.query.all()
-        mentee_tasks = MenteeTask.query.all()
-        
-        all_tasks = list(personal_tasks) + list(mentee_tasks)
-        
-        # Calculate analytics
-        total_tasks = len(all_tasks)
-        completed_tasks = len([t for t in all_tasks if t.status == 'completed'])
-        completion_rate = (completed_tasks / total_tasks * 100) if total_tasks > 0 else 0
-        
-        # Get active mentors count
-        active_mentors = User.query.filter_by(user_type='1').count()
-        
-        # Get active mentees count  
-        active_mentees = User.query.filter_by(user_type='2').count()
-        
-        # Calculate overdue tasks
-        today = datetime.utcnow().date()
-        overdue_tasks = len([t for t in all_tasks if t.due_date and t.due_date.date() < today and t.status != 'completed'])
-        
-        analytics_data = {
-            "total_tasks": total_tasks,
-            "completed_tasks": completed_tasks,
-            "completion_rate": round(completion_rate, 1),
-            "active_mentors": active_mentors,
-            "active_mentees": active_mentees,
-            "overdue_tasks": overdue_tasks,
-            "pending_tasks": total_tasks - completed_tasks - overdue_tasks
-        }
-        
-        return jsonify({"success": True, "analytics": analytics_data})
-        
-    except Exception as e:
-        return jsonify({"success": False, "message": str(e)})
-    
-# More optimized version of supervisor_tasks route
-@app.route("/supervisor_tasks_optimized")
-def supervisor_tasks_optimized():
-    if "email" not in session or session.get("user_type") != "0":
-        return redirect(url_for("signin"))
-    
-    try:
-        # Get personal tasks with joins in single query
-        personal_tasks_query = db.session.query(
-            PersonalTask.id,
-            PersonalTask.title,
-            PersonalTask.description,
-            PersonalTask.due_date,
-            PersonalTask.priority,
-            PersonalTask.status,
-            PersonalTask.progress,
-            PersonalTask.created_date,
-            PersonalTask.completed_date,
-            User.name.label('mentee_name'),
-            User.name.label('mentor_name')
-        ).join(User, PersonalTask.mentee_id == User.id)\
-         .join(User, PersonalTask.mentor_id == User.id)\
-         .all()
-
-        # Convert to list of dicts
-        personal_tasks = []
-        for task in personal_tasks_query:
-            personal_tasks.append({
-                'id': task.id,
+                'id': f"personal_{task.id}",
                 'title': task.title,
                 'description': task.description,
                 'due_date': task.due_date,
                 'priority': task.priority,
                 'status': task.status,
                 'progress': task.progress,
-                'mentee_name': task.mentee_name,
-                'mentor_name': task.mentor_name,
-                'created_date': task.created_date,
-                'completed_date': task.completed_date,
-                'task_type': 'personal',
-                'category': 'Mentor Assigned'
+                'mentee_name': user.name,
+                'mentor_name': mentor.name if mentor else 'Self',
+                'type': 'personal'
             })
-
-        # Similar optimization for mentee tasks...
-        # ... (rest of the optimized code)
-
+        
+        # Process mentee tasks  
+        for task, master, user in mentee_tasks:
+            mentor = User.query.get(task.mentor_id)
+            all_tasks.append({
+                'id': f"master_{task.id}",
+                'title': f"{master.purpose_of_call} - {master.month}",
+                'description': master.mentee_focus,
+                'due_date': task.due_date,
+                'priority': 'medium',
+                'status': task.status,
+                'progress': task.progress,
+                'mentee_name': user.name,
+                'mentor_name': mentor.name if mentor else 'Unknown',
+                'type': 'master'
+            })
+        
+        print(f"🎯 Total tasks prepared: {len(all_tasks)}")
+        
+        return render_template(
+            "supervisor/supervisor_tasks.html",
+            show_sidebar=True,
+            profile_complete=True,
+            all_tasks=all_tasks
+        )
+        
     except Exception as e:
-        print(f"Error: {str(e)}")
-        # Return error page or empty data
-
-
+        print(f"❌ Error in supervisor_tasks: {str(e)}")
+        import traceback
+        traceback.print_exc()
+        return render_template(
+            "supervisor/supervisor_tasks.html",
+            show_sidebar=True,
+            profile_complete=True,
+            all_tasks=[]
+        )
+        
 # ---------------meeting details----------------
 @app.route("/mentee_meeting_details")
 def mentee_meeting_details():
