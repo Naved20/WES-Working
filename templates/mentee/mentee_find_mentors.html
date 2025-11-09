@@ -446,53 +446,98 @@ function closeRequestModal() {
 // ---- Duration Logic ----
 function updateDuration() {
   const mentorType = document.getElementById('mentor_type').value;
-  const term = document.getElementById('term').value;
+  const termSelect = document.getElementById('term');
   const durationInput = document.getElementById('duration_months');
   const durationHint = document.getElementById('durationHint');
-  const termSelect = document.getElementById('term');
 
+  // Reset term options based on mentor type
   resetTermOptions();
 
-
-
-  durationHint.textContent = hint;
+  // Set default values based on mentor type and term
+  if (mentorType === 'anchor') {
+    // Anchor: Always long-term, fixed 12 months
+    termSelect.value = 'long';
+    durationInput.value = 12;
+    durationInput.readOnly = true;
+    durationHint.textContent = 'Anchor mentors require 12-month commitment';
+    durationInput.style.backgroundColor = '#f3f4f6';
+  } else if (mentorType === 'special') {
+    // Special: Can be short or long term
+    durationInput.readOnly = false;
+    durationInput.style.backgroundColor = 'white';
+    
+    if (termSelect.value === 'short') {
+      // Special + Short-term: 3-11 months
+      durationInput.value = 3;
+      durationInput.min = 3;
+      durationInput.max = 11;
+      durationHint.textContent = 'Short-term: 3 to 11 months';
+    } else {
+      // Special + Long-term: 12+ months
+      durationInput.value = 12;
+      durationInput.min = 12;
+      durationInput.max = 24; // Optional: set a maximum
+      durationHint.textContent = 'Long-term: 12 months or more';
+    }
+  }
 }
 
 function resetTermOptions() {
   const mentorType = document.getElementById('mentor_type').value;
   const termSelect = document.getElementById('term');
+  
+  // Save current selection
+  const currentTerm = termSelect.value;
+  
+  // Clear existing options
   termSelect.innerHTML = '';
 
   if (mentorType === 'anchor') {
+    // Anchor: Only long-term option
     const option = new Option('Long-term', 'long');
     termSelect.appendChild(option);
   } else if (mentorType === 'special') {
-    termSelect.appendChild(new Option('Long-term', 'long'));
+    // Special: Both short and long term options
     termSelect.appendChild(new Option('Short-term', 'short'));
+    termSelect.appendChild(new Option('Long-term', 'long'));
+    
+    // Try to restore previous selection, default to short-term
+    if (currentTerm && termSelect.querySelector(`option[value="${currentTerm}"]`)) {
+      termSelect.value = currentTerm;
+    } else {
+      termSelect.value = 'short'; // Default to short-term for special mentors
+    }
   }
 }
 
 function validateDuration() {
-  const mentorType = document.getElementById('mentor_type');
-  const term = document.getElementById('term');
+  const mentorType = document.getElementById('mentor_type').value;
+  const term = document.getElementById('term').value;
   const durationInput = document.getElementById('duration_months');
   let value = parseInt(durationInput.value) || 0;
 
-  if (mentorType.value === 'anchor') {
-    term.value = 'long';
-    durationInput.value = 12;
-    durationInput.readOnly = true;
+  if (mentorType === 'anchor') {
+    // Anchor: Always 12 months
+    if (value !== 12) {
+      durationInput.value = 12;
+    }
     return true;
   }
 
-  if (mentorType.value === 'special') {
-    if (term.value === 'short') {
-      if (value < 3 || value > 11) {
-        alert('Special short-term mentorship must be between 3 and 11 months');
+  if (mentorType === 'special') {
+    if (term === 'short') {
+      // Special + Short-term: 3-11 months
+      if (value < 3) {
+        alert('Special short-term mentorship must be at least 3 months');
         durationInput.value = 3;
         return false;
+      } else if (value > 11) {
+        alert('Special short-term mentorship cannot exceed 11 months');
+        durationInput.value = 11;
+        return false;
       }
-    } else if (term.value === 'long') {
+    } else if (term === 'long') {
+      // Special + Long-term: 12+ months
       if (value < 12) {
         alert('Special long-term mentorship must be 12 months or more');
         durationInput.value = 12;
@@ -503,7 +548,7 @@ function validateDuration() {
   return true;
 }
 
-// ---- Form Submission (from OLD CODE) ----
+// ---- Form Submission ----
 document.getElementById('mentorshipRequestForm').addEventListener('submit', function(e) {
   e.preventDefault();
 
@@ -536,8 +581,57 @@ document.getElementById('mentorshipRequestForm').addEventListener('submit', func
   });
 });
 
-// ---- Init listeners ----
+// ---- Initialize event listeners ----
 document.addEventListener('DOMContentLoaded', function() {
+  const mentorTypeSelect = document.getElementById('mentor_type');
+  const termSelect = document.getElementById('term');
+  const durationInput = document.getElementById('duration_months');
+
+  if (mentorTypeSelect && termSelect) {
+    mentorTypeSelect.addEventListener('change', function() {
+      updateDuration();
+    });
+    
+    termSelect.addEventListener('change', function() {
+      updateDuration();
+    });
+    
+    // Initialize with default values
+    updateDuration();
+  }
+
+  if (durationInput) {
+    durationInput.addEventListener('change', validateDuration);
+    durationInput.addEventListener('input', function() {
+      const mentorType = document.getElementById('mentor_type').value;
+      const term = document.getElementById('term').value;
+      
+      if (mentorType === 'special' && term === 'short') {
+        let value = parseInt(this.value) || 0;
+        if (value < 3) this.value = 3;
+        else if (value > 11) this.value = 11;
+      } else if (mentorType === 'special' && term === 'long') {
+        let value = parseInt(this.value) || 0;
+        if (value < 12) this.value = 12;
+      }
+    });
+  }
+});
+
+// Request modal functions
+function openRequestModal(mentorId) {
+  document.getElementById('mentorIdInput').value = mentorId;
+  document.getElementById('requestModal').classList.remove('hidden');
+  
+  // Reset and initialize form when opening modal
+  document.getElementById('mentorshipRequestForm').reset();
+  updateDuration();
+}
+
+function closeRequestModal() {
+  document.getElementById('requestModal').classList.add('hidden');
+}
+
   const mentorTypeSelect = document.getElementById('mentor_type');
   const termSelect = document.getElementById('term');
   const durationInput = document.getElementById('duration_months');
@@ -558,7 +652,7 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     });
   }
-});
+;
 </script>
 
 

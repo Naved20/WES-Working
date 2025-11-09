@@ -1,0 +1,214 @@
+<!-- templates/view_mastertask_data.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MasterTask Data View</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .meeting-card {
+            border-left: 4px solid #007bff;
+            margin-bottom: 20px;
+        }
+        .meeting-number {
+            background: #007bff;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        .section-title {
+            color: #495057;
+            border-bottom: 2px solid #dee2e6;
+            padding-bottom: 8px;
+            margin-top: 20px;
+        }
+        .focus-section {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid py-4">
+        <div class="row">
+            <div class="col-12">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h1 class="h3">📊 MasterTask Data - 20 Meetings Overview</h1>
+                    <a href="{{ url_for('supervisordashboard') }}" class="btn btn-secondary">← Back to Dashboard</a>
+                </div>
+
+                <!-- Summary Stats -->
+                <div class="row mb-4">
+                    <div class="col-md-3">
+                        <div class="card text-white bg-primary">
+                            <div class="card-body">
+                                <h5 class="card-title">Total Meetings</h5>
+                                <h2 class="card-text">{{ meetings|length }}</h2>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card text-white bg-success">
+                            <div class="card-body">
+                                <h5 class="card-title">Months Covered</h5>
+                                <h2 class="card-text">{{ months|length }}</h2>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card text-white bg-info">
+                            <div class="card-body">
+                                <h5 class="card-title">Journey Phases</h5>
+                                <h2 class="card-text">{{ phases|length }}</h2>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card text-white bg-warning">
+                            <div class="card-body">
+                                <h5 class="card-title">Last Updated</h5>
+                                <h6 class="card-text">{{ last_updated }}</h6>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Search and Filter -->
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <input type="text" id="searchInput" class="form-control" placeholder="Search in meetings...">
+                            </div>
+                            <div class="col-md-3">
+                                <select id="monthFilter" class="form-select">
+                                    <option value="">All Months</option>
+                                    {% for month in months %}
+                                    <option value="{{ month }}">{{ month }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <select id="phaseFilter" class="form-select">
+                                    <option value="">All Journey Phases</option>
+                                    {% for phase in phases %}
+                                    <option value="{{ phase }}">{{ phase }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-md-2">
+                                <button id="clearFilters" class="btn btn-outline-secondary w-100">Clear Filters</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Meetings List -->
+                {% for meeting in meetings %}
+                <div class="card meeting-card meeting-item" 
+                     data-month="{{ meeting.month }}" 
+                     data-phase="{{ meeting.journey_phase }}"
+                     data-search="{{ meeting.meeting_number }} {{ meeting.month }} {{ meeting.journey_phase }} {{ meeting.purpose_of_call|lower }}">
+                    <div class="card-header bg-light">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <span class="meeting-number">Meeting #{{ meeting.meeting_number }}</span>
+                                <strong class="ms-2">{{ meeting.journey_phase }}</strong>
+                            </div>
+                            <div>
+                                <span class="badge bg-secondary">Month {{ meeting.month }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <!-- Purpose Section -->
+                        <h5 class="section-title">🎯 Purpose of the Call</h5>
+                        <p class="mb-3">{{ meeting.purpose_of_call }}</p>
+
+                        <!-- Focus Areas -->
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="focus-section">
+                                    <h6>👨‍🏫 Mentor Focus</h6>
+                                    <p class="mb-0">{{ meeting.mentor_focus|replace('\n', '<br>')|safe }}</p>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="focus-section">
+                                    <h6>👨‍🎓 Mentee Focus</h6>
+                                    <p class="mb-0">{{ meeting.mentee_focus|replace('\n', '<br>')|safe }}</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Program Incharge Actions -->
+                        <h5 class="section-title mt-4">📋 Program In-Charge Actions</h5>
+                        <p>{{ meeting.program_incharge_actions }}</p>
+
+                        <!-- Meeting Plan Overview -->
+                        <h5 class="section-title">📝 Meeting Plan Overview</h5>
+                        <p>{{ meeting.meeting_plan_overview }}</p>
+                    </div>
+                </div>
+                {% endfor %}
+
+                {% if not meetings %}
+                <div class="alert alert-warning text-center">
+                    <h4>No meetings found!</h4>
+                    <p>Please run the data insertion script first.</p>
+                    <a href="#" class="btn btn-primary">Add Sample Data</a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Search and Filter functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchInput = document.getElementById('searchInput');
+            const monthFilter = document.getElementById('monthFilter');
+            const phaseFilter = document.getElementById('phaseFilter');
+            const clearFilters = document.getElementById('clearFilters');
+            const meetingItems = document.querySelectorAll('.meeting-item');
+
+            function filterMeetings() {
+                const searchTerm = searchInput.value.toLowerCase();
+                const selectedMonth = monthFilter.value;
+                const selectedPhase = phaseFilter.value;
+
+                meetingItems.forEach(item => {
+                    const month = item.getAttribute('data-month');
+                    const phase = item.getAttribute('data-phase');
+                    const searchData = item.getAttribute('data-search').toLowerCase();
+
+                    const matchesSearch = searchData.includes(searchTerm);
+                    const matchesMonth = !selectedMonth || month === selectedMonth;
+                    const matchesPhase = !selectedPhase || phase === selectedPhase;
+
+                    if (matchesSearch && matchesMonth && matchesPhase) {
+                        item.style.display = 'block';
+                    } else {
+                        item.style.display = 'none';
+                    }
+                });
+            }
+
+            searchInput.addEventListener('input', filterMeetings);
+            monthFilter.addEventListener('change', filterMeetings);
+            phaseFilter.addEventListener('change', filterMeetings);
+
+            clearFilters.addEventListener('click', function() {
+                searchInput.value = '';
+                monthFilter.value = '';
+                phaseFilter.value = '';
+                filterMeetings();
+            });
+        });
+    </script>
+</body>
+</html>
