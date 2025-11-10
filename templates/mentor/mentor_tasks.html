@@ -5,6 +5,7 @@
 {% block content %}
 
 <style>
+    /* Your existing CSS styles remain the same */
     .task-card {
         background: white;
         border-radius: 12px;
@@ -185,6 +186,53 @@
         border-radius: 6px;
         font-size: 11px;
         font-weight: 500;
+    }
+
+    /* New styles for task details */
+    .task-meta-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .meta-item {
+        background: #f8fafc;
+        padding: 0.75rem;
+        border-radius: 8px;
+        border-left: 3px solid #3b82f6;
+    }
+    
+    .meta-label {
+        font-size: 0.875rem;
+        color: #64748b;
+        font-weight: 500;
+        display: block;
+        margin-bottom: 0.25rem;
+    }
+    
+    .meta-value {
+        font-weight: 600;
+        color: #1e293b;
+    }
+    
+    .subtasks-list {
+        margin-top: 1rem;
+    }
+    
+    .subtask-item {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.75rem;
+        background: #f8fafc;
+        border-radius: 6px;
+        margin-bottom: 0.5rem;
+    }
+    
+    .subtask-item.completed {
+        opacity: 0.7;
+        text-decoration: line-through;
     }
 </style>
 
@@ -530,10 +578,17 @@
 
 <!-- Task Details Modal -->
 <div id="task-details-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
-    <div class="bg-white rounded-xl p-6 w-full max-w-2xl mx-4 max-h-[90vh] overflow-y-auto">
-        <div class="flex justify-between items-start mb-4">
-            <h3 id="detail-task-title" class="text-xl font-semibold">Task Title</h3>
-            <button onclick="closeTaskDetailsModal()" class="text-gray-400 hover:text-gray-600">
+    <div class="bg-white rounded-xl p-6 w-full max-w-3xl mx-4 max-h-[90vh] overflow-y-auto">
+        <div class="flex justify-between items-start mb-6">
+            <div class="flex-1">
+                <h3 id="detail-task-title" class="text-2xl font-bold text-gray-900 mb-2">Task Title</h3>
+                <div class="flex flex-wrap gap-2 items-center">
+                    <span id="detail-task-type" class="task-badge">Personal Task</span>
+                    <span id="detail-task-priority-badge" class="priority-high">High Priority</span>
+                    <span id="detail-task-status" class="task-status status-pending">To Do</span>
+                </div>
+            </div>
+            <button onclick="closeTaskDetailsModal()" class="text-gray-400 hover:text-gray-600 ml-4">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                 </svg>
@@ -541,52 +596,67 @@
         </div>
         
         <div class="space-y-6">
-            <!-- Task Meta -->
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-                <div>
-                    <span class="font-medium text-gray-500">Mentee:</span>
-                    <span id="detail-task-mentee" class="ml-2 font-medium">John Doe</span>
+            <!-- Task Meta Information -->
+            <div class="task-meta-grid">
+                <div class="meta-item">
+                    <span class="meta-label">Assigned To</span>
+                    <span id="detail-task-mentee" class="meta-value">John Doe</span>
                 </div>
-                <div>
-                    <span class="font-medium text-gray-500">Status:</span>
-                    <span id="detail-task-status" class="ml-2 status-pending">Pending</span>
+                <div class="meta-item">
+                    <span class="meta-label">Due Date</span>
+                    <span id="detail-task-due-date" class="meta-value">2024-01-15</span>
                 </div>
-                <div>
-                    <span class="font-medium text-gray-500">Priority:</span>
-                    <span id="detail-task-priority" class="ml-2 priority-high">High</span>
+                <div class="meta-item">
+                    <span class="meta-label">Category</span>
+                    <span id="detail-task-category" class="meta-value">Programming</span>
                 </div>
-                <div>
-                    <span class="font-medium text-gray-500">Due Date:</span>
-                    <span id="detail-task-due-date" class="ml-2">2024-01-15</span>
+                <div class="meta-item">
+                    <span class="meta-label">Estimated Hours</span>
+                    <span id="detail-task-estimated-hours" class="meta-value">5 hours</span>
+                </div>
+                <div class="meta-item">
+                    <span class="meta-label">Created On</span>
+                    <span id="detail-task-created" class="meta-value">2024-01-01</span>
+                </div>
+                <div class="meta-item">
+                    <span class="meta-label">Last Updated</span>
+                    <span id="detail-task-updated" class="meta-value">2024-01-05</span>
                 </div>
             </div>
             
             <!-- Description -->
             <div>
-                <h4 class="font-medium text-gray-700 mb-2">Description</h4>
-                <p id="detail-task-description" class="text-gray-600 bg-gray-50 p-4 rounded-lg">Task description will appear here...</p>
-            </div>
-            
-            <!-- Progress -->
-            <div>
-                <h4 class="font-medium text-gray-700 mb-2">Progress</h4>
-                <div class="flex items-center gap-4">
-                    <div class="flex-1">
-                        <div class="progress-bar">
-                            <div id="detail-progress-fill" class="progress-fill" style="width: 0%"></div>
-                        </div>
-                    </div>
-                    <span id="detail-progress-text" class="text-sm font-medium">0%</span>
+                <h4 class="font-semibold text-gray-700 mb-3 text-lg">Description</h4>
+                <div id="detail-task-description" class="text-gray-600 bg-gray-50 p-4 rounded-lg border border-gray-200">
+                    Task description will appear here...
                 </div>
             </div>
             
+            <!-- Additional Instructions -->
+            <div id="detail-task-instructions-section" class="hidden">
+                <h4 class="font-semibold text-gray-700 mb-3 text-lg">Additional Instructions</h4>
+                <div id="detail-task-instructions" class="text-gray-600 bg-gray-50 p-4 rounded-lg border border-gray-200">
+                    Additional instructions will appear here...
+                </div>
+            </div>
+            
+            <!-- Progress Section -->
+            <div>
+                <div class="flex justify-between items-center mb-3">
+                    <h4 class="font-semibold text-gray-700 text-lg">Progress</h4>
+                    <span id="detail-progress-text" class="text-sm font-medium bg-blue-100 text-blue-800 px-3 py-1 rounded-full">0% Complete</span>
+                </div>
+                <div class="progress-bar bg-gray-200 rounded-full h-3">
+                    <div id="detail-progress-fill" class="progress-fill h-3 rounded-full bg-blue-600 transition-all duration-500" style="width: 0%"></div>
+                </div>
+            </div>
+
+            
             <!-- Actions -->
-            <div class="flex gap-3 pt-4 border-t">
-                <button onclick="sendReminder()" class="px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition flex items-center gap-2">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                    </svg>
-                    Send Reminder
+            <div class="flex flex-wrap gap-3 pt-6 border-t border-gray-200">
+
+                <button onclick="closeTaskDetailsModal()" class="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition">
+                    Close
                 </button>
             </div>
         </div>
@@ -601,7 +671,181 @@ let currentFilter = 'all';
 let currentPriorityFilter = 'all';
 let currentMenteeTab = 'all';
 
-// ========== GLOBAL FUNCTIONS ==========
+// ========== TASK DETAILS FUNCTIONS ==========
+async function viewTaskDetails(taskId, taskType) {
+    console.log("Viewing task details:", taskId, taskType);
+    currentTaskId = taskId;
+    currentTaskType = taskType;
+    
+    try {
+        // Show loading state
+        const modal = document.getElementById('task-details-modal');
+        modal.classList.remove('hidden');
+        
+        // Fetch task details from server
+        const response = await fetch(`/get_task_details/${taskType}/${taskId}`);
+        const taskData = await response.json();
+        
+        if (taskData.success) {
+            populateTaskDetailsModal(taskData.task);
+        } else {
+            alert('Error loading task details: ' + taskData.message);
+            closeTaskDetailsModal();
+        }
+    } catch (error) {
+        console.error('Error fetching task details:', error);
+        // Fallback: Try to get data from DOM
+        populateFromDOM(taskId, taskType);
+    }
+}
+
+function populateTaskDetailsModal(task) {
+    console.log("Populating modal with task:", task);
+    
+    // Basic Information
+    document.getElementById('detail-task-title').textContent = task.title || task.purpose_of_call || 'Untitled Task';
+    document.getElementById('detail-task-type').textContent = currentTaskType === 'master' ? 'Mentorship Task' : 'Personal Task';
+    document.getElementById('detail-task-mentee').textContent = task.mentee_name || 'Unknown Mentee';
+    document.getElementById('detail-task-description').textContent = task.description || task.mentee_focus || 'No description provided';
+    
+    // Dates
+    if (task.due_date) {
+        document.getElementById('detail-task-due-date').textContent = new Date(task.due_date).toLocaleDateString('en-US', {
+            year: 'numeric', month: 'short', day: 'numeric'
+        });
+    }
+    
+    if (task.created_at) {
+        document.getElementById('detail-task-created').textContent = new Date(task.created_at).toLocaleDateString();
+    }
+    
+    if (task.updated_at) {
+        document.getElementById('detail-task-updated').textContent = new Date(task.updated_at).toLocaleDateString();
+    }
+    
+    // Status and Priority
+    const statusElement = document.getElementById('detail-task-status');
+    statusElement.textContent = getStatusText(task.status);
+    statusElement.className = 'task-status ' + getStatusClass(task.status);
+    
+    const priorityBadge = document.getElementById('detail-task-priority-badge');
+    if (task.priority) {
+        priorityBadge.textContent = getPriorityText(task.priority);
+        priorityBadge.className = getPriorityClass(task.priority);
+        priorityBadge.style.display = 'inline-block';
+    } else {
+        priorityBadge.style.display = 'none';
+    }
+    
+    // Progress
+    const progress = task.progress || 0;
+    document.getElementById('detail-progress-text').textContent = `${progress}% Complete`;
+    document.getElementById('detail-progress-fill').style.width = `${progress}%`;
+    
+    // Additional fields for personal tasks
+    if (currentTaskType === 'personal') {
+        document.getElementById('edit-task-btn').style.display = 'inline-flex';
+        document.getElementById('detail-task-category').textContent = task.category || 'Not specified';
+        document.getElementById('detail-task-estimated-hours').textContent = task.estimated_hours ? `${task.estimated_hours} hours` : 'Not specified';
+        
+        if (task.additional_instructions) {
+            document.getElementById('detail-task-instructions').textContent = task.additional_instructions;
+            document.getElementById('detail-task-instructions-section').classList.remove('hidden');
+        } else {
+            document.getElementById('detail-task-instructions-section').classList.add('hidden');
+        }
+        document.getElementById('master-task-details').classList.add('hidden');
+    } else {
+        document.getElementById('edit-task-btn').style.display = 'none';
+        document.getElementById('master-task-details').classList.remove('hidden');
+        document.getElementById('detail-task-month').textContent = task.month || 'Not specified';
+        document.getElementById('detail-task-meeting-number').textContent = `Meeting #${task.meeting_number || '1'}`;
+        document.getElementById('detail-task-purpose').textContent = task.purpose_of_call || 'Not specified';
+    }
+}
+
+function populateFromDOM(taskId, taskType) {
+    // Fallback: Try to extract data from the task card in DOM
+    const taskCard = document.querySelector(`[data-task-id="${taskId}"][data-task-type="${taskType}"]`);
+    if (!taskCard) {
+        alert('Task details not found. Please try again.');
+        closeTaskDetailsModal();
+        return;
+    }
+    
+    const title = taskCard.querySelector('h3')?.textContent || 'Untitled Task';
+    const description = taskCard.querySelector('p')?.textContent || 'No description available';
+    const statusElement = taskCard.querySelector('.task-status');
+    const status = statusElement?.textContent.trim() || 'pending';
+    const dueDateElement = taskCard.querySelector('.flex.items-center.gap-1 span');
+    const dueDate = dueDateElement?.textContent.replace('Due: ', '') || 'No due date';
+    const menteeElement = taskCard.querySelectorAll('.flex.items-center.gap-1 span')[1];
+    const mentee = menteeElement?.textContent.replace('Mentee: ', '') || 'Unknown';
+    
+    // Basic population
+    document.getElementById('detail-task-title').textContent = title;
+    document.getElementById('detail-task-type').textContent = taskType === 'master' ? 'Mentorship Task' : 'Personal Task';
+    document.getElementById('detail-task-mentee').textContent = mentee;
+    document.getElementById('detail-task-description').textContent = description;
+    document.getElementById('detail-task-due-date').textContent = dueDate;
+    
+    // Status
+    const statusText = getStatusText(status.toLowerCase());
+    const statusClass = getStatusClass(status.toLowerCase());
+    document.getElementById('detail-task-status').textContent = statusText;
+    document.getElementById('detail-task-status').className = 'task-status ' + statusClass;
+    
+    // Hide edit button for master tasks
+    document.getElementById('edit-task-btn').style.display = taskType === 'personal' ? 'inline-flex' : 'none';
+    document.getElementById('master-task-details').classList.toggle('hidden', taskType !== 'master');
+}
+
+function getStatusText(status) {
+    const statusMap = {
+        'pending': 'To Do',
+        'in-progress': 'In Progress',
+        'completed': 'Completed',
+        'overdue': 'Overdue'
+    };
+    return statusMap[status] || 'To Do';
+}
+
+function getStatusClass(status) {
+    const classMap = {
+        'pending': 'status-pending',
+        'in-progress': 'status-in-progress',
+        'completed': 'status-completed',
+        'overdue': 'status-overdue'
+    };
+    return classMap[status] || 'status-pending';
+}
+
+function getPriorityText(priority) {
+    const priorityMap = {
+        'high': 'High Priority',
+        'medium': 'Medium Priority',
+        'low': 'Low Priority'
+    };
+    return priorityMap[priority] || 'Medium Priority';
+}
+
+function getPriorityClass(priority) {
+    const classMap = {
+        'high': 'priority-high',
+        'medium': 'priority-medium',
+        'low': 'priority-low'
+    };
+    return classMap[priority] || 'priority-medium';
+}
+
+function editCurrentTask() {
+    if (currentTaskId && currentTaskType === 'personal') {
+        editTask(currentTaskId, currentTaskType);
+        closeTaskDetailsModal();
+    }
+}
+
+// ========== OTHER FUNCTIONS (remain the same) ==========
 function openAssignTaskModal() {
     console.log("Opening assign task modal");
     const modal = document.getElementById('assign-task-modal');
@@ -682,13 +926,6 @@ function filterByPriority(priority) {
     filterTasks(currentFilter);
 }
 
-function viewTaskDetails(taskId, taskType) {
-    console.log("Viewing task details:", taskId, taskType);
-    currentTaskId = taskId;
-    currentTaskType = taskType;
-    alert(`Task Details:\nID: ${taskId}\nType: ${taskType}\n\nFull details modal will be implemented in the next update.`);
-}
-
 function editTask(taskId, taskType) {
     console.log("Editing task:", taskId, taskType);
     alert(`Edit Task:\nID: ${taskId}\nType: ${taskType}\n\nEdit functionality will be available in the next update.`);
@@ -698,7 +935,6 @@ function sendReminder() {
     if (!currentTaskId || !currentTaskType) return;
     console.log("Sending reminder for task:", currentTaskId);
     alert('Reminder sent to mentee!');
-    closeTaskDetailsModal();
 }
 
 function switchMenteeTab(menteeId) {
@@ -756,7 +992,7 @@ function renderMenteeTabs() {
     allTab.onclick = () => switchMenteeTab('all');
     tabsContainer.appendChild(allTab);
     
-    // Create tabs for each mentee - ✅ FIXED: Unique variable names
+    // Create tabs for each mentee
     {% for mentee in my_mentees %}
     const menteeTab{{ loop.index }} = document.createElement('button');
     menteeTab{{ loop.index }}.className = 'mentee-tab';
@@ -862,18 +1098,6 @@ document.addEventListener('DOMContentLoaded', function() {
     console.log("DOM loaded - initializing mentor tasks");
     initializePage();
 });
-
-
-
-
-console.log("🔄 Template loaded - checking for duplicates");
-if (window.templateLoaded) {
-    console.error("❌ DUPLICATE SCRIPT DETECTED!");
-} else {
-    window.templateLoaded = true;
-    console.log("✅ First script load - good!");
-}
-
 </script>
 
 {% endblock %}
