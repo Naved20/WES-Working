@@ -2070,7 +2070,6 @@ def get_task_rating(task_type, task_id):
         return jsonify({'success': False, 'message': str(e)})
 
 
-
 @app.route("/get_supervisor_tasks_data")
 def get_supervisor_tasks_data():
     if "email" not in session or session.get("user_type") != "0":
@@ -2108,9 +2107,12 @@ def get_supervisor_tasks_data():
                 'mentorName': mentor.name if mentor else 'Self',
                 'menteeName': mentee.name if mentee else 'Unknown',
                 'category': 'Personal Task',
-                'rating': rating.rating if rating else None,  # Include rating
+                'rating': rating.rating if rating else None,
                 'isCritical': is_critical,
-                'type': 'personal'
+                'type': 'personal',
+                'journey_phase': 'Custom Task',  # Personal tasks don't have journey phase
+                'month': 'N/A',
+                'meeting_number': 'N/A'
             })
         
         # Process mentee tasks
@@ -2140,9 +2142,12 @@ def get_supervisor_tasks_data():
                     'mentorName': mentor.name,
                     'menteeName': mentee.name,
                     'category': 'Mentorship Program',
-                    'rating': rating.rating if rating else None,  # Include rating
+                    'rating': rating.rating if rating else None,
                     'isCritical': is_overdue,
-                    'type': 'master'
+                    'type': 'master',
+                    'journey_phase': master_task.journey_phase,  # Add journey phase
+                    'month': master_task.month,
+                    'meeting_number': task.meeting_number
                 })
 
         # Get unique mentors and mentees
