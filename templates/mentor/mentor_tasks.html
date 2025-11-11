@@ -329,7 +329,7 @@
                     <div class="flex justify-between items-start mb-3">
                         <div class="flex items-center gap-3">
                             <div class="flex items-center gap-2">
-                                <h3 class="text-lg font-semibold text-gray-900">{{ task.master_task.purpose_of_call }}</h3>
+                                <h3 class="text-lg font-semibold text-gray-900">{{ task.master_task.journey_phase }}</h3>
                                 <span class="task-badge">Mentorship Task</span>
                             </div>
                             <span class="task-status 
@@ -354,7 +354,7 @@
                         </div>
                     </div>
                     
-                    <p class="text-gray-600 mb-4">{{ task.master_task.mentee_focus }}</p>
+                    <p class="text-gray-600 mb-4">{{ task.master_task.purpose_of_call }}</p>
                     
                     <div class="flex justify-between items-center">
                         <div class="flex items-center gap-4 text-sm text-gray-500">
@@ -602,7 +602,22 @@
                     <span class="meta-label">Due Date</span>
                     <span id="detail-task-due-date" class="meta-value">2024-01-15</span>
                 </div>
-
+                <div class="meta-item">
+                    <span class="meta-label">Month</span>
+                    <span id="detail-task-month" class="meta-value">Month 1</span>
+                </div>
+                <div class="meta-item">
+                    <span class="meta-label">Meeting</span>
+                    <span id="detail-task-meeting-number" class="meta-value">#1</span>
+                </div>
+            </div>
+            
+            <!-- ✅ PURPOSE OF CALL SECTION (For Master Tasks) -->
+            <div id="purpose-of-call-section" class="hidden">
+                <h4 class="font-semibold text-gray-700 mb-3 text-lg">Purpose of Call</h4>
+                <div id="detail-purpose-of-call" class="text-gray-600 bg-blue-50 p-4 rounded-lg border border-blue-200">
+                    Purpose of call will appear here...
+                </div>
             </div>
             
             <!-- Description -->
@@ -613,13 +628,7 @@
                 </div>
             </div>
             
-            <!-- Additional Instructions -->
-            <div id="detail-task-instructions-section" class="hidden">
-                <h4 class="font-semibold text-gray-700 mb-3 text-lg">Additional Instructions</h4>
-                <div id="detail-task-instructions" class="text-gray-600 bg-gray-50 p-4 rounded-lg border border-gray-200">
-                    Additional instructions will appear here...
-                </div>
-            </div>
+
             
             <!-- Progress Section -->
             <div>
@@ -632,54 +641,13 @@
                 </div>
             </div>
 
-
             <!-- Rating Section -->
-<div id="rating-section">
-    <div class="flex justify-between items-center mb-3">
-        <h4 class="font-semibold text-gray-700 text-lg">Mentor Rating & Feedback</h4>
-        <button onclick="openRatingModal()" class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition flex items-center gap-2 text-sm">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"></path>
-            </svg>
-            Rate Task
-        </button>
-    </div>
-    
-    <div id="rating-display" class="bg-gray-50 p-4 rounded-lg border border-gray-200">
-        <!-- Rating will be displayed here -->
-        <div id="no-rating-message" class="text-center text-gray-500 py-4">
-            No rating provided yet. Click "Rate Task" to provide feedback.
-        </div>
-        <div id="rating-details" class="hidden">
-            <div class="flex items-center gap-3 mb-3">
-                <div id="display-stars" class="flex gap-1"></div>
-                <span id="rating-score" class="font-semibold text-gray-700"></span>
-                <span id="rating-date" class="text-sm text-gray-500"></span>
+            <div id="rating-section">
+                <!-- Your existing rating section -->
             </div>
-            <div class="space-y-3">
-                <div>
-                    <label class="text-sm font-medium text-gray-700">Overall Feedback:</label>
-                    <p id="display-feedback" class="text-gray-600 mt-1"></p>
-                </div>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <label class="text-sm font-medium text-green-700">Strengths:</label>
-                        <p id="display-strengths" class="text-gray-600 mt-1"></p>
-                    </div>
-                    <div>
-                        <label class="text-sm font-medium text-blue-700">Areas for Improvement:</label>
-                        <p id="display-improvements" class="text-gray-600 mt-1"></p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
             
             <!-- Actions -->
             <div class="flex flex-wrap gap-3 pt-6 border-t border-gray-200">
-
                 <button onclick="closeTaskDetailsModal()" class="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition">
                     Close
                 </button>
@@ -806,6 +774,7 @@ function populateTaskDetailsModal(task) {
 
         // Basic Information with null checks
         const titleElement = getElement('detail-task-title');
+        const journeyPhaseElement = getElement('detail-journey-phase');
         const typeElement = getElement('detail-task-type');
         const menteeElement = getElement('detail-task-mentee');
         const descElement = getElement('detail-task-description');
@@ -815,6 +784,22 @@ function populateTaskDetailsModal(task) {
         if (menteeElement) menteeElement.textContent = task.mentee_name || 'Unknown Mentee';
         if (descElement) descElement.textContent = task.description || task.mentee_focus || 'No description provided';
         
+
+                // ✅ PURPOSE OF CALL SECTION
+        const purposeSection = getElement('purpose-of-call-section');
+        const purposeElement = getElement('detail-purpose-of-call');
+        if (purposeSection && purposeElement) {
+            if (task.purpose_of_call) {
+                purposeElement.textContent = task.purpose_of_call;
+                purposeSection.classList.remove('hidden');
+            } else {
+                purposeSection.classList.add('hidden');
+            }
+        }
+
+
+
+
         // Dates with null checks
         const dueDateElement = getElement('detail-task-due-date');
         if (dueDateElement && task.due_date) {
@@ -916,6 +901,7 @@ function populateFromDOM(taskId, taskType) {
         
         // Basic population with null checks
         const titleElement = getElement('detail-task-title');
+        const journeyPhaseElement = getElement('detail-journey-phase');
         const typeElement = getElement('detail-task-type');
         const menteeElement = getElement('detail-task-mentee');
         const descElement = getElement('detail-task-description');

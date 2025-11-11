@@ -479,7 +479,12 @@
                 <h4 class="font-medium text-gray-700 mb-2">Description</h4>
                 <p id="detail-task-description" class="text-gray-600 bg-gray-50 p-4 rounded-lg">Loading task description...</p>
             </div>
-
+            
+            <!-- Instructions -->
+            <div id="detail-instructions-section">
+                <h4 class="font-medium text-gray-700 mb-2">Mentor Instructions</h4>
+                <p id="detail-task-instructions" class="text-gray-600 bg-blue-50 p-4 rounded-lg border border-blue-200">No additional instructions provided.</p>
+            </div>
             
             <!-- Progress -->
             <div>
@@ -494,42 +499,10 @@
                 </div>
             </div>
             
-
-
-
-                 <!-- Rating Section for Supervisor -->
-            <div id="rating-section" class="bg-yellow-50 p-4 rounded-lg border border-yellow-200">
-                <h4 class="font-semibold text-yellow-800 text-lg mb-3">Mentor Rating & Feedback</h4>
-                
-                <div id="rating-display">
-                    <div id="no-rating-message" class="text-center text-yellow-600 py-4">
-                        No rating provided yet for this task.
-                    </div>
-                    <div id="rating-details" class="hidden">
-                        <div class="flex items-center gap-3 mb-4">
-                            <div id="display-stars" class="flex gap-1 text-2xl"></div>
-                            <span id="rating-score" class="font-semibold text-gray-700 text-lg"></span>
-                            <span id="rating-date" class="text-sm text-gray-500 ml-auto"></span>
-                        </div>
-                        
-                        <div class="space-y-3">
-                            <div>
-                                <label class="text-sm font-medium text-gray-700">Overall Feedback:</label>
-                                <p id="display-feedback" class="text-gray-600 mt-1 bg-white p-3 rounded border text-sm"></p>
-                            </div>
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div>
-                                    <label class="text-sm font-medium text-green-700">Strengths:</label>
-                                    <p id="display-strengths" class="text-gray-600 mt-1 bg-white p-3 rounded border text-sm"></p>
-                                </div>
-                                <div>
-                                    <label class="text-sm font-medium text-blue-700">Areas for Improvement:</label>
-                                    <p id="display-improvements" class="text-gray-600 mt-1 bg-white p-3 rounded border text-sm"></p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+            <!-- Mentee Notes -->
+            <div id="mentee-notes-section">
+                <h4 class="font-medium text-gray-700 mb-2">Mentee's Progress Notes</h4>
+                <p id="detail-mentee-notes" class="text-gray-600 bg-yellow-50 p-4 rounded-lg border border-yellow-200">No progress notes provided by mentee yet.</p>
             </div>
             
             <!-- Supervisor Actions -->
@@ -747,25 +720,9 @@ function isTaskOverdue(task) {
 }
 
 // Create individual task HTML
-// Create individual task HTML with rating display
 function createTaskHTML(task) {
     const isOverdue = isTaskOverdue(task);
     
-    // Generate stars HTML based on rating
-    const renderStars = (rating) => {
-        if (!rating || rating === 0) return '<span class="text-gray-400 text-sm">No rating</span>';
-        
-        let stars = '';
-        for (let i = 1; i <= 5; i++) {
-            if (i <= rating) {
-                stars += '<span class="text-yellow-400">★</span>';
-            } else {
-                stars += '<span class="text-gray-300">★</span>';
-            }
-        }
-        return `<div class="flex gap-1 items-center">${stars} <span class="text-sm text-gray-600 ml-1">${rating}/5</span></div>`;
-    };
-
     return `
         <div class="task-card p-6 ${task.status === 'completed' ? 'completed' : ''} ${task.isCritical || isOverdue ? 'urgent' : ''}">
             <div class="flex justify-between items-start mb-3">
@@ -802,23 +759,6 @@ function createTaskHTML(task) {
             
             <p class="text-gray-600 mb-4 line-clamp-2">${task.description || 'No description available'}</p>
             
-            <!-- Rating Display -->
-            <div class="mb-4 p-3 bg-yellow-50 rounded-lg border border-yellow-200">
-                <div class="flex items-center justify-between">
-                    <span class="text-sm font-medium text-yellow-800">Mentor Rating:</span>
-                    <div id="rating-${task.id}">
-                        ${renderStars(task.rating)}
-                    </div>
-                </div>
-                ${task.rating ? `
-                <div class="mt-2 text-xs text-yellow-700">
-                    <button onclick="loadTaskRatingDetails('${task.id}')" class="text-blue-600 hover:text-blue-800 underline">
-                        View detailed feedback
-                    </button>
-                </div>
-                ` : ''}
-            </div>
-            
             <div class="flex justify-between items-center">
                 <div class="flex items-center gap-4 text-sm text-gray-500">
                     <div class="flex items-center gap-1">
@@ -829,6 +769,7 @@ function createTaskHTML(task) {
                     </div>
                     <span class="priority-${task.priority}">${task.priority ? task.priority.charAt(0).toUpperCase() + task.priority.slice(1) + ' Priority' : 'No Priority'}</span>
                     <span class="badge badge-primary">${task.category}</span>
+                    ${task.score ? `<span class="badge badge-success">Score: ${task.score}/5</span>` : ''}
                 </div>
                 
                 ${task.status !== 'completed' ? `
@@ -852,7 +793,6 @@ function createTaskHTML(task) {
         </div>
     `;
 }
-
 
 // Helper functions
 function getStatusClass(status) {
@@ -1036,126 +976,6 @@ function showNotification(message, type) {
 
 // Initialize when page loads
 document.addEventListener('DOMContentLoaded', initializePage);
-
-
-
-// ========== SUPERVISOR RATING FUNCTIONS ==========
-
-// Load and display rating for supervisor view
-async function loadAndDisplayRating(taskId, taskType) {
-    try {
-        console.log('🔍 Supervisor loading rating for:', taskId, taskType);
-        
-        const response = await fetch(`/supervisor_get_task_rating/${taskType}/${taskId}`);
-        
-        if (!response.ok) {
-            console.error('❌ Rating fetch failed with status:', response.status);
-            return;
-        }
-        
-        const result = await response.json();
-        console.log('✅ Supervisor rating data received:', result);
-        
-        const noRatingMsg = document.getElementById('no-rating-message');
-        const ratingDetails = document.getElementById('rating-details');
-        
-        if (!noRatingMsg || !ratingDetails) {
-            console.warn('❌ Rating display elements not found');
-            return;
-        }
-        
-        if (result.success && result.rating) {
-            noRatingMsg.classList.add('hidden');
-            ratingDetails.classList.remove('hidden');
-            
-            // Display stars
-            const starsContainer = document.getElementById('display-stars');
-            if (starsContainer) {
-                starsContainer.innerHTML = '';
-                for (let i = 1; i <= 5; i++) {
-                    const star = document.createElement('span');
-                    star.className = i <= result.rating.rating ? 'text-yellow-400' : 'text-gray-300';
-                    star.innerHTML = '★';
-                    starsContainer.appendChild(star);
-                }
-            }
-            
-            // Display rating details
-            const ratingScore = document.getElementById('rating-score');
-            const ratingDate = document.getElementById('rating-date');
-            const displayFeedback = document.getElementById('display-feedback');
-            const displayStrengths = document.getElementById('display-strengths');
-            const displayImprovements = document.getElementById('display-improvements');
-            
-            if (ratingScore) ratingScore.textContent = `${result.rating.rating}/5`;
-            if (ratingDate) ratingDate.textContent = `Rated on ${new Date(result.rating.rated_at).toLocaleDateString()}`;
-            if (displayFeedback) displayFeedback.textContent = result.rating.feedback || 'No overall feedback provided';
-            if (displayStrengths) displayStrengths.textContent = result.rating.strengths || 'Not specified';
-            if (displayImprovements) displayImprovements.textContent = result.rating.improvements || 'Not specified';
-        } else {
-            console.log('ℹ️ No rating found for this task');
-            noRatingMsg.classList.remove('hidden');
-            ratingDetails.classList.add('hidden');
-        }
-    } catch (error) {
-        console.error('❌ Error loading rating:', error);
-    }
-}
-
-// Load task rating details in modal
-async function loadTaskRatingDetails(taskId) {
-    // Extract task type and ID from the combined ID
-    const [taskType, actualTaskId] = taskId.split('_');
-    
-    // Find the task to show details
-    const task = allTasks.find(t => t.id === taskId);
-    if (task) {
-        // Populate basic task details first
-        document.getElementById('detail-task-title').textContent = task.title;
-        document.getElementById('detail-task-mentor').textContent = task.mentorName;
-        document.getElementById('detail-task-mentee').textContent = task.menteeName;
-        document.getElementById('detail-task-status').textContent = getStatusText(task.status);
-        document.getElementById('detail-task-status').className = `task-status ${getStatusClass(task.status)}`;
-        
-        // Then load and display rating
-        await loadAndDisplayRating(actualTaskId, taskType);
-        
-        document.getElementById('task-details-modal').classList.remove('hidden');
-    }
-}
-
-// Update task details view to include rating
-function viewTaskDetails(taskId) {
-    const task = allTasks.find(t => t.id === taskId);
-    if (task) {
-        // Populate basic task details
-        document.getElementById('detail-task-title').textContent = task.title;
-        document.getElementById('detail-task-mentor').textContent = task.mentorName;
-        document.getElementById('detail-task-mentee').textContent = task.menteeName;
-        document.getElementById('detail-task-status').textContent = getStatusText(task.status);
-        document.getElementById('detail-task-status').className = `task-status ${getStatusClass(task.status)}`;
-        document.getElementById('detail-task-priority').textContent = task.priority ? task.priority.charAt(0).toUpperCase() + task.priority.slice(1) : 'Not set';
-        document.getElementById('detail-task-priority').className = `priority-${task.priority || 'medium'}`;
-        document.getElementById('detail-task-due-date').textContent = formatDate(task.dueDate);
-        document.getElementById('detail-task-category').textContent = task.category;
-        document.getElementById('detail-task-description').textContent = task.description || 'No description available';
-        document.getElementById('detail-progress-fill').style.width = `${task.progress || 0}%`;
-        document.getElementById('detail-progress-text').textContent = `${task.progress || 0}%`;
-        
-        // Extract task type and ID from the combined ID
-        const [taskType, actualTaskId] = task.id.split('_');
-        
-        // Load and display rating
-        loadAndDisplayRating(actualTaskId, taskType);
-        
-        document.getElementById('task-details-modal').classList.remove('hidden');
-    }
-}
-
-
-
-
-
 </script>
 
 {% endblock %}

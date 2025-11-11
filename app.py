@@ -1916,6 +1916,7 @@ def get_mentor_task_details(task_id):
                 "id": task.id,
                 "type": "master",
                 "title": task.master_task.purpose_of_call,
+                "purpose_of_call": task.master_task.journey_phase,
                 "description": task.master_task.mentee_focus,
                 "due_date": task.due_date.strftime('%Y-%m-%d') if task.due_date else None,
                 "status": task.status,
