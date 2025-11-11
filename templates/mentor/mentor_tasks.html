@@ -441,11 +441,7 @@
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
                                 </svg>
                             </button>
-                            <button onclick="editTask({{ task.id }}, 'personal')" class="p-2 text-gray-400 hover:text-yellow-600 transition">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
-                                </svg>
-                            </button>
+
                         </div>
                     </div>
                     
@@ -606,22 +602,7 @@
                     <span class="meta-label">Due Date</span>
                     <span id="detail-task-due-date" class="meta-value">2024-01-15</span>
                 </div>
-                <div class="meta-item">
-                    <span class="meta-label">Category</span>
-                    <span id="detail-task-category" class="meta-value">Programming</span>
-                </div>
-                <div class="meta-item">
-                    <span class="meta-label">Estimated Hours</span>
-                    <span id="detail-task-estimated-hours" class="meta-value">5 hours</span>
-                </div>
-                <div class="meta-item">
-                    <span class="meta-label">Created On</span>
-                    <span id="detail-task-created" class="meta-value">2024-01-01</span>
-                </div>
-                <div class="meta-item">
-                    <span class="meta-label">Last Updated</span>
-                    <span id="detail-task-updated" class="meta-value">2024-01-05</span>
-                </div>
+
             </div>
             
             <!-- Description -->
@@ -651,6 +632,50 @@
                 </div>
             </div>
 
+
+            <!-- Rating Section -->
+<div id="rating-section">
+    <div class="flex justify-between items-center mb-3">
+        <h4 class="font-semibold text-gray-700 text-lg">Mentor Rating & Feedback</h4>
+        <button onclick="openRatingModal()" class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition flex items-center gap-2 text-sm">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"></path>
+            </svg>
+            Rate Task
+        </button>
+    </div>
+    
+    <div id="rating-display" class="bg-gray-50 p-4 rounded-lg border border-gray-200">
+        <!-- Rating will be displayed here -->
+        <div id="no-rating-message" class="text-center text-gray-500 py-4">
+            No rating provided yet. Click "Rate Task" to provide feedback.
+        </div>
+        <div id="rating-details" class="hidden">
+            <div class="flex items-center gap-3 mb-3">
+                <div id="display-stars" class="flex gap-1"></div>
+                <span id="rating-score" class="font-semibold text-gray-700"></span>
+                <span id="rating-date" class="text-sm text-gray-500"></span>
+            </div>
+            <div class="space-y-3">
+                <div>
+                    <label class="text-sm font-medium text-gray-700">Overall Feedback:</label>
+                    <p id="display-feedback" class="text-gray-600 mt-1"></p>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="text-sm font-medium text-green-700">Strengths:</label>
+                        <p id="display-strengths" class="text-gray-600 mt-1"></p>
+                    </div>
+                    <div>
+                        <label class="text-sm font-medium text-blue-700">Areas for Improvement:</label>
+                        <p id="display-improvements" class="text-gray-600 mt-1"></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
             
             <!-- Actions -->
             <div class="flex flex-wrap gap-3 pt-6 border-t border-gray-200">
@@ -663,8 +688,64 @@
     </div>
 </div>
 
+<!-- Rating Modal -->
+<div id="rating-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+    <div class="bg-white rounded-xl p-6 w-full max-w-2xl mx-4 max-h-[90vh] overflow-y-auto">
+        <div class="flex justify-between items-start mb-6">
+            <div>
+                <h3 class="text-xl font-semibold text-gray-900">Rate Task</h3>
+                <p id="rating-task-title" class="text-gray-600 mt-1">Task Title</p>
+            </div>
+            <button onclick="closeRatingModal()" class="text-gray-400 hover:text-gray-600">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+            </button>
+        </div>
+        
+        <form id="rating-form" class="space-y-6">
+            <!-- Star Rating -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-3">Rating *</label>
+                <div class="flex gap-2" id="star-rating">
+                    <!-- Stars will be populated by JavaScript -->
+                </div>
+                <input type="hidden" id="selected-rating" name="rating" required>
+            </div>
+            
+            <!-- Feedback -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Overall Feedback</label>
+                <textarea id="rating-feedback" name="feedback" rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="Share your overall feedback about the task completion..."></textarea>
+            </div>
+            
+            <!-- Strengths -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">What went well? *</label>
+                <textarea id="rating-strengths" name="strengths" rows="2" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="What did the mentee do particularly well?" required></textarea>
+            </div>
+            
+            <!-- Improvements -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Areas for Improvement *</label>
+                <textarea id="rating-improvements" name="improvements" rows="2" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="What could be improved next time?" required></textarea>
+            </div>
+            
+            <div class="flex justify-end gap-3 pt-4 border-t border-gray-200">
+                <button type="button" onclick="closeRatingModal()" class="px-4 py-2 text-gray-600 hover:text-gray-800 transition">Cancel</button>
+                <button type="submit" class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"></path>
+                    </svg>
+                    Submit Rating
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
 <script>
-// ========== GLOBAL VARIABLES ==========
+    // ========== GLOBAL VARIABLES ==========
 let currentTaskId = null;
 let currentTaskType = null;
 let currentFilter = 'all';
@@ -680,14 +761,24 @@ async function viewTaskDetails(taskId, taskType) {
     try {
         // Show loading state
         const modal = document.getElementById('task-details-modal');
+        if (!modal) {
+            console.error('Task details modal not found');
+            return;
+        }
         modal.classList.remove('hidden');
         
         // Fetch task details from server
-        const response = await fetch(`/get_task_details/${taskType}/${taskId}`);
+        const response = await fetch(`/get_mentor_task_details/${taskId}?type=${taskType}`);
+
+        if (!response.ok) {
+            throw new Error(`Server returned ${response.status} error`);
+        }
+
         const taskData = await response.json();
-        
+
         if (taskData.success) {
             populateTaskDetailsModal(taskData.task);
+            await loadAndDisplayRating(taskId, taskType);
         } else {
             alert('Error loading task details: ' + taskData.message);
             closeTaskDetailsModal();
@@ -702,102 +793,157 @@ async function viewTaskDetails(taskId, taskType) {
 function populateTaskDetailsModal(task) {
     console.log("Populating modal with task:", task);
     
-    // Basic Information
-    document.getElementById('detail-task-title').textContent = task.title || task.purpose_of_call || 'Untitled Task';
-    document.getElementById('detail-task-type').textContent = currentTaskType === 'master' ? 'Mentorship Task' : 'Personal Task';
-    document.getElementById('detail-task-mentee').textContent = task.mentee_name || 'Unknown Mentee';
-    document.getElementById('detail-task-description').textContent = task.description || task.mentee_focus || 'No description provided';
-    
-    // Dates
-    if (task.due_date) {
-        document.getElementById('detail-task-due-date').textContent = new Date(task.due_date).toLocaleDateString('en-US', {
-            year: 'numeric', month: 'short', day: 'numeric'
-        });
-    }
-    
-    if (task.created_at) {
-        document.getElementById('detail-task-created').textContent = new Date(task.created_at).toLocaleDateString();
-    }
-    
-    if (task.updated_at) {
-        document.getElementById('detail-task-updated').textContent = new Date(task.updated_at).toLocaleDateString();
-    }
-    
-    // Status and Priority
-    const statusElement = document.getElementById('detail-task-status');
-    statusElement.textContent = getStatusText(task.status);
-    statusElement.className = 'task-status ' + getStatusClass(task.status);
-    
-    const priorityBadge = document.getElementById('detail-task-priority-badge');
-    if (task.priority) {
-        priorityBadge.textContent = getPriorityText(task.priority);
-        priorityBadge.className = getPriorityClass(task.priority);
-        priorityBadge.style.display = 'inline-block';
-    } else {
-        priorityBadge.style.display = 'none';
-    }
-    
-    // Progress
-    const progress = task.progress || 0;
-    document.getElementById('detail-progress-text').textContent = `${progress}% Complete`;
-    document.getElementById('detail-progress-fill').style.width = `${progress}%`;
-    
-    // Additional fields for personal tasks
-    if (currentTaskType === 'personal') {
-        document.getElementById('edit-task-btn').style.display = 'inline-flex';
-        document.getElementById('detail-task-category').textContent = task.category || 'Not specified';
-        document.getElementById('detail-task-estimated-hours').textContent = task.estimated_hours ? `${task.estimated_hours} hours` : 'Not specified';
+    try {
+        // ✅ SAFE ELEMENT SELECTION WITH NULL CHECKING
+        const getElement = (id) => {
+            const element = document.getElementById(id);
+            if (!element) {
+                console.warn(`Element #${id} not found`);
+                return null;
+            }
+            return element;
+        };
+
+        // Basic Information with null checks
+        const titleElement = getElement('detail-task-title');
+        const typeElement = getElement('detail-task-type');
+        const menteeElement = getElement('detail-task-mentee');
+        const descElement = getElement('detail-task-description');
         
-        if (task.additional_instructions) {
-            document.getElementById('detail-task-instructions').textContent = task.additional_instructions;
-            document.getElementById('detail-task-instructions-section').classList.remove('hidden');
-        } else {
-            document.getElementById('detail-task-instructions-section').classList.add('hidden');
+        if (titleElement) titleElement.textContent = task.title || task.purpose_of_call || 'Untitled Task';
+        if (typeElement) typeElement.textContent = currentTaskType === 'master' ? 'Mentorship Task' : 'Personal Task';
+        if (menteeElement) menteeElement.textContent = task.mentee_name || 'Unknown Mentee';
+        if (descElement) descElement.textContent = task.description || task.mentee_focus || 'No description provided';
+        
+        // Dates with null checks
+        const dueDateElement = getElement('detail-task-due-date');
+        if (dueDateElement && task.due_date) {
+            dueDateElement.textContent = new Date(task.due_date).toLocaleDateString('en-US', {
+                year: 'numeric', month: 'short', day: 'numeric'
+            });
         }
-        document.getElementById('master-task-details').classList.add('hidden');
-    } else {
-        document.getElementById('edit-task-btn').style.display = 'none';
-        document.getElementById('master-task-details').classList.remove('hidden');
-        document.getElementById('detail-task-month').textContent = task.month || 'Not specified';
-        document.getElementById('detail-task-meeting-number').textContent = `Meeting #${task.meeting_number || '1'}`;
-        document.getElementById('detail-task-purpose').textContent = task.purpose_of_call || 'Not specified';
+        
+        // Status and Priority with null checks
+        const statusElement = getElement('detail-task-status');
+        if (statusElement) {
+            statusElement.textContent = getStatusText(task.status);
+            statusElement.className = 'task-status ' + getStatusClass(task.status);
+        }
+        
+        const priorityBadge = getElement('detail-task-priority-badge');
+        if (priorityBadge) {
+            if (task.priority) {
+                priorityBadge.textContent = getPriorityText(task.priority);
+                priorityBadge.className = getPriorityClass(task.priority);
+                priorityBadge.style.display = 'inline-block';
+            } else {
+                priorityBadge.style.display = 'none';
+            }
+        }
+        
+        // Progress with null checks
+        const progress = task.progress || 0;
+        const progressText = getElement('detail-progress-text');
+        const progressFill = getElement('detail-progress-fill');
+        
+        if (progressText) progressText.textContent = `${progress}% Complete`;
+        if (progressFill) progressFill.style.width = `${progress}%`;
+        
+        // Additional fields for personal tasks
+        if (currentTaskType === 'personal') {
+            const editBtn = getElement('edit-task-btn');
+            if (editBtn) editBtn.style.display = 'inline-flex';
+            
+            const categoryElement = getElement('detail-task-category');
+            if (categoryElement) categoryElement.textContent = task.category || 'Not specified';
+            
+            const hoursElement = getElement('detail-task-estimated-hours');
+            if (hoursElement) hoursElement.textContent = task.estimated_hours ? `${task.estimated_hours} hours` : 'Not specified';
+            
+            const instructionsSection = getElement('detail-task-instructions-section');
+            const instructionsElement = getElement('detail-task-instructions');
+            if (instructionsSection && instructionsElement) {
+                if (task.additional_instructions) {
+                    instructionsElement.textContent = task.additional_instructions;
+                    instructionsSection.classList.remove('hidden');
+                } else {
+                    instructionsSection.classList.add('hidden');
+                }
+            }
+            
+            const masterDetails = getElement('master-task-details');
+            if (masterDetails) masterDetails.classList.add('hidden');
+        } else {
+            const editBtn = getElement('edit-task-btn');
+            if (editBtn) editBtn.style.display = 'none';
+            
+            const masterDetails = getElement('master-task-details');
+            if (masterDetails) masterDetails.classList.remove('hidden');
+            
+            const monthElement = getElement('detail-task-month');
+            if (monthElement) monthElement.textContent = task.month || 'Not specified';
+            
+            const meetingElement = getElement('detail-task-meeting-number');
+            if (meetingElement) meetingElement.textContent = `Meeting #${task.meeting_number || '1'}`;
+            
+            const purposeElement = getElement('detail-task-purpose');
+            if (purposeElement) purposeElement.textContent = task.purpose_of_call || 'Not specified';
+        }
+    } catch (error) {
+        console.error('Error in populateTaskDetailsModal:', error);
     }
 }
 
 function populateFromDOM(taskId, taskType) {
-    // Fallback: Try to extract data from the task card in DOM
-    const taskCard = document.querySelector(`[data-task-id="${taskId}"][data-task-type="${taskType}"]`);
-    if (!taskCard) {
-        alert('Task details not found. Please try again.');
-        closeTaskDetailsModal();
-        return;
+    try {
+        const taskCard = document.querySelector(`[data-task-id="${taskId}"][data-task-type="${taskType}"]`);
+        if (!taskCard) {
+            alert('Task details not found. Please try again.');
+            closeTaskDetailsModal();
+            return;
+        }
+        
+        const getElement = (id) => document.getElementById(id);
+        
+        const title = taskCard.querySelector('h3')?.textContent || 'Untitled Task';
+        const description = taskCard.querySelector('p')?.textContent || 'No description available';
+        const statusElement = taskCard.querySelector('.task-status');
+        const status = statusElement?.textContent.trim().toLowerCase() || 'pending';
+        const dueDateElement = taskCard.querySelector('.flex.items-center.gap-1 span');
+        const dueDate = dueDateElement?.textContent.replace('Due: ', '') || 'No due date';
+        const menteeElements = taskCard.querySelectorAll('.flex.items-center.gap-1 span');
+        const mentee = menteeElements[1]?.textContent.replace('Mentee: ', '') || 'Unknown';
+        
+        // Basic population with null checks
+        const titleElement = getElement('detail-task-title');
+        const typeElement = getElement('detail-task-type');
+        const menteeElement = getElement('detail-task-mentee');
+        const descElement = getElement('detail-task-description');
+        const dueDateDisplay = getElement('detail-task-due-date');
+        const statusDisplay = getElement('detail-task-status');
+        const editBtn = getElement('edit-task-btn');
+        const masterDetails = getElement('master-task-details');
+        
+        if (titleElement) titleElement.textContent = title;
+        if (typeElement) typeElement.textContent = taskType === 'master' ? 'Mentorship Task' : 'Personal Task';
+        if (menteeElement) menteeElement.textContent = mentee;
+        if (descElement) descElement.textContent = description;
+        if (dueDateDisplay) dueDateDisplay.textContent = dueDate;
+        
+        // Status
+        const statusText = getStatusText(status.toLowerCase());
+        const statusClass = getStatusClass(status.toLowerCase());
+        if (statusDisplay) {
+            statusDisplay.textContent = statusText;
+            statusDisplay.className = 'task-status ' + statusClass;
+        }
+        
+        // Hide edit button for master tasks
+        if (editBtn) editBtn.style.display = taskType === 'personal' ? 'inline-flex' : 'none';
+        if (masterDetails) masterDetails.classList.toggle('hidden', taskType !== 'master');
+    } catch (error) {
+        console.error('Error in populateFromDOM:', error);
     }
-    
-    const title = taskCard.querySelector('h3')?.textContent || 'Untitled Task';
-    const description = taskCard.querySelector('p')?.textContent || 'No description available';
-    const statusElement = taskCard.querySelector('.task-status');
-    const status = statusElement?.textContent.trim() || 'pending';
-    const dueDateElement = taskCard.querySelector('.flex.items-center.gap-1 span');
-    const dueDate = dueDateElement?.textContent.replace('Due: ', '') || 'No due date';
-    const menteeElement = taskCard.querySelectorAll('.flex.items-center.gap-1 span')[1];
-    const mentee = menteeElement?.textContent.replace('Mentee: ', '') || 'Unknown';
-    
-    // Basic population
-    document.getElementById('detail-task-title').textContent = title;
-    document.getElementById('detail-task-type').textContent = taskType === 'master' ? 'Mentorship Task' : 'Personal Task';
-    document.getElementById('detail-task-mentee').textContent = mentee;
-    document.getElementById('detail-task-description').textContent = description;
-    document.getElementById('detail-task-due-date').textContent = dueDate;
-    
-    // Status
-    const statusText = getStatusText(status.toLowerCase());
-    const statusClass = getStatusClass(status.toLowerCase());
-    document.getElementById('detail-task-status').textContent = statusText;
-    document.getElementById('detail-task-status').className = 'task-status ' + statusClass;
-    
-    // Hide edit button for master tasks
-    document.getElementById('edit-task-btn').style.display = taskType === 'personal' ? 'inline-flex' : 'none';
-    document.getElementById('master-task-details').classList.toggle('hidden', taskType !== 'master');
 }
 
 function getStatusText(status) {
@@ -838,14 +984,7 @@ function getPriorityClass(priority) {
     return classMap[priority] || 'priority-medium';
 }
 
-function editCurrentTask() {
-    if (currentTaskId && currentTaskType === 'personal') {
-        editTask(currentTaskId, currentTaskType);
-        closeTaskDetailsModal();
-    }
-}
-
-// ========== OTHER FUNCTIONS (remain the same) ==========
+// ========== OTHER FUNCTIONS ==========
 function openAssignTaskModal() {
     console.log("Opening assign task modal");
     const modal = document.getElementById('assign-task-modal');
@@ -924,11 +1063,6 @@ function filterByPriority(priority) {
     console.log("Filtering by priority:", priority);
     currentPriorityFilter = priority;
     filterTasks(currentFilter);
-}
-
-function editTask(taskId, taskType) {
-    console.log("Editing task:", taskId, taskType);
-    alert(`Edit Task:\nID: ${taskId}\nType: ${taskType}\n\nEdit functionality will be available in the next update.`);
 }
 
 function sendReminder() {
@@ -1098,6 +1232,271 @@ document.addEventListener('DOMContentLoaded', function() {
     console.log("DOM loaded - initializing mentor tasks");
     initializePage();
 });
+
+// ========== RATING FUNCTIONS ==========
+function openRatingModal() {
+    if (!currentTaskId || !currentTaskType) {
+        alert('No task selected for rating');
+        return;
+    }
+    
+    const modal = document.getElementById('rating-modal');
+    if (!modal) {
+        console.error('Rating modal not found');
+        return;
+    }
+    
+    const taskTitle = document.getElementById('detail-task-title');
+    if (!taskTitle) {
+        console.error('Task title element not found');
+        return;
+    }
+    
+    document.getElementById('rating-task-title').textContent = taskTitle.textContent;
+    initializeStarRating();
+    loadExistingRating();
+    
+    modal.classList.remove('hidden');
+}
+
+function closeRatingModal() {
+    const modal = document.getElementById('rating-modal');
+    if (modal) modal.classList.add('hidden');
+    const form = document.getElementById('rating-form');
+    if (form) form.reset();
+    resetStars();
+}
+
+function initializeStarRating() {
+    const starContainer = document.getElementById('star-rating');
+    if (!starContainer) {
+        console.error('Star rating container not found');
+        return;
+    }
+    
+    starContainer.innerHTML = '';
+    
+    for (let i = 1; i <= 5; i++) {
+        const star = document.createElement('button');
+        star.type = 'button';
+        star.className = 'text-2xl transition transform hover:scale-110';
+        star.innerHTML = '★';
+        star.dataset.rating = i;
+        star.onclick = () => setRating(i);
+        
+        starContainer.appendChild(star);
+    }
+    
+    resetStars();
+}
+
+function setRating(rating) {
+    const selectedRating = document.getElementById('selected-rating');
+    if (selectedRating) {
+        selectedRating.value = rating;
+    }
+    
+    const stars = document.querySelectorAll('#star-rating button');
+    stars.forEach((star, index) => {
+        if (index < rating) {
+            star.style.color = '#fbbf24'; // Gold color for selected stars
+        } else {
+            star.style.color = '#d1d5db'; // Gray color for unselected stars
+        }
+    });
+}
+
+function resetStars() {
+    const stars = document.querySelectorAll('#star-rating button');
+    stars.forEach(star => {
+        star.style.color = '#d1d5db';
+    });
+    const selectedRating = document.getElementById('selected-rating');
+    if (selectedRating) {
+        selectedRating.value = '';
+    }
+}
+
+async function loadExistingRating() {
+    try {
+        const response = await fetch(`/get_task_rating/${currentTaskType}/${currentTaskId}`);
+        
+        if (!response.ok) {
+            console.error('Rating fetch failed with status:', response.status);
+            return;
+        }
+        
+        const contentType = response.headers.get('content-type');
+        if (!contentType || !contentType.includes('application/json')) {
+            const text = await response.text();
+            console.error('Server returned non-JSON response for rating:', text.substring(0, 200));
+            return;
+        }
+        
+        const result = await response.json();
+        
+        if (result.success && result.rating) {
+            // Populate form with existing rating
+            setRating(result.rating.rating);
+            const feedback = document.getElementById('rating-feedback');
+            const strengths = document.getElementById('rating-strengths');
+            const improvements = document.getElementById('rating-improvements');
+            
+            if (feedback) feedback.value = result.rating.feedback || '';
+            if (strengths) strengths.value = result.rating.strengths || '';
+            if (improvements) improvements.value = result.rating.improvements || '';
+        } else {
+            // Reset form for new rating
+            const form = document.getElementById('rating-form');
+            if (form) form.reset();
+            resetStars();
+        }
+    } catch (error) {
+        console.error('Error loading existing rating:', error);
+    }
+}
+
+
+document.addEventListener('DOMContentLoaded', function() {
+    const ratingForm = document.getElementById('rating-form');
+    if (ratingForm) {
+        ratingForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            if (!currentTaskId || !currentTaskType) {
+                alert('No task selected for rating');
+                return;
+            }
+            
+            const formData = new FormData(this);
+            const ratingData = {
+                rating: parseInt(formData.get('rating')),
+                feedback: formData.get('feedback') || '',
+                strengths: formData.get('strengths') || '',
+                improvements: formData.get('improvements') || ''
+            };
+            
+            // Validation
+            if (!ratingData.rating || ratingData.rating < 1 || ratingData.rating > 5) {
+                alert('Please select a valid rating between 1-5');
+                return;
+            }
+            
+            if (!ratingData.strengths.trim()) {
+                alert('Please provide strengths');
+                return;
+            }
+            
+            if (!ratingData.improvements.trim()) {
+                alert('Please provide areas for improvement');
+                return;
+            }
+            
+            try {
+                console.log('Submitting rating for task:', currentTaskId, currentTaskType);
+                
+                const response = await fetch(`/rate_task/${currentTaskType}/${currentTaskId}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(ratingData)
+                });
+
+                // Check if response is JSON
+                const contentType = response.headers.get('content-type');
+                let result;
+                
+                if (contentType && contentType.includes('application/json')) {
+                    result = await response.json();
+                } else {
+                    const text = await response.text();
+                    throw new Error('Server returned non-JSON response');
+                }
+                
+                if (result.success) {
+                    alert('Rating submitted successfully!');
+                    closeRatingModal();
+                    // Reload the rating display
+                    await loadAndDisplayRating(currentTaskId, currentTaskType);
+                } else {
+                    alert('Error: ' + result.message);
+                }
+            } catch (error) {
+                console.error('Error submitting rating:', error);
+                alert('Error submitting rating. Please try again.');
+            }
+        });
+    }
+});
+
+
+
+
+
+async function loadAndDisplayRating(taskId, taskType) {
+    try {
+        const response = await fetch(`/get_task_rating/${taskType}/${taskId}`);
+        
+        // ✅ ADD RESPONSE CHECKING
+        if (!response.ok) {
+            console.error('Rating fetch failed with status:', response.status);
+            return;
+        }
+        
+        const contentType = response.headers.get('content-type');
+        if (!contentType || !contentType.includes('application/json')) {
+            console.error('Server returned non-JSON response for rating');
+            return;
+        }
+        
+        const result = await response.json();
+        
+        const noRatingMsg = document.getElementById('no-rating-message');
+        const ratingDetails = document.getElementById('rating-details');
+        
+        if (!noRatingMsg || !ratingDetails) {
+            console.warn('Rating display elements not found');
+            return;
+        }
+        
+        if (result.success && result.rating) {
+            noRatingMsg.classList.add('hidden');
+            ratingDetails.classList.remove('hidden');
+            
+            // Display stars
+            const starsContainer = document.getElementById('display-stars');
+            if (starsContainer) {
+                starsContainer.innerHTML = '';
+                for (let i = 1; i <= 5; i++) {
+                    const star = document.createElement('span');
+                    star.className = 'text-xl';
+                    star.innerHTML = i <= result.rating.rating ? '★' : '☆';
+                    star.style.color = i <= result.rating.rating ? '#fbbf24' : '#d1d5db';
+                    starsContainer.appendChild(star);
+                }
+            }
+            
+            // Display rating details with null checks
+            const ratingScore = document.getElementById('rating-score');
+            const ratingDate = document.getElementById('rating-date');
+            const displayFeedback = document.getElementById('display-feedback');
+            const displayStrengths = document.getElementById('display-strengths');
+            const displayImprovements = document.getElementById('display-improvements');
+            
+            if (ratingScore) ratingScore.textContent = `${result.rating.rating}/5`;
+            if (ratingDate) ratingDate.textContent = `Rated on ${new Date(result.rating.rated_at).toLocaleDateString()}`;
+            if (displayFeedback) displayFeedback.textContent = result.rating.feedback || 'No overall feedback provided';
+            if (displayStrengths) displayStrengths.textContent = result.rating.strengths || 'Not specified';
+            if (displayImprovements) displayImprovements.textContent = result.rating.improvements || 'Not specified';
+        } else {
+            noRatingMsg.classList.remove('hidden');
+            ratingDetails.classList.add('hidden');
+        }
+    } catch (error) {
+        console.error('Error loading rating:', error);
+    }
+}
 </script>
 
 {% endblock %}
