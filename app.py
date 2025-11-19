@@ -1495,6 +1495,19 @@ def mentee_tasks():
         .order_by(PersonalTask.created_date.desc())\
         .all()
     
+    # Add serial numbers: continue numbering across assigned + personal tasks
+    try:
+        start_index = 1
+        for i, t in enumerate(assigned_tasks, start_index):
+            setattr(t, 'serial', i)
+        # personal tasks continue numbering after assigned tasks
+        start_index = len(assigned_tasks) + 1
+        for i, t in enumerate(personal_tasks, start=start_index):
+            setattr(t, 'serial', i)
+    except Exception:
+        # If we can't set attributes (unlikely), ignore and continue
+        pass
+
     # Calculate statistics
     total_tasks = len(assigned_tasks) + len(personal_tasks)
     completed_tasks = len([t for t in assigned_tasks if t.status == 'completed']) + len([t for t in personal_tasks if t.status == 'completed'])
@@ -1805,6 +1818,18 @@ def mentor_tasks():
          .order_by(MenteeTask.meeting_number)\
          .all()
         all_mentee_tasks.extend(tasks)
+
+    # Assign serial numbers across mentor's personal tasks and mentee master tasks
+    try:
+        idx = 1
+        for t in personal_tasks:
+            setattr(t, 'serial', idx)
+            idx += 1
+        for t in all_mentee_tasks:
+            setattr(t, 'serial', idx)
+            idx += 1
+    except Exception:
+        pass
 
     # Calculate statistics
     all_tasks = list(personal_tasks) + list(all_mentee_tasks)
@@ -2151,6 +2176,13 @@ def get_supervisor_tasks_data():
                 })
 
         # Get unique mentors and mentees
+        # Add serial numbers to tasks for frontend display
+        for i, t in enumerate(tasks, start=1):
+            try:
+                t['serial'] = i
+            except Exception:
+                pass
+
         mentors = list(set([task['mentorName'] for task in tasks]))
         mentees = list(set([task['menteeName'] for task in tasks]))
 
@@ -2238,7 +2270,13 @@ def supervisor_tasks():
             })
         
         print(f"🎯 Total tasks prepared: {len(all_tasks)}")
-        
+        # Add serial numbers to all_tasks (dicts) for display
+        for i, task in enumerate(all_tasks, start=1):
+            try:
+                task['serial'] = i
+            except Exception:
+                pass
+
         return render_template(
             "supervisor/supervisor_tasks.html",
             show_sidebar=True,
