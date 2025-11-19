@@ -203,7 +203,10 @@
             <div class="flex justify-between items-start mb-3">
                 <div class="flex items-center gap-3">
                     <div class="flex items-center gap-2">
-                        <h3 class="text-lg font-semibold text-gray-900">{{ task.master_task.journey_phase }}</h3>
+                        <h3 class="text-lg font-semibold text-gray-900">
+                            <span class="text-sm text-gray-400 mr-2">#{{ task.serial }}</span>
+                            {{ task.master_task.journey_phase }}
+                        </h3>
                         <span class="task-badge bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">
                             Mentorship Task
                         </span>
@@ -288,7 +291,10 @@
             <div class="flex justify-between items-start mb-3">
                 <div class="flex items-center gap-3">
                     <div class="flex items-center gap-2">
-                        <h3 class="text-lg font-semibold text-gray-900">{{ task.title }}</h3>
+                        <h3 class="text-lg font-semibold text-gray-900">
+                            <span class="text-sm text-gray-400 mr-2">#{{ task.serial }}</span>
+                            {{ task.title }}
+                        </h3>
                         <span class="task-badge bg-green-100 text-green-800 text-xs px-2 py-1 rounded">
                             Personal Task
                         </span>

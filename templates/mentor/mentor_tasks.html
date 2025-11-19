@@ -329,7 +329,10 @@
                     <div class="flex justify-between items-start mb-3">
                         <div class="flex items-center gap-3">
                             <div class="flex items-center gap-2">
-                                <h3 class="text-lg font-semibold text-gray-900">{{ task.master_task.journey_phase }}</h3>
+                                <h3 class="text-lg font-semibold text-gray-900">
+                                    <span class="text-sm text-gray-400 mr-2">#{{ task.serial }}</span>
+                                    {{ task.master_task.journey_phase }}
+                                </h3>
                                 <span class="task-badge">Mentorship Task</span>
                             </div>
                             <span class="task-status 
@@ -413,7 +416,10 @@
                     <div class="flex justify-between items-start mb-3">
                         <div class="flex items-center gap-3">
                             <div class="flex items-center gap-2">
-                                <h3 class="text-lg font-semibold text-gray-900">{{ task.title }}</h3>
+                                <h3 class="text-lg font-semibold text-gray-900">
+                                    <span class="text-sm text-gray-400 mr-2">#{{ task.serial }}</span>
+                                    {{ task.title }}
+                                </h3>
                                 <span class="task-badge">Personal Task</span>
                                 {% if task.priority == 'high' %}
                                 <span class="priority-high">High Priority</span>
