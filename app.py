@@ -3115,6 +3115,7 @@ def view_mastertask_data():
     )
 
 
+user_type = session.get("user_type")
 
 session["logged_in"] = True
 session["user_type"] = user_type
