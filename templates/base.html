@@ -50,6 +50,11 @@
            Sign Up
         </a>
 
+        <button id="installBtn" style="padding: 10px 20px; font-size: 18px; display:none;">
+  Download App
+</button>
+
+
         
       </nav>
 
@@ -90,6 +95,29 @@
       if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register("{{ url_for('static', filename='service-worker.js') }}")
       .then(() => console.log("Service worker registered"));
+  }
+  
+
+
+
+
+    // Save current page
+  localStorage.setItem("last_visited_page", window.location.pathname);
+
+  // Auto-open last page on startup
+  if (window.location.pathname === "/") {
+      const last = localStorage.getItem("last_visited_page");
+      if (last && last !== "/") {
+          window.location.href = last;
+      }
+  }
+
+
+
+    if (!navigator.onLine) {
+      if (localStorage.getItem("logged_in") == "true") {
+          window.location.href = "/dashboard";
+      }
   }
   </script>
 </body>
