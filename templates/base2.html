@@ -361,25 +361,39 @@
 
 
 
-          // Save current page
-  localStorage.setItem("last_visited_page", window.location.pathname);
 
-  // Auto-open last page on startup
-  if (window.location.pathname === "/") {
-      const last = localStorage.getItem("last_visited_page");
-      if (last && last !== "/") {
-          window.location.href = last;
-      }
-  }
+document.addEventListener("DOMContentLoaded", () => {
+
+    // Do NOT save login/signup pages
+    const skipPages = ["/signin", "/signup", "/logout"];
+
+    if (!skipPages.includes(window.location.pathname)) {
+        localStorage.setItem("last_page", window.location.pathname);
+    }
+
+    // Only redirect on FIRST page load from home page
+    if (window.location.pathname === "/") {
+        const last = localStorage.getItem("last_page");
+        if (last && !skipPages.includes(last)) {
+            window.location.href = last;
+        }
+    }
+});
 
 
+if (!navigator.onLine) {
+    if (localStorage.getItem("logged_in") === "true") {
 
-    if (!navigator.onLine) {
-      if (localStorage.getItem("logged_in") == "true") {
-          window.location.href = "/dashboard";
-      }
-  }
+        const userType = localStorage.getItem("user_type");
 
+        if (userType === "0") window.location.href = "/supervisordashboard";
+        if (userType === "1") window.location.href = "/mentordashboard";
+        if (userType === "2") window.location.href = "/menteedashboard";
+    }
+}
+
+localStorage.setItem("logged_in", "{{ 'true' if session.get('logged_in') else 'false' }}");
+localStorage.setItem("user_type", "{{ session.get('user_type') or '' }}");
 
 
     </script>
