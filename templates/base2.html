@@ -357,6 +357,31 @@
                 });
             }
         });
+
+
+
+
+          // Save current page
+  localStorage.setItem("last_visited_page", window.location.pathname);
+
+  // Auto-open last page on startup
+  if (window.location.pathname === "/") {
+      const last = localStorage.getItem("last_visited_page");
+      if (last && last !== "/") {
+          window.location.href = last;
+      }
+  }
+
+
+
+    if (!navigator.onLine) {
+      if (localStorage.getItem("logged_in") == "true") {
+          window.location.href = "/dashboard";
+      }
+  }
+
+
+
     </script>
 </body>
 </html>
