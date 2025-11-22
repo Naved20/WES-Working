@@ -50,11 +50,6 @@
            Sign Up
         </a>
 
-        <button id="installBtn" style="padding: 10px 20px; font-size: 18px; display:none;">
-  Download App
-</button>
-
-
         
       </nav>
 
@@ -96,45 +91,6 @@
     navigator.serviceWorker.register("{{ url_for('static', filename='service-worker.js') }}")
       .then(() => console.log("Service worker registered"));
   }
-  
-
-
-document.addEventListener("DOMContentLoaded", () => {
-
-    // Do NOT save login/signup pages
-    const skipPages = ["/signin", "/signup", "/logout"];
-
-    if (!skipPages.includes(window.location.pathname)) {
-        localStorage.setItem("last_page", window.location.pathname);
-    }
-
-    // Only redirect on FIRST page load from home page
-if (window.location.pathname === "/" || window.location.pathname === "/home") {
-        const last = localStorage.getItem("last_page");
-        if (last && !skipPages.includes(last)) {
-            window.location.href = last;
-        }
-    }
-});
-
-
-if (!navigator.onLine) {
-    if (localStorage.getItem("logged_in") === "true") {
-
-        const userType = localStorage.getItem("user_type");
-
-        if (userType === "0") window.location.href = "/supervisordashboard";
-        if (userType === "1") window.location.href = "/mentordashboard";
-        if (userType === "2") window.location.href = "/menteedashboard";
-    }
-}
-
-
-localStorage.setItem("logged_in", "{{ 'true' if session.get('logged_in') else 'false' }}");
-localStorage.setItem("user_type", "{{ session.get('user_type') or '' }}");
-
-
-
   </script>
 </body>
 </html>
