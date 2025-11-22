@@ -3116,6 +3116,10 @@ def view_mastertask_data():
 
 
 
+session["logged_in"] = True
+session["user_type"] = user_type
+
+
 
 
 if __name__ == "__main__":
