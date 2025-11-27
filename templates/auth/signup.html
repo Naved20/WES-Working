@@ -56,6 +56,13 @@
                             <span class="text-xs font-medium text-gray-700 whitespace-nowrap">Supervisor</span>
                         </label> -->
                         <label class="flex-1 flex items-center justify-center p-2 border-2 border-gray-200 rounded-lg cursor-pointer hover:border-blue-500 transition-colors duration-200 text-center">
+                            <input type="radio" name="user-type" value="3" class="sr-only">
+                            <div class="w-4 h-4 border-2 border-gray-300 rounded-full flex items-center justify-center mr-2">
+                                <div class="w-2 h-2 bg-blue-600 rounded-full hidden"></div>
+                            </div>
+                            <span class="text-xs font-medium text-gray-700 whitespace-nowrap">institution</span>
+                        </label>
+                        <label class="flex-1 flex items-center justify-center p-2 border-2 border-gray-200 rounded-lg cursor-pointer hover:border-blue-500 transition-colors duration-200 text-center">
                             <input type="radio" name="user-type" value="1" class="sr-only">
                             <div class="w-4 h-4 border-2 border-gray-300 rounded-full flex items-center justify-center mr-2">
                                 <div class="w-2 h-2 bg-blue-600 rounded-full hidden"></div>
@@ -73,6 +80,16 @@
                     <div id="user-type-error" class="text-red-500 text-xs mt-1 hidden">Please select your role</div>
                 </div>
                 
+
+
+<div class="form-group" id="other_institution" style="display: none;">
+    <label for="other_institution_name">Specify Your Institution</label>
+    <input type="text" name="other_institution_name" id="other_institution_name">
+</div>
+
+
+
+
                 <!-- Password -->
                 <div class="relative">
                     <label for="signup-password" class="block text-sm font-medium text-gray-700 mb-1">Password</label>
@@ -425,6 +442,19 @@
             return isNameValid && isEmailValid && isPasswordValid && isConfirmPasswordValid && isUserTypeSelected && isTermsAccepted;
         }
     });
+
+
+document.getElementById('institution').addEventListener('change', function() {
+    const otherDiv = document.getElementById('other_institution');
+    if (this.value === 'Other') {
+        otherDiv.style.display = 'block';
+    } else {
+        otherDiv.style.display = 'none';
+    }
+});
+
+
+
 </script>
 
 <style>
