@@ -62,7 +62,38 @@
 
                     <label class="block text-gray-700 font-semibold mt-2">Stream</label>
                     <input type="text" name="stream" value="{{ stream }}" class="w-full p-2 border rounded-lg">
+                
+                    <!-- Institution Selection - FIXED -->
+<div class="mb-4">
+    <label for="institution" class="block text-gray-700 font-semibold mb-2">Institution *</label>
+    <select name="institution" id="institution" class="w-full p-2 border rounded-lg" required>
+        <option value="">Select Your Institution</option>
+        {% for inst in institutions %}
+            <option value="{{ inst.name }}" 
+                {% if institution == inst.name %}selected{% endif %}>
+                {{ inst.name }}
+            </option>
+        {% endfor %}
+        <option value="Other" 
+            {% if institution == 'Other' or (institution and institution not in institutions|map(attribute='name')) %}selected{% endif %}>
+            Other
+        </option>
+    </select>
+</div>
+
+<div class="mb-4" id="other_institution_field" 
+     style="display: {% if institution == 'Other' or (institution and institution not in institutions|map(attribute='name')) %}block{% else %}none{% endif %};">
+    <label for="other_institution_name" class="block text-gray-700 font-semibold mb-2">Specify Your Institution</label>
+    <input type="text" name="other_institution_name" id="other_institution_name" 
+           class="w-full p-2 border rounded-lg"
+           placeholder="Enter your institution name"
+           value="{% if institution == 'Other' or (institution and institution not in institutions|map(attribute='name')) %}{{ institution }}{% endif %}">
+</div>
+                
+                
+                
                 </div>
+
                 <div>
                     <label class="block text-gray-700 font-semibold">Class / Year</label>
                     <input type="text" name="class_year" value="{{ class_year }}" class="w-full p-2 border rounded-lg">
@@ -114,4 +145,16 @@
         </div>
     </form>
 </div>
+<script>
+    document.getElementById('institution').addEventListener('change', function() {
+    const otherField = document.getElementById('other_institution_field');
+    if (this.value === 'Other') {
+        otherField.style.display = 'block';
+        document.getElementById('other_institution_name').required = true;
+    } else {
+        otherField.style.display = 'none';
+        document.getElementById('other_institution_name').required = false;
+    }
+});
+</script>
 {% endblock %}

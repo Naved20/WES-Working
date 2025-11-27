@@ -1,0 +1,323 @@
+{% extends "base2.html" %}
+
+{% block title %}Institution Mentors{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="header-section">
+        <h1>Institution Mentors</h1>
+        <p>Manage mentors from {{ session.institution }}</p>
+    </div>
+
+    <!-- Search and Filters -->
+    <div class="filters-section">
+        <div class="search-box">
+            <input type="text" id="searchMentors" placeholder="Search mentors by name, profession..." class="search-input">
+        </div>
+        <div class="filter-options">
+            <select id="professionFilter" class="filter-select">
+                <option value="">All Professions</option>
+                {% set professions = [] %}
+                {% for mentor in mentors %}
+                    {% if mentor.mentor_profile and mentor.mentor_profile.profession and mentor.mentor_profile.profession not in professions %}
+                        {% set _ = professions.append(mentor.mentor_profile.profession) %}
+                        <option value="{{ mentor.mentor_profile.profession }}">{{ mentor.mentor_profile.profession }}</option>
+                    {% endif %}
+                {% endfor %}
+            </select>
+            
+            <select id="statusFilter" class="filter-select">
+                <option value="">All Status</option>
+                <option value="active">Active</option>
+                <option value="pending">Pending</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- Mentors Grid -->
+    <div class="mentors-grid" id="mentorsContainer">
+        {% if mentors %}
+            {% for mentor in mentors %}
+            <div class="mentor-card" data-profession="{{ mentor.mentor_profile.profession if mentor.mentor_profile else '' }}" 
+                 data-status="{{ 'active' if mentor.mentor_profile and mentor.mentor_profile.status == 'approved' else 'pending' }}">
+                <div class="mentor-header">
+                    <div class="mentor-avatar">
+                        {% if mentor.mentor_profile and mentor.mentor_profile.profile_picture %}
+                            <img src="{{ url_for('static', filename='uploads/' + mentor.mentor_profile.profile_picture) }}" alt="{{ mentor.name }}">
+                        {% else %}
+                            <div class="avatar-placeholder">{{ mentor.name[0] }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="mentor-info">
+                        <h3>{{ mentor.name }}</h3>
+                        <p class="mentor-email">{{ mentor.email }}</p>
+                        {% if mentor.mentor_profile and mentor.mentor_profile.profession %}
+                            <span class="profession-badge">{{ mentor.mentor_profile.profession }}</span>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <div class="mentor-details">
+                    {% if mentor.mentor_profile %}
+                    <div class="detail-item">
+                        <strong>Organization:</strong> 
+                        <span>{{ mentor.mentor_profile.organisation or 'Not specified' }}</span>
+                    </div>
+                    <div class="detail-item">
+                        <strong>Experience:</strong> 
+                        <span>{{ mentor.mentor_profile.years_of_experience or 'Not specified' }}</span>
+                    </div>
+                    <div class="detail-item">
+                        <strong>Location:</strong> 
+                        <span>{{ mentor.mentor_profile.location or 'Not specified' }}</span>
+                    </div>
+                    {% endif %}
+                </div>
+                
+                <div class="mentor-actions">
+                    <span class="status-indicator {{ 'status-active' if mentor.mentor_profile and mentor.mentor_profile.status == 'approved' else 'status-pending' }}">
+                        {{ 'Active' if mentor.mentor_profile and mentor.mentor_profile.status == 'approved' else 'Pending Approval' }}
+                    </span>
+                    <button class="btn-view" onclick="viewMentorProfile({{ mentor.id }})">View Profile</button>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="no-data">
+                <div class="no-data-icon">👨‍🏫</div>
+                <h3>No Mentors Found</h3>
+                <p>There are no mentors registered from your institution yet.</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+function viewMentorProfile(mentorId) {
+    // Implement view mentor profile functionality
+    alert('View mentor profile: ' + mentorId);
+    // You can redirect to mentor profile page or show modal
+    // window.location.href = `/mentor_profile/${mentorId}`;
+}
+
+// Search and filter functionality
+document.getElementById('searchMentors').addEventListener('input', filterMentors);
+document.getElementById('professionFilter').addEventListener('change', filterMentors);
+document.getElementById('statusFilter').addEventListener('change', filterMentors);
+
+function filterMentors() {
+    const searchTerm = document.getElementById('searchMentors').value.toLowerCase();
+    const professionFilter = document.getElementById('professionFilter').value;
+    const statusFilter = document.getElementById('statusFilter').value;
+    
+    const mentorCards = document.querySelectorAll('.mentor-card');
+    
+    mentorCards.forEach(card => {
+        const mentorName = card.querySelector('h3').textContent.toLowerCase();
+        const mentorProfession = card.getAttribute('data-profession');
+        const mentorStatus = card.getAttribute('data-status');
+        
+        const matchesSearch = mentorName.includes(searchTerm);
+        const matchesProfession = !professionFilter || mentorProfession === professionFilter;
+        const matchesStatus = !statusFilter || mentorStatus === statusFilter;
+        
+        if (matchesSearch && matchesProfession && matchesStatus) {
+            card.style.display = 'block';
+        } else {
+            card.style.display = 'none';
+        }
+    });
+}
+</script>
+
+<style>
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.header-section {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.header-section h1 {
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.header-section p {
+    color: #666;
+    font-size: 1.1em;
+}
+
+.filters-section {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 30px;
+    flex-wrap: wrap;
+}
+
+.search-input {
+    flex: 1;
+    min-width: 250px;
+    padding: 10px 15px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 1em;
+}
+
+.filter-select {
+    padding: 10px 15px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    background: white;
+    min-width: 150px;
+}
+
+.mentors-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 20px;
+}
+
+.mentor-card {
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    padding: 20px;
+    transition: transform 0.3s ease;
+}
+
+.mentor-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+}
+
+.mentor-header {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 15px;
+}
+
+.mentor-avatar img, .avatar-placeholder {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.avatar-placeholder {
+    background: #007bff;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5em;
+    font-weight: bold;
+}
+
+.mentor-info h3 {
+    margin: 0 0 5px 0;
+    color: #333;
+}
+
+.mentor-email {
+    margin: 0 0 8px 0;
+    color: #666;
+    font-size: 0.9em;
+}
+
+.profession-badge {
+    background: #e3f2fd;
+    color: #1976d2;
+    padding: 3px 8px;
+    border-radius: 12px;
+    font-size: 0.8em;
+    font-weight: bold;
+}
+
+.mentor-details {
+    margin-bottom: 15px;
+}
+
+.detail-item {
+    margin-bottom: 8px;
+    font-size: 0.9em;
+}
+
+.detail-item strong {
+    color: #333;
+}
+
+.mentor-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.status-indicator {
+    padding: 5px 10px;
+    border-radius: 15px;
+    font-size: 0.8em;
+    font-weight: bold;
+}
+
+.status-active {
+    background: #d4edda;
+    color: #155724;
+}
+
+.status-pending {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.btn-view {
+    background: #007bff;
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.9em;
+    transition: background 0.3s ease;
+}
+
+.btn-view:hover {
+    background: #0056b3;
+}
+
+.no-data {
+    text-align: center;
+    padding: 60px 20px;
+    grid-column: 1 / -1;
+}
+
+.no-data-icon {
+    font-size: 4em;
+    margin-bottom: 20px;
+}
+
+.no-data h3 {
+    color: #666;
+    margin-bottom: 10px;
+}
+
+.no-data p {
+    color: #999;
+}
+
+@media (max-width: 768px) {
+    .filters-section {
+        flex-direction: column;
+    }
+    
+    .mentors-grid {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+{% endblock %}

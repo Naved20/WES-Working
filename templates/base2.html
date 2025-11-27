@@ -55,6 +55,8 @@
                 {{ url_for('mentordashboard') }}
             {% elif session.get('user_type') == '2' %}
                 {{ url_for('menteedashboard') }}
+            {% elif session.get('user_type') == '3' %}
+                {{ url_for('institutiondashboard') }}
             {% else %}
                 {{ url_for('home') }}
             {% endif %}
@@ -158,9 +160,7 @@
 
                 {% elif session.get('user_type') == '1' %}
 
-
-
-                    <!-- Mentor Dashboard -->
+                <!-- Mentor Dashboard -->
                     <a href="{{ url_for('mentordashboard')}}"
                        class="block px-4 py-2 text-white hover:bg-gray-600 rounded-md">
                        📊 Dashboard
@@ -180,8 +180,7 @@
                        👥 My Mentees
                     </a>
                     
-                    
-
+                
 
                     <a href="{{ url_for('mentor_meeting_details')}}"
                        class="block px-4 py-2 text-white hover:bg-gray-600 rounded-md">
@@ -196,6 +195,30 @@
                        class="block px-4 py-2 text-white hover:bg-gray-600 rounded-md">
                         📝 My Task
                     </a>                    
+
+                {% elif session.get('user_type') == '3' %}
+
+
+                    <a href="{{ url_for('institutiondashboard')}}"
+                       class="block px-4 py-2 text-white hover:bg-gray-600 rounded-md">
+                       📊 Dashboard
+                    </a>
+                    
+                    <a href="{{ url_for('institution_mentors')}}"
+                       class="block px-4 py-2 text-white hover:bg-gray-600 rounded-md">
+                       🎓 All Mentors
+                    </a>
+                    
+                    <a href="{{ url_for('institution_mentees')}}"
+                       class="block px-4 py-2 text-white hover:bg-gray-600 rounded-md">
+                       👥 All Mentees
+                    </a>
+                    
+
+
+     
+
+
 
                 {% elif session.get('user_type') == '2' %}
 

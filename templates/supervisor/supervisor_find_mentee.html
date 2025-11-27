@@ -34,51 +34,76 @@
            class="w-full p-3 mb-4 border border-gray-300 rounded-lg"
            onkeyup="filterMentees()">
 
-          <!-- Filters -->
-      <form method="GET" action="{{ url_for('supervisordashboard') }}">
-        <div class="flex flex-wrap items-center gap-3">
-          <!-- Stream -->
-          <div class="relative">
-            <select name="stream" class="appearance-none pl-4 pr-10 py-2 border rounded-full text-gray-700 bg-white">
-              <option value="" {% if not request.args.get('stream') %}selected{% endif %}>All Streams</option>
-              {% for stream in mentee_streams %}
-                <option value="{{ stream }}" {% if request.args.get('stream') == stream %}selected{% endif %}>
-                  {{ stream }}
-                </option>
-              {% endfor %}
-            </select>
-          </div>
-
-          <!-- School -->
-          <div class="relative">
-            <select name="school" class="appearance-none pl-4 pr-10 py-2 border rounded-full text-gray-700 bg-white">
-              <option value="" {% if not request.args.get('school') %}selected{% endif %}>All Schools</option>
-              {% for school in mentee_schools %}
-                <option value="{{ school }}" {% if request.args.get('school') == school %}selected{% endif %}>
-                  {{ school }}
-                </option>
-              {% endfor %}
-            </select>
-          </div>
-
-          <!-- Goal -->
-          <div class="relative">
-            <select name="goal" class="appearance-none pl-4 pr-10 py-2 border rounded-full text-gray-700 bg-white">
-              <option value="" {% if not request.args.get('goal') %}selected{% endif %}>All Goals</option>
-              {% for goal in mentee_goals %}
-                <option value="{{ goal }}" {% if request.args.get('goal') == goal %}selected{% endif %}>
-                  {{ goal }}
-                </option>
-              {% endfor %}
-            </select>
-          </div>
-
-          <!-- Search Button -->
-          <button type="submit" class="px-5 py-2 rounded-full bg-blue-600 text-white font-medium">
-            Search
-          </button>
+<form method="GET" action="{{ url_for('supervisor_find_mentee') }}">
+  <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4 p-4 bg-white rounded-xl border border-gray-200 shadow-sm">
+    <div class="flex flex-wrap items-center gap-3 flex-1">
+      <!-- Stream -->
+      <div class="relative min-w-[150px]">
+        <select name="stream" class="appearance-none w-full pl-3 pr-8 py-2 border border-gray-300 rounded-lg text-sm text-gray-700 bg-white hover:border-gray-400 focus:border-blue-500 focus:ring-1 focus:ring-blue-200 transition-all duration-200">
+          <option value="" {% if not request.args.get('stream') %}selected{% endif %}>All Streams</option>
+          {% for stream in mentee_streams %}
+            <option value="{{ stream }}" {% if request.args.get('stream') == stream %}selected{% endif %}>
+              {{ stream }}
+            </option>
+          {% endfor %}
+        </select>
+        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-400">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+          </svg>
         </div>
-      </form>
+      </div>
+
+      <!-- School -->
+      <div class="relative min-w-[150px]">
+        <select name="school" class="appearance-none w-full pl-3 pr-8 py-2 border border-gray-300 rounded-lg text-sm text-gray-700 bg-white hover:border-gray-400 focus:border-blue-500 focus:ring-1 focus:ring-blue-200 transition-all duration-200">
+          <option value="" {% if not request.args.get('school') %}selected{% endif %}>All Schools</option>
+          {% for school in mentee_schools %}
+            <option value="{{ school }}" {% if request.args.get('school') == school %}selected{% endif %}>
+              {{ school }}
+            </option>
+          {% endfor %}
+        </select>
+        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-400">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Goal -->
+      <div class="relative min-w-[150px]">
+        <select name="goal" class="appearance-none w-full pl-3 pr-8 py-2 border border-gray-300 rounded-lg text-sm text-gray-700 bg-white hover:border-gray-400 focus:border-blue-500 focus:ring-1 focus:ring-blue-200 transition-all duration-200">
+          <option value="" {% if not request.args.get('goal') %}selected{% endif %}>All Goals</option>
+          {% for goal in mentee_goals %}
+            <option value="{{ goal }}" {% if request.args.get('goal') == goal %}selected{% endif %}>
+              {{ goal }}
+            </option>
+          {% endfor %}
+        </select>
+        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-400">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="flex items-center gap-2">
+        <button type="submit" class="px-5 py-2 rounded-lg bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 focus:ring-2 focus:ring-blue-200 transition-all duration-200 flex items-center gap-2">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+          </svg>
+          Filter
+        </button>
+        
+        <a href="{{ url_for('supervisordashboard') }}" class="px-4 py-2 rounded-lg border border-gray-300 text-sm text-gray-700 bg-white hover:bg-gray-50 transition-all duration-200">
+          Clear
+        </a>
+      </div>
+    </div>
+  </div>
+</form>
 
     {% if mentees and mentees|length > 0 %}
     <div class="grid p-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="menteesGrid">

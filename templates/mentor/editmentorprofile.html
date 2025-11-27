@@ -10,6 +10,40 @@
 {% endblock %}
 
 {% block content %}
+
+<style>
+    select[multiple] {
+        height: auto;
+        min-height: 120px;
+        background-image: none;
+        padding-right: 0.75rem;
+    }
+    
+    select:focus {
+        outline: none;
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+    }
+    
+    .transition {
+        transition: all 0.3s ease;
+    }
+    
+    .shadow-2xl {
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    }
+    
+    optgroup {
+        font-weight: bold;
+        color: #4b5563;
+    }
+    
+    optgroup option {
+        font-weight: normal;
+        padding-left: 1rem;
+    }
+</style>
+
 <div class="max-w-6xl mx-auto mt-8 p-6 bg-gradient-to-br from-gray-50 to-blue-50 rounded-2xl shadow-2xl">
     <form action="{{ url_for('editmentorprofile') }}" method="POST" enctype="multipart/form-data" class="space-y-8">
         <!-- Profile Header -->
@@ -144,6 +178,34 @@
                         </select>
                     </div>
                 </div>
+
+<!-- Institution Selection -->
+<div class="form-group">
+    <label for="institution" class="block text-gray-700 font-semibold mb-2">Institution *</label>
+    <select name="institution" id="institution" class="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition duration-300" required>
+        <option value="">Select Your Institution</option>
+        {% for inst in institutions %}
+            <option value="{{ inst.name }}" 
+                {% if institution == inst.name %}selected{% endif %}>
+                {{ inst.name }}
+            </option>
+        {% endfor %}
+        <option value="Other" 
+            {% if institution and institution not in institutions|map(attribute='name')|list %}selected{% endif %}>
+            Other
+        </option>
+    </select>
+</div>
+
+<div class="form-group" id="other_institution_field" 
+     style="display: {% if institution and institution not in institutions|map(attribute='name')|list %}block{% else %}none{% endif %};">
+    <label for="other_institution_name" class="block text-gray-700 font-semibold mb-2">Specify Your Institution</label>
+    <input type="text" name="other_institution_name" id="other_institution_name" 
+           class="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition duration-300"
+           placeholder="Enter your institution name"
+           value="{% if institution and institution not in institutions|map(attribute='name')|list %}{{ institution }}{% endif %}">
+</div>
+
             </div>
         </div>
 
@@ -455,38 +517,6 @@
     </form>
 </div>
 
-<style>
-    select[multiple] {
-        height: auto;
-        min-height: 120px;
-        background-image: none;
-        padding-right: 0.75rem;
-    }
-    
-    select:focus {
-        outline: none;
-        border-color: #3b82f6;
-        box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
-    }
-    
-    .transition {
-        transition: all 0.3s ease;
-    }
-    
-    .shadow-2xl {
-        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-    }
-    
-    optgroup {
-        font-weight: bold;
-        color: #4b5563;
-    }
-    
-    optgroup option {
-        font-weight: normal;
-        padding-left: 1rem;
-    }
-</style>
 
 <script>
     function previewImage(input) {
@@ -504,5 +534,52 @@
             reader.readAsDataURL(input.files[0]);
         }
     }
+
+
+    document.getElementById('institution').addEventListener('change', function() {
+    const otherField = document.getElementById('other_institution_field');
+    if (this.value === 'Other') {
+        otherField.style.display = 'block';
+        document.getElementById('other_institution_name').required = true;
+    } else {
+        otherField.style.display = 'none';
+        document.getElementById('other_institution_name').required = false;
+    }
+});
+
+
+document.addEventListener('DOMContentLoaded', function() {
+    const institutionSelect = document.getElementById('institution');
+    const otherField = document.getElementById('other_institution_field');
+    
+    institutionSelect.addEventListener('change', function() {
+        if (this.value === 'Other') {
+            otherField.style.display = 'block';
+            document.getElementById('other_institution_name').required = true;
+        } else {
+            otherField.style.display = 'none';
+            document.getElementById('other_institution_name').required = false;
+        }
+    });
+
+    function previewImage(input) {
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = input.closest('.text-center').querySelector('img');
+                if (img) {
+                    img.src = e.target.result;
+                } else {
+                    const div = input.closest('.text-center').querySelector('div');
+                    div.innerHTML = `<img src="${e.target.result}" class="w-32 h-32 md:w-40 md:h-40 object-cover rounded-full shadow-lg border-4 border-blue-200">`;
+                }
+            }
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+});
+
+
+
 </script>
 {% endblock %}
