@@ -101,8 +101,15 @@
                             <p class="text-gray-800 mt-1">{{ years_of_experience }}</p>
                         </div>
                         <div>
-                            <p class="text-sm font-medium text-gray-500">Education</p>
-                            <p class="text-gray-800 mt-1">{{ education }}</p>
+                            <p class="text-sm font-medium text-gray-500">Institution</p>
+                            <p class="text-gray-800 mt-1">
+                                {% if institution %}
+                                    {{ institution }}
+                                {% else %}
+                                    <span class="text-gray-400 italic">Not specified</span>
+                                {% endif %}
+
+                            </p>
                         </div>
                     </div>
                     <div>

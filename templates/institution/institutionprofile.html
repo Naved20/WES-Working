@@ -1,0 +1,782 @@
+{% extends "base2.html" %}
+
+{% block title %}Institution Profile{% endblock %}
+
+{% block content %}
+<div class="profile-container">
+    <!-- Profile Header -->
+    <div class="profile-header">
+        <div class="profile-identity">
+            <div class="profile-avatar">
+                {% if institution_details and institution_details.logo %}
+                    <img src="{{ url_for('static', filename='uploads/' + institution_details.logo) }}" alt="{{ institution_details.name }}">
+                {% else %}
+                    <div class="avatar-placeholder">
+                        <i class="fas fa-university"></i>
+                    </div>
+                {% endif %}
+            </div>
+            <div class="profile-info">
+                <h1>{{ institution_details.name if institution_details else institution }}</h1>
+                <div class="profile-meta">
+                    <span class="profile-role">Institution Administrator</span>
+                    <span class="profile-status">
+                        <span class="status-indicator {{ 'active' if institution_details and institution_details.status == 'active' else 'inactive' }}"></span>
+                        {{ institution_details.status|title if institution_details else 'Active' }}
+                    </span>
+                </div>
+                <div class="contact-protected">
+                    <span class="protected-email">{{ email }}</span>
+                    <span class="protection-badge">
+                        <i class="fas fa-shield-alt"></i>
+                        Protected
+                    </span>
+                </div>
+            </div>
+        </div>
+        <div class="profile-actions">
+            <a href="{{ url_for('edit_institution_profile') }}" class="btn btn-primary">
+                <i class="fas fa-edit"></i>
+                Edit Profile
+            </a>
+            <a href="#" class="btn btn-secondary">
+                <i class="fas fa-download"></i>
+                Export Data
+            </a>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="profile-content">
+        <!-- Quick Stats -->
+        <div class="stats-section">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-user-graduate"></i>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-number">{{ total_students or 0 }}</div>
+                        <div class="stat-label">Total Students</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-chalkboard-teacher"></i>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-number">{{ total_mentors or 0 }}</div>
+                        <div class="stat-label">Total Mentors</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-handshake"></i>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-number">{{ active_mentorships or 0 }}</div>
+                        <div class="stat-label">Active Mentorships</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-calendar-check"></i>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-number">{{ completed_mentorships or 0 }}</div>
+                        <div class="stat-label">Completed</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="content-grid">
+            <!-- Personal Information -->
+            <div class="content-card">
+                <div class="card-header">
+                    <h2>
+                        <i class="fas fa-user-circle"></i>
+                        Personal Information
+                    </h2>
+                </div>
+                <div class="card-body">
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <label>Full Name</label>
+                            <span>{{ full_name }}</span>
+                        </div>
+                        <div class="info-item">
+                            <label>Email</label>
+                            <div class="protected-info">
+                                <span class="blur-text">{{ email }}</span>
+                                <span class="info-tooltip">
+                                    <i class="fas fa-info-circle"></i>
+                                    Contact via platform only
+                                </span>
+                            </div>
+                        </div>
+                        <div class="info-item">
+                            <label>Designation</label>
+                            <span>{{ designation or "Not specified" }}</span>
+                        </div>
+                        <div class="info-item">
+                            <label>Department</label>
+                            <span>{{ department or "Not specified" }}</span>
+                        </div>
+                        <div class="info-item">
+                            <label>Official Phone</label>
+                            <div class="protected-info">
+                                <span class="blur-text">{{ official_phone or "Not specified" }}</span>
+                                <span class="info-tooltip">
+                                    <i class="fas fa-info-circle"></i>
+                                    Protected contact
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Institution Details -->
+            <div class="content-card">
+                <div class="card-header">
+                    <h2>
+                        <i class="fas fa-university"></i>
+                        Institution Details
+                    </h2>
+                </div>
+                <div class="card-body">
+                    {% if institution_details %}
+                    <div class="info-grid">
+                        {% if institution_details.contact_person %}
+                        <div class="info-item">
+                            <label>Contact Person</label>
+                            <span>{{ institution_details.contact_person }}</span>
+                        </div>
+                        {% endif %}
+                        {% if institution_details.contact_email %}
+                        <div class="info-item">
+                            <label>Contact Email</label>
+                            <div class="protected-info">
+                                <span class="blur-text">{{ institution_details.contact_email }}</span>
+                                <span class="info-tooltip">
+                                    <i class="fas fa-info-circle"></i>
+                                    Secure contact only
+                                </span>
+                            </div>
+                        </div>
+                        {% endif %}
+                        {% if institution_details.contact_phone %}
+                        <div class="info-item">
+                            <label>Contact Phone</label>
+                            <div class="protected-info">
+                                <span class="blur-text">{{ institution_details.contact_phone }}</span>
+                                <span class="info-tooltip">
+                                    <i class="fas fa-info-circle"></i>
+                                    Protected number
+                                </span>
+                            </div>
+                        </div>
+                        {% endif %}
+                        {% if institution_details.email_domain %}
+                        <div class="info-item">
+                            <label>Email Domain</label>
+                            <span>{{ institution_details.email_domain }}</span>
+                        </div>
+                        {% endif %}
+                        {% if institution_details.website %}
+                        <div class="info-item">
+                            <label>Website</label>
+                            <a href="{{ institution_details.website }}" target="_blank" class="website-link">
+                                {{ institution_details.website }}
+                                <i class="fas fa-external-link-alt"></i>
+                            </a>
+                        </div>
+                        {% endif %}
+                        {% if institution_details.address %}
+                        <div class="info-item full-width">
+                            <label>Address</label>
+                            <span>{{ institution_details.address }}</span>
+                        </div>
+                        {% endif %}
+                        {% if institution_details.city or institution_details.state or institution_details.country %}
+                        <div class="info-item">
+                            <label>Location</label>
+                            <span>
+                                {% if institution_details.city %}{{ institution_details.city }}{% endif %}
+                                {% if institution_details.state %}, {{ institution_details.state }}{% endif %}
+                                {% if institution_details.country %}, {{ institution_details.country }}{% endif %}
+                            </span>
+                        </div>
+                        {% endif %}
+                        <div class="info-item">
+                            <label>Member Since</label>
+                            <span>{{ institution_details.created_at.strftime('%B %d, %Y') if institution_details.created_at else 'N/A' }}</span>
+                        </div>
+                    </div>
+                    {% else %}
+                    <div class="empty-state">
+                        <i class="fas fa-info-circle"></i>
+                        <p>No institution details available</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Notification Preferences -->
+            <div class="content-card">
+                <div class="card-header">
+                    <h2>
+                        <i class="fas fa-bell"></i>
+                        Notification Preferences
+                    </h2>
+                </div>
+                <div class="card-body">
+                    <div class="preferences-grid">
+                        <div class="preference-item">
+                            <div class="preference-info">
+                                <h3>Receive Reports</h3>
+                                <p>Get monthly mentorship activity summaries</p>
+                            </div>
+                            <div class="preference-status">
+                                <span class="status-badge {{ 'status-active' if receive_reports else 'status-inactive' }}">
+                                    {{ 'Enabled' if receive_reports else 'Disabled' }}
+                                </span>
+                            </div>
+                        </div>
+                        <div class="preference-item">
+                            <div class="preference-info">
+                                <h3>Report Frequency</h3>
+                                <p>How often you receive mentorship reports</p>
+                            </div>
+                            <div class="preference-status">
+                                <span class="frequency-badge">{{ report_frequency|title }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Security Notice -->
+            <div class="content-card security-notice">
+                <div class="security-header">
+                    <div class="security-icon">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <div class="security-content">
+                        <h3>Contact Information Protection</h3>
+                        <p>All contact details are protected to ensure privacy and security. Please use the platform's messaging system for communication.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+:root {
+    --primary-color: #4361ee;
+    --primary-dark: #3a56d4;
+    --secondary-color: #7209b7;
+    --success-color: #4cc9f0;
+    --text-dark: #2b2d42;
+    --text-light: #6c757d;
+    --bg-light: #f8f9fa;
+    --border-color: #e9ecef;
+    --shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
+    --shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+.profile-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* Profile Header */
+.profile-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 30px;
+    padding: 30px;
+    background: white;
+    border-radius: 16px;
+    box-shadow: var(--shadow);
+    position: relative;
+    overflow: hidden;
+}
+
+.profile-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+}
+
+.profile-identity {
+    display: flex;
+    align-items: flex-start;
+    gap: 20px;
+}
+
+.profile-avatar {
+    position: relative;
+}
+
+.profile-avatar img, .avatar-placeholder {
+    width: 100px;
+    height: 100px;
+    border-radius: 16px;
+    object-fit: cover;
+    border: 4px solid white;
+    box-shadow: var(--shadow);
+}
+
+.avatar-placeholder {
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.5em;
+}
+
+.profile-info h1 {
+    margin: 0 0 8px 0;
+    color: var(--text-dark);
+    font-size: 2em;
+    font-weight: 700;
+}
+
+.profile-meta {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 10px;
+}
+
+.profile-role {
+    background: var(--bg-light);
+    color: var(--text-light);
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.9em;
+    font-weight: 500;
+}
+
+.profile-status {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.9em;
+    color: var(--text-light);
+}
+
+.status-indicator {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+}
+
+.status-indicator.active {
+    background: #4ade80;
+}
+
+.status-indicator.inactive {
+    background: #ef4444;
+}
+
+.contact-protected {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.protected-email {
+    color: var(--text-light);
+    font-size: 1.1em;
+}
+
+.protection-badge {
+    background: #fef3c7;
+    color: #92400e;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.8em;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.profile-actions {
+    display: flex;
+    gap: 12px;
+}
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    border: none;
+    cursor: pointer;
+}
+
+.btn-primary {
+    background: var(--primary-color);
+    color: white;
+}
+
+.btn-primary:hover {
+    background: var(--primary-dark);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow);
+}
+
+.btn-secondary {
+    background: white;
+    color: var(--text-dark);
+    border: 2px solid var(--border-color);
+}
+
+.btn-secondary:hover {
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow);
+}
+
+/* Stats Section */
+.stats-section {
+    margin-bottom: 30px;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 20px;
+}
+
+.stat-card {
+    background: white;
+    padding: 24px;
+    border-radius: 12px;
+    box-shadow: var(--shadow);
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-lg);
+}
+
+.stat-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5em;
+}
+
+.stat-content {
+    flex: 1;
+}
+
+.stat-number {
+    font-size: 2em;
+    font-weight: 700;
+    color: var(--text-dark);
+    line-height: 1;
+    margin-bottom: 4px;
+}
+
+.stat-label {
+    color: var(--text-light);
+    font-size: 0.9em;
+    font-weight: 500;
+}
+
+/* Content Grid */
+.content-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+}
+
+.content-card {
+    background: white;
+    border-radius: 16px;
+    box-shadow: var(--shadow);
+    overflow: hidden;
+}
+
+.card-header {
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--border-color);
+    background: var(--bg-light);
+}
+
+.card-header h2 {
+    margin: 0;
+    font-size: 1.3em;
+    color: var(--text-dark);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.card-body {
+    padding: 24px;
+}
+
+/* Info Grid */
+.info-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.info-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.info-item:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.info-item.full-width {
+    flex-direction: column;
+    gap: 8px;
+}
+
+.info-item label {
+    font-weight: 600;
+    color: var(--text-dark);
+    min-width: 140px;
+}
+
+.info-item span {
+    color: var(--text-light);
+    text-align: right;
+    flex: 1;
+}
+
+/* Protected Information */
+.protected-info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.blur-text {
+    filter: blur(4px);
+    transition: filter 0.3s ease;
+    cursor: default;
+}
+
+.protected-info:hover .blur-text {
+    filter: blur(1px);
+}
+
+.info-tooltip {
+    background: var(--bg-light);
+    color: var(--text-light);
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 0.8em;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+/* Website Link */
+.website-link {
+    color: var(--primary-color);
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: color 0.3s ease;
+}
+
+.website-link:hover {
+    color: var(--primary-dark);
+    text-decoration: underline;
+}
+
+/* Preferences */
+.preferences-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.preference-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px;
+    background: var(--bg-light);
+    border-radius: 12px;
+}
+
+.preference-info h3 {
+    margin: 0 0 4px 0;
+    font-size: 1em;
+    color: var(--text-dark);
+}
+
+.preference-info p {
+    margin: 0;
+    font-size: 0.9em;
+    color: var(--text-light);
+}
+
+.status-badge, .frequency-badge {
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.8em;
+    font-weight: 600;
+}
+
+.status-active {
+    background: #d1fae5;
+    color: #065f46;
+}
+
+.status-inactive {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.frequency-badge {
+    background: #dbeafe;
+    color: #1e40af;
+}
+
+/* Security Notice */
+.security-notice {
+    background: linear-gradient(135deg, #fff3cd, #ffeaa7);
+    border: 1px solid #ffeaa7;
+}
+
+.security-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+}
+
+.security-icon {
+    font-size: 1.5em;
+    color: #856404;
+    margin-top: 4px;
+}
+
+.security-content h3 {
+    margin: 0 0 8px 0;
+    color: #856404;
+    font-size: 1.1em;
+}
+
+.security-content p {
+    margin: 0;
+    color: #856404;
+    font-size: 0.9em;
+    line-height: 1.5;
+}
+
+/* Empty State */
+.empty-state {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--text-light);
+}
+
+.empty-state i {
+    font-size: 3em;
+    margin-bottom: 16px;
+    opacity: 0.5;
+}
+
+.empty-state p {
+    margin: 0;
+    font-size: 1.1em;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+    .content-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    .profile-header {
+        flex-direction: column;
+        gap: 20px;
+        text-align: center;
+    }
+    
+    .profile-identity {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+    
+    .profile-meta {
+        justify-content: center;
+    }
+    
+    .profile-actions {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .info-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+    
+    .info-item span {
+        text-align: left;
+    }
+    
+    .preference-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
+    
+    .security-header {
+        flex-direction: column;
+        text-align: center;
+    }
+}
+</style>
+{% endblock %}
