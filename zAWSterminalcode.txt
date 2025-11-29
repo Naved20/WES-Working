@@ -62,5 +62,8 @@ chnage python 3.14 to 3.11 for some fixing some error {(
 
 
 
-
+for db migration {
+    flask db migrate -m "Remove institution_profile table"
+    flask db upgrade
+}
 

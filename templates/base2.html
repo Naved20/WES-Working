@@ -157,6 +157,10 @@
                        class="block px-4 py-2 text-white hover:bg-gray-600 rounded-md">
                         📝 All Tasks
                     </a>
+                    <a href="{{ url_for('institution')}}"
+                       class="block px-4 py-2 text-white hover:bg-gray-600 rounded-md">
+                        🏛️ All Institution
+                    </a>
 
                 {% elif session.get('user_type') == '1' %}
 
