@@ -1,0 +1,153 @@
+mentorship portal
+
+git rm --cached instance/mentors_connect.db
+cd ~/WES-Working 
+
+downoldeall things
+scp -i "C:\Users\WES\Documents\WES_MENTORSHIP_APP.pem" ubuntu@13.60.24.151:/home/ubuntu/mentors_connect.db "C:\Users\WES\
+scp -r -i "C:\Users\WES\Documents\WES_MENTORSHIP_APP.pem" ubuntu@13.60.24.151:/home/ubuntu/WES-Working/static C:\Users\WES\
+
+
+git pull origin main
+source venv/bin/activate
+gunicorn -w 3 -b 127.0.0.1:8000 app:app
+sudo lsof -i :8000
+sudo pkill -f gunicorn
+
+sudo nano /etc/systemd/system/wes-app.service
+
+[Unit]
+Description=Gunicorn instance for WES App
+After=network.target
+
+[Service]
+User=ubuntu
+Group=www-data
+WorkingDirectory=/home/ubuntu/WES-Working
+Environment="PATH=/home/ubuntu/WES-Working/venv/bin"
+ExecStart=/home/ubuntu/WES-Working/venv/bin/gunicorn -w 3 -b 127.0.0.1:8000 app:app
+
+[Install]
+WantedBy=multi-user.target
+
+sudo systemctl daemon-reload
+sudo systemctl start wes-app
+sudo systemctl enable wes-app
+sudo systemctl status wes-app
+sudo apt install nginx -y
+sudo nano /etc/nginx/sites-available/wes-app
+sudo ln -s /etc/nginx/sites-available/wes-app /etc/nginx/sites-enabled/
+sudo rm /etc/nginx/sites-enabled/default
+sudo nginx -t
+sudo systemctl restart nginx
+
+
+
+
+
+
+chnage python 3.14 to 3.11 for some fixing some error {(
+    but first make sure to changebath of it like i change from control pannel
+)
+    deactivate
+    Remove-Item -Recurse -Force .venv
+    py -3.11 -m venv .venv
+    .\.venv\Scripts\Activate.ps1
+    python --version
+    Python 3.11.x
+    pip install -r requirements.txt
+    python app.py
+
+}
+
+
+
+for db migration {
+    flask db migrate -m "Remove institution_profile table"
+    flask db upgrade
+}
+
+
+file structure{
+    mentors_connect/
+    ├── app.py                          # Main application entry point
+    ├── config.py                       # Configuration settings
+    ├── requirements.txt                # Dependencies
+    ├── .env                            # Environment variables
+    │
+    ├── models/
+    │   ├── __init__.py
+    │   ├── user.py                     # User model
+    │   ├── mentor.py                   # MentorProfile model
+    │   ├── mentee.py                   # MenteeProfile model
+    │   ├── supervisor.py               # SupervisorProfile model
+    │   ├── institution.py              # Institution model
+    │   ├── mentorship.py               # MentorshipRequest model
+    │   ├── meeting.py                  # MeetingRequest model
+    │   └── task.py                     # Task-related models
+    │
+    ├── routes/
+    │   ├── __init__.py
+    │   ├── auth.py                     # Signup, signin, logout
+    │   ├── mentor_routes.py            # Mentor-specific routes
+    │   ├── mentee_routes.py            # Mentee-specific routes
+    │   ├── supervisor_routes.py        # Supervisor-specific routes
+    │   ├── institution_routes.py       # Institution-specific routes
+    │   ├── profile_routes.py           # Profile management
+    │   ├── task_routes.py              # Task management
+    │   ├── meeting_routes.py           # Meeting management
+    │   └── api_routes.py               # API endpoints
+    │
+    ├── services/
+    │   ├── __init__.py
+    │   ├── calendar_service.py         # Google Calendar integration
+    │   ├── task_service.py             # Task assignment logic
+    │   └── profile_service.py          # Profile completion checks
+    │
+    ├── utils/
+    │   ├── __init__.py
+    │   ├── decorators.py               # Custom decorators
+    │   ├── helpers.py                  # Helper functions
+    │   └── validators.py               # Validation functions
+    │
+    ├── templates/
+    │   ├── base.html
+    │   ├── index.html
+    │   ├── auth/
+    │   ├── mentor/
+    │   ├── mentee/
+    │   ├── supervisor/
+    │   └── institution/
+    │
+    └── static/
+        ├── css/
+        ├── js/
+        └── uploads/
+    """
+    
+    # FILE BREAKDOWN:
+    
+    # 1. config.py - Configuration
+    # 2. models/__init__.py - Database initialization
+    # 3. models/user.py - User model
+    # 4. models/mentor.py - Mentor models
+    # 5. models/mentee.py - Mentee models
+    # 6. models/supervisor.py - Supervisor models
+    # 7. models/institution.py - Institution model
+    # 8. models/mentorship.py - Mentorship models
+    # 9. models/meeting.py - Meeting models
+    # 10. models/task.py - Task models
+    # 11. routes/auth.py - Authentication routes
+    # 12. routes/mentor_routes.py - Mentor routes
+    # 13. routes/mentee_routes.py - Mentee routes
+    # 14. routes/supervisor_routes.py - Supervisor routes
+    # 15. routes/profile_routes.py - Profile routes
+    # 16. routes/task_routes.py - Task routes
+    # 17. routes/meeting_routes.py - Meeting routes
+    # 18. services/calendar_service.py - Calendar service
+    # 19. services/task_service.py - Task service
+    # 20. services/profile_service.py - Profile service
+    # 21. utils/decorators.py - Custom decorators
+    # 22. utils/helpers.py - Helper functions
+    # 23. app.py - Main application
+}
