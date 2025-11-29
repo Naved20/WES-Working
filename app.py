@@ -15,6 +15,7 @@ from google.auth.transport import requests as grequests
 from google.oauth2 import service_account
 from googleapiclient.discovery import build
 import datetime as dt
+from flask_migrate import Migrate
 
 
 
@@ -61,7 +62,7 @@ app.config["SQLALCHEMY_DATABASE_URI"] ="sqlite:///mentors_connect.db"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 db = SQLAlchemy(app)
-from flask_migrate import Migrate
+
 migrate = Migrate(app, db)
 
 def mentor_login_required(f):
@@ -256,27 +257,6 @@ class MeetingRequest(db.Model):
     requester = db.relationship("User", foreign_keys=[requester_id], backref="sent_meeting_requests")
     requested_to = db.relationship("User", foreign_keys=[requested_to_id], backref="received_meeting_requests")
 
-#------------Institution Profile Table-------------------
-class InstitutionProfile(db.Model):
-    __tablename__ = "institution_profile"
-    id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey("signup_details.id"), nullable=False, unique=True)
-    
-    # Institution admin details
-    designation = db.Column(db.String(100))
-    department = db.Column(db.String(100))
-    official_phone = db.Column(db.String(20))
-    
-    # Institution statistics (can be updated)
-    total_students = db.Column(db.Integer, default=0)
-    total_mentors = db.Column(db.Integer, default=0)
-    active_mentorships = db.Column(db.Integer, default=0)
-    
-    # Preferences
-    receive_reports = db.Column(db.Boolean, default=True)
-    report_frequency = db.Column(db.String(20), default="monthly")  # weekly, monthly, quarterly
-    
-    user = db.relationship("User", backref="institution_profile", uselist=False)
 
 #------------Master Task Table-------------------
 class MasterTask(db.Model):
@@ -1012,6 +992,11 @@ def supervisordashboard():
         profile_complete=profile_complete
     )
     
+@app.route("/institution")
+def institution():
+    return render_template("supervisor/institution.html")
+
+# ✅ UPDATE THIS ROUTE (remove profile references)
 
 @app.route("/institutiondashboard")
 def institutiondashboard():
@@ -1019,7 +1004,7 @@ def institutiondashboard():
         return redirect(url_for("signin"))
 
     user = User.query.filter_by(email=session["email"]).first()
-    profile_complete = check_profile_complete(user.id, "3")
+    profile_complete = check_profile_complete(user.id, "3")  # ⚠️ Update this function too
 
     # Get institution details
     institution = Institution.query.filter_by(name=user.institution).first()
@@ -1106,63 +1091,56 @@ def institution_mentorships():
         mentorships=institution_mentorships
     )
 
-@app.route("/edit_institution_profile", methods=["GET", "POST"])
-def edit_institution_profile():
-    if "email" not in session or session.get("user_type") != "3":
-        return redirect(url_for("signin"))
-
-    user = User.query.filter_by(email=session["email"]).first()
-    profile = InstitutionProfile.query.filter_by(user_id=user.id).first()
-    
-    # Get institutions for dropdown
-    institutions = Institution.query.filter_by(status="active").all()
-
-    if request.method == "POST":
-        if not profile:
-            profile = InstitutionProfile(user_id=user.id)
-            db.session.add(profile)
-
-        # Update institution if changed
-        new_institution = request.form.get("institution")
-        if new_institution and new_institution != user.institution:
-            user.institution = new_institution
-            db.session.add(user)
-
-        profile.designation = request.form.get("designation")
-        profile.department = request.form.get("department")
-        profile.official_phone = request.form.get("official_phone")
-        profile.total_students = request.form.get("total_students", 0)
-        profile.total_mentors = request.form.get("total_mentors", 0)
-        profile.receive_reports = bool(request.form.get("receive_reports"))
-        profile.report_frequency = request.form.get("report_frequency", "monthly")
-
-        db.session.commit()
-        flash("Institution profile updated successfully!", "success")
-        return redirect(url_for("institutionprofile"))
-
-    return render_template(
-        "institution/editinstitutionprofile.html",
-        full_name=user.name,
-        email=user.email,
-        institution=user.institution,
-        institutions=institutions,
-        designation=profile.designation if profile else "",
-        department=profile.department if profile else "",
-        official_phone=profile.official_phone if profile else "",
-        total_students=profile.total_students if profile else 0,
-        total_mentors=profile.total_mentors if profile else 0,
-        receive_reports=profile.receive_reports if profile else True,
-        report_frequency=profile.report_frequency if profile else "monthly"
-    )
-
 @app.route("/institution_profile")
 def institutionprofile():
     if "email" not in session or session.get("user_type") != "3":
         return redirect(url_for("signin"))
 
     user = User.query.filter_by(email=session["email"]).first()
-    profile = InstitutionProfile.query.filter_by(user_id=user.id).first()
+    
     institution_details = Institution.query.filter_by(name=user.institution).first()
+    
+    # अगर institution नहीं मिला तो default data create करें
+    if not institution_details:
+        print(f"Institution '{user.institution}' not found, creating default data")
+        # Default institution object create करें
+        from datetime import datetime
+        institution_details = type('obj', (object,), {
+            'name': user.institution,
+            'email_domain': user.email.split('@')[1] if '@' in user.email else 'example.com',
+            'contact_person': user.name,
+            'contact_email': user.email,
+            'contact_phone': 'Not provided',
+            'address': 'Not provided',
+            'city': 'Not provided',
+            'state': 'Not provided',
+            'country': 'Not provided',
+            'website': 'Not provided',
+            'status': 'active',
+            'created_at': datetime.utcnow(),
+            'id': 0
+        })()
+    
+    # Calculate statistics
+    total_students = User.query.filter_by(
+        user_type="2", 
+        institution=user.institution
+    ).count()
+    
+    total_mentors = User.query.filter_by(
+        user_type="1", 
+        institution=user.institution
+    ).count()
+    
+    # Count active mentorships
+    active_mentorships = MentorshipRequest.query\
+        .join(User, MentorshipRequest.mentee_id == User.id)\
+        .filter(
+            User.institution == user.institution,
+            MentorshipRequest.final_status == "approved"
+        ).count()
+
+    completed_mentorships = 0  # Placeholder
 
     return render_template(
         "institution/institutionprofile.html",
@@ -1170,14 +1148,10 @@ def institutionprofile():
         full_name=user.name,
         email=user.email,
         institution=user.institution,
-        designation=profile.designation if profile else "",
-        department=profile.department if profile else "",
-        official_phone=profile.official_phone if profile else "",
-        total_students=profile.total_students if profile else 0,
-        total_mentors=profile.total_mentors if profile else 0,
-        active_mentorships=profile.active_mentorships if profile else 0,
-        receive_reports=profile.receive_reports if profile else True,
-        report_frequency=profile.report_frequency if profile else "monthly",
+        total_students=total_students,
+        total_mentors=total_mentors,
+        active_mentorships=active_mentorships,
+        completed_mentorships=completed_mentorships,
         institution_details=institution_details
     )
 
@@ -3560,12 +3534,6 @@ def create_sample_institutions():
             db.session.add(institution)
     
     db.session.commit()
-
-# Call this function once to populate institutions
-# create_sample_institutions()
-
-
-
 
 if __name__ == "__main__":
     app.run(debug=True)
