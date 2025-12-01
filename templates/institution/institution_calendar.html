@@ -1,0 +1,776 @@
+{% extends "base2.html" %}
+{% block title %}Institution Calendar{% endblock %}
+
+{% block user %}Institution Calendar{% endblock %}
+
+{% block content %}
+
+<style>
+.calendar-view {
+    gap: 20px;
+    min-height: 600px;
+}
+
+.calendar-day {
+    min-height: 120px;
+    background: white;
+    transition: all 0.2s;
+}
+
+.calendar-day:hover {
+    background: #f9fafb;
+}
+
+.calendar-day.other-month {
+    background: #f8f9fa;
+    color: #9ca3af;
+}
+
+.calendar-day {
+    min-height: 120px;
+    background: white;
+    transition: all 0.2s;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    margin: 2px;
+}
+
+.calendar-event {
+    font-size: 0.75rem;
+    padding: 2px 4px;
+    margin: 1px 0;
+    border-radius: 4px;
+    cursor: pointer;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.time-slot {
+    height: 60px;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.time-slot-hour {
+    background: #f9fafb;
+    border-right: 1px solid #e5e7eb;
+}
+</style>
+<div class="max-w-7xl mx-auto mt-8 p-6 bg-gray-50 rounded-lg shadow-lg">
+    <!-- Header -->
+    <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-6">
+        <div>
+            <h2 class="text-3xl font-bold text-gray-800 mb-2">Institution Calendar</h2>
+            <p class="text-gray-600">View all meetings from your institution's mentors and mentees</p>
+        </div>
+        
+        <!-- Calendar Controls -->
+        <div class="flex items-center space-x-4 mt-4 lg:mt-0">
+            <!-- View Toggle -->
+            <div class="flex bg-white rounded-lg border border-gray-300 p-1">
+                <button id="monthView" class="px-3 py-2 rounded-md text-sm font-medium bg-blue-600 text-white">Month</button>
+                <button id="weekView" class=""></button>
+                <button id="dayView" class="px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-100">Day</button>
+                <button id="listView" class="px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-100">List</button>
+            </div>
+            
+            <!-- Navigation -->
+            <div class="flex items-center space-x-2">
+                <button id="prevBtn" class="p-2 rounded-lg border border-gray-300 hover:bg-gray-100">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                    </svg>
+                </button>
+                <button id="nextBtn" class="p-2 rounded-lg border border-gray-300 hover:bg-gray-100">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                    </svg>
+                </button>
+                <button id="todayBtn" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm font-medium">
+                    Today
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Current Date Display -->
+    <div class="mb-6 text-center">
+        <h3 id="currentDate" class="text-2xl font-semibold text-gray-800"></h3>
+    </div>
+
+    <!-- Calendar Views -->
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+        
+        <!-- Month View -->
+<div id="monthCalendar" class="calendar-view">
+    <div class="grid grid-cols-7 bg-gray-50 border-b border-gray-200">
+        <div class="p-4 text-center font-semibold text-gray-700">Sun</div>
+        <div class="p-4 text-center font-semibold text-gray-700">Mon</div>
+        <div class="p-4 text-center font-semibold text-gray-700">Tue</div>
+        <div class="p-4 text-center font-semibold text-gray-700">Wed</div>
+        <div class="p-4 text-center font-semibold text-gray-700">Thu</div>
+        <div class="p-4 text-center font-semibold text-gray-700">Fri</div>
+        <div class="p-4 text-center font-semibold text-gray-700">Sat</div>
+    </div>
+    <div id="monthGrid" class="grid grid-cols-7 gap-2 bg-white p-2"></div>
+</div>
+
+        <!-- Week View -->
+        <div id="weekCalendar" class="calendar-view hidden">
+            <div class="grid grid-cols-8 bg-gray-50 border-b border-gray-200">
+                <div class="p-4 font-semibold text-gray-700">Time</div>
+                <div id="weekDays" class="grid grid-cols-7">
+                    <!-- Week days will be populated by JavaScript -->
+                </div>
+            </div>
+            <div id="weekGrid" class="grid grid-cols-8">
+                <!-- Time slots and events will be populated by JavaScript -->
+            </div>
+        </div>
+
+        <!-- Day View -->
+        <div id="dayCalendar" class="calendar-view hidden">
+            <div class="p-4 bg-gray-50 border-b border-gray-200">
+                <h4 id="dayHeader" class="text-lg font-semibold text-gray-800 text-center"></h4>
+            </div>
+            <div id="dayGrid" class="divide-y divide-gray-200">
+                <!-- Time slots and events will be populated by JavaScript -->
+            </div>
+        </div>
+
+        <!-- List View -->
+        <div id="listCalendar" class="calendar-view hidden">
+            <div class="p-4 bg-gray-50 border-b border-gray-200">
+                <h4 class="text-lg font-semibold text-gray-800">All Meetings</h4>
+            </div>
+            <div id="listGrid" class="divide-y divide-gray-200">
+                <!-- Meetings list will be populated by JavaScript -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mt-8">
+        <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+            <div class="flex items-center">
+                <div class="p-3 bg-blue-100 rounded-lg">
+                    <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                </div>
+                <div class="ml-4">
+                    <p class="text-sm font-medium text-gray-600">Total Meetings</p>
+                    <p id="totalMeetings" class="text-2xl font-bold text-gray-900">0</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+            <div class="flex items-center">
+                <div class="p-3 bg-green-100 rounded-lg">
+                    <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                </div>
+                <div class="ml-4">
+                    <p class="text-sm font-medium text-gray-600">Completed</p>
+                    <p id="completedMeetings" class="text-2xl font-bold text-gray-900">0</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+            <div class="flex items-center">
+                <div class="p-3 bg-blue-100 rounded-lg">
+                    <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                </div>
+                <div class="ml-4">
+                    <p class="text-sm font-medium text-gray-600">Upcoming</p>
+                    <p id="upcomingMeetings" class="text-2xl font-bold text-gray-900">0</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+            <div class="flex items-center">
+                <div class="p-3 bg-red-100 rounded-lg">
+                    <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </div>
+                <div class="ml-4">
+                    <p class="text-sm font-medium text-gray-600">Cancelled</p>
+                    <p id="cancelledMeetings" class="text-2xl font-bold text-gray-900">0</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Meeting Detail Modal -->
+<div id="meetingModal" class="fixed inset-0 hidden bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+    <div class="bg-white rounded-2xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+        <div class="p-6 border-b border-gray-200">
+            <div class="flex justify-between items-center">
+                <h3 class="text-xl font-bold text-gray-800">Meeting Details</h3>
+                <button onclick="closeMeetingModal()" class="text-gray-400 hover:text-gray-600">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+        </div>
+        
+        <div class="p-6">
+            <div id="meetingModalContent">
+                <!-- Content will be populated by JavaScript -->
+            </div>
+        </div>
+        
+        <div class="p-6 border-t border-gray-200 bg-gray-50 rounded-b-2xl">
+            <div class="flex justify-end space-x-3">
+                <button onclick="closeMeetingModal()" class="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 font-medium">
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<script>
+// Calendar data
+let currentDate = new Date();
+let meetings = {{ meetings|tojson|safe }};
+let currentView = 'month';
+
+// Initialize calendar
+document.addEventListener('DOMContentLoaded', function() {
+    initializeCalendar();
+    updateStats();
+    setupEventListeners();
+});
+
+function initializeCalendar() {
+    updateCurrentDateDisplay();
+    renderMonthView();
+}
+
+function setupEventListeners() {
+    // View toggle buttons
+    document.getElementById('monthView').addEventListener('click', () => switchView('month'));
+    document.getElementById('weekView').addEventListener('click', () => switchView('week'));
+    document.getElementById('dayView').addEventListener('click', () => switchView('day'));
+    document.getElementById('listView').addEventListener('click', () => switchView('list'));
+    
+    // Navigation buttons
+    document.getElementById('prevBtn').addEventListener('click', navigatePrevious);
+    document.getElementById('nextBtn').addEventListener('click', navigateNext);
+    document.getElementById('todayBtn').addEventListener('click', goToToday);
+}
+
+function switchView(view) {
+    currentView = view;
+    
+    // Update active button
+    document.querySelectorAll('[id$="View"]').forEach(btn => {
+        btn.classList.remove('bg-blue-600', 'text-white');
+        btn.classList.add('text-gray-700', 'hover:bg-gray-100');
+    });
+    document.getElementById(view + 'View').classList.add('bg-blue-600', 'text-white');
+    document.getElementById(view + 'View').classList.remove('text-gray-700', 'hover:bg-gray-100');
+    
+    // Hide all views
+    document.querySelectorAll('.calendar-view').forEach(view => {
+        view.classList.add('hidden');
+    });
+    
+    // Show selected view
+    document.getElementById(view + 'Calendar').classList.remove('hidden');
+    
+    // Render the view
+    switch(view) {
+        case 'month':
+            renderMonthView();
+            break;
+        case 'week':
+            renderWeekView();
+            break;
+        case 'day':
+            renderDayView();
+            break;
+        case 'list':
+            renderListView();
+            break;
+    }
+}
+
+function navigatePrevious() {
+    switch(currentView) {
+        case 'month':
+            currentDate.setMonth(currentDate.getMonth() - 1);
+            renderMonthView();
+            break;
+        case 'week':
+            currentDate.setDate(currentDate.getDate() - 7);
+            renderWeekView();
+            break;
+        case 'day':
+            currentDate.setDate(currentDate.getDate() - 1);
+            renderDayView();
+            break;
+    }
+    updateCurrentDateDisplay();
+}
+
+function navigateNext() {
+    switch(currentView) {
+        case 'month':
+            currentDate.setMonth(currentDate.getMonth() + 1);
+            renderMonthView();
+            break;
+        case 'week':
+            currentDate.setDate(currentDate.getDate() + 7);
+            renderWeekView();
+            break;
+        case 'day':
+            currentDate.setDate(currentDate.getDate() + 1);
+            renderDayView();
+            break;
+    }
+    updateCurrentDateDisplay();
+}
+
+function goToToday() {
+    currentDate = new Date();
+    switch(currentView) {
+        case 'month':
+            renderMonthView();
+            break;
+        case 'week':
+            renderWeekView();
+            break;
+        case 'day':
+            renderDayView();
+            break;
+        case 'list':
+            renderListView();
+            break;
+    }
+    updateCurrentDateDisplay();
+}
+
+function updateCurrentDateDisplay() {
+    const dateElement = document.getElementById('currentDate');
+    switch(currentView) {
+        case 'month':
+            dateElement.textContent = currentDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+            break;
+        case 'week':
+            const weekStart = new Date(currentDate);
+            weekStart.setDate(currentDate.getDate() - currentDate.getDay());
+            const weekEnd = new Date(weekStart);
+            weekEnd.setDate(weekStart.getDate() + 6);
+            dateElement.textContent = `${weekStart.toLocaleDateString()} - ${weekEnd.toLocaleDateString()}`;
+            break;
+        case 'day':
+            dateElement.textContent = currentDate.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+            break;
+        case 'list':
+            dateElement.textContent = 'All Meetings';
+            break;
+    }
+}
+
+function renderMonthView() {
+    const grid = document.getElementById('monthGrid');
+    grid.innerHTML = '';
+    
+    const year = currentDate.getFullYear();
+    const month = currentDate.getMonth();
+    
+    // Get first day of month and last day of month
+    const firstDay = new Date(year, month, 1);
+    const lastDay = new Date(year, month + 1, 0);
+    
+    // Get the day of the week for the first day (0 = Sunday, 6 = Saturday)
+    const firstDayIndex = firstDay.getDay();
+    
+    // Get the number of days in the month
+    const daysInMonth = lastDay.getDate();
+    
+    // Calculate days from previous month to show
+    const prevMonthLastDay = new Date(year, month, 0).getDate();
+    
+    const today = new Date();
+    
+    // Create calendar grid
+    for (let i = 0; i < 42; i++) { // 6 weeks * 7 days
+        const dayElement = document.createElement('div');
+        dayElement.className = 'calendar-day p-2';
+        
+        let dayNumber;
+        let isCurrentMonth = true;
+        
+        if (i < firstDayIndex) {
+            // Previous month
+            dayNumber = prevMonthLastDay - firstDayIndex + i + 1;
+            isCurrentMonth = false;
+            dayElement.classList.add('other-month');
+        } else if (i >= firstDayIndex + daysInMonth) {
+            // Next month
+            dayNumber = i - firstDayIndex - daysInMonth + 1;
+            isCurrentMonth = false;
+            dayElement.classList.add('other-month');
+        } else {
+            // Current month
+            dayNumber = i - firstDayIndex + 1;
+        }
+        
+        // Check if today
+        if (isCurrentMonth && dayNumber === today.getDate() && month === today.getMonth() && year === today.getFullYear()) {
+            dayElement.classList.add('today');
+        }
+        
+        // Add day number
+        const dayHeader = document.createElement('div');
+        dayHeader.className = 'text-sm font-semibold mb-1';
+        dayHeader.textContent = dayNumber;
+        dayElement.appendChild(dayHeader);
+        
+        // Add events for this day
+        if (isCurrentMonth) {
+            const currentDateObj = new Date(year, month, dayNumber);
+            const dayEvents = getMeetingsForDate(currentDateObj);
+            
+            dayEvents.forEach(event => {
+                const eventElement = document.createElement('div');
+                eventElement.className = `calendar-event bg-${getStatusColor(event.status)}-100 text-${getStatusColor(event.status)}-800 border-l-2 border-${getStatusColor(event.status)}-500`;
+                
+                // FIX: Check if time exists, otherwise use a default or extract from date
+                let displayTime = 'Time TBD';
+                if (event.time) {
+                    displayTime = event.time;
+                } else if (event.date) {
+                    // Extract time from date string
+                    const meetingDate = new Date(event.date);
+                    displayTime = meetingDate.toLocaleTimeString('en-US', { 
+                        hour: '2-digit', 
+                        minute: '2-digit',
+                        hour12: true 
+                    });
+                }
+                
+                eventElement.textContent = `${displayTime} - ${event.title}`;
+                eventElement.addEventListener('click', () => openMeetingModal(event));
+                dayElement.appendChild(eventElement);
+            });
+        }
+        
+        grid.appendChild(dayElement);
+    }
+}
+
+function renderWeekView() {
+    const weekDaysElement = document.getElementById('weekDays');
+    const weekGridElement = document.getElementById('weekGrid');
+    
+    weekDaysElement.innerHTML = '';
+    weekGridElement.innerHTML = '';
+    
+    const weekStart = new Date(currentDate);
+    weekStart.setDate(currentDate.getDate() - currentDate.getDay());
+    
+    // Create day headers
+    for (let i = 0; i < 7; i++) {
+        const day = new Date(weekStart);
+        day.setDate(weekStart.getDate() + i);
+        
+        const dayElement = document.createElement('div');
+        dayElement.className = 'p-4 text-center font-semibold text-gray-700 border-l border-gray-200';
+        dayElement.innerHTML = `
+            <div>${day.toLocaleDateString('en-US', { weekday: 'short' })}</div>
+            <div class="text-lg ${isToday(day) ? 'bg-blue-600 text-white rounded-full w-8 h-8 flex items-center justify-center mx-auto' : ''}">${day.getDate()}</div>
+        `;
+        weekDaysElement.appendChild(dayElement);
+    }
+    
+    // Create time slots
+    for (let hour = 0; hour < 24; hour++) {
+        const timeSlot = document.createElement('div');
+        timeSlot.className = 'grid grid-cols-8';
+        
+        // Time label
+        const timeLabel = document.createElement('div');
+        timeLabel.className = 'time-slot-hour p-2 text-sm text-gray-500 text-center';
+        timeLabel.textContent = `${hour.toString().padStart(2, '0')}:00`;
+        timeSlot.appendChild(timeLabel);
+        
+        // Day columns
+        for (let i = 0; i < 7; i++) {
+            const day = new Date(weekStart);
+            day.setDate(weekStart.getDate() + i);
+            day.setHours(hour, 0, 0, 0);
+            
+            const daySlot = document.createElement('div');
+            daySlot.className = 'time-slot border-l border-gray-200 relative';
+            daySlot.dataset.date = day.toISOString();
+            
+            // Add events for this time slot
+            const hourEvents = getMeetingsForDateAndHour(day, hour);
+            hourEvents.forEach(event => {
+                const eventElement = document.createElement('div');
+                eventElement.className = `calendar-event absolute left-1 right-1 ${getStatusColor(event.status)}-100 border-l-2 border-${getStatusColor(event.status)}-500 z-10`;
+                eventElement.style.top = '2px';
+                eventElement.style.bottom = '2px';
+                eventElement.innerHTML = `
+                    <div class="text-xs font-medium truncate">${event.title}</div>
+                    <div class="text-xs truncate">${event.time}</div>
+                `;
+                eventElement.addEventListener('click', () => openMeetingModal(event));
+                daySlot.appendChild(eventElement);
+            });
+            
+            timeSlot.appendChild(daySlot);
+        }
+        
+        weekGridElement.appendChild(timeSlot);
+    }
+}
+
+function renderDayView() {
+    const dayHeader = document.getElementById('dayHeader');
+    const dayGrid = document.getElementById('dayGrid');
+    
+    dayHeader.textContent = currentDate.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+    dayGrid.innerHTML = '';
+    
+    const dayEvents = getMeetingsForDate(currentDate);
+    
+    if (dayEvents.length === 0) {
+        dayGrid.innerHTML = `
+            <div class="p-8 text-center text-gray-500">
+                <svg class="w-12 h-12 mx-auto mb-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+                <p>No meetings scheduled for this day</p>
+            </div>
+        `;
+        return;
+    }
+    
+    dayEvents.sort((a, b) => new Date(a.date) - new Date(b.date));
+    
+    dayEvents.forEach(event => {
+        const eventElement = document.createElement('div');
+        eventElement.className = 'p-4 hover:bg-gray-50 cursor-pointer';
+        eventElement.addEventListener('click', () => openMeetingModal(event));
+        eventElement.innerHTML = `
+            <div class="flex items-start justify-between">
+                <div class="flex-1">
+                    <h4 class="font-semibold text-gray-800">${event.title}</h4>
+                    <p class="text-sm text-gray-600 mt-1">${event.time} • ${event.duration} minutes</p>
+                    <p class="text-sm text-gray-700 mt-2">${event.description}</p>
+                    <div class="flex items-center mt-2 space-x-4 text-sm text-gray-600">
+                        <span>👨‍🏫 ${event.mentor}</span>
+                        <span>👨‍🎓 ${event.mentee}</span>
+                    </div>
+                </div>
+                <span class="px-2 py-1 rounded-full text-xs font-medium
+                    ${event.status === 'upcoming' ? 'bg-blue-100 text-blue-800' :
+                      event.status === 'completed' ? 'bg-green-100 text-green-800' :
+                      'bg-red-100 text-red-800'}">
+                    ${event.status}
+                </span>
+            </div>
+        `;
+        dayGrid.appendChild(eventElement);
+    });
+}
+
+function renderListView() {
+    const listGrid = document.getElementById('listGrid');
+    listGrid.innerHTML = '';
+    
+    if (meetings.length === 0) {
+        listGrid.innerHTML = `
+            <div class="p-8 text-center text-gray-500">
+                <svg class="w-12 h-12 mx-auto mb-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+                <p>No meetings found</p>
+            </div>
+        `;
+        return;
+    }
+    
+    meetings.sort((a, b) => new Date(b.date) - new Date(a.date));
+    
+    meetings.forEach(meeting => {
+        const meetingElement = document.createElement('div');
+        meetingElement.className = 'p-6 hover:bg-gray-50 cursor-pointer border-b border-gray-200 last:border-b-0';
+        meetingElement.addEventListener('click', () => openMeetingModal(meeting));
+        meetingElement.innerHTML = `
+            <div class="flex items-start justify-between">
+                <div class="flex-1">
+                    <div class="flex items-center space-x-3 mb-2">
+                        <h4 class="text-lg font-semibold text-gray-800">${meeting.title}</h4>
+                        <span class="px-2 py-1 rounded-full text-xs font-medium
+                            ${meeting.status === 'upcoming' ? 'bg-blue-100 text-blue-800' :
+                              meeting.status === 'completed' ? 'bg-green-100 text-green-800' :
+                              'bg-red-100 text-red-800'}">
+                            ${meeting.status}
+                        </span>
+                    </div>
+                    <p class="text-gray-600 mb-3">${meeting.description}</p>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm text-gray-700">
+                        <div>
+                            <p><span class="font-semibold">Date & Time:</span> ${meeting.date}</p>
+                            <p><span class="font-semibold">Duration:</span> ${meeting.duration} minutes</p>
+                        </div>
+                        <div>
+                            <p><span class="font-semibold">Mentor:</span> ${meeting.mentor}</p>
+                            <p><span class="font-semibold">Mentee:</span> ${meeting.mentee}</p>
+                        </div>
+                        <div>
+                            ${meeting.meet_link ? `<p><span class="font-semibold">Meeting Link:</span> <a href="${meeting.meet_link}" target="_blank" class="text-blue-500 hover:underline">Join</a></p>` : ''}
+                            <p><span class="font-semibold">Created:</span> ${meeting.created_at}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+        listGrid.appendChild(meetingElement);
+    });
+}
+
+function getMeetingsForDate(date) {
+    return meetings.filter(meeting => {
+        const meetingDate = new Date(meeting.date);
+        return meetingDate.getDate() === date.getDate() &&
+               meetingDate.getMonth() === date.getMonth() &&
+               meetingDate.getFullYear() === date.getFullYear();
+    });
+}
+
+function getMeetingsForDateAndHour(date, hour) {
+    return meetings.filter(meeting => {
+        const meetingDate = new Date(meeting.date);
+        return meetingDate.getDate() === date.getDate() &&
+               meetingDate.getMonth() === date.getMonth() &&
+               meetingDate.getFullYear() === date.getFullYear() &&
+               meetingDate.getHours() === hour;
+    });
+}
+
+function getStatusColor(status) {
+    switch(status) {
+        case 'upcoming': return 'blue';
+        case 'completed': return 'green';
+        case 'cancelled': return 'red';
+        default: return 'gray';
+    }
+}
+
+function isToday(date) {
+    const today = new Date();
+    return date.getDate() === today.getDate() &&
+           date.getMonth() === today.getMonth() &&
+           date.getFullYear() === today.getFullYear();
+}
+
+function openMeetingModal(meeting) {
+    const modalContent = document.getElementById('meetingModalContent');
+    modalContent.innerHTML = `
+        <div class="space-y-6">
+            <div class="flex items-start justify-between">
+                <div>
+                    <h4 class="text-xl font-bold text-gray-800">${meeting.title}</h4>
+                    <p class="text-gray-600 mt-1">${meeting.date} • ${meeting.duration} minutes</p>
+                </div>
+                <span class="px-3 py-1 rounded-full text-sm font-medium
+                    ${meeting.status === 'upcoming' ? 'bg-blue-100 text-blue-800' :
+                      meeting.status === 'completed' ? 'bg-green-100 text-green-800' :
+                      'bg-red-100 text-red-800'}">
+                    ${meeting.status.charAt(0).toUpperCase() + meeting.status.slice(1)}
+                </span>
+            </div>
+            
+            <div>
+                <h5 class="font-semibold text-gray-700 mb-2">Description</h5>
+                <p class="text-gray-600 bg-gray-50 p-4 rounded-lg">${meeting.description}</p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <h5 class="font-semibold text-gray-700 mb-3">Participants</h5>
+                    <div class="space-y-3">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+                                <span class="text-blue-600 font-semibold">M</span>
+                            </div>
+                            <div>
+                                <p class="font-medium text-gray-800">${meeting.mentor}</p>
+                                <p class="text-sm text-gray-600">${meeting.mentor_email}</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
+                                <span class="text-green-600 font-semibold">S</span>
+                            </div>
+                            <div>
+                                <p class="font-medium text-gray-800">${meeting.mentee}</p>
+                                <p class="text-sm text-gray-600">${meeting.mentee_email}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div>
+                    <h5 class="font-semibold text-gray-700 mb-3">Meeting Details</h5>
+                    <div class="space-y-2 text-sm text-gray-600">
+                        <p><span class="font-medium">Duration:</span> ${meeting.duration} minutes</p>
+                        <p><span class="font-medium">Created:</span> ${meeting.created_at}</p>
+                        ${meeting.meet_link ? `
+                            <p><span class="font-medium">Meeting Link:</span> 
+                                <a href="${meeting.meet_link}" target="_blank" class="text-blue-500 hover:underline ml-1">
+                                    Join Meeting
+                                </a>
+                            </p>
+                        ` : ''}
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    document.getElementById('meetingModal').classList.remove('hidden');
+}
+
+function closeMeetingModal() {
+    document.getElementById('meetingModal').classList.add('hidden');
+}
+
+function updateStats() {
+    const total = meetings.length;
+    const completed = meetings.filter(m => m.status === 'completed').length;
+    const upcoming = meetings.filter(m => m.status === 'upcoming').length;
+    const cancelled = meetings.filter(m => m.status === 'cancelled').length;
+    
+    document.getElementById('totalMeetings').textContent = total;
+    document.getElementById('completedMeetings').textContent = completed;
+    document.getElementById('upcomingMeetings').textContent = upcoming;
+    document.getElementById('cancelledMeetings').textContent = cancelled;
+}
+
+// Close modal when clicking outside
+document.getElementById('meetingModal').addEventListener('click', function(e) {
+    if (e.target === this) {
+        closeMeetingModal();
+    }
+});
+</script>
+{% endblock %}

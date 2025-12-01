@@ -1,132 +1,63 @@
 {% extends "base2.html" %}
 
 {% block title %}Institution Dashboard{% endblock %}
+{% block user %}institution{% endblock %}
 
 {% block content %}
 <div class="dashboard-container">
     <div class="dashboard-header">
         <h1>Institution Dashboard</h1>
-        <p>Welcome back, {{ user.name }} | {{ user.institution }}</p>
     </div>
 
-    <!-- Statistics Cards -->
-    <div class="stats-grid">
-        <div class="stat-card">
-            <div class="stat-icon">👨‍🏫</div>
-            <div class="stat-info">
-                <h3>{{ institution_mentors|length }}</h3>
-                <p>Total Mentors</p>
-            </div>
+  
+
+  <section id="dashboard" class="p-6 bg-white rounded-xl shadow-sm">
+    <div class="mb-8">
+      <h1 class="text-xl font-semibold text-gray-800 mb-2">Welcome, {{ user.name }} | {{ user.institution }}</h1>
+      <p class="text-gray-600">Monitor and manage all mentors and mentees of your institution from here.</p>
+    </div>
+    
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+      <div class="bg-blue-50 p-5 rounded-xl border border-blue-100">
+        <div class="flex items-center">
+          <div class="rounded-full bg-blue-100 p-3 mr-4">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+            </svg>
+          </div>
+          <div>
+            <p class="text-sm font-medium text-gray-500">Total Mentors</p>
+            <p class="text-2xl font-bold text-gray-800">{{ institution_mentors|length }}</p>
+          </div>
         </div>
-        
-        <div class="stat-card">
-            <div class="stat-icon">🎓</div>
-            <div class="stat-info">
-                <h3>{{ institution_mentees|length }}</h3>
-                <p>Total Mentees</p>
-            </div>
+      </div>
+      
+      <div class="bg-green-50 p-5 rounded-xl border border-green-100">
+        <div class="flex items-center">
+          <div class="rounded-full bg-green-100 p-3 mr-4">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+            </svg>
+          </div>
+          <div>
+            <p class="text-sm font-medium text-gray-500">Total Mentees</p>
+            <p class="text-2xl font-bold text-gray-800">{{ institution_mentees|length }}</p>
+          </div>
         </div>
-        
-        <div class="stat-card">
-            <div class="stat-icon">🤝</div>
-            <div class="stat-info">
-                <h3>{{ mentorship_requests|length }}</h3>
-                <p>Active Mentorships</p>
-            </div>
-        </div>
-        
-        <div class="stat-card">
-            <div class="stat-icon">📊</div>
-            <div class="stat-info">
-                <h3>{{ (mentorship_requests|selectattr('final_status', 'equalto', 'approved')|list|length) }}</h3>
-                <p>Approved Requests</p>
-            </div>
-        </div>
+      </div>
+      
     </div>
 
-    <!-- Quick Actions -->
-    <div class="quick-actions">
-        <h2>Quick Actions</h2>
-        <div class="action-grid">
-            <a href="{{ url_for('institution_mentors') }}" class="action-card">
-                <div class="action-icon">👨‍🏫</div>
-                <h3>View Mentors</h3>
-                <p>Manage institution mentors</p>
-            </a>
-            
-            <a href="{{ url_for('institution_mentees') }}" class="action-card">
-                <div class="action-icon">🎓</div>
-                <h3>View Mentees</h3>
-                <p>Manage institution mentees</p>
-            </a>
-            
-            <a href="{{ url_for('institution_mentorships') }}" class="action-card">
-                <div class="action-icon">🤝</div>
-                <h3>Mentorships</h3>
-                <p>View all mentorship programs</p>
-            </a>
-            
 
-        </div>
-    </div>
+    
+  </section>
 
-    <!-- Recent Activity -->
-    <div class="recent-activity">
-        <h2>Recent Mentorship Activity</h2>
-        <div class="activity-list">
-            {% if mentorship_requests %}
-                {% for request in mentorship_requests[:5] %}
-                <div class="activity-item">
-                    <div class="activity-icon">📋</div>
-                    <div class="activity-details">
-                        <h4>Mentorship Request #{{ request.id }}</h4>
-                        <p>
-                            <strong>Mentee:</strong> {{ request.mentee.name }} | 
-                            <strong>Mentor:</strong> {{ request.mentor.name }} | 
-                            <strong>Status:</strong> 
-                            <span class="status-badge status-{{ request.final_status }}">
-                                {{ request.final_status }}
-                            </span>
-                        </p>
-                        <small>Created: {{ request.created_at.strftime('%d %b %Y') }}</small>
-                    </div>
-                </div>
-                {% endfor %}
-            {% else %}
-                <div class="no-activity">
-                    <p>No mentorship activity yet.</p>
-                </div>
-            {% endif %}
-        </div>
-    </div>
 
-    <!-- Institution Details -->
-    {% if institution %}
-    <div class="institution-info">
-        <h2>Institution Information</h2>
-        <div class="info-grid">
-            <div class="info-item">
-                <strong>Name:</strong> {{ institution.name }}
-            </div>
-            {% if institution.city %}
-            <div class="info-item">
-                <strong>City:</strong> {{ institution.city }}
-            </div>
-            {% endif %}
-            {% if institution.contact_email %}
-            <div class="info-item">
-                <strong>Contact Email:</strong> {{ institution.contact_email }}
-            </div>
-            {% endif %}
-            {% if institution.website %}
-            <div class="info-item">
-                <strong>Website:</strong> 
-                <a href="{{ institution.website }}" target="_blank">{{ institution.website }}</a>
-            </div>
-            {% endif %}
-        </div>
-    </div>
-    {% endif %}
+
+
+
+
+
 </div>
 
 <style>
@@ -305,6 +236,78 @@
 .status-rejected {
     background: #f8d7da;
     color: #721c24;
+}
+
+.members-section {
+    background: white;
+    padding: 25px;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    margin-bottom: 40px;
+}
+
+.members-section h2 {
+    margin-bottom: 20px;
+    color: #333;
+}
+
+.members-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+}
+
+.member-card {
+    background: #f9f9f9;
+    padding: 20px;
+    border-radius: 8px;
+    border-left: 4px solid #007bff;
+    transition: all 0.3s ease;
+}
+
+.member-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.member-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.member-header h3 {
+    margin: 0;
+    color: #333;
+    font-size: 1.1em;
+}
+
+.role-badge {
+    background: #007bff;
+    color: white;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.8em;
+    font-weight: bold;
+}
+
+.member-card p {
+    margin: 8px 0;
+    color: #666;
+    font-size: 0.95em;
+}
+
+.no-members {
+    text-align: center;
+    padding: 40px;
+    color: #999;
+    background: #f9f9f9;
+    border-radius: 8px;
+}
+
+.no-members p {
+    margin: 0;
 }
 
 .institution-info {

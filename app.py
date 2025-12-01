@@ -1,12 +1,11 @@
 from flask import Flask, redirect, url_for, render_template, request, session, flash, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin, login_user, LoginManager, login_required, logout_user, current_user
-from sqlalchemy import cast, Integer
+from sqlalchemy import cast, Integer, or_, and_
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
 from datetime import datetime, timedelta
 from functools import wraps
-from sqlalchemy import or_
 import os
 import json 
 from google_auth_oauthlib.flow import Flow
@@ -83,9 +82,11 @@ class User(db.Model):
     password = db.Column(db.String(200), nullable=False)   # length thoda bada
     user_type = db.Column(db.String(10), nullable=False)
     institution = db.Column(db.String(150), nullable=True)
+    institution_id = db.Column(db.Integer, db.ForeignKey("institutions.id"), nullable=True)
 
     #connect form another table
     mentor_profile = db.relationship("MentorProfile", backref="user", uselist=False)
+    institution_ref = db.relationship("Institution", backref="users", foreign_keys="User.institution_id")
 
     def __repr__(self):
         return f"<user {self.name}>"
@@ -189,6 +190,7 @@ class Institution(db.Model):
     __tablename__ = "institutions"
     
     id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("signup_details.id"), nullable=True, unique=True)
     name = db.Column(db.String(150), nullable=False, unique=True)
     email_domain = db.Column(db.String(100), nullable=True)  # For auto-detection
     contact_person = db.Column(db.String(100))
@@ -199,12 +201,16 @@ class Institution(db.Model):
     state = db.Column(db.String(100))
     country = db.Column(db.String(100))
     website = db.Column(db.String(200))
+    institution_type = db.Column(db.String(50), default="other")  # university, college, school, other
     status = db.Column(db.String(20), default="active")  # active, inactive
+    profile_picture = db.Column(db.String(100), nullable=True)  # Store image filename
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    
+    # Relationship with User (institution admin) - via user_id
+    user = db.relationship("User", backref="institution_profile", uselist=False, foreign_keys="Institution.user_id")
     
     def __repr__(self):
         return f"<Institution {self.name}>"
-
 
 #------------------mentorship request table-------------------
 class MentorshipRequest(db.Model):
@@ -575,72 +581,79 @@ def home():
 @app.route("/signup", methods=["GET", "POST"])
 def signup():
     if request.method == "POST":
-        name = request.form["name"]
-        email = request.form["email"]
-        user_type = request.form["user-type"]
-        password = request.form["password"]
-        confirm_password = request.form["confirm-password"]
-        institution_name = request.form.get("institution", "Other")  # New field
+        name = request.form.get("name")
+        email = request.form.get("email")
+        user_type = request.form.get("user-type")
+        password = request.form.get("password")
+        confirm_password = request.form.get("confirm-password")
+        institution_name = request.form.get("institution", "")
 
         # Password check
         if password != confirm_password:
-            return "Passwords do not match!"
+            flash("Passwords do not match!", "error")
+            return redirect(url_for("signup"))
 
         # Check if user already exists
         existing_user = User.query.filter_by(email=email).first()
         if existing_user:
-            return "User already exists! Please sign in."
+            flash("User already exists! Please sign in.", "error")
+            return redirect(url_for("signin"))
 
-        # Save user in "database"
+        # Hash password
         hashed_password = generate_password_hash(password, method='pbkdf2:sha256', salt_length=8)
-        new_user = User(name=name, email=email, password=hashed_password, user_type=user_type, institution=institution_name)
+        
+        # Create new user first
+        new_user = User(
+            name=name, 
+            email=email, 
+            password=hashed_password, 
+            user_type=user_type, 
+            institution=institution_name
+        )
         db.session.add(new_user)
+        db.session.flush()  # Get user ID
+        
+        # For institution admin (user_type = "3"), create/link institution profile
+        if user_type == "3":
+            # Check if institution exists
+            institution = Institution.query.filter_by(name=institution_name).first()
+            if not institution:
+                # Create new institution with admin user link
+                institution = Institution(
+                    user_id=new_user.id,
+                    name=institution_name, 
+                    contact_person=name,
+                    contact_email=email,
+                    status="active"
+                )
+                db.session.add(institution)
+                db.session.flush()
+            
+            # Link user to institution
+            new_user.institution_id = institution.id
+        
         db.session.commit()
 
-        #store in session
+        # Store in session
         session["email"] = email
         session["user_type"] = user_type
+        session["user_id"] = new_user.id
 
-        #render based on role
+        # Redirect based on role
         if user_type == "1":
             return redirect(url_for("mentordashboard"))
         elif user_type == "2":
             return redirect(url_for("menteedashboard"))
         elif user_type == "0":
             return redirect(url_for("supervisordashboard"))
-        elif user_type == "3":  # New institution user
+        elif user_type == "3":  # Institution admin
             return redirect(url_for("institutiondashboard"))
         
-        # agar user_type galat aaya ho
         return redirect(url_for("signin"))
 
-    # agar request GET ho to signup form dikhana
+    # Show signup form with active institutions
     institutions = Institution.query.filter_by(status="active").all()
     return render_template("auth/signup.html", institutions=institutions)
-
-    if request.method == "POST":
-        name = request.form.get("name")
-        email = request.form.get("email")
-        password = request.form.get("password")
-        user_type = request.form.get("user_type")
-
-        # Basic validation
-        if not name or not email or not password or not user_type:
-            flash("All fields are required.", "error")
-            return render_template("auth/signup.html")
-        
-        # Check for existing user
-        if User.query.filter_by(email=email).first():
-            flash("Email already registered.", "error")
-            return render_template("auth/signup.html")
-
-        # Hash password
-        hashed_password = generate_password_hash(password)
-        new_user = User(name=name, email=email, password=hashed_password, user_type=user_type)
-        db.session.add(new_user)
-        db.session.commit()
-        flash("Signup successful! Please sign in.", "success")
-        return redirect(url_for("signin"))
 
     return render_template("auth/signup.html")
 
@@ -666,6 +679,7 @@ def signin():
         # Save session
         session["email"] = user.email
         session["user_type"] = user.user_type
+        session["user_id"] = user.id
 
         # Redirect based on role
         if user.user_type == "1":
@@ -1004,26 +1018,40 @@ def institutiondashboard():
         return redirect(url_for("signin"))
 
     user = User.query.filter_by(email=session["email"]).first()
-    profile_complete = check_profile_complete(user.id, "3")  # ⚠️ Update this function too
+    profile_complete = check_profile_complete(user.id, "3")
 
-    # Get institution details
-    institution = Institution.query.filter_by(name=user.institution).first()
+    # Get institution details by ID (primary) or fall back to name (legacy)
+    institution = None
+    if user.institution_id:
+        institution = Institution.query.filter_by(id=user.institution_id).first()
+    if not institution:
+        institution = Institution.query.filter_by(name=user.institution).first()
     
-    # Get mentors and mentees from same institution
-    institution_mentors = User.query.filter_by(
-        user_type="1", 
-        institution=user.institution
+    # Get mentors and mentees who selected this institution
+    # Match by either institution_id (new) or institution name (legacy)
+    institution_name = institution.name if institution else user.institution
+    
+    institution_mentors = User.query.filter(
+        (User.user_type == "1") & (
+            (User.institution_id == user.institution_id) |
+            (User.institution == institution_name)
+        )
     ).all()
     
-    institution_mentees = User.query.filter_by(
-        user_type="2", 
-        institution=user.institution
+    institution_mentees = User.query.filter(
+        (User.user_type == "2") & (
+            (User.institution_id == user.institution_id) |
+            (User.institution == institution_name)
+        )
     ).all()
 
     # Get mentorship requests involving institution members
     institution_mentorship_requests = MentorshipRequest.query\
         .join(User, MentorshipRequest.mentee_id == User.id)\
-        .filter(User.institution == user.institution)\
+        .filter(
+            (User.institution_id == user.institution_id) |
+            (User.institution == institution_name)
+        )\
         .all()
 
     return render_template(
@@ -1044,9 +1072,14 @@ def institution_mentors():
         return redirect(url_for("signin"))
     
     user = User.query.filter_by(email=session["email"]).first()
-    institution_mentors = User.query.filter_by(
-        user_type="1", 
-        institution=user.institution
+    institution_name = user.institution
+    
+    # Get mentors who selected this institution (by ID or name)
+    institution_mentors = User.query.filter(
+        (User.user_type == "1") & (
+            (User.institution_id == user.institution_id) |
+            (User.institution == institution_name)
+        )
     ).all()
     
     return render_template(
@@ -1061,15 +1094,21 @@ def institution_mentees():
         return redirect(url_for("signin"))
     
     user = User.query.filter_by(email=session["email"]).first()
-    institution_mentees = User.query.filter_by(
-        user_type="2", 
-        institution=user.institution
+    institution_name = user.institution
+    
+    # Get mentees who selected this institution (by ID or name)
+    institution_mentees = User.query.filter(
+        (User.user_type == "2") & (
+            (User.institution_id == user.institution_id) |
+            (User.institution == institution_name)
+        )
     ).all()
     
     return render_template(
         "institution/institution_mentees.html",
         show_sidebar=True,
         mentees=institution_mentees
+        
     )
 
 @app.route("/institution_mentorships")
@@ -1078,11 +1117,15 @@ def institution_mentorships():
         return redirect(url_for("signin"))
     
     user = User.query.filter_by(email=session["email"]).first()
+    institution_name = user.institution
     
-    # Get all mentorships involving institution members
+    # Get all mentorships involving institution members (by ID or name)
     institution_mentorships = MentorshipRequest.query\
         .join(User, MentorshipRequest.mentee_id == User.id)\
-        .filter(User.institution == user.institution)\
+        .filter(
+            (User.institution_id == user.institution_id) |
+            (User.institution == institution_name)
+        )\
         .all()
     
     return render_template(
@@ -1090,6 +1133,246 @@ def institution_mentorships():
         show_sidebar=True,
         mentorships=institution_mentorships
     )
+from sqlalchemy.orm import aliased
+from sqlalchemy import and_, or_
+from datetime import datetime
+
+
+@app.route("/institution_all_tasks")
+def institution_all_tasks():
+    if "email" not in session or session.get("user_type") != "3":
+        return redirect(url_for("signin"))
+
+    user = User.query.filter_by(email=session["email"]).first()
+    institution_id = user.institution_id
+    institution_name = user.institution
+
+    if not institution_id and not institution_name:
+        flash("Institution not linked to your account.", "error")
+        return redirect(url_for("institutiondashboard"))
+
+    all_institution_tasks = []
+    
+    # Get all users from the institution
+    institution_users = User.query.filter(
+        (User.institution == institution_name) | 
+        (User.institution_id == institution_id)
+    ).all()
+    
+    institution_user_ids = [user.id for user in institution_users]
+
+    # 1. PERSONAL TASKS (Self-assigned by mentees)
+    personal_tasks_self = PersonalTask.query.filter(
+        PersonalTask.mentee_id.in_(institution_user_ids),
+        PersonalTask.mentor_id == None
+    ).all()
+
+    for task in personal_tasks_self:
+        mentee = User.query.get(task.mentee_id)
+        all_institution_tasks.append({
+            "id": f"personal_{task.id}",
+            "serial": f"P-{task.id}",
+            "title": task.title,
+            "description": task.description,
+            "due_date": task.due_date,
+            "status": task.status or "pending",
+            "progress": task.progress or 0,
+            "priority": task.priority or "medium",
+            "category": task.category or "Personal",
+            "mentor_id": None,
+            "mentor_name": "Self-assigned",
+            "mentee_id": task.mentee_id,
+            "mentee_name": mentee.name if mentee else "Unknown",
+            "mentee_email": mentee.email if mentee else "",
+            "type": "personal",
+            "rating": task.rating or 0,
+            "isCritical": task.is_critical if hasattr(task, 'is_critical') else False,
+            "comments": task.comments if hasattr(task, 'comments') else None
+        })
+
+    # 2. PERSONAL TASKS (Assigned by mentors)
+    personal_tasks_by_mentors = PersonalTask.query.filter(
+        PersonalTask.mentee_id.in_(institution_user_ids),
+        PersonalTask.mentor_id != None
+    ).all()
+
+    for task in personal_tasks_by_mentors:
+        mentee = User.query.get(task.mentee_id)
+        mentor = User.query.get(task.mentor_id)
+        
+        # Check if mentor belongs to same institution
+        if mentor and (mentor.institution == institution_name or mentor.institution_id == institution_id):
+            all_institution_tasks.append({
+                "id": f"personal_{task.id}",
+                "serial": f"P-{task.id}",
+                "title": task.title,
+                "description": task.description,
+                "due_date": task.due_date,
+                "status": task.status or "pending",
+                "progress": task.progress or 0,
+                "priority": task.priority or "medium",
+                "category": task.category or "Personal",
+                "mentor_id": task.mentor_id,
+                "mentor_name": mentor.name if mentor else "Unknown",
+                "mentor_email": mentor.email if mentor else "",
+                "mentee_id": task.mentee_id,
+                "mentee_name": mentee.name if mentee else "Unknown",
+                "mentee_email": mentee.email if mentee else "",
+                "type": "personal",
+                "isCritical": task.is_critical if hasattr(task, 'is_critical') else False,
+                "comments": task.comments if hasattr(task, 'comments') else None
+            })
+
+    # 3. MENTEE TASKS (Master Tasks)
+    mentee_tasks = MenteeTask.query.filter(
+        MenteeTask.mentee_id.in_(institution_user_ids)
+    ).all()
+
+    for task in mentee_tasks:
+        mentee = User.query.get(task.mentee_id)
+        mentor = User.query.get(task.mentor_id)
+        master_task = MasterTask.query.get(task.task_id) if task.task_id else None
+        
+        if mentor and (mentor.institution == institution_name or mentor.institution_id == institution_id):
+            all_institution_tasks.append({
+                "id": f"master_{task.id}",
+                "serial": f"M-{task.id}",
+                "title": master_task.purpose_of_call if master_task else "Master Task",
+                "description": master_task.mentee_focus if master_task else "No description",
+                "due_date": task.due_date,
+                "status": task.status or "pending",
+                "progress": task.progress or 0,
+                "priority": "high",  # Master tasks are typically high priority
+                "category": "Master Task",
+                "mentor_id": task.mentor_id,
+                "mentor_name": mentor.name if mentor else "Unknown",
+                "mentor_email": mentor.email if mentor else "",
+                "mentee_id": task.mentee_id,
+                "mentee_name": mentee.name if mentee else "Unknown",
+                "mentee_email": mentee.email if mentee else "",
+                "type": "master",
+                "isCritical": True,  # Master tasks are always critical
+                "comments": task.comments if hasattr(task, 'comments') else None
+            })
+
+    # Sort by due date (most urgent first)
+    all_institution_tasks.sort(key=lambda x: x['due_date'] if x['due_date'] else datetime.max)
+
+    # Get mentors and mentees for filters
+    institution_mentors = User.query.filter(
+        User.id.in_(institution_user_ids),
+        User.user_type == "1"  # Mentor type
+    ).all()
+    
+    institution_mentees = User.query.filter(
+        User.id.in_(institution_user_ids),
+        User.user_type == "2"  # Mentee type
+    ).all()
+
+    return render_template(
+        "institution/institution_all_tasks.html",
+        show_sidebar=True,
+        tasks=all_institution_tasks,
+        mentors=[{"id": m.id, "name": m.name} for m in institution_mentors],
+        mentees=[{"id": m.id, "name": m.name} for m in institution_mentees],
+        now=datetime.now(),
+        profile_complete=True
+    )
+
+@app.route("/get_institution_tasks_data")
+def get_institution_tasks_data():
+    if "email" not in session or session.get("user_type") != "3":
+        return jsonify({"success": False, "message": "Unauthorized"})
+
+    user = User.query.filter_by(email=session["email"]).first()
+    institution_id = user.institution_id
+    institution_name = user.institution
+
+    # Get all users from the institution
+    institution_users = User.query.filter(
+        (User.institution == institution_name) | 
+        (User.institution_id == institution_id)
+    ).all()
+    
+    institution_user_ids = [user.id for user in institution_users]
+    
+    tasks_data = []
+    
+    # Get Personal Tasks
+    personal_tasks = PersonalTask.query.filter(
+        PersonalTask.mentee_id.in_(institution_user_ids)
+    ).all()
+    
+    for task in personal_tasks:
+        mentee = User.query.get(task.mentee_id)
+        mentor = User.query.get(task.mentor_id) if task.mentor_id else None
+        
+        tasks_data.append({
+            "id": f"personal_{task.id}",
+            "serial": f"P-{task.id}",
+            "title": task.title,
+            "description": task.description,
+            "dueDate": task.due_date.isoformat() if task.due_date else None,
+            "status": task.status or "pending",
+            "progress": task.progress or 0,
+            "priority": task.priority or "medium",
+            "category": task.category or "Personal",
+            "mentorId": task.mentor_id,
+            "mentorName": mentor.name if mentor else "Self-assigned",
+            "menteeId": task.mentee_id,
+            "menteeName": mentee.name if mentee else "Unknown",
+            "type": "personal",
+            "isCritical": task.is_critical if hasattr(task, 'is_critical') else False
+        })
+    
+    # Get Mentee Tasks (Master Tasks)
+    mentee_tasks = MenteeTask.query.filter(
+        MenteeTask.mentee_id.in_(institution_user_ids)
+    ).all()
+    
+    for task in mentee_tasks:
+        mentee = User.query.get(task.mentee_id)
+        mentor = User.query.get(task.mentor_id)
+        master_task = MasterTask.query.get(task.task_id) if task.task_id else None
+        
+        tasks_data.append({
+            "id": f"master_{task.id}",
+            "serial": f"M-{task.id}",
+            "title": master_task.purpose_of_call if master_task else "Master Task",
+            "description": master_task.mentee_focus if master_task else "No description",
+            "dueDate": task.due_date.isoformat() if task.due_date else None,
+            "status": task.status or "pending",
+            "progress": task.progress or 0,
+            "priority": "high",
+            "category": "Master Task",
+            "mentorId": task.mentor_id,
+            "mentorName": mentor.name if mentor else "Unknown",
+            "menteeId": task.mentee_id,
+            "menteeName": mentee.name if mentee else "Unknown",
+            "type": "master",
+            "isCritical": True
+        })
+    
+    # Get institution mentors and mentees for filters
+    institution_mentors = User.query.filter(
+        User.id.in_(institution_user_ids),
+        User.user_type == "1"
+    ).all()
+    
+    institution_mentees = User.query.filter(
+        User.id.in_(institution_user_ids),
+        User.user_type == "2"
+    ).all()
+
+    return jsonify({
+        "success": True,
+        "tasks": tasks_data,
+        "mentors": [{"id": m.id, "name": m.name} for m in institution_mentors],
+        "mentees": [{"id": m.id, "name": m.name} for m in institution_mentees],
+        "institutionName": institution_name
+    })
+
+
 
 @app.route("/institution_profile")
 def institutionprofile():
@@ -1098,12 +1381,19 @@ def institutionprofile():
 
     user = User.query.filter_by(email=session["email"]).first()
     
-    institution_details = Institution.query.filter_by(name=user.institution).first()
+    # Get institution by user_id (primary - linked as admin) or by institution_id
+    institution_details = None
+    if user.id:
+        institution_details = Institution.query.filter_by(user_id=user.id).first()
+    if not institution_details and user.institution_id:
+        institution_details = Institution.query.filter_by(id=user.institution_id).first()
+    if not institution_details:
+        institution_details = Institution.query.filter_by(name=user.institution).first()
     
-    # अगर institution नहीं मिला तो default data create करें
+    # If institution not found, create default data
     if not institution_details:
         print(f"Institution '{user.institution}' not found, creating default data")
-        # Default institution object create करें
+        # Create default institution object
         from datetime import datetime
         institution_details = type('obj', (object,), {
             'name': user.institution,
@@ -1121,22 +1411,22 @@ def institutionprofile():
             'id': 0
         })()
     
-    # Calculate statistics
+    # Calculate statistics using institution_id
     total_students = User.query.filter_by(
         user_type="2", 
-        institution=user.institution
+        institution_id=user.institution_id
     ).count()
     
     total_mentors = User.query.filter_by(
         user_type="1", 
-        institution=user.institution
+        institution_id=user.institution_id
     ).count()
     
     # Count active mentorships
     active_mentorships = MentorshipRequest.query\
         .join(User, MentorshipRequest.mentee_id == User.id)\
         .filter(
-            User.institution == user.institution,
+            User.institution_id == user.institution_id,
             MentorshipRequest.final_status == "approved"
         ).count()
 
@@ -1155,6 +1445,102 @@ def institutionprofile():
         institution_details=institution_details
     )
 
+
+@app.route("/editinstitutionprofile", methods=["GET", "POST"])
+def editinstitutionprofile():
+    if "email" not in session or session.get("user_type") != "3":
+        return redirect(url_for("signin"))
+
+    user = User.query.filter_by(email=session["email"]).first()
+    
+    # Get institution by user_id (primary - linked as admin) or by institution_id
+    institution_details = None
+    if user.id:
+        institution_details = Institution.query.filter_by(user_id=user.id).first()
+    if not institution_details and user.institution_id:
+        institution_details = Institution.query.filter_by(id=user.institution_id).first()
+    if not institution_details:
+        institution_details = Institution.query.filter_by(name=user.institution).first()
+
+    if request.method == "POST":
+        try:
+            # If institution doesn't exist, create it with user_id link
+            if not institution_details:
+                institution_details = Institution(
+                    user_id=user.id,  # Link to admin user
+                    name=request.form.get("name", user.institution)
+                )
+                db.session.add(institution_details)
+                db.session.flush()
+            
+            # Update institution details from form
+            institution_details.name = request.form.get("name", user.institution)
+            institution_details.email_domain = request.form.get("email_domain", "")
+            institution_details.contact_person = request.form.get("contact_person", "")
+            institution_details.contact_email = request.form.get("contact_email", "")
+            institution_details.contact_phone = request.form.get("contact_phone", "")
+            institution_details.address = request.form.get("address", "")
+            institution_details.city = request.form.get("city", "")
+            institution_details.state = request.form.get("state", "")
+            institution_details.country = request.form.get("country", "")
+            institution_details.website = request.form.get("website", "")
+            
+            # Sync institution name to user's institution field
+            user.institution = request.form.get("name", user.institution)
+            
+            # Safely set institution_type
+            try:
+                institution_type = request.form.get("institution_type", "other")
+                if hasattr(institution_details, 'institution_type'):
+                    institution_details.institution_type = institution_type
+            except Exception as e:
+                print(f"Warning: Could not set institution_type: {e}")
+            
+            # Link both ways: user.institution_id and institution.user_id
+            user.institution_id = institution_details.id
+            if not institution_details.user_id:
+                institution_details.user_id = user.id
+            
+            # Handle profile picture upload
+            if 'profile_picture' in request.files:
+                file = request.files['profile_picture']
+                if file and file.filename and allowed_file(file.filename):
+                    filename = secure_filename(f"institution_{institution_details.id}_{file.filename}")
+                    file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+                    institution_details.profile_picture = filename
+            
+            # Update user details
+            if hasattr(user, 'designation'):
+                user.designation = request.form.get("designation", "")
+            if hasattr(user, 'department'):
+                user.department = request.form.get("department", "")
+            if hasattr(user, 'phone'):
+                user.phone = request.form.get("official_phone", "")
+            
+            db.session.commit()
+            flash("Institution profile updated successfully!", "success")
+            return redirect(url_for("institutionprofile"))
+            
+        except Exception as e:
+            db.session.rollback()
+            print(f"Error updating institution profile: {str(e)}")
+            flash(f"Error updating profile: {str(e)}", "error")
+            return redirect(url_for("editinstitutionprofile"))
+
+    # GET request - prepare data for the form
+    institution_type = 'other'
+    if institution_details and hasattr(institution_details, 'institution_type'):
+        institution_type = institution_details.institution_type or 'other'
+
+    return render_template(
+        "institution/editinstitutionprofile.html",
+        show_sidebar=False,
+        user=user,
+        full_name=user.name,
+        email=user.email,
+        institution=user.institution,
+        institution_details=institution_details
+    )
 
 #-------- find function------------
 @app.route("/find_mentor", methods=["GET"])
@@ -1367,7 +1753,7 @@ def my_mentees():
                         "comments": mentee_profile.comments,
                         "terms_agreement": mentee_profile.terms_agreement,
                         "profile_picture": mentee_profile.profile_picture,
-                        "profile_complete": mentee_profile_complete  # Use the calculated value
+                        "profile_complete": mentee_profile_complete 
                     }
                 })
 
@@ -2519,9 +2905,71 @@ def supervisor_get_task_rating(task_type, task_id):
     except Exception as e:
         return jsonify({'success': False, 'message': str(e)})
 
+@app.route("/institution_calendar")
+def institution_calendar():
+    if "email" not in session or session.get("user_type") != "3":
+        return redirect(url_for("signin"))
+    
+    user = User.query.filter_by(email=session["email"]).first()
+    institution_name = user.institution
+    institution_id = user.institution_id
 
+    # Fetch all meetings involving mentees or mentors from this institution
+    # We need to query MeetingRequest and join with User to filter by institution
+    meetings = (
+        MeetingRequest.query
+        .join(User, or_(MeetingRequest.requester_id == User.id, MeetingRequest.requested_to_id == User.id))
+        .filter(
+            (User.user_type.in_(["1", "2"])) & # Only mentors and mentees
+            (
+                (User.institution_id == institution_id) |
+                (User.institution == institution_name)
+            )
+        )
+        .order_by(MeetingRequest.meeting_date.asc(), MeetingRequest.meeting_time.asc())
+        .all()
+    )
 
+    from datetime import datetime, date
+    now = datetime.now()
+
+    calendar_meetings = []
+    for meeting in meetings:
+        mentee = User.query.get(meeting.requester_id)
+        mentor = User.query.get(meeting.requested_to_id)
         
+        meeting_datetime = datetime.combine(meeting.meeting_date, meeting.meeting_time)
+        
+        if meeting.status == "cancelled":
+            status = "cancelled"
+        elif meeting_datetime < now:
+            status = "completed"
+        else:
+            status = "upcoming"
+        
+        calendar_meetings.append({
+            "id": meeting.id,
+            "title": meeting.meeting_title,
+            "date": meeting_datetime,
+            "duration": meeting.meeting_duration,
+            "mentee": mentee.name if mentee else "Unknown Mentee",
+            "mentee_email": mentee.email if mentee else "",
+            "mentor": mentor.name if mentor else "Unknown Mentor",
+            "mentor_email": mentor.email if mentor else "",
+            "type": "Video Call",
+            "status": status,
+            "description": meeting.meeting_description or "No description provided",
+            "meet_link": meeting.meet_link,
+            "created_at": meeting.created_at
+        })
+    
+    return render_template(
+        "institution/institution_calendar.html",
+        show_sidebar=True,
+        meetings=calendar_meetings
+    )
+
+
 # ---------------meeting details----------------
 @app.route("/mentee_meeting_details")
 def mentee_meeting_details():
@@ -2753,6 +3201,9 @@ def inject_user_profile_pic():
             elif session.get("user_type") == "0":  # Supervisor
                 profile = SupervisorProfile.query.filter_by(user_id=user.id).first()
                 profile_pic = profile.profile_picture if profile else None
+            elif session.get("user_type") == "3":  # Institution
+                profile = Institution.query.filter_by(user_id=user.id).first()
+                profile_pic = profile.profile_picture if profile else None
         return dict(current_user_profile_pic=profile_pic)
     return dict(current_user_profile_pic=None)
 
@@ -2897,20 +3348,17 @@ def editmenteeprofile():
         # Create profile if not exists
         if not profile:
             profile = MenteeProfile(user_id=user.id)
+            db.session.add(profile)
 
         # Update institution if changed
         new_institution = request.form.get("institution")
-
         if new_institution:
             if new_institution == "Other":
                 other_institution = request.form.get("other_institution_name")
                 if other_institution:
                     user.institution = other_institution
-
-                else:
-                    user.institution = new_institution  
-                
-                db.session.add(user)
+            else:
+                user.institution = new_institution
 
         # Save form data
         profile.dob = request.form.get("dob")
@@ -2928,15 +3376,14 @@ def editmenteeprofile():
         profile.terms_agreement = request.form.get("terms_agreement")
 
         # Handle profile picture upload
-        file = request.files.get("profile_picture")
-        if file and allowed_file(file.filename):
-            filename = secure_filename(file.filename)
-            file.save(os.path.join(app.config["UPLOAD_FOLDER"], filename))
-            profile.profile_picture = filename
+        if 'profile_picture' in request.files:
+            file = request.files['profile_picture']
+            if file and file.filename and allowed_file(file.filename):
+                filename = secure_filename(f"mentee_{profile.id}_{file.filename}")
+                file.save(os.path.join(app.config["UPLOAD_FOLDER"], filename))
+                profile.profile_picture = filename
 
-        db.session.add(profile)
         db.session.commit()
-
         flash("Mentee profile updated successfully!", "success")
         return redirect(url_for("menteeprofile"))
 
@@ -2945,74 +3392,8 @@ def editmenteeprofile():
         "mentee/editmenteeprofile.html",
         full_name=user.name,
         email=user.email,
-        institution=user.institution,  # Pass current institution
-        institutions=institutions,     # Pass institutions list
-        dob=profile.dob if profile else "",
-        school_college_name=profile.school_college_name if profile else "",
-        mobile_number=profile.mobile_number if profile else "",
-        whatsapp_number=profile.whatsapp_number if profile else "",
-        govt_private=profile.govt_private if profile else "",
-        stream=profile.stream if profile else "",
-        class_year=profile.class_year if profile else "",
-        favourite_subject=profile.favourite_subject if profile else "",
-        goal=profile.goal if profile else "",
-        parent_name=profile.parent_name if profile else "",
-        parent_mobile=profile.parent_mobile if profile else "",
-        comments=profile.comments if profile else "",
-        terms_agreement=profile.terms_agreement if profile else "",
-        profile_picture=profile.profile_picture if profile else None
-    )
-
-    if "email" not in session or session.get("user_type") != "2":
-        return redirect(url_for("signin"))
-
-    # Current user
-    user = User.query.filter_by(email=session["email"]).first()
-    profile = MenteeProfile.query.filter_by(user_id=user.id).first()
-
-    if request.method == "POST":
-        # Create profile if not exists
-        if not profile:
-            profile = MenteeProfile(user_id=user.id)
-
-        # Save form data
-        profile.dob = request.form.get("dob")
-        profile.school_college_name = request.form.get("school_college_name")
-        profile.mobile_number = request.form.get("mobile_number")
-        profile.whatsapp_number = request.form.get("whatsapp_number")
-        profile.govt_private = request.form.get("govt_private")
-        profile.stream = request.form.get("stream")
-        profile.class_year = request.form.get("class_year")
-        profile.favourite_subject = request.form.get("favourite_subject")
-        profile.goal = request.form.get("goal")
-        profile.parent_name = request.form.get("parent_name")
-        profile.parent_mobile = request.form.get("parent_mobile")
-        profile.comments = request.form.get("comments")
-        profile.terms_agreement = request.form.get("terms_agreement")
-
-        # Handle profile picture upload
-        file = request.files.get("profile_picture")
-        if file and allowed_file(file.filename):
-            filename = secure_filename(file.filename)
-            # Save file to upload folder
-            file.save(os.path.join(app.config["UPLOAD_FOLDER"], filename))
-            # Store filename in db
-            profile.profile_picture = filename
-
-        db.session.add(profile)
-        db.session.commit()
-
-        flash("Mentee profile updated successfully!", "success")
-        # Redirect to mentee profile page
-        return redirect(url_for("menteeprofile"))
-
-    # GET request – pre-fill form with existing data
-    return render_template(
-        "mentee/editmenteeprofile.html",
-        full_name=user.name,
-        email=user.email,
-        institution=user.institution,  # Pass current institution
-        institutions=institutions,     # Pass institutions list
+        institution=user.institution,
+        institutions=institutions,
         dob=profile.dob if profile else "",
         school_college_name=profile.school_college_name if profile else "",
         mobile_number=profile.mobile_number if profile else "",
@@ -3160,34 +3541,44 @@ def mentorprofile():
         user = User.query.filter_by(email=session["email"]).first()
         profile = MentorProfile.query.filter_by(user_id=user.id).first()
 
+        # Fetch institution details to get its profile picture
+        institution_details = None
+        if user.institution_id:
+            institution_details = Institution.query.filter_by(id=user.institution_id).first()
+        elif user.institution:
+            institution_details = Institution.query.filter_by(name=user.institution).first()
+        
+        institution_profile_picture = institution_details.profile_picture if institution_details else None
+
         return render_template(
             "mentor/mentorprofile.html",
             show_sidebar=False,
-        full_name=user.name,
-        email=user.email,
-        institution=user.institution,
-        profession=profile.profession if profile else "",
-        organisation=profile.organisation if profile else "",
-        whatsapp=profile.whatsapp if profile else "",
-        location=profile.location if profile else "",
-        education=profile.education if profile else "",
-        language=profile.language if profile else "",
-        availability=profile.availability if profile else "",
-        connect_frequency=profile.connect_frequency if profile else "",
-        preferred_communication=profile.preferred_communication if profile else "",
-        other_social_link=profile.other_social_link if profile else "",
-        why_mentor=profile.why_mentor if profile else "",
-        additional_info=profile.additional_info if profile else "",
-        years_of_experience=profile.years_of_experience if profile else "",
-        skills=profile.skills if profile else "",
-        linkedin_link=profile.linkedin_link if profile else "",
-        github_link=profile.github_link if profile else "",
-        portfolio_link=profile.portfolio_link if profile else "",
-        mentorship_topics=profile.mentorship_topics if profile else "",
-        mentorship_type_preference=profile.mentorship_type_preference if profile else "",
-        mentorship_philosophy=profile.mentorship_philosophy if profile else "",
-        mentorship_motto=profile.mentorship_motto if profile else "",
-        profile_picture=profile.profile_picture if profile else None
+            full_name=user.name,
+            email=user.email,
+            institution=user.institution,
+            profession=profile.profession if profile else "",
+            organisation=profile.organisation if profile else "",
+            whatsapp=profile.whatsapp if profile else "",
+            location=profile.location if profile else "",
+            education=profile.education if profile else "",
+            language=profile.language if profile else "",
+            availability=profile.availability if profile else "",
+            connect_frequency=profile.connect_frequency if profile else "",
+            preferred_communication=profile.preferred_communication if profile else "",
+            other_social_link=profile.other_social_link if profile else "",
+            why_mentor=profile.why_mentor if profile else "",
+            additional_info=profile.additional_info if profile else "",
+            years_of_experience=profile.years_of_experience if profile else "",
+            skills=profile.skills if profile else "",
+            linkedin_link=profile.linkedin_link if profile else "",
+            github_link=profile.github_link if profile else "",
+            portfolio_link=profile.portfolio_link if profile else "",
+            mentorship_topics=profile.mentorship_topics if profile else "",
+            mentorship_type_preference=profile.mentorship_type_preference if profile else "",
+            mentorship_philosophy=profile.mentorship_philosophy if profile else "",
+            mentorship_motto=profile.mentorship_motto if profile else "",
+            profile_picture=profile.profile_picture if profile else None,
+            institution_profile_picture=institution_profile_picture
         )
     return redirect(url_for("signin"))
 
@@ -3204,6 +3595,15 @@ def menteeprofile():
                 dob_formatted = datetime.strptime(profile.dob, "%Y-%m-%d").strftime("%d-%m-%Y")
             except ValueError:
                 dob_formatted = profile.dob   # fallback if already formatted
+
+        # Fetch institution details to get its profile picture
+        institution_details = None
+        if user.institution_id:
+            institution_details = Institution.query.filter_by(id=user.institution_id).first()
+        elif user.institution:
+            institution_details = Institution.query.filter_by(name=user.institution).first()
+        
+        institution_profile_picture = institution_details.profile_picture if institution_details else None
 
         return render_template(
             "mentee/menteeprofile.html",
@@ -3224,7 +3624,8 @@ def menteeprofile():
             parent_mobile=profile.parent_mobile if profile else "",
             comments=profile.comments if profile else "",
             terms_agreement=profile.terms_agreement if profile else "",
-            profile_picture=profile.profile_picture if profile else None
+            profile_picture=profile.profile_picture if profile else None,
+            institution_profile_picture=institution_profile_picture
         )
     return redirect(url_for("signin"))
 
@@ -3255,6 +3656,102 @@ def supervisorprofile():
         profile_picture=profile.profile_picture if profile else None
     )
 
+# View Mentor Profile (for institution admin)
+@app.route("/view_mentor_profile/<int:mentor_id>")
+def view_mentor_profile(mentor_id):
+    # Allow institution admins to view mentor profiles
+    if "email" not in session or session.get("user_type") != "3":
+        return redirect(url_for("signin"))
+    
+    user = User.query.get(mentor_id)
+    if not user or user.user_type != "1":
+        flash("Mentor not found!", "error")
+        return redirect(url_for("institution_mentors"))
+    
+    profile = MentorProfile.query.filter_by(user_id=mentor_id).first()
+    
+    return render_template(
+        "mentor/mentorprofile.html",
+        show_sidebar=False,
+        full_name=user.name,
+        email=user.email,
+        institution=user.institution,
+        profession=profile.profession if profile else "",
+        organisation=profile.organisation if profile else "",
+        whatsapp=profile.whatsapp if profile else "",
+        location=profile.location if profile else "",
+        education=profile.education if profile else "",
+        language=profile.language if profile else "",
+        availability=profile.availability if profile else "",
+        connect_frequency=profile.connect_frequency if profile else "",
+        preferred_communication=profile.preferred_communication if profile else "",
+        other_social_link=profile.other_social_link if profile else "",
+        why_mentor=profile.why_mentor if profile else "",
+        additional_info=profile.additional_info if profile else "",
+        years_of_experience=profile.years_of_experience if profile else "",
+        skills=profile.skills if profile else "",
+        linkedin_link=profile.linkedin_link if profile else "",
+        github_link=profile.github_link if profile else "",
+        portfolio_link=profile.portfolio_link if profile else "",
+        mentorship_topics=profile.mentorship_topics if profile else "",
+        mentorship_type_preference=profile.mentorship_type_preference if profile else "",
+        mentorship_philosophy=profile.mentorship_philosophy if profile else "",
+        mentorship_motto=profile.mentorship_motto if profile else "",
+        profile_picture=profile.profile_picture if profile else None
+    )
+
+# View Mentee Profile (for institution admin)
+@app.route("/view_mentee_profile/<int:mentee_id>")
+def view_mentee_profile(mentee_id):
+    # Allow institution admins to view mentee profiles
+    if "email" not in session or session.get("user_type") != "3":
+        return redirect(url_for("signin"))
+    
+    user = User.query.get(mentee_id)
+    if not user or user.user_type != "2":
+        flash("Mentee not found!", "error")
+        return redirect(url_for("institution_mentees"))
+    
+    profile = MenteeProfile.query.filter_by(user_id=mentee_id).first()
+    
+    dob_formatted = ""
+    if profile and profile.dob:
+        try:
+            dob_formatted = datetime.strptime(profile.dob, "%Y-%m-%d").strftime("%d-%m-%Y")
+        except ValueError:
+            dob_formatted = profile.dob
+    
+    # Fetch institution details to get its profile picture
+    institution_details = None
+    if user.institution_id:
+        institution_details = Institution.query.filter_by(id=user.institution_id).first()
+    elif user.institution:
+        institution_details = Institution.query.filter_by(name=user.institution).first()
+
+    institution_profile_picture = institution_details.profile_picture if institution_details else None
+    
+    return render_template(
+        "mentee/menteeprofile.html",
+        show_sidebar=False,
+        full_name=user.name,
+        email=user.email,
+        institution=user.institution,
+        dob=dob_formatted,
+        school_college_name=profile.school_college_name if profile else "",
+        mobile_number=profile.mobile_number if profile else "",
+        whatsapp_number=profile.whatsapp_number if profile else "",
+        govt_private=profile.govt_private if profile else "",
+        stream=profile.stream if profile else "",
+        class_year=profile.class_year if profile else "",
+        favourite_subject=profile.favourite_subject if profile else "",
+        goal=profile.goal if profile else "",
+        parent_name=profile.parent_name if profile else "",
+        parent_mobile=profile.parent_mobile if profile else "",
+        comments=profile.comments if profile else "",
+        terms_agreement=profile.terms_agreement if profile else "",
+        profile_picture=profile.profile_picture if profile else None,
+        institution_profile_picture=institution_profile_picture
+    )
 # ------------------ APPROVE/REJECT MENTORSHIP REQUESTS ------------------
 @app.route("/supervisor_response", methods=["POST"])
 def supervisor_response():
@@ -3537,7 +4034,3 @@ def create_sample_institutions():
 
 if __name__ == "__main__":
     app.run(debug=True)
-
-
-
-
