@@ -14,25 +14,64 @@
 
 {% block content %}
 <div class="max-w-4xl mx-auto mt-8 p-6 bg-gray-50 rounded-lg shadow-lg">
+    <!-- Back Button for Institution Admin -->
+    {% if session.get('user_type') == '3' %}
+    <div class="mb-6">
+        <a href="{{ url_for('institution_mentees') }}" class="inline-flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition font-medium">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+            </svg>
+            Back to Institution Mentees
+        </a>
+    </div>
+    {% endif %}
+
     <!-- Profile Header -->
-    <div class="flex flex-col items-center md:flex-row md:items-center md:justify-start space-y-4 md:space-y-0 md:space-x-6 mb-8">
+    <div class="flex flex-col items-center md:flex-row md:items-center md:justify-between space-y-4 md:space-y-0 md:space-x-6 mb-8">
         <!-- Profile Picture -->
-        {% if profile_picture %}
-        <img src="{{ url_for('static', filename='uploads/' + profile_picture) }}" alt="Profile Picture" class="w-32 h-32 md:w-40 md:h-40 object-cover rounded-full shadow-md border-2 border-gray-200">
-        {% else %}
-        <div class="w-32 h-32 md:w-40 md:h-40 flex items-center justify-center bg-gray-200 text-gray-500 rounded-full text-lg font-semibold">
-            No Picture
+        <div class="flex-shrink-0">
+            {% if profile_picture %}
+            <img src="{{ url_for('static', filename='uploads/' + profile_picture) }}" alt="Profile Picture" class="w-32 h-32 md:w-40 md:h-40 object-cover rounded-full shadow-md border-4 border-blue-100">
+            {% else %}
+            <div class="w-32 h-32 md:w-40 md:h-40 flex items-center justify-center bg-blue-50 text-gray-500 rounded-full text-lg font-semibold border-4 border-blue-100">
+                <i class="fas fa-user text-3xl text-blue-500"></i>
+            </div>
+            {% endif %}
         </div>
-        {% endif %}
 
         <!-- Name & Email -->
-        <div class="text-center md:text-left">
+        <div class="text-center md:text-left flex-1">
             <h2 class="text-3xl font-bold text-gray-800">{{ full_name }}</h2>
             <p class="text-gray-600 mt-1">{{ email }}</p>
             <p class="text-gray-500 mt-2"><strong>Date of Birth:</strong> {{ dob }}</p>
             <p class="text-gray-500"><strong>School/College:</strong> {{ school_college_name }}</p>
+            <div class="mt-4">
+                <a href="{{ url_for('editmenteeprofile') }}" class="inline-flex items-center px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition">
+                    <i class="fas fa-edit mr-2"></i>
+                    Edit Profile
+                </a>
+            </div>
         </div>
     </div>
+
+    <!-- Institution Profile Picture and Name -->
+    {% if institution %}
+    <div class="flex items-center space-x-4 mb-8">
+        <div class="flex-shrink-0">
+            {% if institution_profile_picture %}
+            <img src="{{ url_for('static', filename='uploads/' + institution_profile_picture) }}" alt="Institution Logo" class="w-20 h-20 object-cover rounded-full shadow-md border-2 border-gray-200">
+            {% else %}
+            <div class="w-20 h-20 flex items-center justify-center bg-gray-50 text-gray-400 rounded-full text-md font-semibold border-2 border-gray-200">
+                <i class="fas fa-building text-2xl text-gray-400"></i>
+            </div>
+            {% endif %}
+        </div>
+        <div>
+            <h3 class="text-xl font-semibold text-gray-700">{{ institution }}</h3>
+            <p class="text-gray-500">Associated Institution</p>
+        </div>
+    </div>
+    {% endif %}
 
     <!-- Profile Details -->
     <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
@@ -43,7 +82,6 @@
                 <p class="text-gray-600 mt-2"><span class="font-semibold">WhatsApp Number:</span> {{ whatsapp_number }}</p>
                 <p class="text-gray-600 mt-2"><span class="font-semibold">Government/Private:</span> {{ govt_private }}</p>
                 <p class="text-gray-600 mt-2"><span class="font-semibold">Stream:</span> {{ stream }}</p>
-                <p class="text-gray-600 mt-2"><span class="font-semibold">Institution:</span> {{ institution or "Not specified" }}</p>
 
             </div>
             <div>

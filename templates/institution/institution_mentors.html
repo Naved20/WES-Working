@@ -3,127 +3,465 @@
 {% block title %}Institution Mentors{% endblock %}
 {% block user %}Institution{% endblock %}
 
-
 {% block content %}
-<div class="container">
-    <div class="header-section">
-        <h1>Institution Mentors</h1>
-        <p>Manage mentors from {{ session.institution }}</p>
+<div class="bg-white rounded-xl shadow-sm">
+    <div class="p-6 border-b border-gray-200">
+        <h2 class="text-2xl font-semibold text-gray-800 mb-2">Institution Mentors</h2>
+        <p class="text-gray-600">Browse all mentors associated with your institution</p>
     </div>
+    
+    <div class="p-6 bg-gray-50 border-b border-gray-200">
+        <!-- Search Input -->
+        <input type="text" id="searchMentors" placeholder="Search mentors by name, profession, organization..."
+               class="w-full p-3 mb-4 border border-gray-300 rounded-lg"
+               onkeyup="filterMentors()">
+        
+        <!-- Filters -->
+        <div class="flex flex-wrap items-center gap-3">
+          <!-- Profession -->
+          <div class="relative">
+            <select id="professionFilter" onchange="filterMentors()" class="appearance-none pl-4 pr-10 py-2 border rounded-full text-gray-700 bg-white">
+              <option value="">All Professions</option>
+              {% set professions = [] %}
+              {% for mentor in mentors %}
+                {% if mentor.mentor_profile and mentor.mentor_profile.profession and mentor.mentor_profile.profession not in professions %}
+                  {% set _ = professions.append(mentor.mentor_profile.profession) %}
+                  <option value="{{ mentor.mentor_profile.profession }}">{{ mentor.mentor_profile.profession }}</option>
+                {% endif %}
+              {% endfor %}
+            </select>
+          </div>
 
-    <!-- Search and Filters -->
-    <div class="filters-section">
-        <div class="search-box">
-            <input type="text" id="searchMentors" placeholder="Search mentors by name, profession..." class="search-input">
-        </div>
-        <div class="filter-options">
-            <select id="professionFilter" class="filter-select">
-                <option value="">All Professions</option>
-                {% set professions = [] %}
-                {% for mentor in mentors %}
-                    {% if mentor.mentor_profile and mentor.mentor_profile.profession and mentor.mentor_profile.profession not in professions %}
-                        {% set _ = professions.append(mentor.mentor_profile.profession) %}
-                        <option value="{{ mentor.mentor_profile.profession }}">{{ mentor.mentor_profile.profession }}</option>
-                    {% endif %}
-                {% endfor %}
+          <!-- Organization -->
+          <div class="relative">
+            <select id="organisationFilter" onchange="filterMentors()" class="appearance-none pl-4 pr-10 py-2 border rounded-full text-gray-700 bg-white">
+              <option value="">All Organizations</option>
+              {% set organisations = [] %}
+              {% for mentor in mentors %}
+                {% if mentor.mentor_profile and mentor.mentor_profile.organisation and mentor.mentor_profile.organisation not in organisations %}
+                  {% set _ = organisations.append(mentor.mentor_profile.organisation) %}
+                  <option value="{{ mentor.mentor_profile.organisation }}">{{ mentor.mentor_profile.organisation }}</option>
+                {% endif %}
+              {% endfor %}
             </select>
-            
-            <select id="statusFilter" class="filter-select">
-                <option value="">All Status</option>
-                <option value="active">Active</option>
-                <option value="pending">Pending</option>
+          </div>
+
+          <!-- Location -->
+          <div class="relative">
+            <select id="locationFilter" onchange="filterMentors()" class="appearance-none pl-4 pr-10 py-2 border rounded-full text-gray-700 bg-white">
+              <option value="">All Locations</option>
+              {% set locations = [] %}
+              {% for mentor in mentors %}
+                {% if mentor.mentor_profile and mentor.mentor_profile.location and mentor.mentor_profile.location not in locations %}
+                  {% set _ = locations.append(mentor.mentor_profile.location) %}
+                  <option value="{{ mentor.mentor_profile.location }}">{{ mentor.mentor_profile.location }}</option>
+                {% endif %}
+              {% endfor %}
             </select>
+          </div>
         </div>
     </div>
 
     <!-- Mentors Grid -->
-    <div class="mentors-grid" id="mentorsContainer">
-        {% if mentors %}
-            {% for mentor in mentors %}
-            <div class="mentor-card" data-profession="{{ mentor.mentor_profile.profession if mentor.mentor_profile else '' }}" 
-                 data-status="{{ 'active' if mentor.mentor_profile and mentor.mentor_profile.status == 'approved' else 'pending' }}">
-                <div class="mentor-header">
-                    <div class="mentor-avatar">
-                        {% if mentor.mentor_profile and mentor.mentor_profile.profile_picture %}
-                            <img src="{{ url_for('static', filename='uploads/' + mentor.mentor_profile.profile_picture) }}" alt="{{ mentor.name }}">
-                        {% else %}
-                            <div class="avatar-placeholder">{{ mentor.name[0] }}</div>
-                        {% endif %}
-                    </div>
-                    <div class="mentor-info">
-                        <h3>{{ mentor.name }}</h3>
-                        <p class="mentor-email">{{ mentor.email }}</p>
-                        {% if mentor.mentor_profile and mentor.mentor_profile.profession %}
-                            <span class="profession-badge">{{ mentor.mentor_profile.profession }}</span>
-                        {% endif %}
-                    </div>
-                </div>
-                
-                <div class="mentor-details">
-                    {% if mentor.mentor_profile %}
-                    <div class="detail-item">
-                        <strong>Organization:</strong> 
-                        <span>{{ mentor.mentor_profile.organisation or 'Not specified' }}</span>
-                    </div>
-                    <div class="detail-item">
-                        <strong>Experience:</strong> 
-                        <span>{{ mentor.mentor_profile.years_of_experience or 'Not specified' }}</span>
-                    </div>
-                    <div class="detail-item">
-                        <strong>Location:</strong> 
-                        <span>{{ mentor.mentor_profile.location or 'Not specified' }}</span>
-                    </div>
-                    {% endif %}
-                </div>
-                
-                <div class="mentor-actions">
-                    <span class="status-indicator {{ 'status-active' if mentor.mentor_profile and mentor.mentor_profile.status == 'approved' else 'status-pending' }}">
-                        {{ 'Active' if mentor.mentor_profile and mentor.mentor_profile.status == 'approved' else 'Pending Approval' }}
-                    </span>
-                    <button class="btn-view" onclick="viewMentorProfile({{ mentor.id }})">View Profile</button>
-                </div>
+    <div class="p-6">
+      {% if mentors and mentors|length > 0 %}
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="mentorsContainer">
+        {% for mentor in mentors %}
+        <div class="mentor-card bg-white rounded-xl border border-gray-200 p-5 transition-all hover:shadow-md"
+             data-profession="{{ mentor.mentor_profile.profession if mentor.mentor_profile else '' }}"
+             data-organisation="{{ mentor.mentor_profile.organisation if mentor.mentor_profile else '' }}"
+             data-location="{{ mentor.mentor_profile.location if mentor.mentor_profile else '' }}"
+             data-name="{{ mentor.name.lower() }}">
+          <div class="flex items-center gap-4 mb-4">
+            {% if mentor.mentor_profile and mentor.mentor_profile.profile_picture %}
+              <img src="{{ url_for('static', filename='uploads/' ~ mentor.mentor_profile.profile_picture) }}" 
+                   alt="{{ mentor.name }}" 
+                   class="w-16 h-16 rounded-full object-cover border-2 border-white shadow">
+            {% else %}
+              <div class="w-16 h-16 rounded-full bg-gradient-to-br from-blue-100 to-blue-200 flex items-center justify-center text-blue-600 border-2 border-white shadow">
+                <span class="text-xl font-semibold">{{ mentor.name[0] if mentor.name else '?' }}</span>
+              </div>
+            {% endif %}
+            <div>
+              <h3 class="text-lg font-bold text-gray-800 mentor-name">{{ mentor.name }}</h3>
+              <p class="text-sm text-gray-600">{{ mentor.email }}</p>
+              {% if mentor.mentor_profile and mentor.mentor_profile.profession %}
+                <p class="text-sm text-blue-600 font-semibold">{{ mentor.mentor_profile.profession }}</p>
+              {% endif %}
             </div>
-            {% endfor %}
-        {% else %}
-            <div class="no-data">
-                <div class="no-data-icon">👨‍🏫</div>
-                <h3>No Mentors Found</h3>
-                <p>There are no mentors registered from your institution yet.</p>
-            </div>
-        {% endif %}
+          </div>
+          
+          <div class="space-y-2 mb-4">
+            {% if mentor.mentor_profile %}
+              {% if mentor.mentor_profile.organisation %}
+              <div class="flex items-center text-sm text-gray-600">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5.5m0 0H9m11 0v-5.5m0 0V21m0-5.5a1 1 0 11-2 0 1 1 0 012 0z" />
+                </svg>
+                <span>{{ mentor.mentor_profile.organisation }}</span>
+              </div>
+              {% endif %}
+              
+              {% if mentor.mentor_profile.years_of_experience %}
+              <div class="flex items-center text-sm text-gray-600">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <span>{{ mentor.mentor_profile.years_of_experience }} years experience</span>
+              </div>
+              {% endif %}
+              
+              {% if mentor.mentor_profile.location %}
+              <div class="flex items-center text-sm text-gray-600">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+                <span>{{ mentor.mentor_profile.location }}</span>
+              </div>
+              {% endif %}
+            {% endif %}
+          </div>
+          
+          <button onclick="openMentorProfileModal(
+              '{{ mentor.name }}',
+              '{{ mentor.mentor_profile.profession if mentor.mentor_profile else '' }}',
+              '{{ mentor.mentor_profile.organisation if mentor.mentor_profile else '' }}',
+              '{{ mentor.mentor_profile.location if mentor.mentor_profile else '' }}',
+              '{{ mentor.mentor_profile.years_of_experience if mentor.mentor_profile else '' }}',
+              '{{ mentor.mentor_profile.profile_picture if mentor.mentor_profile else '' }}',
+              '{{ mentor.email }}',
+              '{{ mentor.mentor_profile.education if mentor.mentor_profile else '' }}',
+              '{{ mentor.mentor_profile.language if mentor.mentor_profile else '' }}',
+              '{{ mentor.mentor_profile.preferred_communication if mentor.mentor_profile else '' }}',
+              '{{ mentor.mentor_profile.why_mentor if mentor.mentor_profile else '' }}',
+              '{{ mentor.mentor_profile.role if mentor.mentor_profile else '' }}',
+              '{{ mentor.mentor_profile.industry_sector if mentor.mentor_profile else '' }}',
+              '{{ mentor.mentor_profile.skills if mentor.mentor_profile else '' }}',
+              '{{ mentor.mentor_profile.availability if mentor.mentor_profile else '' }}',
+              '{{ mentor.mentor_profile.mentorship_topics if mentor.mentor_profile else '' }}',
+              '{{ mentor.mentor_profile.linkedin_link if mentor.mentor_profile else '' }}',
+              '{{ mentor.mentor_profile.github_link if mentor.mentor_profile else '' }}',
+              '{{ mentor.mentor_profile.portfolio_link if mentor.mentor_profile else '' }}'
+          )" class="block w-full text-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-medium">
+            View Profile
+          </button>
+        </div>
+        {% endfor %}
+      </div>
+      {% else %}
+        <div class="text-center py-12">
+          <div class="text-6xl mb-4">👨‍🏫</div>
+          <h3 class="text-2xl font-semibold text-gray-700 mb-2">No Mentors Found</h3>
+          <p class="text-gray-600">There are no mentors registered from your institution yet.</p>
+        </div>
+      {% endif %}
     </div>
 </div>
 
+<!-- Mentor Profile Modal -->
+<div id="mentorProfileModal" class="fixed inset-0 hidden bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+  <div class="bg-white rounded-2xl shadow-xl w-full max-w-4xl max-h-[90vh] overflow-y-auto relative">
+    
+    <!-- Close Button -->
+    <button onclick="closeMentorProfileModal()" class="absolute top-5 right-5 text-gray-400 hover:text-gray-600 transition-colors duration-200 text-xl bg-white rounded-full p-1 shadow-sm z-10">
+      ✕
+    </button>
+
+    <!-- Header -->
+    <div class="sticky top-0 bg-white z-10 px-8 pt-8 pb-4 border-b border-gray-100">
+      <h2 class="text-2xl font-bold text-gray-800 flex items-center">
+        <svg class="w-6 h-6 text-blue-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+        </svg>
+        Mentor Profile
+      </h2>
+    </div>
+
+    <!-- Content -->
+    <div class="p-8">
+      <!-- Profile Picture + Basic Info -->
+      <div class="flex flex-col md:flex-row items-center gap-6 mb-8">
+        <div class="relative">
+          <img id="modalProfilePic" src="" alt="Profile Picture" class="w-28 h-28 rounded-full object-cover border-4 border-blue-50 shadow-sm">
+          <div class="absolute -bottom-2 -right-2 bg-blue-600 text-white p-2 rounded-full">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+            </svg>
+          </div>
+        </div>
+        <div class="text-center md:text-left">
+          <h3 id="modalName" class="text-2xl font-bold text-gray-800 mb-1"></h3>
+          <p id="modalEmail" class="text-sm text-gray-600 mb-1"></p>
+          <div class="flex items-center justify-center md:justify-start gap-3 mt-2">
+            <span id="modalProfession" class="bg-blue-100 text-blue-800 text-xs px-3 py-1 rounded-full"></span>
+            <span id="modalRole" class="bg-green-100 text-green-800 text-xs px-3 py-1 rounded-full"></span>
+            <span id="modalOrganisation" class="text-sm text-gray-600"></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Details Grid - 3 Columns -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-gray-700 mb-8">
+        <!-- Column 1: Personal & Professional -->
+        <div class="space-y-4">
+          <h4 class="font-semibold text-gray-800 mb-3 border-b pb-2">Professional Details</h4>
+          
+          <div class="flex items-start">
+            <svg class="w-5 h-5 text-gray-400 mr-3 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2-2v2m8 0V6a2 2 0 012 2v6a2 2 0 01-2 2H8a2 2 0 01-2-2V8a2 2 0 012-2V6"></path>
+            </svg>
+            <div>
+              <p class="font-medium text-gray-600">Role/Position</p>
+              <p id="modalRole2" class="text-gray-800"></p>
+            </div>
+          </div>
+          
+          <div class="flex items-start">
+            <svg class="w-5 h-5 text-gray-400 mr-3 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5.5m0 0H9m11 0v-5.5m0 0V21m0-5.5a1 1 0 11-2 0 1 1 0 012 0z"></path>
+            </svg>
+            <div>
+              <p class="font-medium text-gray-600">Industry/Sector</p>
+              <p id="modalIndustry" class="text-gray-800"></p>
+            </div>
+          </div>
+          
+          <div class="flex items-start">
+            <svg class="w-5 h-5 text-gray-400 mr-3 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5z"></path>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5zm0 0v6"></path>
+            </svg>
+            <div>
+              <p class="font-medium text-gray-600">Education</p>
+              <p id="modalEducation" class="text-gray-800"></p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Column 2: Experience & Skills -->
+        <div class="space-y-4">
+          <h4 class="font-semibold text-gray-800 mb-3 border-b pb-2">Experience & Skills</h4>
+          
+          <div class="flex items-start">
+            <svg class="w-5 h-5 text-gray-400 mr-3 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+            <div>
+              <p class="font-medium text-gray-600">Years of Experience</p>
+              <p id="modalExperience" class="text-gray-800"></p>
+            </div>
+          </div>
+          
+          <div class="flex items-start">
+            <svg class="w-5 h-5 text-gray-400 mr-3 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+            </svg>
+            <div>
+              <p class="font-medium text-gray-600">Skills</p>
+              <p id="modalSkills" class="text-gray-800"></p>
+            </div>
+          </div>
+          
+          <div class="flex items-start">
+            <svg class="w-5 h-5 text-gray-400 mr-3 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"></path>
+            </svg>
+            <div>
+              <p class="font-medium text-gray-600">Languages</p>
+              <p id="modalLanguage" class="text-gray-800"></p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Column 3: Contact & Preferences -->
+        <div class="space-y-4">
+          <h4 class="font-semibold text-gray-800 mb-3 border-b pb-2">Contact & Preferences</h4>
+          
+          <div class="flex items-start">
+            <svg class="w-5 h-5 text-gray-400 mr-3 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+            </svg>
+            <div>
+              <p class="font-medium text-gray-600">Location</p>
+              <p id="modalLocation" class="text-gray-800"></p>
+            </div>
+          </div>
+          
+          <div class="flex items-start">
+            <svg class="w-5 h-5 text-gray-400 mr-3 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path>
+            </svg>
+            <div>
+              <p class="font-medium text-gray-600">Preferred Communication</p>
+              <p id="modalCommunication" class="text-gray-800"></p>
+            </div>
+          </div>
+          
+          <div class="flex items-start">
+            <svg class="w-5 h-5 text-gray-400 mr-3 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+            <div>
+              <p class="font-medium text-gray-600">Availability</p>
+              <p id="modalAvailability" class="text-gray-800"></p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mentorship Topics -->
+      <div class="mb-8">
+        <h4 class="font-semibold text-gray-800 flex items-center mb-4">
+          <svg class="w-5 h-5 text-blue-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+          </svg>
+          Mentorship Topics
+        </h4>
+        <div class="bg-gray-50 p-5 rounded-lg border border-gray-100">
+          <p id="modalMentorshipTopics" class="text-gray-600"></p>
+        </div>
+      </div>
+
+      <!-- Why Become a Mentor -->
+      <div class="mb-8">
+        <h4 class="font-semibold text-gray-800 flex items-center mb-4">
+          <svg class="w-5 h-5 text-blue-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+          </svg>
+          Why I Became a Mentor
+        </h4>
+        <div class="bg-gray-50 p-5 rounded-lg border border-gray-100">
+          <p id="modalWhyMentor" class="text-gray-600 italic"></p>
+        </div>
+      </div>
+
+      <!-- Social Links -->
+      <div class="mb-8">
+        <h4 class="font-semibold text-gray-800 flex items-center mb-4">
+          <svg class="w-5 h-5 text-blue-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path>
+          </svg>
+          Social Links
+        </h4>
+        <div class="flex flex-wrap gap-4">
+          <a id="modalLinkedin" href="#" target="_blank" class="flex items-center gap-2 px-4 py-2 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition">
+            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>
+            LinkedIn
+          </a>
+          <a id="modalGithub" href="#" target="_blank" class="flex items-center gap-2 px-4 py-2 bg-gray-50 text-gray-600 rounded-lg hover:bg-gray-100 transition">
+            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+            GitHub
+          </a>
+          <a id="modalPortfolio" href="#" target="_blank" class="flex items-center gap-2 px-4 py-2 bg-purple-50 text-purple-600 rounded-lg hover:bg-purple-100 transition">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9v-9m0-9v9"/></svg>
+            Portfolio
+          </a>
+        </div>
+      </div>
+
+      <!-- Footer Buttons -->
+      <div class="flex flex-col sm:flex-row justify-end gap-3 pt-4 border-t border-gray-100">
+        <button onclick="closeMentorProfileModal()" class="px-5 py-2.5 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors duration-200 font-medium">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <script>
-function viewMentorProfile(mentorId) {
-    // Implement view mentor profile functionality
-    alert('View mentor profile: ' + mentorId);
-    // You can redirect to mentor profile page or show modal
-    // window.location.href = `/mentor_profile/${mentorId}`;
+function openMentorProfileModal(
+    name, profession, organisation, location, experience, profilePic, 
+    email, education, language, communication, whyMentor,
+    role, industry, skills, availability, mentorshipTopics,
+    linkedin, github, portfolio
+) {
+  // Basic Info
+  document.getElementById('modalName').innerText = name;
+  document.getElementById('modalEmail').innerText = email || "Not specified";
+  
+  // Professional Details
+  document.getElementById('modalProfession').innerText = profession || "Not specified";
+  document.getElementById('modalRole2').innerText = role || "Not specified";
+  document.getElementById('modalOrganisation').innerText = organisation || "Not specified";
+  document.getElementById('modalIndustry').innerText = industry || "Not specified";
+  document.getElementById('modalEducation').innerText = education || "Not specified";
+  
+  // Experience & Skills
+  document.getElementById('modalExperience').innerText = experience ? experience + " years" : "Not specified";
+  document.getElementById('modalSkills').innerText = skills || "Not specified";
+  document.getElementById('modalLanguage').innerText = language || "Not specified";
+  
+  // Contact & Preferences
+  document.getElementById('modalLocation').innerText = location || "Not specified";
+  document.getElementById('modalCommunication').innerText = communication || "Not specified";
+  document.getElementById('modalAvailability').innerText = availability || "Not specified";
+  
+  // Mentorship Details
+  document.getElementById('modalMentorshipTopics').innerText = mentorshipTopics || "Not specified";
+  document.getElementById('modalWhyMentor').innerText = whyMentor || "Not specified";
+  
+  // Social Links
+  const linkedinLink = document.getElementById('modalLinkedin');
+  const githubLink = document.getElementById('modalGithub');
+  const portfolioLink = document.getElementById('modalPortfolio');
+  
+  if (linkedin) {
+    linkedinLink.href = linkedin;
+    linkedinLink.classList.remove('hidden');
+  } else {
+    linkedinLink.classList.add('hidden');
+  }
+  
+  if (github) {
+    githubLink.href = github;
+    githubLink.classList.remove('hidden');
+  } else {
+    githubLink.classList.add('hidden');
+  }
+  
+  if (portfolio) {
+    portfolioLink.href = portfolio;
+    portfolioLink.classList.remove('hidden');
+  } else {
+    portfolioLink.classList.add('hidden');
+  }
+  
+  // Profile Picture
+  document.getElementById('modalProfilePic').src = profilePic
+    ? "/static/uploads/" + profilePic
+    : "https://via.placeholder.com/100";
+
+  document.getElementById('mentorProfileModal').classList.remove('hidden');
 }
+  
+function closeMentorProfileModal() {
+  document.getElementById('mentorProfileModal').classList.add('hidden');
+}
+</script>
 
-// Search and filter functionality
-document.getElementById('searchMentors').addEventListener('input', filterMentors);
-document.getElementById('professionFilter').addEventListener('change', filterMentors);
-document.getElementById('statusFilter').addEventListener('change', filterMentors);
 
-function filterMentors() {
     const searchTerm = document.getElementById('searchMentors').value.toLowerCase();
-    const professionFilter = document.getElementById('professionFilter').value;
-    const statusFilter = document.getElementById('statusFilter').value;
+    const professionFilter = document.getElementById('professionFilter').value.toLowerCase();
+    const organisationFilter = document.getElementById('organisationFilter').value.toLowerCase();
+    const locationFilter = document.getElementById('locationFilter').value.toLowerCase();
     
     const mentorCards = document.querySelectorAll('.mentor-card');
     
     mentorCards.forEach(card => {
-        const mentorName = card.querySelector('h3').textContent.toLowerCase();
-        const mentorProfession = card.getAttribute('data-profession');
-        const mentorStatus = card.getAttribute('data-status');
+        const mentorName = card.getAttribute('data-name');
+        const mentorProfession = card.getAttribute('data-profession').toLowerCase();
+        const mentorOrganisation = card.getAttribute('data-organisation').toLowerCase();
+        const mentorLocation = card.getAttribute('data-location').toLowerCase();
         
-        const matchesSearch = mentorName.includes(searchTerm);
+        const matchesSearch = mentorName.includes(searchTerm) || 
+                              mentorProfession.includes(searchTerm) || 
+                              mentorOrganisation.includes(searchTerm);
         const matchesProfession = !professionFilter || mentorProfession === professionFilter;
-        const matchesStatus = !statusFilter || mentorStatus === statusFilter;
+        const matchesOrganisation = !organisationFilter || mentorOrganisation === organisationFilter;
+        const matchesLocation = !locationFilter || mentorLocation === locationFilter;
         
-        if (matchesSearch && matchesProfession && matchesStatus) {
+        if (matchesSearch && matchesProfession && matchesOrganisation && matchesLocation) {
             card.style.display = 'block';
         } else {
             card.style.display = 'none';
@@ -133,193 +471,13 @@ function filterMentors() {
 </script>
 
 <style>
-.container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 20px;
-}
-
-.header-section {
-    text-align: center;
-    margin-bottom: 30px;
-}
-
-.header-section h1 {
-    color: #333;
-    margin-bottom: 10px;
-}
-
-.header-section p {
-    color: #666;
-    font-size: 1.1em;
-}
-
-.filters-section {
-    display: flex;
-    gap: 15px;
-    margin-bottom: 30px;
-    flex-wrap: wrap;
-}
-
-.search-input {
-    flex: 1;
-    min-width: 250px;
-    padding: 10px 15px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    font-size: 1em;
-}
-
-.filter-select {
-    padding: 10px 15px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    background: white;
-    min-width: 150px;
-}
-
-.mentors-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-    gap: 20px;
-}
-
-.mentor-card {
-    background: white;
-    border-radius: 10px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-    padding: 20px;
-    transition: transform 0.3s ease;
-}
-
-.mentor-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-}
-
-.mentor-header {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    margin-bottom: 15px;
-}
-
-.mentor-avatar img, .avatar-placeholder {
-    width: 60px;
-    height: 60px;
-    border-radius: 50%;
-    object-fit: cover;
-}
-
-.avatar-placeholder {
-    background: #007bff;
-    color: white;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.5em;
-    font-weight: bold;
-}
-
-.mentor-info h3 {
-    margin: 0 0 5px 0;
-    color: #333;
-}
-
-.mentor-email {
-    margin: 0 0 8px 0;
-    color: #666;
-    font-size: 0.9em;
-}
-
-.profession-badge {
-    background: #e3f2fd;
-    color: #1976d2;
-    padding: 3px 8px;
-    border-radius: 12px;
-    font-size: 0.8em;
-    font-weight: bold;
-}
-
-.mentor-details {
-    margin-bottom: 15px;
-}
-
-.detail-item {
-    margin-bottom: 8px;
-    font-size: 0.9em;
-}
-
-.detail-item strong {
-    color: #333;
-}
-
-.mentor-actions {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.status-indicator {
-    padding: 5px 10px;
-    border-radius: 15px;
-    font-size: 0.8em;
-    font-weight: bold;
-}
-
-.status-active {
-    background: #d4edda;
-    color: #155724;
-}
-
-.status-pending {
-    background: #fff3cd;
-    color: #856404;
-}
-
-.btn-view {
-    background: #007bff;
-    color: white;
-    border: none;
-    padding: 8px 15px;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 0.9em;
-    transition: background 0.3s ease;
-}
-
-.btn-view:hover {
-    background: #0056b3;
-}
-
-.no-data {
-    text-align: center;
-    padding: 60px 20px;
-    grid-column: 1 / -1;
-}
-
-.no-data-icon {
-    font-size: 4em;
-    margin-bottom: 20px;
-}
-
-.no-data h3 {
-    color: #666;
-    margin-bottom: 10px;
-}
-
-.no-data p {
-    color: #999;
-}
-
-@media (max-width: 768px) {
-    .filters-section {
-        flex-direction: column;
-    }
-    
-    .mentors-grid {
-        grid-template-columns: 1fr;
-    }
-}
+  .relative select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3E%3C/svg%3E");
+    background-position: right 0.5rem center;
+    background-repeat: no-repeat;
+    background-size: 1.5em 1.5em;
+    padding-right: 2.5rem;
+  }
 </style>
+
 {% endblock %}
