@@ -10,6 +10,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- FullCalendar CSS -->
+    <link href='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css' rel='stylesheet' />
     <!-- title icon -->
     <link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('static', filename='img/logo.jpg') }}">
 
@@ -205,17 +207,35 @@
 
                     <a href="{{ url_for('institutiondashboard')}}"
                        class="block px-4 py-2 text-white hover:bg-gray-600 rounded-md">
-                       📊 Dashboard
+                       📊 Institute Dashboard
                     </a>
                     
                     <a href="{{ url_for('institution_mentors')}}"
                        class="block px-4 py-2 text-white hover:bg-gray-600 rounded-md">
-                       🎓 All Mentors
+                       🎓 Institute Mentors
                     </a>
                     
                     <a href="{{ url_for('institution_mentees')}}"
                        class="block px-4 py-2 text-white hover:bg-gray-600 rounded-md">
-                       👥 All Mentees
+                       👥 Institute Mentees
+                    </a>
+                    
+                    
+                    <a href="{{ url_for('institution_mentorships')}}"
+                       class="block px-4 py-2 text-white hover:bg-gray-600 rounded-md">
+                       🤝 Institute Mentorships
+                    </a>
+                    
+                    
+                    <a href="{{ url_for('institution_calendar') }}"
+                       class="block px-4 py-2 text-white hover:bg-gray-600 rounded-md">
+                       📅 Institute Calendar
+                    </a>
+                    
+                    
+                    <a href="{{ url_for('institution_all_tasks') }}"
+                       class="block px-4 py-2 text-white hover:bg-gray-600 rounded-md">
+                       📝 Institute Task
                     </a>
                     
 
@@ -385,5 +405,8 @@
             }
         });
     </script>
+    <!-- FullCalendar JS -->
+    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js'></script>
+    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/locales-all.min.js'></script>
 </body>
 </html>
