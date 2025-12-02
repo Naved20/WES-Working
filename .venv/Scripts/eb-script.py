@@ -1,4 +1,4 @@
-#!C:\wes\WES-Working\.venv\Scripts\python.exe
+#!C:\MD_naved\WES-Working\.venv\Scripts\python.exe
 # EASY-INSTALL-ENTRY-SCRIPT: 'awsebcli==3.25','console_scripts','eb'
 import re
 import sys

@@ -1,4 +1,4 @@
-#!C:\wes\WES-Working\.venv\Scripts\python.exe
+#!C:\MD_naved\WES-Working\.venv\Scripts\python.exe
 
 import sys
 import json
