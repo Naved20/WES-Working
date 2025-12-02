@@ -1,0 +1,315 @@
+{% extends "base2.html" %}
+
+{% block title %}{{ institution.name }} - Details{% endblock %}
+
+{% block user %}Supervisor{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto">
+    <!-- Back Button -->
+    <div class="mb-6">
+        <a href="{{ url_for('institution') }}" class="inline-flex items-center text-blue-600 hover:text-blue-800">
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+            </svg>
+            Back to Institutions
+        </a>
+    </div>
+
+    <!-- Institution Header -->
+    <div class="bg-white rounded-lg shadow p-6 mb-8">
+        <div class="flex items-start justify-between">
+            <div class="flex items-start">
+                {% if institution.profile_picture %}
+                <img class="h-20 w-20 rounded-lg object-cover mr-6" 
+                     src="{{ url_for('static', filename='uploads/' + institution.profile_picture) }}" 
+                     alt="{{ institution.name }}">
+                {% else %}
+                <div class="h-20 w-20 rounded-lg bg-blue-100 flex items-center justify-center mr-6">
+                    <span class="text-blue-600 text-3xl font-bold">{{ institution.name[0]|upper }}</span>
+                </div>
+                {% endif %}
+                <div>
+                    <h1 class="text-3xl font-bold text-gray-900">{{ institution.name }}</h1>
+                    <div class="flex items-center mt-2 space-x-4">
+                        {% if institution.institution_type %}
+                        <span class="px-3 py-1 text-sm rounded-full bg-blue-100 text-blue-800">
+                            {{ institution.institution_type|title }}
+                        </span>
+                        {% endif %}
+                        
+                        {% if institution.status == 'active' %}
+                        <span class="px-3 py-1 text-sm rounded-full bg-green-100 text-green-800">
+                            Active
+                        </span>
+                        {% else %}
+                        <span class="px-3 py-1 text-sm rounded-full bg-red-100 text-red-800">
+                            Inactive
+                        </span>
+                        {% endif %}
+                        
+                        <span class="text-gray-500 text-sm">
+                            Joined: {{ institution.created_at.strftime('%d %b %Y') if institution.created_at else 'N/A' }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="flex space-x-2">
+                {% if institution.status == 'active' %}
+                <button onclick="updateStatus('deactivate')"
+                   class="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-md hover:bg-red-700">
+                    Deactivate
+                </button>
+                {% else %}
+                <button onclick="updateStatus('activate')"
+                   class="px-4 py-2 text-sm font-medium text-white bg-green-600 rounded-md hover:bg-green-700">
+                    Activate
+                </button>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+        <!-- Mentors Card -->
+        <div class="block bg-blue-50 rounded-lg p-6  transition-colors">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm text-blue-600 font-medium">Total Mentors</p>
+                    <p class="text-3xl font-bold text-gray-900 mt-2">{{ total_mentors }}</p>
+                </div>
+                <div class="bg-blue-100 p-3 rounded-full">
+                    <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                    </svg>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mentees Card -->
+        <div class="block bg-green-50 rounded-lg p-6 transition-colors">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm text-green-600 font-medium">Total Mentees</p>
+                    <p class="text-3xl font-bold text-gray-900 mt-2">{{ total_mentees }}</p>
+                </div>
+                <div class="bg-green-100 p-3 rounded-full">
+                    <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                    </svg>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mentorships Card -->
+        <div class="bg-purple-50 rounded-lg p-6">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm text-purple-600 font-medium">Active Mentorships</p>
+                    <p class="text-3xl font-bold text-gray-900 mt-2">{{ active_mentorships }}</p>
+                </div>
+                <div class="bg-purple-100 p-3 rounded-full">
+                    <svg class="w-8 h-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+                    </svg>
+                </div>
+            </div>
+        </div>
+
+        <!-- Admin Card -->
+        <div class="bg-yellow-50 rounded-lg p-6">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm text-yellow-600 font-medium">Institution Admin</p>
+                    <p class="text-lg font-bold text-gray-900 mt-2">
+                        {% if admin %}
+                        {{ admin.name }}
+                        {% else %}
+                        Not assigned
+                        {% endif %}
+                    </p>
+                    {% if admin %}
+                    <p class="text-sm text-gray-500 mt-1">{{ admin.email }}</p>
+                    {% endif %}
+                </div>
+                <div class="bg-yellow-100 p-3 rounded-full">
+                    <svg class="w-8 h-8 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                    </svg>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Contact & Location Information -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+        <!-- Contact Details -->
+        <div class="bg-white rounded-lg shadow p-6">
+            <h2 class="text-xl font-bold text-gray-800 mb-4">Contact Information</h2>
+            <div class="space-y-4">
+                <div>
+                    <label class="text-sm text-gray-500">Contact Person</label>
+                    <p class="text-gray-900 font-medium">{{ institution.contact_person or 'Not specified' }}</p>
+                </div>
+                <div>
+                    <label class="text-sm text-gray-500">Contact Email</label>
+                    <p class="text-gray-900 font-medium">{{ institution.contact_email or 'Not specified' }}</p>
+                </div>
+                <div>
+                    <label class="text-sm text-gray-500">Contact Phone</label>
+                    <p class="text-gray-900 font-medium">{{ institution.contact_phone or 'Not specified' }}</p>
+                </div>
+                <div>
+                    <label class="text-sm text-gray-500">Website</label>
+                    <p class="text-gray-900 font-medium">
+                        {% if institution.website %}
+                        <a href="{{ institution.website }}" target="_blank" class="text-blue-600 hover:underline">
+                            {{ institution.website }}
+                        </a>
+                        {% else %}
+                        Not specified
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Location Details -->
+        <div class="bg-white rounded-lg shadow p-6">
+            <h2 class="text-xl font-bold text-gray-800 mb-4">Location Details</h2>
+            <div class="space-y-4">
+                <div>
+                    <label class="text-sm text-gray-500">Address</label>
+                    <p class="text-gray-900">{{ institution.address or 'Not specified' }}</p>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="text-sm text-gray-500">City</label>
+                        <p class="text-gray-900">{{ institution.city or 'Not specified' }}</p>
+                    </div>
+                    <div>
+                        <label class="text-sm text-gray-500">State</label>
+                        <p class="text-gray-900">{{ institution.state or 'Not specified' }}</p>
+                    </div>
+                </div>
+                <div>
+                    <label class="text-sm text-gray-500">Country</label>
+                    <p class="text-gray-900">{{ institution.country or 'Not specified' }}</p>
+                </div>
+                <div>
+                    <label class="text-sm text-gray-500">Email Domain</label>
+                    <p class="text-gray-900">{{ institution.email_domain or 'Not specified' }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Mentorships -->
+    <div class="bg-white rounded-lg shadow p-6">
+        <h2 class="text-xl font-bold text-gray-800 mb-4">Recent Mentorships</h2>
+        
+        {% if mentorship_requests %}
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Mentee</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Mentor</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Purpose</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Duration</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Created</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    {% for request in mentorship_requests[:10] %}
+                    <tr>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm font-medium text-gray-900">{{ request.mentee.name }}</div>
+                            <div class="text-sm text-gray-500">{{ request.mentee.email }}</div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm font-medium text-gray-900">{{ request.mentor.name }}</div>
+                            <div class="text-sm text-gray-500">{{ request.mentor.email }}</div>
+                        </td>
+                        <td class="px-6 py-4">
+                            <div class="text-sm text-gray-900">{{ request.purpose[:50] }}{% if request.purpose|length > 50 %}...{% endif %}</div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm text-gray-900">{{ request.duration_months }} months</div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            {% if request.final_status == 'approved' %}
+                            <span class="px-2 py-1 text-xs rounded-full bg-green-100 text-green-800">
+                                Approved
+                            </span>
+                            {% elif request.final_status == 'pending' %}
+                            <span class="px-2 py-1 text-xs rounded-full bg-yellow-100 text-yellow-800">
+                                Pending
+                            </span>
+                            {% else %}
+                            <span class="px-2 py-1 text-xs rounded-full bg-red-100 text-red-800">
+                                Rejected
+                            </span>
+                            {% endif %}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm text-gray-500">
+                                {{ request.created_at.strftime('%d %b %Y') if request.created_at else 'N/A' }}
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        
+        {% if mentorship_requests|length > 10 %}
+        <div class="mt-4 text-center">
+            <p class="text-sm text-gray-500">Showing 10 of {{ mentorship_requests|length }} mentorships</p>
+        </div>
+        {% endif %}
+        
+        {% else %}
+        <div class="text-center py-8">
+            <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+            </svg>
+            <h3 class="mt-2 text-sm font-medium text-gray-900">No mentorships found</h3>
+            <p class="mt-1 text-sm text-gray-500">This institution doesn't have any mentorship requests yet.</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+function updateStatus(action) {
+    if (!confirm(`Are you sure you want to ${action} this institution?`)) {
+        return;
+    }
+    
+    const formData = new FormData();
+    formData.append('action', action);
+    
+    fetch(`/update_institution_status/{{ institution.id }}`, {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert(data.message);
+            location.reload();
+        } else {
+            alert('Error: ' + data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('An error occurred. Please try again.');
+    });
+}
+</script>
+{% endblock %}
