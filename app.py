@@ -6,6 +6,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
 from datetime import datetime, timedelta
 from functools import wraps
+from sqlalchemy.orm import Session
 import os
 import json 
 from google_auth_oauthlib.flow import Flow
@@ -1008,7 +1009,190 @@ def supervisordashboard():
     
 @app.route("/institution")
 def institution():
-    return render_template("supervisor/institution.html")
+    if "email" not in session or session.get("user_type") != "0":
+        return redirect(url_for("signin"))
+
+    # Get all institutions
+    institutions = Institution.query.order_by(Institution.name.asc()).all()
+    
+    # Get institution statistics
+    institution_stats = []
+    for inst in institutions:
+        # Count mentors in this institution
+        mentors_count = User.query.filter(
+            (User.user_type == "1") & 
+            ((User.institution_id == inst.id) | (User.institution == inst.name))
+        ).count()
+        
+        # Count mentees in this institution
+        mentees_count = User.query.filter(
+            (User.user_type == "2") & 
+            ((User.institution_id == inst.id) | (User.institution == inst.name))
+        ).count()
+        
+        # Count active mentorships
+        active_mentorships = MentorshipRequest.query\
+            .join(User, MentorshipRequest.mentee_id == User.id)\
+            .filter(
+                ((User.institution_id == inst.id) | (User.institution == inst.name)) &
+                (MentorshipRequest.final_status == "approved")
+            ).count()
+        
+        institution_stats.append({
+            'institution': inst,
+            'mentors_count': mentors_count,
+            'mentees_count': mentees_count,
+            'active_mentorships': active_mentorships,
+            'status': inst.status
+        })
+    
+    return render_template(
+        "supervisor/institution.html",
+        show_sidebar=True,
+        active_section="institution",
+        institution_stats=institution_stats
+    )
+
+@app.route("/view_institution/<int:institution_id>")
+def view_institution(institution_id):
+    if "email" not in session or session.get("user_type") != "0":
+        return redirect(url_for("signin"))
+    
+    institution = Institution.query.get_or_404(institution_id)
+    
+    # Get institution admin
+    admin = None
+    if institution.user_id:
+        admin = User.query.get(institution.user_id)
+    
+    # Get all users from this institution
+    # First get users by institution_id (new system)
+    users_by_id = User.query.filter_by(institution_id=institution_id).all()
+    
+    # Then get users by institution name (legacy system)
+    users_by_name = User.query.filter(
+        User.institution == institution.name,
+        User.institution_id.is_(None)  # Only get legacy records
+    ).all()
+    
+    # Combine both lists
+    all_users = list(users_by_id) + list(users_by_name)
+    
+    # Separate mentors and mentees
+    institution_mentors = [user for user in all_users if user.user_type == "1"]
+    institution_mentees = [user for user in all_users if user.user_type == "2"]
+    
+    # Get mentorship requests involving institution members
+    # First get mentee IDs
+    mentee_ids = [user.id for user in institution_mentees]
+    
+    institution_mentorship_requests = []
+    if mentee_ids:
+        institution_mentorship_requests = MentorshipRequest.query\
+            .filter(MentorshipRequest.mentee_id.in_(mentee_ids))\
+            .all()
+    
+    # Calculate statistics
+    total_mentors = len(institution_mentors)
+    total_mentees = len(institution_mentees)
+    active_mentorships = len([req for req in institution_mentorship_requests if req.final_status == "approved"])
+    
+    return render_template(
+        "supervisor/view_institution.html",
+        show_sidebar=True,
+        active_section="institution",
+        institution=institution,
+        admin=admin,
+        institution_mentors=institution_mentors,
+        institution_mentees=institution_mentees,
+        mentorship_requests=institution_mentorship_requests,
+        total_mentors=total_mentors,
+        total_mentees=total_mentees,
+        active_mentorships=active_mentorships,
+        now=datetime.utcnow()
+    )
+
+@app.route("/update_institution_status/<int:institution_id>", methods=["POST"])
+def update_institution_status(institution_id):
+    if "email" not in session or session.get("user_type") != "0":
+        return jsonify({"success": False, "message": "Unauthorized"})
+    
+    institution = Institution.query.get_or_404(institution_id)
+    
+    action = request.form.get("action")
+    if action == "activate":
+        institution.status = "active"
+        message = "Institution activated successfully!"
+    elif action == "deactivate":
+        institution.status = "inactive"
+        message = "Institution deactivated successfully!"
+    else:
+        return jsonify({"success": False, "message": "Invalid action"})
+    
+    try:
+        db.session.commit()
+        return jsonify({"success": True, "message": message, "new_status": institution.status})
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"success": False, "message": str(e)})
+
+@app.route("/institution_users/<int:institution_id>/<user_type>")
+def institution_users(institution_id, user_type):
+    if "email" not in session or session.get("user_type") != "0":
+        return redirect(url_for("signin"))
+    
+    institution = Institution.query.get_or_404(institution_id)
+    
+    # Get users based on type
+    if user_type == "mentors":
+        # Get mentors by institution_id (new system)
+        mentors_by_id = User.query.filter_by(
+            user_type="1", 
+            institution_id=institution_id
+        ).all()
+        
+        # Get mentors by institution name (legacy system)
+        mentors_by_name = User.query.filter(
+            User.user_type == "1",
+            User.institution == institution.name,
+            User.institution_id.is_(None)
+        ).all()
+        
+        users = list(mentors_by_id) + list(mentors_by_name)
+        title = f"Mentors - {institution.name}"
+        
+    elif user_type == "mentees":
+        # Get mentees by institution_id (new system)
+        mentees_by_id = User.query.filter_by(
+            user_type="2", 
+            institution_id=institution_id
+        ).all()
+        
+        # Get mentees by institution name (legacy system)
+        mentees_by_name = User.query.filter(
+            User.user_type == "2",
+            User.institution == institution.name,
+            User.institution_id.is_(None)
+        ).all()
+        
+        users = list(mentees_by_id) + list(mentees_by_name)
+        title = f"Mentees - {institution.name}"
+    
+    else:
+        flash("Invalid user type", "error")
+        return redirect(url_for("view_institution", institution_id=institution_id))
+    
+    return render_template(
+        "supervisor/institution_users.html",
+        show_sidebar=True,
+        active_section="institution",
+        institution=institution,
+        users=users,
+        user_type=user_type,
+        title=title
+    )
+
+
 
 # ✅ UPDATE THIS ROUTE (remove profile references)
 
@@ -1229,9 +1413,9 @@ def institution_all_tasks():
     ).all()
 
     for task in mentee_tasks:
-        mentee = User.query.get(task.mentee_id)
-        mentor = User.query.get(task.mentor_id)
-        master_task = MasterTask.query.get(task.task_id) if task.task_id else None
+        mentee = db.session.get(User, task.mentee_id)
+        mentor = db.session.get(User, task.mentor_id)
+        master_task = db.session.get(MasterTask, task.task_id) if task.task_id else None
         
         if mentor and (mentor.institution == institution_name or mentor.institution_id == institution_id):
             all_institution_tasks.append({
@@ -1331,9 +1515,9 @@ def get_institution_tasks_data():
     ).all()
     
     for task in mentee_tasks:
-        mentee = User.query.get(task.mentee_id)
-        mentor = User.query.get(task.mentor_id)
-        master_task = MasterTask.query.get(task.task_id) if task.task_id else None
+        mentee = db.session.get(User, task.mentee_id)
+        mentor = db.session.get(User, task.mentor_id)
+        master_task = db.session.get(MasterTask, task.task_id) if task.task_id else None
         
         tasks_data.append({
             "id": f"master_{task.id}",
@@ -2721,9 +2905,9 @@ def get_supervisor_tasks_data():
         
         # Process mentee tasks
         for task in mentee_tasks:
-            master_task = MasterTask.query.get(task.task_id)
-            mentee = User.query.get(task.mentee_id)
-            mentor = User.query.get(task.mentor_id)
+            master_task = db.session.get(MasterTask, task.task_id)
+            mentee = db.session.get(User, task.mentee_id)
+            mentor = db.session.get(User, task.mentor_id)
             
             if master_task and mentee and mentor:
                 # Get rating for this task
