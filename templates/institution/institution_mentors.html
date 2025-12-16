@@ -4,6 +4,19 @@
 {% block user %}Institution{% endblock %}
 
 {% block content %}
+
+<style>
+  .relative select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3E%3C/svg%3E");
+    background-position: right 0.5rem center;
+    background-repeat: no-repeat;
+    background-size: 1.5em 1.5em;
+    padding-right: 2.5rem;
+  }
+</style>
+
+
+
 <div class="bg-white rounded-xl shadow-sm">
     <div class="p-6 border-b border-gray-200">
         <h2 class="text-2xl font-semibold text-gray-800 mb-2">Institution Mentors</h2>
@@ -438,7 +451,7 @@ function openMentorProfileModal(
 function closeMentorProfileModal() {
   document.getElementById('mentorProfileModal').classList.add('hidden');
 }
-</script>
+
 
 
     const searchTerm = document.getElementById('searchMentors').value.toLowerCase();
@@ -470,14 +483,5 @@ function closeMentorProfileModal() {
 }
 </script>
 
-<style>
-  .relative select {
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3E%3C/svg%3E");
-    background-position: right 0.5rem center;
-    background-repeat: no-repeat;
-    background-size: 1.5em 1.5em;
-    padding-right: 2.5rem;
-  }
-</style>
 
 {% endblock %}
