@@ -1,4 +1,4 @@
-{% extends "base2.html" %}
+ {% extends "base2.html" %}
 
 {% block title %}Edit Institution Profile{% endblock %}
 {% block user %}Institution{% endblock %}
@@ -48,7 +48,7 @@
     {% endwith %}
 
     <!-- Main Form -->
-    <form method="POST" enctype="multipart/form-data" class="edit-profile-form">
+    <form id="institutionProfileForm" method="POST" enctype="multipart/form-data" class="edit-profile-form" onsubmit="return validateInstitutionForm()">
 
         <div class="form-sections">
             <!-- Institution Information Section -->
@@ -239,14 +239,68 @@
 </div>
 
 <script>
-// Form Validation
-document.querySelector('form').addEventListener('submit', function(e) {
-    const nameInput = document.getElementById('name');
-    
-    if (!nameInput.value.trim()) {
-        e.preventDefault();
-        showNotification('Please enter your institution name', 'error');
-        nameInput.focus();
+// Form Validation for Institution
+function validateInstitutionForm() {
+    const form = document.getElementById('institutionProfileForm');
+    const requiredFields = [
+        { name: 'name', label: 'Institution Name' },
+        { name: 'contact_person', label: 'Contact Person' },
+        { name: 'contact_email', label: 'Contact Email' },
+        { name: 'contact_phone', label: 'Contact Phone' },
+        { name: 'address', label: 'Address' },
+        { name: 'city', label: 'City' },
+        { name: 'state', label: 'State' },
+        { name: 'country', label: 'Country' },
+        { name: 'website', label: 'Website' }
+    ];
+
+    let emptyFields = [];
+
+    requiredFields.forEach(field => {
+        const element = form.elements[field.name];
+        if (!element) return;
+
+        let isEmpty = false;
+
+        if (element.type === 'text' || element.type === 'email' || element.type === 'tel' || element.type === 'url') {
+            isEmpty = !element.value.trim();
+        } else if (element.type === 'select-one') {
+            isEmpty = !element.value || element.value === '';
+        }
+
+        if (isEmpty) {
+            emptyFields.push(field.label);
+            element.style.borderColor = '#ef4444';
+            element.style.borderWidth = '2px';
+        } else {
+            element.style.borderColor = '';
+            element.style.borderWidth = '';
+        }
+    });
+
+    if (emptyFields.length > 0) {
+        alert('❌ Please fill all mandatory fields:\n\n' + emptyFields.join('\n'));
+        return false;
+    }
+
+    return true;
+}
+
+// Clear error styling when user starts typing
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('institutionProfileForm');
+    if (form) {
+        const inputs = form.querySelectorAll('input, select, textarea');
+        inputs.forEach(input => {
+            input.addEventListener('change', function() {
+                this.style.borderColor = '';
+                this.style.borderWidth = '';
+            });
+            input.addEventListener('input', function() {
+                this.style.borderColor = '';
+                this.style.borderWidth = '';
+            });
+        });
     }
 });
 
