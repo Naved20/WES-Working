@@ -17,7 +17,7 @@
 <div class="max-w-4xl mx-auto mt-8 p-6 bg-gray-50 rounded-lg shadow-lg">
     <h2 class="text-2xl font-bold text-gray-800 mb-6">Edit Supervisor Profile</h2>
     
-    <form method="POST" enctype="multipart/form-data" class="space-y-6">
+    <form id="supervisorProfileForm" method="POST" enctype="multipart/form-data" class="space-y-6" onsubmit="return validateSupervisorForm()">
         <!-- Profile Picture -->
         <div class="flex flex-col items-center md:flex-row md:items-center md:space-x-6">
             <img src="{{ url_for('static', filename='uploads/' + (profile_picture if profile_picture else 'default.png')) }}"
@@ -83,4 +83,70 @@
         </div>
     </form>
 </div>
+
+<script>
+// Form validation function for supervisor
+function validateSupervisorForm() {
+    const form = document.getElementById('supervisorProfileForm');
+    const requiredFields = [
+        { name: 'organisation_or_college', label: 'Organization / College' },
+        { name: 'whatsapp_number', label: 'WhatsApp Number' },
+        { name: 'location', label: 'Location' },
+        { name: 'role', label: 'Role' },
+        { name: 'additional_info', label: 'Additional Info' }
+    ];
+
+    let emptyFields = [];
+
+    requiredFields.forEach(field => {
+        const element = form.elements[field.name];
+        if (!element) return;
+
+        let isEmpty = false;
+
+        if (element.type === 'text' || element.type === 'email' || element.type === 'tel') {
+            isEmpty = !element.value.trim();
+        } else if (element.type === 'select-one') {
+            isEmpty = !element.value || element.value === '';
+        } else if (element.tagName === 'TEXTAREA') {
+            isEmpty = !element.value.trim();
+        }
+
+        if (isEmpty) {
+            emptyFields.push(field.label);
+            element.style.borderColor = '#ef4444';
+            element.style.borderWidth = '2px';
+        } else {
+            element.style.borderColor = '';
+            element.style.borderWidth = '';
+        }
+    });
+
+    if (emptyFields.length > 0) {
+        alert('❌ Please fill all mandatory fields:\n\n' + emptyFields.join('\n'));
+        return false;
+    }
+
+    return true;
+}
+
+// Clear error styling when user starts typing
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('supervisorProfileForm');
+    if (form) {
+        const inputs = form.querySelectorAll('input, select, textarea');
+        inputs.forEach(input => {
+            input.addEventListener('change', function() {
+                this.style.borderColor = '';
+                this.style.borderWidth = '';
+            });
+            input.addEventListener('input', function() {
+                this.style.borderColor = '';
+                this.style.borderWidth = '';
+            });
+        });
+    }
+});
+</script>
+
 {% endblock %}

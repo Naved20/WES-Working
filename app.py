@@ -514,8 +514,8 @@ def inject_profile_complete():
 # ---------- Profile Completion Check Function ----------
 def check_profile_complete(user_id, user_type):
     """
-    Check if user profile is complete
-    Returns True if profile exists and has basic data, False if empty/not created
+    Check if user profile is FULLY complete with ALL mandatory fields
+    Returns True only if ALL required fields are filled, False otherwise
     """
     print(f"🔍 Checking profile completion for user_id: {user_id}, user_type: {user_type}")
     
@@ -523,17 +523,31 @@ def check_profile_complete(user_id, user_type):
         profile = MentorProfile.query.filter_by(user_id=user_id).first()
         print(f"📊 Mentor profile found: {profile is not None}")
         if profile:
-            # Check if profile has at least some basic data filled
-            has_basic_info = any([
+            # Check if ALL mandatory fields are filled
+            has_all_required = all([
                 profile.profession, 
                 profile.organisation, 
                 profile.whatsapp,
                 profile.location,
                 profile.education,
-                profile.years_of_experience
+                profile.years_of_experience,
+                profile.skills,
+                profile.role,
+                profile.industry_sector,
+                profile.language,
+                profile.linkedin_link,
+                profile.mentorship_topics,
+                profile.mentorship_type_preference,
+                profile.preferred_communication,
+                profile.availability,
+                profile.connect_frequency,
+                profile.preferred_duration,
+                profile.why_mentor,
+                profile.mentorship_philosophy,
+                profile.mentorship_motto
             ])
-            print(f"✅ Mentor profile complete: {has_basic_info}")
-            return has_basic_info
+            print(f"✅ Mentor profile complete: {has_all_required}")
+            return has_all_required
         print("❌ No mentor profile found")
         return False
     
@@ -541,17 +555,24 @@ def check_profile_complete(user_id, user_type):
         profile = MenteeProfile.query.filter_by(user_id=user_id).first()
         print(f"📊 Mentee profile found: {profile is not None}")
         if profile:
-            # Check if profile has at least some basic data filled
-            has_basic_info = any([
+            # Check if ALL mandatory fields are filled
+            has_all_required = all([
                 profile.dob,
                 profile.school_college_name, 
                 profile.mobile_number,
+                profile.whatsapp_number,
+                profile.govt_private,
                 profile.stream,
                 profile.class_year,
-                profile.goal
+                profile.favourite_subject,
+                profile.goal,
+                profile.parent_name,
+                profile.parent_mobile,
+                profile.comments,
+                profile.terms_agreement
             ])
-            print(f"✅ Mentee profile complete: {has_basic_info}")
-            return has_basic_info
+            print(f"✅ Mentee profile complete: {has_all_required}")
+            return has_all_required
         print("❌ No mentee profile found")
         return False
     
@@ -559,19 +580,49 @@ def check_profile_complete(user_id, user_type):
         profile = SupervisorProfile.query.filter_by(user_id=user_id).first()
         print(f"📊 Supervisor profile found: {profile is not None}")
         if profile:
-            has_basic_info = any([
+            has_all_required = all([
                 profile.organisation,
                 profile.whatsapp,
                 profile.location,
-                profile.role
+                profile.role,
+                profile.additional_info
             ])
-            print(f"✅ Supervisor profile complete: {has_basic_info}")
-            return has_basic_info
+            print(f"✅ Supervisor profile complete: {has_all_required}")
+            return has_all_required
         print("❌ No supervisor profile found")
         return False
     
     print(f"⚠️ Unknown user type: {user_type}")
     return True  # Default to True for unknown types (no popup)
+
+# Decorator to enforce profile completion
+def profile_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if "email" not in session:
+            return redirect(url_for("signin"))
+        
+        user = User.query.filter_by(email=session["email"]).first()
+        user_type = session.get("user_type")
+        
+        if not user:
+            return redirect(url_for("signin"))
+        
+        # Check if profile is complete
+        if not check_profile_complete(user.id, user_type):
+            flash("Please complete your profile first before accessing this section.", "warning")
+            # Redirect to appropriate profile edit page
+            if user_type == "1":
+                return redirect(url_for("editmentorprofile"))
+            elif user_type == "2":
+                return redirect(url_for("editmenteeprofile"))
+            elif user_type == "0":
+                return redirect(url_for("editsupervisorprofile"))
+            elif user_type == "3":
+                return redirect(url_for("editinstitutionprofile"))
+        
+        return f(*args, **kwargs)
+    return decorated_function
 
 #-------------HOME----------------
 @app.route("/")
@@ -640,15 +691,19 @@ def signup():
         session["user_type"] = user_type
         session["user_id"] = new_user.id
 
-        # Redirect based on role
+        # Redirect to profile completion (mandatory)
         if user_type == "1":
-            return redirect(url_for("mentordashboard"))
+            flash("Welcome! Please complete your profile to continue.", "info")
+            return redirect(url_for("editmentorprofile"))
         elif user_type == "2":
-            return redirect(url_for("menteedashboard"))
+            flash("Welcome! Please complete your profile to continue.", "info")
+            return redirect(url_for("editmenteeprofile"))
         elif user_type == "0":
-            return redirect(url_for("supervisordashboard"))
+            flash("Welcome! Please complete your profile to continue.", "info")
+            return redirect(url_for("editsupervisorprofile"))
         elif user_type == "3":  # Institution admin
-            return redirect(url_for("institutiondashboard"))
+            flash("Welcome! Please complete your profile to continue.", "info")
+            return redirect(url_for("editinstitutionprofile"))
         
         return redirect(url_for("signin"))
 
@@ -700,6 +755,7 @@ def signin():
 
 # ------------------ DASHBOARDS ------------------
 @app.route("/mentordashboard", methods=["GET", "POST"])
+@profile_required
 def mentordashboard():
     if "email" not in session or session.get("user_type") != "1":  # Only mentors
         return redirect(url_for("signin"))
@@ -869,6 +925,7 @@ def mentor_mentorship_request():
     )
 
 @app.route("/menteedashboard")
+@profile_required
 def menteedashboard():
     if "email" in session and session.get("user_type") == "2":
         # Fetch current mentee
@@ -909,6 +966,7 @@ def menteedashboard():
     return redirect(url_for("signin"))
 
 @app.route("/supervisordashboard")
+@profile_required
 def supervisordashboard():
     if "email" not in session or session.get("user_type") != "0":
         return redirect(url_for("signin"))
@@ -1197,6 +1255,7 @@ def institution_users(institution_id, user_type):
 # ✅ UPDATE THIS ROUTE (remove profile references)
 
 @app.route("/institutiondashboard")
+@profile_required
 def institutiondashboard():
     if "email" not in session or session.get("user_type") != "3":
         return redirect(url_for("signin"))
@@ -1648,6 +1707,29 @@ def editinstitutionprofile():
 
     if request.method == "POST":
         try:
+            # Validate all mandatory fields
+            mandatory_fields = {
+                "name": request.form.get("name"),
+                "contact_person": request.form.get("contact_person"),
+                "contact_email": request.form.get("contact_email"),
+                "contact_phone": request.form.get("contact_phone"),
+                "address": request.form.get("address"),
+                "city": request.form.get("city"),
+                "state": request.form.get("state"),
+                "country": request.form.get("country"),
+                "website": request.form.get("website"),
+            }
+            
+            # Check for empty fields
+            missing_fields = []
+            for field_name, field_value in mandatory_fields.items():
+                if not field_value:
+                    missing_fields.append(field_name.replace("_", " ").title())
+            
+            if missing_fields:
+                flash(f"Please fill all mandatory fields: {', '.join(missing_fields)}", "error")
+                return redirect(url_for("editinstitutionprofile"))
+            
             # If institution doesn't exist, create it with user_id link
             if not institution_details:
                 institution_details = Institution(
@@ -3409,6 +3491,41 @@ def editmentorprofile():
             profile = MentorProfile(user_id=user.id)
             db.session.add(profile)
 
+        # Validate all mandatory fields
+        mandatory_fields = {
+            "profession": request.form.get("profession"),
+            "skills": request.form.get("skills"),
+            "role": request.form.get("role"),
+            "industry_sector": request.form.get("industry_sector"),
+            "organisation": request.form.get("organisation"),
+            "years_of_experience": request.form.get("years_of_experience"),
+            "whatsapp": request.form.get("whatsapp"),
+            "city": request.form.get("city"),
+            "country": request.form.get("country"),
+            "education": request.form.get("education"),
+            "language": request.form.getlist("language"),
+            "linkedin_link": request.form.get("linkedin_link"),
+            "mentorship_topics": request.form.getlist("mentorship_topics"),
+            "mentorship_type_preference": request.form.getlist("mentorship_type_preference"),
+            "preferred_communication": request.form.get("preferred_communication"),
+            "availability": request.form.get("availability"),
+            "connect_frequency": request.form.get("connect_frequency"),
+            "preferred_duration": request.form.get("preferred_duration"),
+            "why_mentor": request.form.get("why_mentor"),
+            "mentorship_philosophy": request.form.get("mentorship_philosophy"),
+            "mentorship_motto": request.form.get("mentorship_motto"),
+        }
+        
+        # Check for empty fields
+        missing_fields = []
+        for field_name, field_value in mandatory_fields.items():
+            if not field_value or (isinstance(field_value, list) and len(field_value) == 0):
+                missing_fields.append(field_name.replace("_", " ").title())
+        
+        if missing_fields:
+            flash(f"Please fill all mandatory fields: {', '.join(missing_fields)}", "error")
+            return redirect(url_for("editmentorprofile"))
+
         # Update institution if changed
         new_institution = request.form.get("institution")
         print(f" insitiution from from:{new_institution}")
@@ -3501,8 +3618,8 @@ def editmentorprofile():
         github_link=profile.github_link if profile else "",
         portfolio_link=profile.portfolio_link if profile else "",
         other_social_link=profile.other_social_link if profile else "",
-        mentorship_topics=profile.mentorship_topics if profile else "",
-        mentorship_type_preference=profile.mentorship_type_preference if profile else "",
+        mentorship_topics=profile.mentorship_topics or "",
+        mentorship_type_preference=profile.mentorship_type_preference or "",
         preferred_communication=profile.preferred_communication if profile else "",
         availability=profile.availability if profile else "",
         connect_frequency=profile.connect_frequency if profile else "",
@@ -3533,6 +3650,33 @@ def editmenteeprofile():
         if not profile:
             profile = MenteeProfile(user_id=user.id)
             db.session.add(profile)
+
+        # Validate all mandatory fields
+        mandatory_fields = {
+            "dob": request.form.get("dob"),
+            "school_college_name": request.form.get("school_college_name"),
+            "mobile_number": request.form.get("mobile_number"),
+            "whatsapp_number": request.form.get("whatsapp_number"),
+            "govt_private": request.form.get("govt_private"),
+            "stream": request.form.get("stream"),
+            "class_year": request.form.get("class_year"),
+            "favourite_subject": request.form.get("favourite_subject"),
+            "goal": request.form.get("goal"),
+            "parent_name": request.form.get("parent_name"),
+            "parent_mobile": request.form.get("parent_mobile"),
+            "comments": request.form.get("comments"),
+            "terms_agreement": request.form.get("terms_agreement"),
+        }
+        
+        # Check for empty fields
+        missing_fields = []
+        for field_name, field_value in mandatory_fields.items():
+            if not field_value:
+                missing_fields.append(field_name.replace("_", " ").title())
+        
+        if missing_fields:
+            flash(f"Please fill all mandatory fields: {', '.join(missing_fields)}", "error")
+            return redirect(url_for("editmenteeprofile"))
 
         # Update institution if changed
         new_institution = request.form.get("institution")
@@ -3610,57 +3754,24 @@ def editsupervisorprofile():
             profile = SupervisorProfile(user_id=user.id)
             db.session.add(profile)
 
-        # Update institution if changed
-        new_institution = request.form.get("institution")
-        if new_institution and new_institution != user.institution:
-            user.institution = new_institution
-            db.session.add(user)
-
-        profile.organisation = request.form.get("organisation_or_college")
-        profile.whatsapp = request.form.get("whatsapp_number")
-        profile.location = request.form.get("location")
-        profile.role = request.form.get("role")
-        profile.additional_info = request.form.get("additional_info")
-
-        # Profile picture handling
-        file = request.files.get("profile_picture")
-        if file and allowed_file(file.filename):
-            filename = f"{user.id}_{int(datetime.now().timestamp())}{secure_filename(file.filename)}"
-            file.save(os.path.join(app.config["UPLOAD_FOLDER"], filename))
-            profile.profile_picture = filename
-            
-        db.session.add(profile)
-        db.session.commit()
-        flash("Profile updated successfully!", "success")
-        return redirect(url_for("supervisorprofile"))
-
-    return render_template(
-        "supervisor/editsupervisorprofile.html",
-        full_name=user.name,
-        email=user.email,
-        institution=user.institution,  # Pass current institution
-        institutions=institutions,     # Pass institutions list
-        organisation_or_college=profile.organisation if profile else "",
-        whatsapp_number=profile.whatsapp if profile else "",
-        location=profile.location if profile else "",
-        role=profile.role if profile else "",
-        additional_info=profile.additional_info if profile else "",
-        profile_picture=profile.profile_picture if profile else None
-    )
-
-    if "email" not in session or session.get("user_type") != "0":  
-        return redirect(url_for("signin"))
-
-    user = User.query.filter_by(email=session["email"]).first()
-    profile = SupervisorProfile.query.filter_by(user_id=user.id).first()
-    
-    # Get institutions for dropdown
-    institutions = Institution.query.filter_by(status="active").all()
-
-    if request.method == "POST":
-        if not profile:
-            profile = SupervisorProfile(user_id=user.id)
-            db.session.add(profile)
+        # Validate all mandatory fields
+        mandatory_fields = {
+            "organisation_or_college": request.form.get("organisation_or_college"),
+            "whatsapp_number": request.form.get("whatsapp_number"),
+            "location": request.form.get("location"),
+            "role": request.form.get("role"),
+            "additional_info": request.form.get("additional_info"),
+        }
+        
+        # Check for empty fields
+        missing_fields = []
+        for field_name, field_value in mandatory_fields.items():
+            if not field_value:
+                missing_fields.append(field_name.replace("_", " ").title())
+        
+        if missing_fields:
+            flash(f"Please fill all mandatory fields: {', '.join(missing_fields)}", "error")
+            return redirect(url_for("editsupervisorprofile"))
 
         # Update institution if changed
         new_institution = request.form.get("institution")
@@ -3699,6 +3810,9 @@ def editsupervisorprofile():
         additional_info=profile.additional_info if profile else "",
         profile_picture=profile.profile_picture if profile else None
     )
+
+# Remove duplicate code below
+
 
 # ------------------ PROFILE ------------------
 @app.route("/profile")

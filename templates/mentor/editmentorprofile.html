@@ -45,7 +45,7 @@
 </style>
 
 <div class="max-w-6xl mx-auto mt-8 p-6 bg-gradient-to-br from-gray-50 to-blue-50 rounded-2xl shadow-2xl">
-    <form action="{{ url_for('editmentorprofile') }}" method="POST" enctype="multipart/form-data" class="space-y-8">
+    <form id="mentorProfileForm" action="{{ url_for('editmentorprofile') }}" method="POST" enctype="multipart/form-data" class="space-y-8" onsubmit="return validateForm()">
         <!-- Profile Header -->
         <div class="flex flex-col items-center md:flex-row md:items-center md:justify-start space-y-6 md:space-y-0 md:space-x-8 mb-8 p-6 bg-white rounded-xl shadow-md">
             <!-- Profile Picture Upload -->
@@ -355,19 +355,19 @@
                         <label class="block text-gray-700 font-semibold mb-2">Mentorship Topics *</label>
                         <select name="mentorship_topics" class="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition duration-300" multiple>
                             <optgroup label="Career Development">
-                                <option value="Career Guidance" {% if 'Career Guidance' in mentorship_topics %}selected{% endif %}>🎯 Career Guidance</option>
-                                <option value="Career Transition" {% if 'Career Transition' in mentorship_topics %}selected{% endif %}>🔄 Career Transition</option>
-                                <option value="Interview Preparation" {% if 'Interview Preparation' in mentorship_topics %}selected{% endif %}>📝 Interview Preparation</option>
-                                <option value="Resume Building" {% if 'Resume Building' in mentorship_topics %}selected{% endif %}>📄 Resume Building</option>
-                                <option value="Job Search Strategy" {% if 'Job Search Strategy' in mentorship_topics %}selected{% endif %}>🔍 Job Search Strategy</option>
-                                <option value="Salary Negotiation" {% if 'Salary Negotiation' in mentorship_topics %}selected{% endif %}>💰 Salary Negotiation</option>
+                                <option value="Career Guidance" {% if mentorship_topics and 'Career Guidance' in mentorship_topics %}selected{% endif %}>🎯 Career Guidance</option>
+                                <option value="Career Transition" {% if mentorship_topics and 'Career Transition' in mentorship_topics %}selected{% endif %}>🔄 Career Transition</option>
+                                <option value="Interview Preparation" {% if mentorship_topics and 'Interview Preparation' in mentorship_topics %}selected{% endif %}>📝 Interview Preparation</option>
+                                <option value="Resume Building" {% if mentorship_topics and 'Resume Building' in mentorship_topics %}selected{% endif %}>📄 Resume Building</option>
+                                <option value="Job Search Strategy" {% if mentorship_topics and 'Job Search Strategy' in mentorship_topics %}selected{% endif %}>🔍 Job Search Strategy</option>
+                                <option value="Salary Negotiation" {% if mentorship_topics and 'Salary Negotiation' in mentorship_topics %}selected{% endif %}>💰 Salary Negotiation</option>
                             </optgroup>
                             <optgroup label="Technical Skills">
-                                <option value="Programming" {% if 'Programming' in mentorship_topics %}selected{% endif %}>💻 Programming</option>
-                                <option value="Data Science" {% if 'Data Science' in mentorship_topics %}selected{% endif %}>📊 Data Science</option>
-                                <option value="Machine Learning" {% if 'Machine Learning' in mentorship_topics %}selected{% endif %}>🤖 Machine Learning</option>
-                                <option value="Web Development" {% if 'Web Development' in mentorship_topics %}selected{% endif %}>🌐 Web Development</option>
-                                <option value="Mobile Development" {% if 'Mobile Development' in mentorship_topics %}selected{% endif %}>📱 Mobile Development</option>
+                                <option value="Programming" {% if mentorship_topics and 'Programming' in mentorship_topics %}selected{% endif %}>💻 Programming</option>
+                                <option value="Data Science" {% if mentorship_topics and 'Data Science' in mentorship_topics %}selected{% endif %}>📊 Data Science</option>
+                                <option value="Machine Learning" {% if mentorship_topics and 'Machine Learning' in mentorship_topics %}selected{% endif %}>🤖 Machine Learning</option>
+                                <option value="Web Development" {% if mentorship_topics and 'Web Development' in mentorship_topics %}selected{% endif %}>🌐 Web Development</option>
+                                <option value="Mobile Development" {% if mentorship_topics and 'Mobile Development' in mentorship_topics %}selected{% endif %}>📱 Mobile Development</option>
                                 <option value="Cloud Computing" {% if 'Cloud Computing' in mentorship_topics %}selected{% endif %}>☁️ Cloud Computing</option>
                                 <option value="Cybersecurity" {% if 'Cybersecurity' in mentorship_topics %}selected{% endif %}>🔒 Cybersecurity</option>
                             </optgroup>
@@ -408,25 +408,25 @@
                         <label class="block text-gray-700 font-semibold mb-2">Mentorship Type Preference *</label>
                         <select name="mentorship_type_preference" class="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition duration-300" multiple>
                             <optgroup label="Student Groups">
-                                <option value="School Students" {% if 'School Students' in mentorship_type_preference %}selected{% endif %}>🎒 School Students (6th-12th)</option>
-                                <option value="College Students" {% if 'College Students' in mentorship_type_preference %}selected{% endif %}>🎓 College Students (Undergraduate)</option>
-                                <option value="Graduate Students" {% if 'Graduate Students' in mentorship_type_preference %}selected{% endif %}>🎓 Graduate Students (Postgraduate)</option>
-                                <option value="PhD Scholars" {% if 'PhD Scholars' in mentorship_type_preference %}selected{% endif %}>🔬 PhD Scholars</option>
+                                <option value="School Students" {% if mentorship_type_preference and 'School Students' in mentorship_type_preference %}selected{% endif %}>🎒 School Students (6th-12th)</option>
+                                <option value="College Students" {% if mentorship_type_preference and 'College Students' in mentorship_type_preference %}selected{% endif %}>🎓 College Students (Undergraduate)</option>
+                                <option value="Graduate Students" {% if mentorship_type_preference and 'Graduate Students' in mentorship_type_preference %}selected{% endif %}>🎓 Graduate Students (Postgraduate)</option>
+                                <option value="PhD Scholars" {% if mentorship_type_preference and 'PhD Scholars' in mentorship_type_preference %}selected{% endif %}>🔬 PhD Scholars</option>
                             </optgroup>
                             <optgroup label="Professional Groups">
-                                <option value="Early Professionals" {% if 'Early Professionals' in mentorship_type_preference %}selected{% endif %}>👨‍💼 Early Professionals (0-3 years)</option>
-                                <option value="Mid-Level Professionals" {% if 'Mid-Level Professionals' in mentorship_type_preference %}selected{% endif %}>💼 Mid-Level Professionals (4-8 years)</option>
-                                <option value="Senior Professionals" {% if 'Senior Professionals' in mentorship_type_preference %}selected{% endif %}>👔 Senior Professionals (8+ years)</option>
-                                <option value="Career Changers" {% if 'Career Changers' in mentorship_type_preference %}selected{% endif %}>🔄 Career Changers</option>
+                                <option value="Early Professionals" {% if mentorship_type_preference and 'Early Professionals' in mentorship_type_preference %}selected{% endif %}>👨‍💼 Early Professionals (0-3 years)</option>
+                                <option value="Mid-Level Professionals" {% if mentorship_type_preference and 'Mid-Level Professionals' in mentorship_type_preference %}selected{% endif %}>💼 Mid-Level Professionals (4-8 years)</option>
+                                <option value="Senior Professionals" {% if mentorship_type_preference and 'Senior Professionals' in mentorship_type_preference %}selected{% endif %}>👔 Senior Professionals (8+ years)</option>
+                                <option value="Career Changers" {% if mentorship_type_preference and 'Career Changers' in mentorship_type_preference %}selected{% endif %}>🔄 Career Changers</option>
                             </optgroup>
                             <optgroup label="Special Groups">
-                                <option value="Women" {% if 'Women' in mentorship_type_preference %}selected{% endif %}>👩‍💼 Women Professionals</option>
-                                <option value="Underrepresented Groups" {% if 'Underrepresented Groups' in mentorship_type_preference %}selected{% endif %}>🌈 Underrepresented Groups</option>
-                                <option value="Entrepreneurs" {% if 'Entrepreneurs' in mentorship_type_preference %}selected{% endif %}>💡 Entrepreneurs</option>
-                                <option value="Returning Professionals" {% if 'Returning Professionals' in mentorship_type_preference %}selected{% endif %}>↩️ Returning Professionals</option>
-                                <option value="First Generation Students" {% if 'First Generation Students' in mentorship_type_preference %}selected{% endif %}>🌟 First Generation Students</option>
+                                <option value="Women" {% if mentorship_type_preference and 'Women' in mentorship_type_preference %}selected{% endif %}>👩‍💼 Women Professionals</option>
+                                <option value="Underrepresented Groups" {% if mentorship_type_preference and 'Underrepresented Groups' in mentorship_type_preference %}selected{% endif %}>🌈 Underrepresented Groups</option>
+                                <option value="Entrepreneurs" {% if mentorship_type_preference and 'Entrepreneurs' in mentorship_type_preference %}selected{% endif %}>💡 Entrepreneurs</option>
+                                <option value="Returning Professionals" {% if mentorship_type_preference and 'Returning Professionals' in mentorship_type_preference %}selected{% endif %}>↩️ Returning Professionals</option>
+                                <option value="First Generation Students" {% if mentorship_type_preference and 'First Generation Students' in mentorship_type_preference %}selected{% endif %}>🌟 First Generation Students</option>
                             </optgroup>
-                            <option value="All" {% if 'All' in mentorship_type_preference %}selected{% endif %}>🌍 All Groups</option>
+                            <option value="All" {% if mentorship_type_preference and 'All' in mentorship_type_preference %}selected{% endif %}>🌍 All Groups</option>
                         </select>
                         <p class="text-sm text-gray-500 mt-1"><i class="fas fa-mouse-pointer mr-1"></i>Hold Ctrl/Cmd to select multiple preferences</p>
                     </div>
@@ -579,7 +579,97 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
+// Form validation function
+function validateForm() {
+    const form = document.getElementById('mentorProfileForm');
+    if (!form) {
+        console.error('Form not found');
+        return false;
+    }
+    
+    const requiredFields = [
+        { name: 'profession', label: 'Profession' },
+        { name: 'skills', label: 'Skills' },
+        { name: 'role', label: 'Role' },
+        { name: 'industry_sector', label: 'Industry Sector' },
+        { name: 'organisation', label: 'Organisation' },
+        { name: 'years_of_experience', label: 'Years of Experience' },
+        { name: 'whatsapp', label: 'WhatsApp Number' },
+        { name: 'city', label: 'City' },
+        { name: 'country', label: 'Country' },
+        { name: 'education', label: 'Education' },
+        { name: 'language', label: 'Language' },
+        { name: 'linkedin_link', label: 'LinkedIn Link' },
+        { name: 'mentorship_topics', label: 'Mentorship Topics' },
+        { name: 'mentorship_type_preference', label: 'Mentorship Type Preference' },
+        { name: 'preferred_communication', label: 'Preferred Communication' },
+        { name: 'availability', label: 'Availability' },
+        { name: 'connect_frequency', label: 'Connect Frequency' },
+        { name: 'preferred_duration', label: 'Preferred Duration' },
+        { name: 'why_mentor', label: 'Why Mentor' },
+        { name: 'mentorship_philosophy', label: 'Mentorship Philosophy' },
+        { name: 'mentorship_motto', label: 'Mentorship Motto' }
+    ];
 
+    let emptyFields = [];
+
+    requiredFields.forEach(field => {
+        const element = form.elements[field.name];
+        if (!element) {
+            console.warn(`Field not found: ${field.name}`);
+            return;
+        }
+
+        let isEmpty = false;
+
+        if (element.type === 'select-multiple') {
+            // For multi-select, check if at least one option is selected
+            isEmpty = element.selectedOptions.length === 0;
+        } else if (element.tagName === 'TEXTAREA') {
+            isEmpty = !element.value.trim();
+        } else if (element.type === 'text' || element.type === 'email' || element.type === 'number' || element.type === 'url') {
+            isEmpty = !element.value.trim();
+        } else if (element.type === 'select-one') {
+            isEmpty = !element.value || element.value === '';
+        }
+
+        if (isEmpty) {
+            emptyFields.push(field.label);
+            element.style.borderColor = '#ef4444';
+            element.style.borderWidth = '2px';
+        } else {
+            element.style.borderColor = '';
+            element.style.borderWidth = '';
+        }
+    });
+
+    if (emptyFields.length > 0) {
+        alert('❌ Please fill all mandatory fields:\n\n' + emptyFields.join('\n'));
+        return false;
+    }
+
+    return true;
+}
+
+// Clear error styling when user starts typing
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('mentorProfileForm');
+    if (form) {
+        const inputs = form.querySelectorAll('input, select, textarea');
+        inputs.forEach(input => {
+            input.addEventListener('change', function() {
+                this.style.borderColor = '';
+                this.style.borderWidth = '';
+            });
+            input.addEventListener('input', function() {
+                this.style.borderColor = '';
+                this.style.borderWidth = '';
+            });
+        });
+    } else {
+        console.error('mentorProfileForm not found in DOM');
+    }
+});
 
 </script>
 {% endblock %}
