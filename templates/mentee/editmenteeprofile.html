@@ -13,7 +13,7 @@
 
 {% block content %}
 <div class="max-w-4xl mx-auto mt-8 p-6 bg-gray-50 rounded-lg shadow-lg">
-    <form action="{{ url_for('editmenteeprofile') }}" method="POST" enctype="multipart/form-data" class="space-y-6">
+    <form id="menteeProfileForm" action="{{ url_for('editmenteeprofile') }}" method="POST" enctype="multipart/form-data" class="space-y-6" onsubmit="return validateMenteeForm()">
         <!-- Profile Header -->
         <div class="flex flex-col items-center md:flex-row md:items-center md:justify-start space-y-4 md:space-y-0 md:space-x-6 mb-8">
             <!-- Profile Picture Upload -->
@@ -154,6 +154,79 @@
     } else {
         otherField.style.display = 'none';
         document.getElementById('other_institution_name').required = false;
+    }
+});
+
+// Form validation function for mentee
+function validateMenteeForm() {
+    const form = document.getElementById('menteeProfileForm');
+    const requiredFields = [
+        { name: 'dob', label: 'Date of Birth' },
+        { name: 'school_college_name', label: 'School / College Name' },
+        { name: 'mobile_number', label: 'Mobile Number' },
+        { name: 'whatsapp_number', label: 'WhatsApp Number' },
+        { name: 'govt_private', label: 'Government / Private' },
+        { name: 'stream', label: 'Stream' },
+        { name: 'class_year', label: 'Class / Year' },
+        { name: 'favourite_subject', label: 'Favourite Subject' },
+        { name: 'goal', label: 'Goal' },
+        { name: 'parent_name', label: 'Parent Name' },
+        { name: 'parent_mobile', label: 'Parent Mobile' },
+        { name: 'comments', label: 'Comments' },
+        { name: 'terms_agreement', label: 'Terms Agreement' }
+    ];
+
+    let emptyFields = [];
+
+    requiredFields.forEach(field => {
+        const element = form.elements[field.name];
+        if (!element) return;
+
+        let isEmpty = false;
+
+        if (element.type === 'checkbox') {
+            isEmpty = !element.checked;
+        } else if (element.type === 'text' || element.type === 'email' || element.type === 'tel' || element.type === 'date') {
+            isEmpty = !element.value.trim();
+        } else if (element.type === 'select-one') {
+            isEmpty = !element.value || element.value === '';
+        } else if (element.tagName === 'TEXTAREA') {
+            isEmpty = !element.value.trim();
+        }
+
+        if (isEmpty) {
+            emptyFields.push(field.label);
+            element.style.borderColor = '#ef4444';
+            element.style.borderWidth = '2px';
+        } else {
+            element.style.borderColor = '';
+            element.style.borderWidth = '';
+        }
+    });
+
+    if (emptyFields.length > 0) {
+        alert('❌ Please fill all mandatory fields:\n\n' + emptyFields.join('\n'));
+        return false;
+    }
+
+    return true;
+}
+
+// Clear error styling when user starts typing
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('menteeProfileForm');
+    if (form) {
+        const inputs = form.querySelectorAll('input, select, textarea');
+        inputs.forEach(input => {
+            input.addEventListener('change', function() {
+                this.style.borderColor = '';
+                this.style.borderWidth = '';
+            });
+            input.addEventListener('input', function() {
+                this.style.borderColor = '';
+                this.style.borderWidth = '';
+            });
+        });
     }
 });
 </script>
