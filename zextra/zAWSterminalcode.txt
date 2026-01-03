@@ -4,7 +4,7 @@ git rm --cached instance/mentors_connect.db
 cd ~/WES-Working 
 
 downoldeall things
-scp -i "C:\Users\WES\Documents\WES_MENTORSHIP_APP.pem" ubuntu@13.60.24.151:/home/ubuntu/mentors_connect.db "C:\Users\WES\
+scp -i "C:\Users\WES\Documents\WES_MENTORSHIP_APP.pem" ubuntu@13.60.24.151:/home/ubuntu/mentors_connect.db "C:\Users\WES\"
 scp -r -i "C:\Users\WES\Documents\WES_MENTORSHIP_APP.pem" ubuntu@13.60.24.151:/home/ubuntu/WES-Working/static C:\Users\WES\
 
 
