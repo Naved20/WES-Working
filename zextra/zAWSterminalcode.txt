@@ -42,6 +42,66 @@ sudo nginx -t
 sudo systemctl restart nginx
 
 
+for pushing db github to aws {
+    sudo systemctl stop wes-app
+sudo pkill -9 gunicorn
+
+rm instance/mentors_connect.db
+git checkout origin/main -- instance/mentors_connect.db
+
+sudo chown ubuntu:ubuntu instance/mentors_connect.db
+sudo systemctl start wes-app
+
+this is ubuntu terminal code{
+    Welcome to Ubuntu 24.04.3 LTS (GNU/Linux 6.14.0-1015-aws x86_64)
+
+ * Documentation:  https://help.ubuntu.com
+ * Management:     https://landscape.canonical.com
+ * Support:        https://ubuntu.com/pro
+
+ System information as of Thu Jan  1 07:59:10 UTC 2026
+
+  System load:  0.08              Temperature:           -273.1 C
+  Usage of /:   60.9% of 6.71GB   Processes:             119
+  Memory usage: 54%               Users logged in:       0
+  Swap usage:   0%                IPv4 address for ens5: 172.31.36.113
+
+ * Ubuntu Pro delivers the most comprehensive open source security and
+   compliance features.
+
+   https://ubuntu.com/aws/pro
+
+Expanded Security Maintenance for Applications is not enabled.
+
+46 updates can be applied immediately.
+To see these additional updates run: apt list --upgradable
+
+Enable ESM Apps to receive additional future security updates.
+See https://ubuntu.com/esm or run: sudo pro status
+
+
+*** System restart required ***
+Last login: Thu Jan  1 06:18:01 2026 from 13.48.4.202
+ubuntu@ip-172-31-36-113:~$ cd ~/WES-Working
+ubuntu@ip-172-31-36-113:~/WES-Working$ cd ~/WES-Working
+ls -lh instance/
+total 352K
+-rwxr-xr-x 1 ubuntu ubuntu 352K Jan  1 06:20 mentors_connect.db
+ubuntu@ip-172-31-36-113:~/WES-Working$ sqlite3 instance/mentors_connect.db ".tables"
+MasterTask           mentee_profile       personal_tasks     
+alembic_version      mentee_tasks         signup_details     
+institutions         mentor_profile       supervisor_profile 
+meeting_requests     mentorship_requests  task_ratings       
+ubuntu@ip-172-31-36-113:~/WES-Working$ sudo systemctl stop wes-app
+sudo pkill -9 gunicorn
+ubuntu@ip-172-31-36-113:~/WES-Working$ rm instance/mentors_connect.db
+git checkout origin/main -- instance/mentors_connect.db
+ubuntu@ip-172-31-36-113:~/WES-Working$ sudo chown ubuntu:ubuntu instance/mentors_connect.db
+sudo systemctl start wes-app
+ubuntu@ip-172-31-36-113:~/WES-Working$ 
+}
+}
+
 
 
 
