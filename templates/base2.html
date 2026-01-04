@@ -78,7 +78,7 @@
                 </svg>
             </button>
         {% endif %}
-
+        
         <!-- Profile Dropdown -->
         <div class="relative">
             <button id="profile-dropdown-btn" class="group flex items-center space-x-2 p-2 rounded-full hover:bg-gray-600 hover:text-white transition-colors duration-200 focus:outline-none focus:ring focus:ring-blue-300">
@@ -98,20 +98,17 @@
 
             <!-- Dropdown menu -->
             <div id="profile-menu" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 ring-1 ring-black ring-opacity-5 focus:outline-none transition-transform transform origin-top-right">
+                
                 <a href="{{ url_for('profile')}}" 
                    class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
                    👤 My Profile
-                </a>
-
-                <a href="#" 
-                   class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                   ⚙️ Settings
                 </a>
 
                 <a href="{{ url_for('logout')}}" 
                    class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
                    🚪 Sign out
                 </a>
+
             </div>
         </div>
     </nav>
@@ -178,7 +175,7 @@
                     </a>
                     <a href="{{ url_for('mentor_mentorship_request')}}"
                        class="block px-4 py-2 text-white hover:bg-gray-600 rounded-md">
-                       🧑 Mentee request
+                       🧑 Mentoring request
                     </a>
                     
                     <a href="{{ url_for('my_mentees')}}"
@@ -190,7 +187,7 @@
 
                     <a href="{{ url_for('mentor_meeting_details')}}"
                        class="block px-4 py-2 text-white hover:bg-gray-600 rounded-md">
-                        🤝 My Meeting
+                        🤝 My Meetings
                     </a>
                     <a href="{{ url_for('mentor_calendar')}}"
                        class="block px-4 py-2 text-white hover:bg-gray-600 rounded-md">
