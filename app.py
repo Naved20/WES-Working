@@ -1252,6 +1252,79 @@ def institution_users(institution_id, user_type):
 
 
 
+# ============ PASSWORD RESET ROUTES (Supervisor) ============
+
+@app.route("/reset_user_password/<int:user_id>", methods=["GET", "POST"])
+def reset_user_password(user_id):
+    """Supervisor can reset any user's password"""
+    if "email" not in session or session.get("user_type") != "0":
+        flash("Only supervisors can reset passwords!", "error")
+        return redirect(url_for("signin"))
+    
+    user = User.query.get_or_404(user_id)
+    
+    if request.method == "POST":
+        new_password = request.form.get("new_password")
+        confirm_password = request.form.get("confirm_password")
+        
+        # Validate passwords
+        if not new_password or not confirm_password:
+            flash("Please enter both password fields!", "error")
+            return redirect(url_for("reset_user_password", user_id=user_id))
+        
+        if len(new_password) < 6:
+            flash("Password must be at least 6 characters long!", "error")
+            return redirect(url_for("reset_user_password", user_id=user_id))
+        
+        if new_password != confirm_password:
+            flash("Passwords do not match!", "error")
+            return redirect(url_for("reset_user_password", user_id=user_id))
+        
+        try:
+            # Hash and update password
+            hashed_password = generate_password_hash(new_password, method='pbkdf2:sha256', salt_length=8)
+            user.password = hashed_password
+            db.session.commit()
+            
+            flash(f"✅ Password reset successfully for {user.name} ({user.email})", "success")
+            return redirect(url_for("supervisordashboard"))
+        except Exception as e:
+            db.session.rollback()
+            flash(f"Error resetting password: {str(e)}", "error")
+            return redirect(url_for("reset_user_password", user_id=user_id))
+    
+    return render_template(
+        "supervisor/reset_password.html",
+        user=user,
+        show_sidebar=True
+    )
+
+
+@app.route("/manage_users_passwords")
+def manage_users_passwords():
+    """Supervisor dashboard to manage user passwords"""
+    if "email" not in session or session.get("user_type") != "0":
+        flash("Only supervisors can access this page!", "error")
+        return redirect(url_for("signin"))
+    
+    # Get all users
+    all_users = User.query.all()
+    
+    # Group by user type
+    mentors = [u for u in all_users if u.user_type == "1"]
+    mentees = [u for u in all_users if u.user_type == "2"]
+    supervisors = [u for u in all_users if u.user_type == "0"]
+    
+    return render_template(
+        "supervisor/manage_passwords.html",
+        show_sidebar=True,
+        mentors=mentors,
+        mentees=mentees,
+        supervisors=supervisors,
+        total_users=len(all_users)
+    )
+
+
 # ✅ UPDATE THIS ROUTE (remove profile references)
 
 @app.route("/institutiondashboard")
