@@ -1,0 +1,145 @@
+{% extends "base2.html" %}
+{% block title %}Manage Created Accounts{% endblock %}
+{% block user %}Manage Accounts{% endblock %}
+
+{% block Sidebar %}
+    <a href="{{ url_for('supervisordashboard')}}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">📊 Dashboard</a>
+    <a href="{{ url_for('create_account')}}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">➕ Create Account</a>
+    <a href="{{ url_for('manage_created_accounts')}}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 bg-gray-100">👥 Manage Accounts</a>
+    <a href="{{ url_for('manage_users_passwords')}}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">🔐 Manage Passwords</a>
+    <a href="{{ url_for('logout')}}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">🚪 Sign out</a>
+{% endblock %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto mt-8 p-6">
+    <div class="mb-6">
+        <h1 class="text-3xl font-bold text-gray-800 mb-2">👥 Manage Created Accounts</h1>
+        <p class="text-gray-600">Total Accounts: <strong>{{ total_accounts }}</strong></p>
+    </div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="mb-4 p-4 rounded-lg {% if category == 'error' %}bg-red-100 text-red-700{% else %}bg-green-100 text-green-700{% endif %}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <!-- Mentors Section -->
+    <div class="mb-8">
+        <div class="bg-blue-50 border-l-4 border-blue-500 p-4 mb-4 rounded">
+            <h2 class="text-2xl font-bold text-blue-800">👨‍🏫 Mentors ({{ mentors|length }})</h2>
+        </div>
+        {% if mentors %}
+        <div class="overflow-x-auto">
+            <table class="w-full border-collapse">
+                <thead>
+                    <tr class="bg-blue-100">
+                        <th class="border p-3 text-left">Name</th>
+                        <th class="border p-3 text-left">Email</th>
+                        <th class="border p-3 text-left">Institution</th>
+                        <th class="border p-3 text-center">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for mentor in mentors %}
+                    <tr class="hover:bg-gray-50">
+                        <td class="border p-3">{{ mentor.name }}</td>
+                        <td class="border p-3">{{ mentor.email }}</td>
+                        <td class="border p-3">{{ mentor.institution or 'N/A' }}</td>
+                        <td class="border p-3 text-center">
+                            <a href="{{ url_for('reset_user_password', user_id=mentor.id) }}" class="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm inline-block">
+                                <i class="fas fa-key mr-1"></i>Reset Password
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <p class="text-gray-500 p-4">No mentors created yet.</p>
+        {% endif %}
+    </div>
+
+    <!-- Mentees Section -->
+    <div class="mb-8">
+        <div class="bg-green-50 border-l-4 border-green-500 p-4 mb-4 rounded">
+            <h2 class="text-2xl font-bold text-green-800">👨‍🎓 Mentees ({{ mentees|length }})</h2>
+        </div>
+        {% if mentees %}
+        <div class="overflow-x-auto">
+            <table class="w-full border-collapse">
+                <thead>
+                    <tr class="bg-green-100">
+                        <th class="border p-3 text-left">Name</th>
+                        <th class="border p-3 text-left">Email</th>
+                        <th class="border p-3 text-left">Institution</th>
+                        <th class="border p-3 text-center">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for mentee in mentees %}
+                    <tr class="hover:bg-gray-50">
+                        <td class="border p-3">{{ mentee.name }}</td>
+                        <td class="border p-3">{{ mentee.email }}</td>
+                        <td class="border p-3">{{ mentee.institution or 'N/A' }}</td>
+                        <td class="border p-3 text-center">
+                            <a href="{{ url_for('reset_user_password', user_id=mentee.id) }}" class="px-3 py-1 bg-green-600 text-white rounded hover:bg-green-700 text-sm inline-block">
+                                <i class="fas fa-key mr-1"></i>Reset Password
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <p class="text-gray-500 p-4">No mentees created yet.</p>
+        {% endif %}
+    </div>
+
+    <!-- Institutions Section -->
+    <div class="mb-8">
+        <div class="bg-purple-50 border-l-4 border-purple-500 p-4 mb-4 rounded">
+            <h2 class="text-2xl font-bold text-purple-800">🏢 Institution Admins ({{ institutions|length }})</h2>
+        </div>
+        {% if institutions %}
+        <div class="overflow-x-auto">
+            <table class="w-full border-collapse">
+                <thead>
+                    <tr class="bg-purple-100">
+                        <th class="border p-3 text-left">Name</th>
+                        <th class="border p-3 text-left">Email</th>
+                        <th class="border p-3 text-left">Institution</th>
+                        <th class="border p-3 text-center">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for institution in institutions %}
+                    <tr class="hover:bg-gray-50">
+                        <td class="border p-3">{{ institution.name }}</td>
+                        <td class="border p-3">{{ institution.email }}</td>
+                        <td class="border p-3">{{ institution.institution or 'N/A' }}</td>
+                        <td class="border p-3 text-center">
+                            <a href="{{ url_for('reset_user_password', user_id=institution.id) }}" class="px-3 py-1 bg-purple-600 text-white rounded hover:bg-purple-700 text-sm inline-block">
+                                <i class="fas fa-key mr-1"></i>Reset Password
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <p class="text-gray-500 p-4">No institution admins created yet.</p>
+        {% endif %}
+    </div>
+
+    <div class="mt-8 p-4 bg-blue-50 border-l-4 border-blue-400 rounded">
+        <p class="text-blue-800"><strong>ℹ️ Info:</strong> You can reset passwords for any created account using the "Reset Password" button.</p>
+    </div>
+</div>
+{% endblock %}
