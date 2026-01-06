@@ -1325,6 +1325,117 @@ def manage_users_passwords():
     )
 
 
+# ============ CREATE ACCOUNT ROUTES (Supervisor) ============
+
+@app.route("/create_account", methods=["GET", "POST"])
+def create_account():
+    """Supervisor can create accounts for mentors, mentees, and institutions"""
+    if "email" not in session or session.get("user_type") != "0":
+        flash("Only supervisors can create accounts!", "error")
+        return redirect(url_for("signin"))
+    
+    if request.method == "POST":
+        name = request.form.get("name")
+        email = request.form.get("email")
+        password = request.form.get("password")
+        confirm_password = request.form.get("confirm_password")
+        user_type = request.form.get("user_type")
+        institution_name = request.form.get("institution", "")
+        
+        # Validation
+        if not all([name, email, password, confirm_password, user_type]):
+            flash("Please fill all required fields!", "error")
+            return redirect(url_for("create_account"))
+        
+        if len(password) < 6:
+            flash("Password must be at least 6 characters long!", "error")
+            return redirect(url_for("create_account"))
+        
+        if password != confirm_password:
+            flash("Passwords do not match!", "error")
+            return redirect(url_for("create_account"))
+        
+        # Check if email already exists
+        existing_user = User.query.filter_by(email=email).first()
+        if existing_user:
+            flash("Email already exists! Please use a different email.", "error")
+            return redirect(url_for("create_account"))
+        
+        try:
+            # Hash password
+            hashed_password = generate_password_hash(password, method='pbkdf2:sha256', salt_length=8)
+            
+            # Create new user
+            new_user = User(
+                name=name,
+                email=email,
+                password=hashed_password,
+                user_type=user_type,
+                institution=institution_name
+            )
+            db.session.add(new_user)
+            db.session.flush()  # Get user ID
+            
+            # For institution admin (user_type = "3"), create institution profile
+            if user_type == "3":
+                institution = Institution.query.filter_by(name=institution_name).first()
+                if not institution:
+                    institution = Institution(
+                        user_id=new_user.id,
+                        name=institution_name,
+                        contact_person=name,
+                        contact_email=email,
+                        status="active"
+                    )
+                    db.session.add(institution)
+                    db.session.flush()
+                
+                new_user.institution_id = institution.id
+            
+            db.session.commit()
+            
+            flash(f"✅ Account created successfully for {name} ({email})", "success")
+            return redirect(url_for("manage_created_accounts"))
+        except Exception as e:
+            db.session.rollback()
+            flash(f"Error creating account: {str(e)}", "error")
+            return redirect(url_for("create_account"))
+    
+    # Get institutions for dropdown
+    institutions = Institution.query.filter_by(status="active").all()
+    
+    return render_template(
+        "supervisor/create_account.html",
+        show_sidebar=True,
+        institutions=institutions
+    )
+
+
+@app.route("/manage_created_accounts")
+def manage_created_accounts():
+    """View all accounts created by supervisors"""
+    if "email" not in session or session.get("user_type") != "0":
+        flash("Only supervisors can access this page!", "error")
+        return redirect(url_for("signin"))
+    
+    # Get all users
+    all_users = User.query.all()
+    
+    # Group by user type
+    mentors = [u for u in all_users if u.user_type == "1"]
+    mentees = [u for u in all_users if u.user_type == "2"]
+    institutions = [u for u in all_users if u.user_type == "3"]
+    
+    return render_template(
+        "supervisor/manage_created_accounts.html",
+        show_sidebar=True,
+        mentors=mentors,
+        mentees=mentees,
+        institutions=institutions,
+        total_accounts=len(all_users)
+    )
+
+
 # ✅ UPDATE THIS ROUTE (remove profile references)
 
 @app.route("/institutiondashboard")
