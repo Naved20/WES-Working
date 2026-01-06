@@ -138,6 +138,11 @@
                        class="block px-4 py-2 text-white hover:bg-gray-600 rounded-md">
                        👥 All Mentees
                     </a>
+        
+                    <a href="{{ url_for('institution')}}"
+                       class="block px-4 py-2 text-white hover:bg-gray-600 rounded-md">
+                        🏛️ All Institution
+                    </a>
                     
                     <a href="{{ url_for('view_requests')}}"
                        class="block px-4 py-2 text-white hover:bg-gray-600 rounded-md">
@@ -159,12 +164,8 @@
                        class="block px-4 py-2 text-white hover:bg-gray-600 rounded-md">
                         📝 All Tasks
                     </a>
-                    <a href="{{ url_for('institution')}}"
-                       class="block px-4 py-2 text-white hover:bg-gray-600 rounded-md">
-                        🏛️ All Institution
-                    </a>
+
                     
-                    <hr class="my-2 border-gray-700">
 
                     <a href="{{ url_for('create_account')}}"
                        class="block px-4 py-2 text-white hover:bg-gray-600 rounded-md">
@@ -176,10 +177,6 @@
                        👥 Manage Accounts
                     </a>
                     
-                    <a href="{{ url_for('manage_users_passwords')}}"
-                       class="block px-4 py-2 text-white hover:bg-gray-600 rounded-md">
-                       🔐 Manage Passwords
-                    </a>
 
                 {% elif session.get('user_type') == '1' %}
 

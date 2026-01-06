@@ -1,7 +1,7 @@
 from flask import Flask, redirect, url_for, render_template, request, session, flash, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin, login_user, LoginManager, login_required, logout_user, current_user
-from sqlalchemy import cast, Integer, or_, and_
+from sqlalchemy import cast, Integer, or_, and_, text
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
 from datetime import datetime, timedelta
@@ -1517,7 +1517,7 @@ def delete_user(user_id):
         ]
         
         for table, column in tables_to_clean:
-            db.session.execute(f"DELETE FROM {table} WHERE {column} = {user_id}")
+            db.session.execute(text(f"DELETE FROM {table} WHERE {column} = {user_id}"))
         
         # Delete the user
         db.session.delete(user)
