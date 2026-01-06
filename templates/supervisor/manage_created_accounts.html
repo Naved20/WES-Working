@@ -27,10 +27,65 @@
         {% endif %}
     {% endwith %}
 
+    <!-- Search and Filter Section -->
+    <div class="mb-8 p-6 bg-white rounded-lg shadow-sm border border-gray-200">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+                <label class="block text-gray-700 font-semibold mb-2">🔍 Search by Name or Email</label>
+                <input type="text" id="searchInput" placeholder="Enter name or email..." class="w-full p-3 border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-200" onkeyup="filterAccounts()">
+            </div>
+            
+            <div>
+                <label class="block text-gray-700 font-semibold mb-2">📋 Filter by Type</label>
+                <select id="typeFilter" class="w-full p-3 border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-200" onchange="filterAccounts()">
+                    <option value="">All Types</option>
+                    <option value="mentor">👨‍🏫 Mentors</option>
+                    <option value="mentee">👨‍🎓 Mentees</option>
+                    <option value="institution">🏢 Institution Admins</option>
+                </select>
+            </div>
+
+            <div>
+                <label class="block text-gray-700 font-semibold mb-2">🏛️ Filter by Institution</label>
+                <select id="institutionFilter" class="w-full p-3 border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-200" onchange="filterAccounts()">
+                    <option value="">All Institutions</option>
+                    {% set institutions_list = [] %}
+                    {% for mentor in mentors %}
+                        {% if mentor.institution and mentor.institution not in institutions_list %}
+                            {% set _ = institutions_list.append(mentor.institution) %}
+                            <option value="{{ mentor.institution }}">{{ mentor.institution }}</option>
+                        {% endif %}
+                    {% endfor %}
+                    {% for mentee in mentees %}
+                        {% if mentee.institution and mentee.institution not in institutions_list %}
+                            {% set _ = institutions_list.append(mentee.institution) %}
+                            <option value="{{ mentee.institution }}">{{ mentee.institution }}</option>
+                        {% endif %}
+                    {% endfor %}
+                    {% for institution in institutions %}
+                        {% if institution.institution and institution.institution not in institutions_list %}
+                            {% set _ = institutions_list.append(institution.institution) %}
+                            <option value="{{ institution.institution }}">{{ institution.institution }}</option>
+                        {% endif %}
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+        
+        <div class="mt-4 flex gap-2">
+            <button onclick="filterAccounts()" class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-semibold transition">
+                <i class="fas fa-search mr-2"></i>Search
+            </button>
+            <button onclick="resetFilters()" class="px-6 py-2 bg-gray-400 text-white rounded-lg hover:bg-gray-500 font-semibold transition">
+                <i class="fas fa-redo mr-2"></i>Reset
+            </button>
+        </div>
+    </div>
+
     <!-- Mentors Section -->
     <div class="mb-8">
         <div class="bg-blue-50 border-l-4 border-blue-500 p-4 mb-4 rounded">
-            <h2 class="text-2xl font-bold text-blue-800">👨‍🏫 Mentors ({{ mentors|length }})</h2>
+            <h2 class="text-2xl font-bold text-blue-800">👨‍🏫 Mentors (<span id="mentorCount">{{ mentors|length }}</span>)</h2>
         </div>
         {% if mentors %}
         <div class="overflow-x-auto">
@@ -43,9 +98,9 @@
                         <th class="border p-3 text-center">Actions</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody id="mentorTable">
                     {% for mentor in mentors %}
-                    <tr class="hover:bg-gray-50">
+                    <tr class="hover:bg-gray-50 account-row" data-type="mentor" data-name="{{ mentor.name.lower() }}" data-email="{{ mentor.email.lower() }}" data-institution="{{ (mentor.institution or '').lower() }}">
                         <td class="border p-3">{{ mentor.name }}</td>
                         <td class="border p-3">{{ mentor.email }}</td>
                         <td class="border p-3">{{ mentor.institution or 'N/A' }}</td>
@@ -77,7 +132,7 @@
     <!-- Mentees Section -->
     <div class="mb-8">
         <div class="bg-green-50 border-l-4 border-green-500 p-4 mb-4 rounded">
-            <h2 class="text-2xl font-bold text-green-800">👨‍🎓 Mentees ({{ mentees|length }})</h2>
+            <h2 class="text-2xl font-bold text-green-800">👨‍🎓 Mentees (<span id="menteeCount">{{ mentees|length }}</span>)</h2>
         </div>
         {% if mentees %}
         <div class="overflow-x-auto">
@@ -90,9 +145,9 @@
                         <th class="border p-3 text-center">Actions</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody id="menteeTable">
                     {% for mentee in mentees %}
-                    <tr class="hover:bg-gray-50">
+                    <tr class="hover:bg-gray-50 account-row" data-type="mentee" data-name="{{ mentee.name.lower() }}" data-email="{{ mentee.email.lower() }}" data-institution="{{ (mentee.institution or '').lower() }}">
                         <td class="border p-3">{{ mentee.name }}</td>
                         <td class="border p-3">{{ mentee.email }}</td>
                         <td class="border p-3">{{ mentee.institution or 'N/A' }}</td>
@@ -172,4 +227,55 @@
         <p class="text-blue-800"><strong>ℹ️ Info:</strong> You can reset passwords for any created account using the "Reset Password" button.</p>
     </div>
 </div>
+
+<script>
+function filterAccounts() {
+    const searchInput = document.getElementById('searchInput').value.toLowerCase();
+    const typeFilter = document.getElementById('typeFilter').value.toLowerCase();
+    const institutionFilter = document.getElementById('institutionFilter').value.toLowerCase();
+    
+    const rows = document.querySelectorAll('.account-row');
+    let mentorCount = 0;
+    let menteeCount = 0;
+    
+    rows.forEach(row => {
+        const name = row.getAttribute('data-name');
+        const email = row.getAttribute('data-email');
+        const type = row.getAttribute('data-type');
+        const institution = row.getAttribute('data-institution');
+        
+        // Check if row matches all filters
+        const matchesSearch = name.includes(searchInput) || email.includes(searchInput);
+        const matchesType = !typeFilter || type === typeFilter;
+        const matchesInstitution = !institutionFilter || institution === institutionFilter;
+        
+        if (matchesSearch && matchesType && matchesInstitution) {
+            row.style.display = '';
+            if (type === 'mentor') mentorCount++;
+            if (type === 'mentee') menteeCount++;
+        } else {
+            row.style.display = 'none';
+        }
+    });
+    
+    // Update counts
+    document.getElementById('mentorCount').textContent = mentorCount;
+    document.getElementById('menteeCount').textContent = menteeCount;
+}
+
+function resetFilters() {
+    document.getElementById('searchInput').value = '';
+    document.getElementById('typeFilter').value = '';
+    document.getElementById('institutionFilter').value = '';
+    
+    const rows = document.querySelectorAll('.account-row');
+    rows.forEach(row => row.style.display = '');
+    
+    // Reset counts
+    const mentorCount = document.querySelectorAll('.account-row[data-type="mentor"]').length;
+    const menteeCount = document.querySelectorAll('.account-row[data-type="mentee"]').length;
+    document.getElementById('mentorCount').textContent = mentorCount;
+    document.getElementById('menteeCount').textContent = menteeCount;
+}
+</script>
 {% endblock %}
