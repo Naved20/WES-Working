@@ -1436,6 +1436,101 @@ def manage_created_accounts():
     )
 
 
+# ============ EDIT & DELETE USER ROUTES (Supervisor) ============
+
+@app.route("/edit_user/<int:user_id>", methods=["GET", "POST"])
+def edit_user(user_id):
+    """Supervisor can edit user details"""
+    if "email" not in session or session.get("user_type") != "0":
+        flash("Only supervisors can edit users!", "error")
+        return redirect(url_for("signin"))
+    
+    user = User.query.get_or_404(user_id)
+    
+    if request.method == "POST":
+        name = request.form.get("name")
+        email = request.form.get("email")
+        institution = request.form.get("institution")
+        
+        # Validation
+        if not all([name, email]):
+            flash("Please fill all required fields!", "error")
+            return redirect(url_for("edit_user", user_id=user_id))
+        
+        # Check if email is already taken by another user
+        existing_user = User.query.filter(User.email == email, User.id != user_id).first()
+        if existing_user:
+            flash("Email already taken by another user!", "error")
+            return redirect(url_for("edit_user", user_id=user_id))
+        
+        try:
+            user.name = name
+            user.email = email
+            user.institution = institution
+            db.session.commit()
+            
+            flash(f"✅ User details updated successfully for {name}", "success")
+            return redirect(url_for("manage_created_accounts"))
+        except Exception as e:
+            db.session.rollback()
+            flash(f"Error updating user: {str(e)}", "error")
+            return redirect(url_for("edit_user", user_id=user_id))
+    
+    # Get institutions for dropdown
+    institutions = Institution.query.filter_by(status="active").all()
+    
+    return render_template(
+        "supervisor/edit_user.html",
+        user=user,
+        institutions=institutions,
+        show_sidebar=True
+    )
+
+
+@app.route("/delete_user/<int:user_id>", methods=["POST"])
+def delete_user(user_id):
+    """Supervisor can delete users"""
+    if "email" not in session or session.get("user_type") != "0":
+        flash("Only supervisors can delete users!", "error")
+        return redirect(url_for("signin"))
+    
+    user = User.query.get_or_404(user_id)
+    user_email = user.email
+    user_name = user.name
+    
+    try:
+        # Delete related records first (due to foreign key constraints)
+        tables_to_clean = [
+            ("mentor_profile", "user_id"),
+            ("mentee_profile", "user_id"),
+            ("supervisor_profile", "user_id"),
+            ("mentorship_requests", "mentee_id"),
+            ("mentorship_requests", "mentor_id"),
+            ("meeting_requests", "requester_id"),
+            ("meeting_requests", "requested_to_id"),
+            ("mentee_tasks", "mentee_id"),
+            ("mentee_tasks", "mentor_id"),
+            ("personal_tasks", "mentee_id"),
+            ("personal_tasks", "mentor_id"),
+            ("task_ratings", "mentee_id"),
+            ("task_ratings", "mentor_id"),
+        ]
+        
+        for table, column in tables_to_clean:
+            db.session.execute(f"DELETE FROM {table} WHERE {column} = {user_id}")
+        
+        # Delete the user
+        db.session.delete(user)
+        db.session.commit()
+        
+        flash(f"✅ User {user_name} ({user_email}) has been deleted successfully", "success")
+        return redirect(url_for("manage_created_accounts"))
+    except Exception as e:
+        db.session.rollback()
+        flash(f"Error deleting user: {str(e)}", "error")
+        return redirect(url_for("manage_created_accounts"))
+
+
 # ✅ UPDATE THIS ROUTE (remove profile references)
 
 @app.route("/institutiondashboard")
