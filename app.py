@@ -523,7 +523,7 @@ def check_profile_complete(user_id, user_type):
         profile = MentorProfile.query.filter_by(user_id=user_id).first()
         print(f"📊 Mentor profile found: {profile is not None}")
         if profile:
-            # Check if ALL mandatory fields are filled
+            # Check if ALL mandatory fields are filled (including profile picture)
             has_all_required = all([
                 profile.profession, 
                 profile.organisation, 
@@ -544,7 +544,8 @@ def check_profile_complete(user_id, user_type):
                 profile.preferred_duration,
                 profile.why_mentor,
                 profile.mentorship_philosophy,
-                profile.mentorship_motto
+                profile.mentorship_motto,
+                profile.profile_picture  # Profile picture is now mandatory
             ])
             print(f"✅ Mentor profile complete: {has_all_required}")
             return has_all_required
@@ -555,7 +556,7 @@ def check_profile_complete(user_id, user_type):
         profile = MenteeProfile.query.filter_by(user_id=user_id).first()
         print(f"📊 Mentee profile found: {profile is not None}")
         if profile:
-            # Check if ALL mandatory fields are filled
+            # Check if ALL mandatory fields are filled (including profile picture)
             has_all_required = all([
                 profile.dob,
                 profile.school_college_name, 
@@ -569,7 +570,8 @@ def check_profile_complete(user_id, user_type):
                 profile.parent_name,
                 profile.parent_mobile,
                 profile.comments,
-                profile.terms_agreement
+                profile.terms_agreement,
+                profile.profile_picture  # Profile picture is now mandatory
             ])
             print(f"✅ Mentee profile complete: {has_all_required}")
             return has_all_required
@@ -585,11 +587,32 @@ def check_profile_complete(user_id, user_type):
                 profile.whatsapp,
                 profile.location,
                 profile.role,
-                profile.additional_info
+                profile.additional_info,
+                profile.profile_picture  # Profile picture is now mandatory
             ])
             print(f"✅ Supervisor profile complete: {has_all_required}")
             return has_all_required
         print("❌ No supervisor profile found")
+        return False
+    
+    elif user_type == "3":  # Institution
+        institution = Institution.query.filter_by(user_id=user_id).first()
+        print(f"📊 Institution profile found: {institution is not None}")
+        if institution:
+            has_all_required = all([
+                institution.name,
+                institution.contact_person,
+                institution.contact_email,
+                institution.contact_phone,
+                institution.address,
+                institution.city,
+                institution.state,
+                institution.country,
+                institution.profile_picture  # Profile picture is now mandatory
+            ])
+            print(f"✅ Institution profile complete: {has_all_required}")
+            return has_all_required
+        print("❌ No institution profile found")
         return False
     
     print(f"⚠️ Unknown user type: {user_type}")
@@ -4109,6 +4132,49 @@ def profile():
         return redirect(url_for("supervisorprofile"))
     elif user_type == "3":
         return redirect(url_for("institutionprofile"))
+
+# --------- CHANGE PASSWORD ROUTE ---------
+@app.route("/change_password", methods=["GET", "POST"])
+def change_password():
+    if "email" not in session:
+        flash("Please login first!", "error")
+        return redirect(url_for("signin"))
+    
+    if request.method == "POST":
+        current_password = request.form.get("current_password")
+        new_password = request.form.get("new_password")
+        confirm_password = request.form.get("confirm_password")
+        
+        # Get current user
+        user = User.query.filter_by(email=session["email"]).first()
+        
+        if not user:
+            flash("User not found!", "error")
+            return redirect(url_for("change_password"))
+        
+        # Verify current password
+        if not check_password_hash(user.password, current_password):
+            flash("Current password is incorrect!", "error")
+            return redirect(url_for("change_password"))
+        
+        # Check if new passwords match
+        if new_password != confirm_password:
+            flash("New passwords do not match!", "error")
+            return redirect(url_for("change_password"))
+        
+        # Check if new password is same as current
+        if check_password_hash(user.password, new_password):
+            flash("New password must be different from current password!", "error")
+            return redirect(url_for("change_password"))
+        
+        # Update password
+        user.password = generate_password_hash(new_password, method='pbkdf2:sha256', salt_length=8)
+        db.session.commit()
+        
+        flash("✅ Password changed successfully!", "success")
+        return redirect(url_for("profile"))
+    
+    return render_template("change_password.html")
 
 #--------------route for all profiles----------------
 @app.route("/mentor_profile")
