@@ -257,12 +257,21 @@ class MeetingRequest(db.Model):
     gcal_event_id = db.Column(db.String(200), nullable=True)
 
     # Status tracking
-    status = db.Column(db.String(20), default="pending")  # 'pending', 'approved', 'rejected'
+    status = db.Column(db.String(20), default="pending")  # 'pending', 'approved', 'rejected', 'rescheduled'
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    # Reschedule fields
+    is_rescheduled = db.Column(db.Boolean, default=False)
+    reschedule_reason = db.Column(db.Text, nullable=True)  # Required if rescheduling within 8 hours
+    original_date = db.Column(db.Date, nullable=True)  # Store original date before reschedule
+    original_time = db.Column(db.Time, nullable=True)  # Store original time before reschedule
+    rescheduled_at = db.Column(db.DateTime, nullable=True)  # When was it rescheduled
+    rescheduled_by_id = db.Column(db.Integer, db.ForeignKey("signup_details.id"), nullable=True)
 
     # Relationships
     requester = db.relationship("User", foreign_keys=[requester_id], backref="sent_meeting_requests")
     requested_to = db.relationship("User", foreign_keys=[requested_to_id], backref="received_meeting_requests")
+    rescheduled_by = db.relationship("User", foreign_keys=[rescheduled_by_id])
 
 
 #------------Master Task Table-------------------
@@ -3578,6 +3587,103 @@ def mentor_meeting_details():
         show_sidebar=True,
         meetings=meetings
     )
+
+# ------------------- RESCHEDULE MEETING -------------------
+@app.route("/reschedule_meeting/<int:meeting_id>", methods=["POST"])
+def reschedule_meeting(meeting_id):
+    if "email" not in session or session.get("user_type") != "1":
+        return jsonify({"success": False, "message": "Unauthorized"}), 401
+
+    try:
+        data = request.get_json()
+        new_date = data.get("new_date")
+        new_time = data.get("new_time")
+        reason = data.get("reason", "").strip()
+
+        if not new_date or not new_time:
+            return jsonify({"success": False, "message": "Please provide new date and time"}), 400
+
+        mentor = User.query.filter_by(email=session["email"]).first()
+        meeting = MeetingRequest.query.get(meeting_id)
+
+        if not meeting:
+            return jsonify({"success": False, "message": "Meeting not found"}), 404
+
+        if meeting.requested_to_id != mentor.id:
+            return jsonify({"success": False, "message": "You can only reschedule your own meetings"}), 403
+
+        # Parse new date and time
+        new_meeting_date = datetime.strptime(new_date, "%Y-%m-%d").date()
+        new_meeting_time = datetime.strptime(new_time, "%H:%M").time()
+
+        # Calculate original meeting datetime
+        original_datetime = datetime.combine(meeting.meeting_date, meeting.meeting_time)
+        now = datetime.now()
+
+        # Check if rescheduling within 8 hours of original meeting time
+        time_until_meeting = original_datetime - now
+        hours_until_meeting = time_until_meeting.total_seconds() / 3600
+
+        # If less than 8 hours until meeting, reason is mandatory
+        if hours_until_meeting <= 8 and hours_until_meeting > 0:
+            if not reason:
+                return jsonify({
+                    "success": False, 
+                    "message": "Reason is required when rescheduling within 8 hours of the meeting",
+                    "urgent": True
+                }), 400
+
+        # Store original date/time before updating
+        if not meeting.original_date:  # Only store first original values
+            meeting.original_date = meeting.meeting_date
+            meeting.original_time = meeting.meeting_time
+
+        # Update meeting with new date/time
+        meeting.meeting_date = new_meeting_date
+        meeting.meeting_time = new_meeting_time
+        meeting.is_rescheduled = True
+        meeting.reschedule_reason = reason if reason else None
+        meeting.rescheduled_at = datetime.utcnow()
+        meeting.rescheduled_by_id = mentor.id
+        meeting.status = "rescheduled"
+
+        # Update Google Calendar event if exists
+        if meeting.gcal_event_id:
+            try:
+                service = get_calendar_service()
+                
+                # Calculate new start and end times
+                new_start_datetime = datetime.combine(new_meeting_date, new_meeting_time)
+                new_end_datetime = new_start_datetime + timedelta(minutes=meeting.meeting_duration)
+                
+                event_update = {
+                    "start": {"dateTime": new_start_datetime.isoformat(), "timeZone": "Asia/Kolkata"},
+                    "end": {"dateTime": new_end_datetime.isoformat(), "timeZone": "Asia/Kolkata"},
+                }
+                
+                service.events().patch(
+                    calendarId="primary",
+                    eventId=meeting.gcal_event_id,
+                    body=event_update,
+                    sendUpdates="all"
+                ).execute()
+            except Exception as e:
+                print(f"Error updating Google Calendar: {str(e)}")
+                # Continue even if calendar update fails
+
+        db.session.commit()
+
+        return jsonify({
+            "success": True,
+            "message": "Meeting rescheduled successfully",
+            "new_date": new_meeting_date.strftime("%Y-%m-%d"),
+            "new_time": new_meeting_time.strftime("%I:%M %p")
+        })
+
+    except Exception as e:
+        db.session.rollback()
+        print(f"Error rescheduling meeting: {str(e)}")
+        return jsonify({"success": False, "message": f"Error: {str(e)}"}), 500
 
 # ---------------- Supervisor - All Meeting Details ----------------
 @app.route("/supervisor_meeting_details")
