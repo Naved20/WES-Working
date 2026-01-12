@@ -96,7 +96,7 @@
                     {% endif %}
                 </div>
 
-                <span class="text-sm font-medium text-gray-700 group-hover:text-white hidden sm:block">{{ session.get('email') }}</span>
+                <span class="text-sm font-medium text-gray-700 group-hover:text-white hidden sm:block">{{ session.get('user_name') or session.get('email') }}</span>
             </button>
 
             <!-- Dropdown menu -->
