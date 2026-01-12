@@ -84,10 +84,14 @@
                                 <img src="{{ url_for('static', filename='uploads/' + institution_details.profile_picture) }}" 
                                      alt="Institution Logo" style="max-width: 200px; max-height: 200px; border-radius: 8px;">
                             </div>
+                            <input type="file" name="profile_picture" id="profile_picture" accept="image/*" 
+                                   class="form-input" placeholder="Choose image">
+                            <div class="form-hint" style="margin-top: 8px;">Leave empty to keep current logo</div>
+                        {% else %}
+                            <input type="file" name="profile_picture" id="profile_picture" accept="image/*" 
+                                   class="form-input" placeholder="Choose image" required>
+                            <div class="form-hint" style="margin-top: 8px; color: #ef4444;">* Logo is required. PNG, JPG, JPEG, or GIF (Max 5MB)</div>
                         {% endif %}
-                        <input type="file" name="profile_picture" id="profile_picture" accept="image/*" 
-                               class="form-input" placeholder="Choose image" required>
-                        <div class="form-hint" style="margin-top: 8px;">PNG, JPG, JPEG, or GIF (Max 5MB)</div>
                     </div>
 
                     <!-- Institution Type -->

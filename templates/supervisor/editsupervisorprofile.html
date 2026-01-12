@@ -23,7 +23,15 @@
             <img src="{{ url_for('static', filename='uploads/' + (profile_picture if profile_picture else 'default.png')) }}"
                  alt="Profile Picture"
                  class="w-28 h-28 rounded-full object-cover border-4 border-gray-300 shadow mb-4 md:mb-0">
-            <input type="file" name="profile_picture" class="border p-2 rounded w-full md:w-auto" required accept="image/*">
+            <div>
+                {% if profile_picture %}
+                <input type="file" name="profile_picture" class="border p-2 rounded w-full md:w-auto" accept="image/*">
+                <p class="text-xs text-gray-500 mt-1">Leave empty to keep current picture</p>
+                {% else %}
+                <input type="file" name="profile_picture" class="border p-2 rounded w-full md:w-auto" required accept="image/*">
+                <p class="text-xs text-red-500 mt-1">* Profile picture is required</p>
+                {% endif %}
+            </div>
         </div>
 
         <!-- Name -->

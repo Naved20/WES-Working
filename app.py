@@ -48,8 +48,23 @@ def load_user(user_id):
 # ----------config---------- 
 os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"  # ONLY for local dev (http). Remove in production.
 CLIENT_SECRETS_FILE = "client_secret.json"
-SCOPES = ["openid", "https://www.googleapis.com/auth/userinfo.email", "https://www.googleapis.com/auth/userinfo.profile",]
-REDIRECT_URI = "http://127.0.0.1:8000/callback"
+
+# Scopes for Google OAuth Login (user info only)
+LOGIN_SCOPES = [
+    "openid", 
+    "https://www.googleapis.com/auth/userinfo.email", 
+    "https://www.googleapis.com/auth/userinfo.profile"
+]
+
+# Scopes for Google Calendar (meetings)
+CALENDAR_SCOPES = [
+    "https://www.googleapis.com/auth/calendar"
+]
+
+# Combined scopes (for backward compatibility)
+SCOPES = LOGIN_SCOPES
+
+REDIRECT_URI = "http://127.0.0.1:5000/callback"
 
 
 
@@ -80,10 +95,16 @@ class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
     email = db.Column(db.String(100), unique=True, nullable=False)
-    password = db.Column(db.String(200), nullable=False)   # length thoda bada
-    user_type = db.Column(db.String(10), nullable=False)
+    password = db.Column(db.String(200), nullable=True)   # nullable for OAuth users
+    user_type = db.Column(db.String(10), nullable=True)  # nullable until user selects type
     institution = db.Column(db.String(150), nullable=True)
     institution_id = db.Column(db.Integer, db.ForeignKey("institutions.id"), nullable=True)
+
+    # OAuth fields
+    google_id = db.Column(db.String(200), unique=True, nullable=True)
+    oauth_provider = db.Column(db.String(50), nullable=True)  # 'google', 'facebook', etc.
+    profile_picture_url = db.Column(db.String(500), nullable=True)  # OAuth profile picture
+    oauth_created_at = db.Column(db.DateTime, nullable=True)
 
     #connect form another table
     mentor_profile = db.relationship("MentorProfile", backref="user", uselist=False)
@@ -784,6 +805,276 @@ def signin():
 
    
     return render_template("auth/signin.html")
+
+# ------------------- GOOGLE OAUTH LOGIN -------------------
+@app.route("/google_login")
+def google_login():
+    """Redirect to Google OAuth consent screen for login"""
+    # Check if user is already logged in
+    if "email" in session and "user_id" in session:
+        user = User.query.get(session["user_id"])
+        if user:
+            # User already logged in, redirect to dashboard
+            if user.user_type == "1":
+                return redirect(url_for("mentordashboard"))
+            elif user.user_type == "2":
+                return redirect(url_for("menteedashboard"))
+            elif user.user_type == "0":
+                return redirect(url_for("supervisordashboard"))
+            elif user.user_type == "3":
+                return redirect(url_for("institutiondashboard"))
+            else:
+                return redirect(url_for("select_user_type"))
+    
+    flow = Flow.from_client_secrets_file(
+        CLIENT_SECRETS_FILE,
+        scopes=LOGIN_SCOPES,  # Use login scopes only
+        redirect_uri=REDIRECT_URI
+    )
+    authorization_url, state = flow.authorization_url(
+        access_type='offline',
+        include_granted_scopes='true',
+        prompt='select_account'  # Allow user to select account but skip consent if already authorized
+    )
+    session['state'] = state
+    session['oauth_type'] = 'login'  # Mark this as login flow
+    return redirect(authorization_url)
+
+@app.route("/callback")
+def callback():
+    """Handle Google OAuth callback"""
+    print("\n" + "="*60)
+    print("🔄 CALLBACK ROUTE CALLED")
+    print("="*60)
+    
+    try:
+        print(f"📍 Step 1: Getting state from session")
+        state = session.get('state')
+        print(f"   State: {state}")
+        
+        print(f"📍 Step 2: Creating Flow from client secrets")
+        flow = Flow.from_client_secrets_file(
+            CLIENT_SECRETS_FILE,
+            scopes=LOGIN_SCOPES,  # Use login scopes
+            state=state,
+            redirect_uri=REDIRECT_URI
+        )
+        print(f"   ✅ Flow created")
+        
+        print(f"📍 Step 3: Getting authorization response")
+        authorization_response = request.url
+        print(f"   URL: {authorization_response}")
+        
+        print(f"📍 Step 4: Fetching token")
+        # Set environment variable to allow scope changes
+        os.environ['OAUTHLIB_RELAX_TOKEN_SCOPE'] = '1'
+        flow.fetch_token(authorization_response=authorization_response)
+        print(f"   ✅ Token fetched")
+        
+        print(f"📍 Step 5: Getting credentials")
+        credentials = flow.credentials
+        access_token = credentials.token
+        print(f"   ✅ Credentials obtained")
+        print(f"   Token: {access_token[:30]}..." if access_token else "   No token")
+        
+        print(f"📍 Step 6: Getting user info via HTTP request")
+        # Use requests library to get user info directly with access token
+        import requests as http_requests
+        
+        headers = {'Authorization': f'Bearer {access_token}'}
+        user_info_response = http_requests.get(
+            'https://www.googleapis.com/oauth2/v2/userinfo',
+            headers=headers
+        )
+        
+        print(f"   Response status: {user_info_response.status_code}")
+        
+        if user_info_response.status_code != 200:
+            print(f"   ❌ Error response: {user_info_response.text}")
+            flash("Error getting user info from Google. Please try again.", "error")
+            return redirect(url_for("signin"))
+        
+        user_info = user_info_response.json()
+        print(f"   ✅ User info retrieved")
+        
+        google_id = user_info.get('id')
+        email = user_info.get('email')
+        name = user_info.get('name', email.split('@')[0] if email else 'User')
+        picture_url = user_info.get('picture')
+        
+        print(f"\n📊 Google User Data:")
+        print(f"   Name: {name}")
+        print(f"   Email: {email}")
+        print(f"   Google ID: {google_id}")
+        print(f"   Picture: {picture_url}")
+        
+        if not email:
+            print(f"   ❌ ERROR: No email in response!")
+            flash("Could not get email from Google. Please try again.", "error")
+            return redirect(url_for("signin"))
+        
+        print(f"\n📍 Step 7: Checking if user exists in database")
+        user = User.query.filter_by(email=email).first()
+        
+        if user:
+            print(f"   ✅ Existing user found: {user.email}")
+            print(f"   User ID: {user.id}")
+            print(f"   User Type: {user.user_type}")
+            
+            # Update Google ID if not set
+            if not user.google_id:
+                user.google_id = google_id
+                user.oauth_provider = 'google'
+                user.profile_picture_url = picture_url
+                db.session.commit()
+                print(f"   ✅ Updated user with Google ID")
+            
+            print(f"\n📍 Step 8: Setting session for existing user")
+            session.permanent = True
+            session["email"] = user.email
+            session["user_type"] = user.user_type
+            session["user_id"] = user.id
+            print(f"   ✅ Session set")
+            print(f"      Email: {session.get('email')}")
+            print(f"      Type: {session.get('user_type')}")
+            print(f"      ID: {session.get('user_id')}")
+            
+            print(f"\n📍 Step 9: Redirecting based on user type")
+            if user.user_type == "1":
+                print(f"   ➡️ Redirecting to mentordashboard")
+                return redirect(url_for("mentordashboard"))
+            elif user.user_type == "2":
+                print(f"   ➡️ Redirecting to menteedashboard")
+                return redirect(url_for("menteedashboard"))
+            elif user.user_type == "0":
+                print(f"   ➡️ Redirecting to supervisordashboard")
+                return redirect(url_for("supervisordashboard"))
+            elif user.user_type == "3":
+                print(f"   ➡️ Redirecting to institutiondashboard")
+                return redirect(url_for("institutiondashboard"))
+            else:
+                print(f"   ➡️ No user type set, redirecting to select_user_type")
+                return redirect(url_for("select_user_type"))
+        else:
+            print(f"   ❌ User not found, creating new account")
+            
+            print(f"\n📍 Step 8: Creating new user object")
+            new_user = User(
+                name=name,
+                email=email,
+                google_id=google_id,
+                oauth_provider='google',
+                profile_picture_url=picture_url,
+                oauth_created_at=datetime.utcnow()
+            )
+            print(f"   ✅ User object created")
+            print(f"      Name: {new_user.name}")
+            print(f"      Email: {new_user.email}")
+            print(f"      Google ID: {new_user.google_id}")
+            
+            print(f"\n📍 Step 9: Adding user to database session")
+            db.session.add(new_user)
+            print(f"   ✅ User added to session")
+            
+            print(f"\n📍 Step 10: Committing to database")
+            db.session.commit()
+            print(f"   ✅ Committed successfully")
+            print(f"   New User ID: {new_user.id}")
+            
+            print(f"\n📍 Step 11: Setting session for new user")
+            session.permanent = True
+            session["email"] = email
+            session["user_id"] = new_user.id
+            session["oauth_user"] = True
+            print(f"   ✅ Session set")
+            print(f"      Email: {session.get('email')}")
+            print(f"      ID: {session.get('user_id')}")
+            
+            print(f"\n📍 Step 12: Redirecting to select_user_type")
+            print(f"   ➡️ Redirecting to select_user_type")
+            print("="*60 + "\n")
+            return redirect(url_for("select_user_type"))
+    
+    except Exception as e:
+        print(f"\n❌ ERROR in callback: {str(e)}")
+        import traceback
+        print("\nFull traceback:")
+        traceback.print_exc()
+        print("="*60 + "\n")
+        flash("Error during Google login. Please try again.", "error")
+        return redirect(url_for("signin"))
+
+@app.route("/select_user_type", methods=["GET", "POST"])
+def select_user_type():
+    """Allow OAuth users to select their user type"""
+    if "email" not in session:
+        print("❌ No email in session - redirecting to signin")
+        return redirect(url_for("signin"))
+    
+    print(f"✅ Email in session: {session.get('email')}")
+    
+    user = User.query.filter_by(email=session["email"]).first()
+    
+    if not user:
+        print(f"❌ User not found for email: {session.get('email')}")
+        return redirect(url_for("signin"))
+    
+    print(f"✅ User found: {user.email}, Current type: {user.user_type}")
+    
+    # If user already has a type, redirect to dashboard
+    if user.user_type:
+        session.permanent = True
+        session["user_type"] = user.user_type
+        session["user_id"] = user.id
+        
+        print(f"📝 User already has type: {user.user_type}, redirecting to dashboard")
+        
+        if user.user_type == "1":
+            return redirect(url_for("mentordashboard"))
+        elif user.user_type == "2":
+            return redirect(url_for("menteedashboard"))
+        elif user.user_type == "0":
+            return redirect(url_for("supervisordashboard"))
+        elif user.user_type == "3":
+            return redirect(url_for("institutiondashboard"))
+    
+    if request.method == "POST":
+        user_type = request.form.get("user_type")
+        
+        print(f"📝 User selected type: {user_type}")
+        
+        if user_type not in ["0", "1", "2", "3"]:
+            flash("Invalid user type selected", "error")
+            return redirect(url_for("select_user_type"))
+        
+        # Update user type
+        user.user_type = user_type
+        db.session.commit()
+        
+        print(f"✅ User type saved to database: {user_type}")
+        
+        # Update session
+        session.permanent = True
+        session["user_type"] = user_type
+        session["user_id"] = user.id
+        
+        print(f"📝 Session updated - Type: {session.get('user_type')}, ID: {session.get('user_id')}")
+        
+        # Redirect to profile completion
+        if user_type == "1":
+            flash("Welcome! Please complete your mentor profile to continue.", "info")
+            return redirect(url_for("editmentorprofile"))
+        elif user_type == "2":
+            flash("Welcome! Please complete your mentee profile to continue.", "info")
+            return redirect(url_for("editmenteeprofile"))
+        elif user_type == "0":
+            flash("Welcome! Please complete your supervisor profile to continue.", "info")
+            return redirect(url_for("editsupervisorprofile"))
+        elif user_type == "3":
+            flash("Welcome! Please complete your institution profile to continue.", "info")
+            return redirect(url_for("editinstitutionprofile"))
+    
+    return render_template("auth/select_user_type.html", user=user)
 
 # ------------------ DASHBOARDS ------------------
 @app.route("/mentordashboard", methods=["GET", "POST"])
@@ -3949,18 +4240,56 @@ def editmentorprofile():
                 db.session.add(user)
 
        # Save form data to mentor profile
-        profile.profession = request.form.get("profession")
+        # Handle "Other" option for profession
+        profession = request.form.get("profession")
+        if profession == "Other":
+            other_profession = request.form.get("other_profession")
+            profile.profession = other_profession if other_profession else profession
+        else:
+            profile.profession = profession
+        
         profile.skills = request.form.get("skills")
         profile.role = request.form.get("role")
-        profile.industry_sector = request.form.get("industry_sector")
+        
+        # Handle "Other" option for industry_sector
+        industry_sector = request.form.get("industry_sector")
+        if industry_sector == "Other":
+            other_industry_sector = request.form.get("other_industry_sector")
+            profile.industry_sector = other_industry_sector if other_industry_sector else industry_sector
+        else:
+            profile.industry_sector = industry_sector
+        
         profile.organisation = request.form.get("organisation")
         profile.years_of_experience = request.form.get("years_of_experience")
-        profile.whatsapp = request.form.get("whatsapp")
-        profile.location = request.form.get("city") + ", " + request.form.get("country") if request.form.get("city") and request.form.get("country") else request.form.get("city") or request.form.get("country")
-        profile.education = request.form.get("education")
         
-        # Handle multiple language selection
+        # Handle WhatsApp with country code
+        whatsapp_country_code = request.form.get("whatsapp_country_code", "+91")
+        whatsapp_number = request.form.get("whatsapp")
+        profile.whatsapp = whatsapp_number  # Store just the number, or combine: f"{whatsapp_country_code} {whatsapp_number}"
+        
+        # Handle "Other" option for country
+        country = request.form.get("country")
+        if country == "Other":
+            other_country = request.form.get("other_country")
+            country = other_country if other_country else country
+        
+        city = request.form.get("city")
+        profile.location = f"{city}, {country}" if city and country else city or country
+        
+        # Handle "Other" option for education
+        education = request.form.get("education")
+        if education == "Other":
+            other_education = request.form.get("other_education")
+            profile.education = other_education if other_education else education
+        else:
+            profile.education = education
+        
+        # Handle multiple language selection with "Other" option
         languages = request.form.getlist("language")
+        other_language = request.form.get("other_language")
+        if "Other" in languages and other_language:
+            languages = [lang for lang in languages if lang != "Other"]
+            languages.append(other_language)
         profile.language = ", ".join(languages) if languages else None
         
         # Social links
@@ -4006,6 +4335,17 @@ def editmentorprofile():
             print(f"❌ Database commit failed: {str(e)}")
 
     # GET request – pre-fill form with existing data
+    # Parse location to get city and country separately
+    location = profile.location if profile else ""
+    city = ""
+    country = ""
+    if location and ", " in location:
+        parts = location.split(", ", 1)
+        city = parts[0]
+        country = parts[1] if len(parts) > 1 else ""
+    else:
+        city = location
+    
     return render_template(
         "mentor/editmentorprofile.html",
         full_name=user.name,
@@ -4019,7 +4359,10 @@ def editmentorprofile():
         organisation=profile.organisation if profile else "",
         years_of_experience=profile.years_of_experience if profile else "",
         whatsapp=profile.whatsapp if profile else "",
-        location=profile.location if profile else "",
+        whatsapp_country_code="+91",  # Default country code
+        location=location,
+        city=city,
+        country=country,
         education=profile.education if profile else "",
         language=profile.language if profile else "",
         linkedin_link=profile.linkedin_link if profile else "",
@@ -4059,12 +4402,26 @@ def editmenteeprofile():
             profile = MenteeProfile(user_id=user.id)
             db.session.add(profile)
 
+        # Check if same as WhatsApp is checked
+        same_as_whatsapp = request.form.get("same_as_whatsapp")
+        
+        # Get mobile number with country code
+        mobile_country_code = request.form.get("mobile_country_code", "+91")
+        mobile_number = request.form.get("mobile_number")
+        
+        # Get WhatsApp number - use mobile if same_as_whatsapp is checked
+        if same_as_whatsapp:
+            whatsapp_country_code = mobile_country_code
+            whatsapp_number = mobile_number
+        else:
+            whatsapp_country_code = request.form.get("whatsapp_country_code", "+91")
+            whatsapp_number = request.form.get("whatsapp_number")
+
         # Validate all mandatory fields
         mandatory_fields = {
             "dob": request.form.get("dob"),
             "school_college_name": request.form.get("school_college_name"),
-            "mobile_number": request.form.get("mobile_number"),
-            "whatsapp_number": request.form.get("whatsapp_number"),
+            "mobile_number": mobile_number,
             "govt_private": request.form.get("govt_private"),
             "stream": request.form.get("stream"),
             "class_year": request.form.get("class_year"),
@@ -4073,8 +4430,11 @@ def editmenteeprofile():
             "parent_name": request.form.get("parent_name"),
             "parent_mobile": request.form.get("parent_mobile"),
             "comments": request.form.get("comments"),
-            "terms_agreement": request.form.get("terms_agreement"),
         }
+        
+        # WhatsApp is only mandatory if not same as mobile
+        if not same_as_whatsapp:
+            mandatory_fields["whatsapp_number"] = whatsapp_number
         
         # Check for empty fields
         missing_fields = []
@@ -4099,17 +4459,32 @@ def editmenteeprofile():
         # Save form data
         profile.dob = request.form.get("dob")
         profile.school_college_name = request.form.get("school_college_name")
-        profile.mobile_number = request.form.get("mobile_number")
-        profile.whatsapp_number = request.form.get("whatsapp_number")
-        profile.govt_private = request.form.get("govt_private")
-        profile.stream = request.form.get("stream")
+        profile.mobile_number = mobile_number
+        profile.whatsapp_number = whatsapp_number
+        
+        # Handle "Other" option for govt_private
+        govt_private = request.form.get("govt_private")
+        if govt_private == "Other":
+            other_govt_private = request.form.get("other_govt_private")
+            profile.govt_private = other_govt_private if other_govt_private else govt_private
+        else:
+            profile.govt_private = govt_private
+        
+        # Handle "Other" option for stream
+        stream = request.form.get("stream")
+        if stream == "Other":
+            other_stream = request.form.get("other_stream")
+            profile.stream = other_stream if other_stream else stream
+        else:
+            profile.stream = stream
+        
         profile.class_year = request.form.get("class_year")
         profile.favourite_subject = request.form.get("favourite_subject")
         profile.goal = request.form.get("goal")
         profile.parent_name = request.form.get("parent_name")
         profile.parent_mobile = request.form.get("parent_mobile")
         profile.comments = request.form.get("comments")
-        profile.terms_agreement = request.form.get("terms_agreement")
+        profile.terms_agreement = "Yes" if request.form.get("terms_agreement") else "No"
 
         # Handle profile picture upload
         if 'profile_picture' in request.files:
@@ -4124,6 +4499,9 @@ def editmenteeprofile():
         return redirect(url_for("menteeprofile"))
 
     # GET request – pre-fill form with existing data
+    # Determine if mobile and whatsapp are same
+    same_as_whatsapp = "yes" if profile and profile.mobile_number == profile.whatsapp_number else ""
+    
     return render_template(
         "mentee/editmenteeprofile.html",
         full_name=user.name,
@@ -4133,7 +4511,10 @@ def editmenteeprofile():
         dob=profile.dob if profile else "",
         school_college_name=profile.school_college_name if profile else "",
         mobile_number=profile.mobile_number if profile else "",
+        mobile_country_code="+91",  # Default country code
         whatsapp_number=profile.whatsapp_number if profile else "",
+        whatsapp_country_code="+91",  # Default country code
+        same_as_whatsapp=same_as_whatsapp,
         govt_private=profile.govt_private if profile else "",
         stream=profile.stream if profile else "",
         class_year=profile.class_year if profile else "",
@@ -4141,6 +4522,7 @@ def editmenteeprofile():
         goal=profile.goal if profile else "",
         parent_name=profile.parent_name if profile else "",
         parent_mobile=profile.parent_mobile if profile else "",
+        parent_country_code="+91",  # Default country code
         comments=profile.comments if profile else "",
         terms_agreement=profile.terms_agreement if profile else "",
         profile_picture=profile.profile_picture if profile else None
@@ -4354,6 +4736,9 @@ def menteeprofile():
         
         institution_profile_picture = institution_details.profile_picture if institution_details else None
 
+        # Determine if mobile and whatsapp are same
+        same_as_whatsapp = "yes" if profile and profile.mobile_number == profile.whatsapp_number else ""
+
         return render_template(
             "mentee/menteeprofile.html",
             show_sidebar=False,
@@ -4363,7 +4748,10 @@ def menteeprofile():
             dob=dob_formatted,
             school_college_name=profile.school_college_name if profile else "",
             mobile_number=profile.mobile_number if profile else "",
+            mobile_country_code="+91",  # Default country code
             whatsapp_number=profile.whatsapp_number if profile else "",
+            whatsapp_country_code="+91",  # Default country code
+            same_as_whatsapp=same_as_whatsapp,
             govt_private=profile.govt_private if profile else "",
             stream=profile.stream if profile else "",
             class_year=profile.class_year if profile else "",
@@ -4371,6 +4759,7 @@ def menteeprofile():
             goal=profile.goal if profile else "",
             parent_name=profile.parent_name if profile else "",
             parent_mobile=profile.parent_mobile if profile else "",
+            parent_country_code="+91",  # Default country code
             comments=profile.comments if profile else "",
             terms_agreement=profile.terms_agreement if profile else "",
             profile_picture=profile.profile_picture if profile else None,
@@ -4552,14 +4941,14 @@ def supervisor_response():
     return redirect(url_for("supervisordashboard"))
 
 # ---------- Google Calendar Service Account Config ----------
-SCOPES = ["https://www.googleapis.com/auth/calendar"]
+CALENDAR_SERVICE_SCOPES = ["https://www.googleapis.com/auth/calendar"]
 SERVICE_ACCOUNT_FILE = "service_account.json"
 DELEGATED_EMAIL = "info@wazireducationsociety.com"  # Organization calendar email
 
 def get_calendar_service():
     """Return Google Calendar API service using service account"""
     creds = service_account.Credentials.from_service_account_file(
-        SERVICE_ACCOUNT_FILE, scopes=SCOPES
+        SERVICE_ACCOUNT_FILE, scopes=CALENDAR_SERVICE_SCOPES
     )
     delegated_creds = creds.with_subject(DELEGATED_EMAIL)
     service = build("calendar", "v3", credentials=delegated_creds)
@@ -4673,7 +5062,36 @@ def create_meeting_ajax():
         "mentor_email": mentor.email
     })
 
-@app.route("/debug_profile")
+@app.route("/debug_oauth")
+def debug_oauth():
+    """Debug route to check OAuth users in database"""
+    if "email" not in session:
+        return "Not logged in"
+    
+    users = User.query.all()
+    
+    html = "<h1>OAuth Debug Info</h1>"
+    html += f"<p>Total users: {len(users)}</p>"
+    html += "<table border='1' cellpadding='10'>"
+    html += "<tr><th>ID</th><th>Name</th><th>Email</th><th>Google ID</th><th>OAuth Provider</th><th>User Type</th><th>Created At</th></tr>"
+    
+    for user in users:
+        html += f"<tr>"
+        html += f"<td>{user.id}</td>"
+        html += f"<td>{user.name}</td>"
+        html += f"<td>{user.email}</td>"
+        html += f"<td>{user.google_id or 'N/A'}</td>"
+        html += f"<td>{user.oauth_provider or 'N/A'}</td>"
+        html += f"<td>{user.user_type or 'Not selected'}</td>"
+        html += f"<td>{user.oauth_created_at or 'N/A'}</td>"
+        html += f"</tr>"
+    
+    html += "</table>"
+    html += "<p><a href='/'>Back to home</a></p>"
+    
+    return html
+
+
 def debug_profile():
     if "email" not in session:
         return "Not logged in"

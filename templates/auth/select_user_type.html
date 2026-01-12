@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+{% block title %}Select User Type | Mentor Connect{% endblock %}
+{% block content %}
+
+<section class="flex justify-center items-center min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-12 px-4">
+    <div class="w-full max-w-2xl">
+        <div class="bg-white rounded-xl shadow-2xl p-8">
+            <!-- Header -->
+            <div class="text-center mb-8">
+                <h1 class="text-3xl font-bold text-gray-800 mb-2">Welcome to Mentor Connect!</h1>
+                <p class="text-gray-600">{{ user.name }}, please select your role to get started</p>
+            </div>
+
+            <!-- User Type Selection Form -->
+            <form method="POST" class="space-y-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    
+                    <!-- Mentor Option -->
+                    <label class="relative cursor-pointer group">
+                        <input type="radio" name="user_type" value="1" class="sr-only peer" required>
+                        <div class="p-6 border-2 border-gray-200 rounded-lg transition-all duration-300 peer-checked:border-blue-500 peer-checked:bg-blue-50 group-hover:border-blue-300 group-hover:shadow-lg">
+                            <div class="flex flex-col items-center text-center">
+                                <svg class="w-12 h-12 text-blue-500 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                                </svg>
+                                <h3 class="text-lg font-semibold text-gray-800 mb-2">Mentor</h3>
+                                <p class="text-sm text-gray-600">Share your expertise and guide mentees through their journey</p>
+                                <ul class="mt-4 text-xs text-gray-600 space-y-1 text-left">
+                                    <li>✓ Guide and mentor students</li>
+                                    <li>✓ Share your experience</li>
+                                    <li>✓ Build meaningful connections</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </label>
+
+                    <!-- Mentee Option -->
+                    <label class="relative cursor-pointer group">
+                        <input type="radio" name="user_type" value="2" class="sr-only peer" required>
+                        <div class="p-6 border-2 border-gray-200 rounded-lg transition-all duration-300 peer-checked:border-green-500 peer-checked:bg-green-50 group-hover:border-green-300 group-hover:shadow-lg">
+                            <div class="flex flex-col items-center text-center">
+                                <svg class="w-12 h-12 text-green-500 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C6.5 6.253 2 10.998 2 17.25c0 5.079 3.855 9.26 8.75 9.589.5.005 1 .005 1.5 0 4.895-.329 8.75-4.51 8.75-9.589 0-6.252-4.5-10.997-10-10.997z"></path>
+                                </svg>
+                                <h3 class="text-lg font-semibold text-gray-800 mb-2">Mentee</h3>
+                                <p class="text-sm text-gray-600">Learn from experienced mentors and grow your skills</p>
+                                <ul class="mt-4 text-xs text-gray-600 space-y-1 text-left">
+                                    <li>✓ Get personalized guidance</li>
+                                    <li>✓ Learn from experts</li>
+                                    <li>✓ Achieve your goals</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </label>
+
+
+
+                </div>
+
+                <!-- Submit Button -->
+                <div class="flex gap-4 pt-6">
+                    <a href="{{ url_for('logout') }}" class="flex-1 px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors duration-200 font-medium text-center">
+                        Cancel
+                    </a>
+                    <button type="submit" class="flex-1 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200 font-medium">
+                        Continue
+                    </button>
+                </div>
+            </form>
+
+            <!-- Info Box -->
+            <div class="mt-8 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                <p class="text-sm text-blue-800">
+                    <strong>Note:</strong> You can change your role later in your account settings if needed.
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
+    input[type="radio"]:checked + div {
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+</style>
+
+{% endblock %}
