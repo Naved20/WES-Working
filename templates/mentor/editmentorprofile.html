@@ -67,10 +67,18 @@
                 <div class="mt-4">
                     <label class="bg-blue-500 text-white px-4 py-2 rounded-lg cursor-pointer hover:bg-blue-600 transition duration-300 inline-block">
                         <i class="fas fa-upload mr-2"></i>Upload Photo
+                        {% if profile_picture %}
+                        <input type="file" name="profile_picture" class="hidden" onchange="previewImage(this)" accept="image/*">
+                        {% else %}
                         <input type="file" name="profile_picture" class="hidden" onchange="previewImage(this)" required accept="image/*">
+                        {% endif %}
                     </label>
                 </div>
-                <p class="text-xs text-gray-500 mt-2">Max size: 2MB • JPG, PNG, GIF</p>
+                {% if profile_picture %}
+                <p class="text-xs text-gray-500 mt-2">Leave empty to keep current picture</p>
+                {% else %}
+                <p class="text-xs text-red-500 mt-2">* Profile picture is required</p>
+                {% endif %}
             </div>
 
             <!-- Basic Information -->
@@ -93,9 +101,11 @@
             </h3>
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <div class="space-y-4">
+                    {% set profession_options = ['Software Engineer', 'Data Scientist', 'AI/ML Engineer', 'Web Developer', 'DevOps Engineer', 'Cybersecurity Analyst', 'Doctor', 'Surgeon', 'Dentist', 'Pharmacist', 'Medical Researcher', 'Business Consultant', 'Product Manager', 'Marketing Manager', 'Financial Analyst', 'Entrepreneur', 'Professor', 'Teacher', 'Education Consultant', 'Researcher'] %}
+                    {% set is_other_profession = profession and profession not in profession_options %}
                     <div>
                         <label class="block text-gray-700 font-semibold mb-2">Profession *</label>
-                        <select name="profession" class="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition duration-300">
+                        <select name="profession" id="profession_select" class="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition duration-300">
                             <option value="">Select Your Profession</option>
                             <optgroup label="Technology">
                                 <option value="Software Engineer" {% if profession == 'Software Engineer' %}selected{% endif %}>Software Engineer</option>
@@ -125,8 +135,14 @@
                                 <option value="Education Consultant" {% if profession == 'Education Consultant' %}selected{% endif %}>Education Consultant</option>
                                 <option value="Researcher" {% if profession == 'Researcher' %}selected{% endif %}>Researcher</option>
                             </optgroup>
-                            <option value="Other">Other (Please specify)</option>
+                            <option value="Other" {% if is_other_profession %}selected{% endif %}>Other (Please specify)</option>
                         </select>
+                    </div>
+
+                    <!-- Other Profession Field -->
+                    <div id="other_profession_field" style="display: {% if is_other_profession %}block{% else %}none{% endif %};">
+                        <label class="block text-gray-700 font-semibold mb-2">Specify Your Profession</label>
+                        <input type="text" name="other_profession" id="other_profession" class="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition duration-300" placeholder="Enter your profession" value="{% if is_other_profession %}{{ profession }}{% endif %}">
                     </div>
 
                     <div>
@@ -143,7 +159,7 @@
                 <div class="space-y-4">
                     <div>
                         <label class="block text-gray-700 font-semibold mb-2">Industry/Sector *</label>
-                        <select name="industry_sector" class="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition duration-300">
+                        <select name="industry_sector" id="industry_sector_select" class="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition duration-300">
                             <option value="">Select Industry</option>
                             <option value="Technology" {% if industry_sector == 'Technology' %}selected{% endif %}>💻 Technology</option>
                             <option value="Healthcare" {% if industry_sector == 'Healthcare' %}selected{% endif %}>🏥 Healthcare</option>
@@ -157,8 +173,18 @@
                             <option value="Manufacturing" {% if industry_sector == 'Manufacturing' %}selected{% endif %}>🏭 Manufacturing</option>
                             <option value="Retail" {% if industry_sector == 'Retail' %}selected{% endif %}>🛍️ Retail</option>
                             <option value="Hospitality" {% if industry_sector == 'Hospitality' %}selected{% endif %}>🏨 Hospitality</option>
-                            <option value="Other" {% if industry_sector == 'Other' %}selected{% endif %}>🔶 Other</option>
+                            <option value="Legal" {% if industry_sector == 'Legal' %}selected{% endif %}>⚖️ Legal</option>
+                            <option value="Media & Entertainment" {% if industry_sector == 'Media & Entertainment' %}selected{% endif %}>🎬 Media & Entertainment</option>
+                            <option value="Real Estate" {% if industry_sector == 'Real Estate' %}selected{% endif %}>🏠 Real Estate</option>
+                            <option value="Agriculture" {% if industry_sector == 'Agriculture' %}selected{% endif %}>🌾 Agriculture</option>
+                            <option value="Other" {% if industry_sector and industry_sector not in ['Technology', 'Healthcare', 'Education', 'Finance', 'Business', 'Creative Arts', 'Science & Research', 'Government', 'Non-Profit', 'Manufacturing', 'Retail', 'Hospitality', 'Legal', 'Media & Entertainment', 'Real Estate', 'Agriculture'] %}selected{% endif %}>🔶 Other</option>
                         </select>
+                    </div>
+
+                    <!-- Other Industry/Sector Field -->
+                    <div id="other_industry_sector_field" style="display: {% if industry_sector and industry_sector not in ['Technology', 'Healthcare', 'Education', 'Finance', 'Business', 'Creative Arts', 'Science & Research', 'Government', 'Non-Profit', 'Manufacturing', 'Retail', 'Hospitality', 'Legal', 'Media & Entertainment', 'Real Estate', 'Agriculture', ''] %}block{% else %}none{% endif %};">
+                        <label class="block text-gray-700 font-semibold mb-2">Specify Your Industry/Sector</label>
+                        <input type="text" name="other_industry_sector" id="other_industry_sector" class="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition duration-300" placeholder="Enter your industry/sector" value="{% if industry_sector and industry_sector not in ['Technology', 'Healthcare', 'Education', 'Finance', 'Business', 'Creative Arts', 'Science & Research', 'Government', 'Non-Profit', 'Manufacturing', 'Retail', 'Hospitality', 'Legal', 'Media & Entertainment', 'Real Estate', 'Agriculture', ''] %}{{ industry_sector }}{% endif %}">
                     </div>
 
                     <div>
@@ -218,64 +244,169 @@
                 <div class="space-y-4">
                     <div>
                         <label class="block text-gray-700 font-semibold mb-2">WhatsApp Number *</label>
-                        <input type="text" name="whatsapp" value="{{ whatsapp }}" class="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition duration-300">
+                        <div class="flex gap-2">
+                            <input type="text" name="whatsapp_country_code" list="country_codes" value="{{ whatsapp_country_code or '+91' }}" class="w-24 p-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition duration-300" placeholder="+91">
+                            <input type="tel" name="whatsapp" value="{{ whatsapp }}" class="flex-1 p-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition duration-300" placeholder="Enter WhatsApp number" pattern="[0-9]{10}" maxlength="10">
+                        </div>
                     </div>
 
+                    {% set country_options = ['India', 'Pakistan', 'Bangladesh', 'Nepal', 'Sri Lanka', 'China', 'Japan', 'South Korea', 'Singapore', 'Malaysia', 'Indonesia', 'Philippines', 'Thailand', 'Vietnam', 'UAE', 'Saudi Arabia', 'Qatar', 'Kuwait', 'Oman', 'Bahrain', 'Israel', 'Turkey', 'UK', 'Germany', 'France', 'Italy', 'Spain', 'Netherlands', 'Belgium', 'Luxembourg', 'Switzerland', 'Austria', 'Sweden', 'Norway', 'Denmark', 'Finland', 'Poland', 'Portugal', 'Greece', 'Czech Republic', 'Hungary', 'Russia', 'Ukraine', 'Ireland', 'USA', 'Canada', 'Mexico', 'Brazil', 'Argentina', 'Chile', 'Colombia', 'Australia', 'New Zealand', 'South Africa', 'Nigeria', 'Kenya', 'Egypt', 'Morocco'] %}
+                    {% set is_other_country = country and country not in country_options %}
                     <div>
                         <label class="block text-gray-700 font-semibold mb-2">Country *</label>
-                        <select name="country" class="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition duration-300">
+                        <select name="country" id="country_select" class="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition duration-300">
                             <option value="">Select Country</option>
-                            <option value="India" {% if location == 'India' %}selected{% endif %}>🇮🇳 India</option>
-                            <option value="USA" {% if location == 'USA' %}selected{% endif %}>🇺🇸 United States</option>
-                            <option value="UK" {% if location == 'UK' %}selected{% endif %}>🇬🇧 United Kingdom</option>
-                            <option value="Canada" {% if location == 'Canada' %}selected{% endif %}>🇨🇦 Canada</option>
-                            <option value="Australia" {% if location == 'Australia' %}selected{% endif %}>🇦🇺 Australia</option>
-                            <option value="Germany" {% if location == 'Germany' %}selected{% endif %}>🇩🇪 Germany</option>
-                            <option value="France" {% if location == 'France' %}selected{% endif %}>🇫🇷 France</option>
-                            <option value="Japan" {% if location == 'Japan' %}selected{% endif %}>🇯🇵 Japan</option>
-                            <option value="Singapore" {% if location == 'Singapore' %}selected{% endif %}>🇸🇬 Singapore</option>
-                            <option value="Other">Other</option>
+                            <optgroup label="Asia">
+                                <option value="India" {% if country == 'India' %}selected{% endif %}>🇮🇳 India</option>
+                                <option value="Pakistan" {% if country == 'Pakistan' %}selected{% endif %}>🇵🇰 Pakistan</option>
+                                <option value="Bangladesh" {% if country == 'Bangladesh' %}selected{% endif %}>🇧🇩 Bangladesh</option>
+                                <option value="Nepal" {% if country == 'Nepal' %}selected{% endif %}>🇳🇵 Nepal</option>
+                                <option value="Sri Lanka" {% if country == 'Sri Lanka' %}selected{% endif %}>🇱🇰 Sri Lanka</option>
+                                <option value="China" {% if country == 'China' %}selected{% endif %}>🇨🇳 China</option>
+                                <option value="Japan" {% if country == 'Japan' %}selected{% endif %}>🇯🇵 Japan</option>
+                                <option value="South Korea" {% if country == 'South Korea' %}selected{% endif %}>🇰🇷 South Korea</option>
+                                <option value="Singapore" {% if country == 'Singapore' %}selected{% endif %}>🇸🇬 Singapore</option>
+                                <option value="Malaysia" {% if country == 'Malaysia' %}selected{% endif %}>🇲🇾 Malaysia</option>
+                                <option value="Indonesia" {% if country == 'Indonesia' %}selected{% endif %}>🇮🇩 Indonesia</option>
+                                <option value="Philippines" {% if country == 'Philippines' %}selected{% endif %}>🇵🇭 Philippines</option>
+                                <option value="Thailand" {% if country == 'Thailand' %}selected{% endif %}>🇹🇭 Thailand</option>
+                                <option value="Vietnam" {% if country == 'Vietnam' %}selected{% endif %}>🇻🇳 Vietnam</option>
+                            </optgroup>
+                            <optgroup label="Middle East">
+                                <option value="UAE" {% if country == 'UAE' %}selected{% endif %}>🇦🇪 UAE</option>
+                                <option value="Saudi Arabia" {% if country == 'Saudi Arabia' %}selected{% endif %}>🇸🇦 Saudi Arabia</option>
+                                <option value="Qatar" {% if country == 'Qatar' %}selected{% endif %}>🇶🇦 Qatar</option>
+                                <option value="Kuwait" {% if country == 'Kuwait' %}selected{% endif %}>🇰🇼 Kuwait</option>
+                                <option value="Oman" {% if country == 'Oman' %}selected{% endif %}>🇴🇲 Oman</option>
+                                <option value="Bahrain" {% if country == 'Bahrain' %}selected{% endif %}>🇧🇭 Bahrain</option>
+                                <option value="Israel" {% if country == 'Israel' %}selected{% endif %}>🇮🇱 Israel</option>
+                                <option value="Turkey" {% if country == 'Turkey' %}selected{% endif %}>🇹🇷 Turkey</option>
+                            </optgroup>
+                            <optgroup label="Europe">
+                                <option value="UK" {% if country == 'UK' %}selected{% endif %}>🇬🇧 United Kingdom</option>
+                                <option value="Germany" {% if country == 'Germany' %}selected{% endif %}>🇩🇪 Germany</option>
+                                <option value="France" {% if country == 'France' %}selected{% endif %}>🇫🇷 France</option>
+                                <option value="Italy" {% if country == 'Italy' %}selected{% endif %}>🇮🇹 Italy</option>
+                                <option value="Spain" {% if country == 'Spain' %}selected{% endif %}>🇪🇸 Spain</option>
+                                <option value="Netherlands" {% if country == 'Netherlands' %}selected{% endif %}>🇳🇱 Netherlands</option>
+                                <option value="Belgium" {% if country == 'Belgium' %}selected{% endif %}>🇧🇪 Belgium</option>
+                                <option value="Luxembourg" {% if country == 'Luxembourg' %}selected{% endif %}>🇱🇺 Luxembourg</option>
+                                <option value="Switzerland" {% if country == 'Switzerland' %}selected{% endif %}>🇨🇭 Switzerland</option>
+                                <option value="Austria" {% if country == 'Austria' %}selected{% endif %}>🇦🇹 Austria</option>
+                                <option value="Sweden" {% if country == 'Sweden' %}selected{% endif %}>🇸🇪 Sweden</option>
+                                <option value="Norway" {% if country == 'Norway' %}selected{% endif %}>🇳🇴 Norway</option>
+                                <option value="Denmark" {% if country == 'Denmark' %}selected{% endif %}>🇩🇰 Denmark</option>
+                                <option value="Finland" {% if country == 'Finland' %}selected{% endif %}>🇫🇮 Finland</option>
+                                <option value="Poland" {% if country == 'Poland' %}selected{% endif %}>🇵🇱 Poland</option>
+                                <option value="Portugal" {% if country == 'Portugal' %}selected{% endif %}>🇵🇹 Portugal</option>
+                                <option value="Greece" {% if country == 'Greece' %}selected{% endif %}>🇬🇷 Greece</option>
+                                <option value="Czech Republic" {% if country == 'Czech Republic' %}selected{% endif %}>🇨🇿 Czech Republic</option>
+                                <option value="Hungary" {% if country == 'Hungary' %}selected{% endif %}>🇭🇺 Hungary</option>
+                                <option value="Russia" {% if country == 'Russia' %}selected{% endif %}>🇷🇺 Russia</option>
+                                <option value="Ukraine" {% if country == 'Ukraine' %}selected{% endif %}>🇺🇦 Ukraine</option>
+                                <option value="Ireland" {% if country == 'Ireland' %}selected{% endif %}>🇮🇪 Ireland</option>
+                            </optgroup>
+                            <optgroup label="Americas">
+                                <option value="USA" {% if country == 'USA' %}selected{% endif %}>🇺🇸 United States</option>
+                                <option value="Canada" {% if country == 'Canada' %}selected{% endif %}>🇨🇦 Canada</option>
+                                <option value="Mexico" {% if country == 'Mexico' %}selected{% endif %}>🇲🇽 Mexico</option>
+                                <option value="Brazil" {% if country == 'Brazil' %}selected{% endif %}>🇧🇷 Brazil</option>
+                                <option value="Argentina" {% if country == 'Argentina' %}selected{% endif %}>🇦🇷 Argentina</option>
+                                <option value="Chile" {% if country == 'Chile' %}selected{% endif %}>🇨🇱 Chile</option>
+                                <option value="Colombia" {% if country == 'Colombia' %}selected{% endif %}>🇨🇴 Colombia</option>
+                            </optgroup>
+                            <optgroup label="Oceania">
+                                <option value="Australia" {% if country == 'Australia' %}selected{% endif %}>🇦🇺 Australia</option>
+                                <option value="New Zealand" {% if country == 'New Zealand' %}selected{% endif %}>🇳🇿 New Zealand</option>
+                            </optgroup>
+                            <optgroup label="Africa">
+                                <option value="South Africa" {% if country == 'South Africa' %}selected{% endif %}>🇿🇦 South Africa</option>
+                                <option value="Nigeria" {% if country == 'Nigeria' %}selected{% endif %}>🇳🇬 Nigeria</option>
+                                <option value="Kenya" {% if country == 'Kenya' %}selected{% endif %}>🇰🇪 Kenya</option>
+                                <option value="Egypt" {% if country == 'Egypt' %}selected{% endif %}>🇪🇬 Egypt</option>
+                                <option value="Morocco" {% if country == 'Morocco' %}selected{% endif %}>🇲🇦 Morocco</option>
+                            </optgroup>
+                            <option value="Other" {% if is_other_country %}selected{% endif %}>🌍 Other (Please specify)</option>
                         </select>
+                    </div>
+
+                    <!-- Other Country Field -->
+                    <div id="other_country_field" style="display: {% if is_other_country %}block{% else %}none{% endif %};">
+                        <label class="block text-gray-700 font-semibold mb-2">Specify Your Country</label>
+                        <input type="text" name="other_country" id="other_country" class="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition duration-300" placeholder="Enter your country name" value="{% if is_other_country %}{{ country }}{% endif %}">
                     </div>
 
                     <div>
                         <label class="block text-gray-700 font-semibold mb-2">Language(s) *</label>
-                        <select name="language" class="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition duration-300" multiple>
-                            <optgroup label="Popular Languages">
-                                <option value="English" {% if 'English' in (language | default([], true)) %}selected{% endif %}>🇬🇧 English</option>
-                                <option value="Hindi" {% if 'Hindi' in (language | default([], true)) %}selected{% endif %}>🇮🇳 Hindi</option>
-                                <option value="Spanish" {% if 'Spanish' in (language | default([], true)) %}selected{% endif %}>🇪🇸 Spanish</option>
-                                <option value="French" {% if 'French' in (language | default([], true)) %}selected{% endif %}>🇫🇷 French</option>
-                                <option value="German" {% if 'German' in (language | default([], true)) %}selected{% endif %}>🇩🇪 German</option>
+                        <select name="language" id="language_select" class="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition duration-300" multiple>
+                            <optgroup label="Indian Languages">
+                                <option value="Hindi" {% if language and 'Hindi' in language %}selected{% endif %}>🇮🇳 Hindi</option>
+                                <option value="English" {% if language and 'English' in language %}selected{% endif %}>🇬🇧 English</option>
+                                <option value="Tamil" {% if language and 'Tamil' in language %}selected{% endif %}>🇮🇳 Tamil</option>
+                                <option value="Telugu" {% if language and 'Telugu' in language %}selected{% endif %}>🇮🇳 Telugu</option>
+                                <option value="Marathi" {% if language and 'Marathi' in language %}selected{% endif %}>🇮🇳 Marathi</option>
+                                <option value="Bengali" {% if language and 'Bengali' in language %}selected{% endif %}>🇮🇳 Bengali</option>
+                                <option value="Gujarati" {% if language and 'Gujarati' in language %}selected{% endif %}>🇮🇳 Gujarati</option>
+                                <option value="Kannada" {% if language and 'Kannada' in language %}selected{% endif %}>🇮🇳 Kannada</option>
+                                <option value="Malayalam" {% if language and 'Malayalam' in language %}selected{% endif %}>🇮🇳 Malayalam</option>
+                                <option value="Punjabi" {% if language and 'Punjabi' in language %}selected{% endif %}>🇮🇳 Punjabi</option>
+                                <option value="Odia" {% if language and 'Odia' in language %}selected{% endif %}>🇮🇳 Odia</option>
+                                <option value="Urdu" {% if language and 'Urdu' in language %}selected{% endif %}>🇮🇳 Urdu</option>
+                                <option value="Assamese" {% if language and 'Assamese' in language %}selected{% endif %}>🇮🇳 Assamese</option>
                             </optgroup>
-                            <optgroup label="Other Languages">
-                                <option value="Chinese" {% if 'Chinese' in (language | default([], true)) %}selected{% endif %}>🇨🇳 Chinese (Mandarin)</option>
-                                <option value="Japanese" {% if 'Japanese' in (language | default([], true)) %}selected{% endif %}>🇯🇵 Japanese</option>
-                                <option value="Arabic" {% if 'Arabic' in (language | default([], true)) %}selected{% endif %}>🇸🇦 Arabic</option>
-                                <option value="Portuguese" {% if 'Portuguese' in (language | default([], true)) %}selected{% endif %}>🇵🇹 Portuguese</option>
-                                <option value="Russian" {% if 'Russian' in (language | default([], true)) %}selected{% endif %}>🇷🇺 Russian</option>
-                                <option value="Italian" {% if 'Italian' in (language | default([], true)) %}selected{% endif %}>🇮🇹 Italian</option>
-                                <option value="Korean" {% if 'Korean' in (language | default([], true)) %}selected{% endif %}>🇰🇷 Korean</option>
-                                <option value="Dutch" {% if 'Dutch' in (language | default([], true)) %}selected{% endif %}>🇳🇱 Dutch</option>
-                                <option value="Turkish" {% if 'Turkish' in (language | default([], true)) %}selected{% endif %}>🇹🇷 Turkish</option>
-                                <option value="Tamil" {% if 'Tamil' in (language | default([], true)) %}selected{% endif %}>🇮🇳 Tamil</option>
-                                <option value="Telugu" {% if 'Telugu' in (language | default([], true)) %}selected{% endif %}>🇮🇳 Telugu</option>
-                                <option value="Marathi" {% if 'Marathi' in (language | default([], true)) %}selected{% endif %}>🇮🇳 Marathi</option>
-                                <option value="Bengali" {% if 'Bengali' in (language | default([], true)) %}selected{% endif %}>🇧🇩 Bengali</option>
+                            <optgroup label="European Languages">
+                                <option value="Spanish" {% if language and 'Spanish' in language %}selected{% endif %}>🇪🇸 Spanish</option>
+                                <option value="French" {% if language and 'French' in language %}selected{% endif %}>🇫🇷 French</option>
+                                <option value="German" {% if language and 'German' in language %}selected{% endif %}>🇩🇪 German</option>
+                                <option value="Italian" {% if language and 'Italian' in language %}selected{% endif %}>🇮🇹 Italian</option>
+                                <option value="Portuguese" {% if language and 'Portuguese' in language %}selected{% endif %}>🇵🇹 Portuguese</option>
+                                <option value="Russian" {% if language and 'Russian' in language %}selected{% endif %}>🇷🇺 Russian</option>
+                                <option value="Dutch" {% if language and 'Dutch' in language %}selected{% endif %}>🇳🇱 Dutch</option>
+                                <option value="Polish" {% if language and 'Polish' in language %}selected{% endif %}>🇵🇱 Polish</option>
+                                <option value="Swedish" {% if language and 'Swedish' in language %}selected{% endif %}>🇸🇪 Swedish</option>
+                                <option value="Greek" {% if language and 'Greek' in language %}selected{% endif %}>🇬🇷 Greek</option>
                             </optgroup>
+                            <optgroup label="Asian Languages">
+                                <option value="Chinese (Mandarin)" {% if language and 'Chinese (Mandarin)' in language %}selected{% endif %}>🇨🇳 Chinese (Mandarin)</option>
+                                <option value="Japanese" {% if language and 'Japanese' in language %}selected{% endif %}>🇯🇵 Japanese</option>
+                                <option value="Korean" {% if language and 'Korean' in language %}selected{% endif %}>🇰🇷 Korean</option>
+                                <option value="Thai" {% if language and 'Thai' in language %}selected{% endif %}>🇹🇭 Thai</option>
+                                <option value="Vietnamese" {% if language and 'Vietnamese' in language %}selected{% endif %}>🇻🇳 Vietnamese</option>
+                                <option value="Indonesian" {% if language and 'Indonesian' in language %}selected{% endif %}>🇮🇩 Indonesian</option>
+                                <option value="Malay" {% if language and 'Malay' in language %}selected{% endif %}>🇲🇾 Malay</option>
+                            </optgroup>
+                            <optgroup label="Middle Eastern Languages">
+                                <option value="Arabic" {% if language and 'Arabic' in language %}selected{% endif %}>🇸🇦 Arabic</option>
+                                <option value="Persian" {% if language and 'Persian' in language %}selected{% endif %}>🇮🇷 Persian (Farsi)</option>
+                                <option value="Turkish" {% if language and 'Turkish' in language %}selected{% endif %}>🇹🇷 Turkish</option>
+                                <option value="Hebrew" {% if language and 'Hebrew' in language %}selected{% endif %}>🇮🇱 Hebrew</option>
+                            </optgroup>
+                            <optgroup label="African Languages">
+                                <option value="Swahili" {% if language and 'Swahili' in language %}selected{% endif %}>🇰🇪 Swahili</option>
+                                <option value="Afrikaans" {% if language and 'Afrikaans' in language %}selected{% endif %}>🇿🇦 Afrikaans</option>
+                            </optgroup>
+                            <option value="Other">🌍 Other</option>
                         </select>
                         <p class="text-sm text-gray-500 mt-1"><i class="fas fa-mouse-pointer mr-1"></i>Hold Ctrl/Cmd to select multiple languages</p>
+                    </div>
+
+                    <!-- Other Language Field -->
+                    <div id="other_language_field" style="display: none;">
+                        <label class="block text-gray-700 font-semibold mb-2">Specify Other Language(s)</label>
+                        <input type="text" name="other_language" id="other_language" class="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition duration-300" placeholder="Enter language(s), separated by commas">
                     </div>
                 </div>
                 <div class="space-y-4">
                     <div>
                         <label class="block text-gray-700 font-semibold mb-2">City *</label>
-                        <input type="text" name="city" value="{{ location }}" class="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition duration-300">
+                        <input type="text" name="city" value="{{ city }}" class="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition duration-300">
                     </div>
 
+                    {% set education_options = ['B.Tech', 'B.E.', 'B.Sc', 'B.Com', 'BA', 'BBA', 'BCA', 'MBBS', 'B.Arch', 'LLB', 'B.Ed', 'B.Pharm', 'M.Tech', 'MBA', 'M.Sc', 'MA', 'M.Com', 'MCA', 'MD', 'MS', 'LLM', 'M.Ed', 'M.Pharm', 'PhD', 'Postdoc', 'CA', 'CS', 'CFA', 'ICWA'] %}
+                    {% set is_other_education = education and education not in education_options %}
                     <div>
                         <label class="block text-gray-700 font-semibold mb-2">Education *</label>
-                        <select name="education" class="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition duration-300">
+                        <select name="education" id="education_select" class="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition duration-300">
                             <option value="">Select Education</option>
                             <optgroup label="Undergraduate">
                                 <option value="B.Tech" {% if education == 'B.Tech' %}selected{% endif %}>B.Tech</option>
@@ -283,23 +414,45 @@
                                 <option value="B.Sc" {% if education == 'B.Sc' %}selected{% endif %}>B.Sc</option>
                                 <option value="B.Com" {% if education == 'B.Com' %}selected{% endif %}>B.Com</option>
                                 <option value="BA" {% if education == 'BA' %}selected{% endif %}>BA</option>
+                                <option value="BBA" {% if education == 'BBA' %}selected{% endif %}>BBA</option>
+                                <option value="BCA" {% if education == 'BCA' %}selected{% endif %}>BCA</option>
                                 <option value="MBBS" {% if education == 'MBBS' %}selected{% endif %}>MBBS</option>
                                 <option value="B.Arch" {% if education == 'B.Arch' %}selected{% endif %}>B.Arch</option>
+                                <option value="LLB" {% if education == 'LLB' %}selected{% endif %}>LLB</option>
+                                <option value="B.Ed" {% if education == 'B.Ed' %}selected{% endif %}>B.Ed</option>
+                                <option value="B.Pharm" {% if education == 'B.Pharm' %}selected{% endif %}>B.Pharm</option>
                             </optgroup>
                             <optgroup label="Postgraduate">
                                 <option value="M.Tech" {% if education == 'M.Tech' %}selected{% endif %}>M.Tech</option>
                                 <option value="MBA" {% if education == 'MBA' %}selected{% endif %}>MBA</option>
                                 <option value="M.Sc" {% if education == 'M.Sc' %}selected{% endif %}>M.Sc</option>
                                 <option value="MA" {% if education == 'MA' %}selected{% endif %}>MA</option>
+                                <option value="M.Com" {% if education == 'M.Com' %}selected{% endif %}>M.Com</option>
+                                <option value="MCA" {% if education == 'MCA' %}selected{% endif %}>MCA</option>
                                 <option value="MD" {% if education == 'MD' %}selected{% endif %}>MD</option>
                                 <option value="MS" {% if education == 'MS' %}selected{% endif %}>MS</option>
+                                <option value="LLM" {% if education == 'LLM' %}selected{% endif %}>LLM</option>
+                                <option value="M.Ed" {% if education == 'M.Ed' %}selected{% endif %}>M.Ed</option>
+                                <option value="M.Pharm" {% if education == 'M.Pharm' %}selected{% endif %}>M.Pharm</option>
                             </optgroup>
                             <optgroup label="Doctorate">
                                 <option value="PhD" {% if education == 'PhD' %}selected{% endif %}>PhD</option>
                                 <option value="Postdoc" {% if education == 'Postdoc' %}selected{% endif %}>Postdoc</option>
                             </optgroup>
-                            <option value="Other">Other</option>
+                            <optgroup label="Professional Certifications">
+                                <option value="CA" {% if education == 'CA' %}selected{% endif %}>CA (Chartered Accountant)</option>
+                                <option value="CS" {% if education == 'CS' %}selected{% endif %}>CS (Company Secretary)</option>
+                                <option value="CFA" {% if education == 'CFA' %}selected{% endif %}>CFA</option>
+                                <option value="ICWA" {% if education == 'ICWA' %}selected{% endif %}>ICWA</option>
+                            </optgroup>
+                            <option value="Other" {% if is_other_education %}selected{% endif %}>Other (Please specify)</option>
                         </select>
+                    </div>
+
+                    <!-- Other Education Field -->
+                    <div id="other_education_field" style="display: {% if is_other_education %}block{% else %}none{% endif %};">
+                        <label class="block text-gray-700 font-semibold mb-2">Specify Your Education</label>
+                        <input type="text" name="other_education" id="other_education" class="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition duration-300" placeholder="Enter your education/degree" value="{% if is_other_education %}{{ education }}{% endif %}">
                     </div>
                 </div>
             </div>
@@ -519,6 +672,62 @@
 
 
 <script>
+// Datalist for country codes
+const countryCodesDatalist = `
+<datalist id="country_codes">
+    <option value="+91">India</option>
+    <option value="+1">USA/Canada</option>
+    <option value="+44">UK</option>
+    <option value="+971">UAE</option>
+    <option value="+966">Saudi Arabia</option>
+    <option value="+65">Singapore</option>
+    <option value="+61">Australia</option>
+    <option value="+49">Germany</option>
+    <option value="+33">France</option>
+    <option value="+81">Japan</option>
+    <option value="+86">China</option>
+    <option value="+92">Pakistan</option>
+    <option value="+880">Bangladesh</option>
+    <option value="+977">Nepal</option>
+    <option value="+94">Sri Lanka</option>
+    <option value="+60">Malaysia</option>
+    <option value="+63">Philippines</option>
+    <option value="+82">South Korea</option>
+    <option value="+39">Italy</option>
+    <option value="+34">Spain</option>
+    <option value="+7">Russia</option>
+    <option value="+55">Brazil</option>
+    <option value="+52">Mexico</option>
+    <option value="+27">South Africa</option>
+    <option value="+20">Egypt</option>
+    <option value="+234">Nigeria</option>
+    <option value="+254">Kenya</option>
+    <option value="+974">Qatar</option>
+    <option value="+965">Kuwait</option>
+    <option value="+968">Oman</option>
+    <option value="+973">Bahrain</option>
+    <option value="+64">New Zealand</option>
+    <option value="+31">Netherlands</option>
+    <option value="+41">Switzerland</option>
+    <option value="+46">Sweden</option>
+    <option value="+47">Norway</option>
+    <option value="+45">Denmark</option>
+    <option value="+48">Poland</option>
+    <option value="+353">Ireland</option>
+    <option value="+352">Luxembourg</option>
+    <option value="+32">Belgium</option>
+    <option value="+43">Austria</option>
+    <option value="+358">Finland</option>
+    <option value="+351">Portugal</option>
+    <option value="+30">Greece</option>
+    <option value="+420">Czech Republic</option>
+    <option value="+36">Hungary</option>
+    <option value="+380">Ukraine</option>
+    <option value="+90">Turkey</option>
+    <option value="+972">Israel</option>
+</datalist>`;
+document.body.insertAdjacentHTML('beforeend', countryCodesDatalist);
+
     function previewImage(input) {
         if (input.files && input.files[0]) {
             const reader = new FileReader();
@@ -534,48 +743,102 @@
             reader.readAsDataURL(input.files[0]);
         }
     }
-
-
-    document.getElementById('institution').addEventListener('change', function() {
-    const otherField = document.getElementById('other_institution_field');
-    if (this.value === 'Other') {
-        otherField.style.display = 'block';
-        document.getElementById('other_institution_name').required = true;
-    } else {
-        otherField.style.display = 'none';
-        document.getElementById('other_institution_name').required = false;
-    }
-});
 
 
 document.addEventListener('DOMContentLoaded', function() {
+    // Institution dropdown handler
     const institutionSelect = document.getElementById('institution');
-    const otherField = document.getElementById('other_institution_field');
+    const otherInstitutionField = document.getElementById('other_institution_field');
     
-    institutionSelect.addEventListener('change', function() {
-        if (this.value === 'Other') {
-            otherField.style.display = 'block';
-            document.getElementById('other_institution_name').required = true;
-        } else {
-            otherField.style.display = 'none';
-            document.getElementById('other_institution_name').required = false;
-        }
-    });
-
-    function previewImage(input) {
-        if (input.files && input.files[0]) {
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const img = input.closest('.text-center').querySelector('img');
-                if (img) {
-                    img.src = e.target.result;
-                } else {
-                    const div = input.closest('.text-center').querySelector('div');
-                    div.innerHTML = `<img src="${e.target.result}" class="w-32 h-32 md:w-40 md:h-40 object-cover rounded-full shadow-lg border-4 border-blue-200">`;
-                }
+    if (institutionSelect) {
+        institutionSelect.addEventListener('change', function() {
+            if (this.value === 'Other') {
+                otherInstitutionField.style.display = 'block';
+                document.getElementById('other_institution_name').required = true;
+            } else {
+                otherInstitutionField.style.display = 'none';
+                document.getElementById('other_institution_name').required = false;
             }
-            reader.readAsDataURL(input.files[0]);
-        }
+        });
+    }
+
+    // Profession dropdown handler
+    const professionSelect = document.getElementById('profession_select');
+    const otherProfessionField = document.getElementById('other_profession_field');
+    
+    if (professionSelect) {
+        professionSelect.addEventListener('change', function() {
+            if (this.value === 'Other') {
+                otherProfessionField.style.display = 'block';
+                document.getElementById('other_profession').required = true;
+            } else {
+                otherProfessionField.style.display = 'none';
+                document.getElementById('other_profession').required = false;
+            }
+        });
+    }
+
+    // Industry/Sector dropdown handler
+    const industrySectorSelect = document.getElementById('industry_sector_select');
+    const otherIndustrySectorField = document.getElementById('other_industry_sector_field');
+    
+    if (industrySectorSelect) {
+        industrySectorSelect.addEventListener('change', function() {
+            if (this.value === 'Other') {
+                otherIndustrySectorField.style.display = 'block';
+                document.getElementById('other_industry_sector').required = true;
+            } else {
+                otherIndustrySectorField.style.display = 'none';
+                document.getElementById('other_industry_sector').required = false;
+            }
+        });
+    }
+
+    // Country dropdown handler
+    const countrySelect = document.getElementById('country_select');
+    const otherCountryField = document.getElementById('other_country_field');
+    
+    if (countrySelect) {
+        countrySelect.addEventListener('change', function() {
+            if (this.value === 'Other') {
+                otherCountryField.style.display = 'block';
+                document.getElementById('other_country').required = true;
+            } else {
+                otherCountryField.style.display = 'none';
+                document.getElementById('other_country').required = false;
+            }
+        });
+    }
+
+    // Education dropdown handler
+    const educationSelect = document.getElementById('education_select');
+    const otherEducationField = document.getElementById('other_education_field');
+    
+    if (educationSelect) {
+        educationSelect.addEventListener('change', function() {
+            if (this.value === 'Other') {
+                otherEducationField.style.display = 'block';
+                document.getElementById('other_education').required = true;
+            } else {
+                otherEducationField.style.display = 'none';
+                document.getElementById('other_education').required = false;
+            }
+        });
+    }
+
+    // Language dropdown handler (for multi-select)
+    const languageSelect = document.getElementById('language_select');
+    const otherLanguageField = document.getElementById('other_language_field');
+    
+    if (languageSelect) {
+        languageSelect.addEventListener('change', function() {
+            const selectedOptions = Array.from(this.selectedOptions).map(opt => opt.value);
+            if (selectedOptions.includes('Other')) {
+                otherLanguageField.style.display = 'block';
+            } else {
+                otherLanguageField.style.display = 'none';
+            }
+        });
     }
 });
 

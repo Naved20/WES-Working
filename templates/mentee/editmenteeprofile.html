@@ -22,12 +22,16 @@
                 <img src="{{ url_for('static', filename='uploads/' + profile_picture) }}" 
                      alt="Profile Picture" 
                      class="w-32 h-32 md:w-40 md:h-40 object-cover rounded-full shadow-md border-2 border-gray-200 mb-2">
+                <p class="text-xs text-gray-500 mb-1">Current picture uploaded</p>
+                <input type="file" name="profile_picture" class="block text-sm text-gray-600" accept="image/*">
+                <p class="text-xs text-gray-400">Leave empty to keep current picture</p>
                 {% else %}
                 <div class="w-32 h-32 md:w-40 md:h-40 flex items-center justify-center bg-gray-200 text-gray-500 rounded-full text-lg font-semibold mb-2">
                     No Picture
                 </div>
-                {% endif %}
                 <input type="file" name="profile_picture" class="block text-sm text-gray-600" required accept="image/*">
+                <p class="text-xs text-red-500">* Profile picture is required</p>
+                {% endif %}
             </div>
 
             <!-- Name & Email -->
@@ -51,73 +55,108 @@
             <h3 class="text-2xl font-semibold text-gray-700 mb-4">Profile Details</h3>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                    <label class="block text-gray-700 font-semibold">Mobile Number</label>
-                    <input type="text" name="mobile_number" value="{{ mobile_number }}" class="w-full p-2 border rounded-lg">
+                    <!-- Mobile Number with Country Code -->
+                    <label class="block text-gray-700 font-semibold">Mobile Number *</label>
+                    <div class="flex gap-2">
+                        <input type="text" name="mobile_country_code" list="country_codes" value="{{ mobile_country_code or '+91' }}" class="w-24 p-2 border rounded-lg" placeholder="+91">
+                        <input type="tel" name="mobile_number" value="{{ mobile_number }}" class="flex-1 p-2 border rounded-lg" placeholder="Enter mobile number" pattern="[0-9]{10}" maxlength="10">
+                    </div>
 
-                    <label class="block text-gray-700 font-semibold mt-2">WhatsApp Number</label>
-                    <input type="text" name="whatsapp_number" value="{{ whatsapp_number }}" class="w-full p-2 border rounded-lg">
+                    <!-- Same as WhatsApp Checkbox -->
+                    <div class="mt-3 flex items-center">
+                        <input type="checkbox" id="same_as_whatsapp" name="same_as_whatsapp" class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500" {% if same_as_whatsapp == 'yes' or mobile_number == whatsapp_number %}checked{% endif %}>
+                        <label for="same_as_whatsapp" class="ml-2 text-gray-700 text-sm">This is also my WhatsApp number</label>
+                    </div>
 
-                    <label class="block text-gray-700 font-semibold mt-2">Government / Private</label>
-                    <input type="text" name="govt_private" value="{{ govt_private }}" class="w-full p-2 border rounded-lg">
+                    <!-- WhatsApp Number with Country Code -->
+                    <div id="whatsapp_field" class="mt-3" style="display: {% if same_as_whatsapp == 'yes' or mobile_number == whatsapp_number %}none{% else %}block{% endif %};">
+                        <label class="block text-gray-700 font-semibold">WhatsApp Number</label>
+                        <div class="flex gap-2">
+                            <input type="text" name="whatsapp_country_code" list="country_codes" value="{{ whatsapp_country_code or '+91' }}" class="w-24 p-2 border rounded-lg" placeholder="+91">
+                            <input type="tel" name="whatsapp_number" id="whatsapp_number_input" value="{{ whatsapp_number }}" class="flex-1 p-2 border rounded-lg" placeholder="Enter WhatsApp number" pattern="[0-9]{10}" maxlength="10">
+                        </div>
+                    </div>
 
-                    <label class="block text-gray-700 font-semibold mt-2">Stream</label>
-                    <input type="text" name="stream" value="{{ stream }}" class="w-full p-2 border rounded-lg">
-                
-                    <!-- Institution Selection - FIXED -->
-<div class="mb-4">
-    <label for="institution" class="block text-gray-700 font-semibold mb-2">Institution *</label>
-    <select name="institution" id="institution" class="w-full p-2 border rounded-lg" required>
-        <option value="">Select Your Institution</option>
-        {% for inst in institutions %}
-            <option value="{{ inst.name }}" 
-                {% if institution == inst.name %}selected{% endif %}>
-                {{ inst.name }}
-            </option>
-        {% endfor %}
-        <option value="Other" 
-            {% if institution == 'Other' or (institution and institution not in institutions|map(attribute='name')) %}selected{% endif %}>
-            Other
-        </option>
-    </select>
-</div>
+                    <label class="block text-gray-700 font-semibold mt-3">Government / Private *</label>
+                    <select name="govt_private" id="govt_private_select" class="w-full p-2 border rounded-lg">
+                        <option value="">Select Type</option>
+                        <option value="Government" {% if govt_private == 'Government' %}selected{% endif %}>Government</option>
+                        <option value="Private" {% if govt_private == 'Private' %}selected{% endif %}>Private</option>
+                        <option value="Semi-Government" {% if govt_private == 'Semi-Government' %}selected{% endif %}>Semi-Government</option>
+                        <option value="Aided" {% if govt_private == 'Aided' %}selected{% endif %}>Aided</option>
+                        <option value="Autonomous" {% if govt_private == 'Autonomous' %}selected{% endif %}>Autonomous</option>
+                        <option value="Other" {% if govt_private and govt_private not in ['Government', 'Private', 'Semi-Government', 'Aided', 'Autonomous'] %}selected{% endif %}>Other</option>
+                    </select>
 
-<div class="mb-4" id="other_institution_field" 
-     style="display: {% if institution == 'Other' or (institution and institution not in institutions|map(attribute='name')) %}block{% else %}none{% endif %};">
-    <label for="other_institution_name" class="block text-gray-700 font-semibold mb-2">Specify Your Institution</label>
-    <input type="text" name="other_institution_name" id="other_institution_name" 
-           class="w-full p-2 border rounded-lg"
-           placeholder="Enter your institution name"
-           value="{% if institution == 'Other' or (institution and institution not in institutions|map(attribute='name')) %}{{ institution }}{% endif %}">
-</div>
+                    <!-- Other Govt/Private Field -->
+                    <div id="other_govt_private_field" class="mt-2" style="display: {% if govt_private and govt_private not in ['Government', 'Private', 'Semi-Government', 'Aided', 'Autonomous', ''] %}block{% else %}none{% endif %};">
+                        <input type="text" name="other_govt_private" id="other_govt_private" class="w-full p-2 border rounded-lg" placeholder="Specify institution type" value="{% if govt_private and govt_private not in ['Government', 'Private', 'Semi-Government', 'Aided', 'Autonomous', ''] %}{{ govt_private }}{% endif %}">
+                    </div>
+
+                    <label class="block text-gray-700 font-semibold mt-3">Stream *</label>
+                    <select name="stream" id="stream_select" class="w-full p-2 border rounded-lg">
+                        <option value="">Select Stream</option>
+                        <option value="Science" {% if stream == 'Science' %}selected{% endif %}>Science</option>
+                        <option value="Commerce" {% if stream == 'Commerce' %}selected{% endif %}>Commerce</option>
+                        <option value="Arts" {% if stream == 'Arts' %}selected{% endif %}>Arts/Humanities</option>
+                        <option value="Engineering" {% if stream == 'Engineering' %}selected{% endif %}>Engineering</option>
+                        <option value="Medical" {% if stream == 'Medical' %}selected{% endif %}>Medical</option>
+                        <option value="Law" {% if stream == 'Law' %}selected{% endif %}>Law</option>
+                        <option value="Management" {% if stream == 'Management' %}selected{% endif %}>Management</option>
+                        <option value="Computer Science" {% if stream == 'Computer Science' %}selected{% endif %}>Computer Science</option>
+                        <option value="Other" {% if stream and stream not in ['Science', 'Commerce', 'Arts', 'Engineering', 'Medical', 'Law', 'Management', 'Computer Science'] %}selected{% endif %}>Other</option>
+                    </select>
+
+                    <!-- Other Stream Field -->
+                    <div id="other_stream_field" class="mt-2" style="display: {% if stream and stream not in ['Science', 'Commerce', 'Arts', 'Engineering', 'Medical', 'Law', 'Management', 'Computer Science', ''] %}block{% else %}none{% endif %};">
+                        <input type="text" name="other_stream" id="other_stream" class="w-full p-2 border rounded-lg" placeholder="Specify your stream" value="{% if stream and stream not in ['Science', 'Commerce', 'Arts', 'Engineering', 'Medical', 'Law', 'Management', 'Computer Science', ''] %}{{ stream }}{% endif %}">
+                    </div>
                 
-                
-                
+                    <!-- Institution Selection -->
+                    <div class="mt-3">
+                        <label for="institution" class="block text-gray-700 font-semibold mb-2">Institution *</label>
+                        <select name="institution" id="institution" class="w-full p-2 border rounded-lg" required>
+                            <option value="">Select Your Institution</option>
+                            {% for inst in institutions %}
+                                <option value="{{ inst.name }}" {% if institution == inst.name %}selected{% endif %}>{{ inst.name }}</option>
+                            {% endfor %}
+                            <option value="Other" {% if institution == 'Other' or (institution and institution not in institutions|map(attribute='name')) %}selected{% endif %}>Other</option>
+                        </select>
+                    </div>
+
+                    <div class="mt-3" id="other_institution_field" style="display: {% if institution == 'Other' or (institution and institution not in institutions|map(attribute='name')) %}block{% else %}none{% endif %};">
+                        <label for="other_institution_name" class="block text-gray-700 font-semibold mb-2">Specify Your Institution</label>
+                        <input type="text" name="other_institution_name" id="other_institution_name" class="w-full p-2 border rounded-lg" placeholder="Enter your institution name" value="{% if institution == 'Other' or (institution and institution not in institutions|map(attribute='name')) %}{{ institution }}{% endif %}">
+                    </div>
                 </div>
 
                 <div>
                     <label class="block text-gray-700 font-semibold">Class / Year</label>
-                    <input type="text" name="class_year" value="{{ class_year }}" class="w-full p-2 border rounded-lg">
+                    <input type="text" name="class_year" value="{{ class_year }}" class="w-full p-2 border rounded-lg" placeholder="e.g., 10th, 12th, 1st Year">
 
-                    <label class="block text-gray-700 font-semibold mt-2">Favourite Subject</label>
-                    <input type="text" name="favourite_subject" value="{{ favourite_subject }}" class="w-full p-2 border rounded-lg">
+                    <label class="block text-gray-700 font-semibold mt-3">Favourite Subject</label>
+                    <input type="text" name="favourite_subject" value="{{ favourite_subject }}" class="w-full p-2 border rounded-lg" placeholder="e.g., Mathematics, Physics">
 
-                    <label class="block text-gray-700 font-semibold mt-2">Goal / Future Aspiration</label>
-                    <textarea name="goal" class="w-full p-2 border rounded-lg" rows="2">{{ goal }}</textarea>
+                    <label class="block text-gray-700 font-semibold mt-3">Goal / Future Aspiration</label>
+                    <textarea name="goal" class="w-full p-2 border rounded-lg" rows="3" placeholder="What do you want to achieve?">{{ goal }}</textarea>
                 </div>
             </div>
         </div>
 
         <!-- Parent Info -->
         <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-            <h3 class="text-2xl font-semibold text-gray-700 mb-4">Parent’s Information</h3>
+            <h3 class="text-2xl font-semibold text-gray-700 mb-4">Parent's Information</h3>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                    <label class="block text-gray-700 font-semibold">Parent’s Name</label>
-                    <input type="text" name="parent_name" value="{{ parent_name }}" class="w-full p-2 border rounded-lg">
+                    <label class="block text-gray-700 font-semibold">Parent's Name</label>
+                    <input type="text" name="parent_name" value="{{ parent_name }}" class="w-full p-2 border rounded-lg" placeholder="Father's/Mother's Name">
                 </div>
                 <div>
-                    <label class="block text-gray-700 font-semibold">Parent’s Mobile Number</label>
-                    <input type="text" name="parent_mobile" value="{{ parent_mobile }}" class="w-full p-2 border rounded-lg">
+                    <label class="block text-gray-700 font-semibold">Parent's Mobile Number</label>
+                    <div class="flex gap-2">
+                        <input type="text" name="parent_country_code" list="country_codes" value="{{ parent_country_code or '+91' }}" class="w-24 p-2 border rounded-lg" placeholder="+91">
+                        <input type="tel" name="parent_mobile" value="{{ parent_mobile }}" class="flex-1 p-2 border rounded-lg" placeholder="Parent's mobile number" pattern="[0-9]{10}" maxlength="10">
+                    </div>
                 </div>
             </div>
         </div>
@@ -125,16 +164,16 @@
         <!-- Comments -->
         <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
             <h3 class="text-2xl font-semibold text-gray-700 mb-4">Comments about Programme</h3>
-            <textarea name="comments" class="w-full p-2 border rounded-lg" rows="4">{{ comments }}</textarea>
+            <textarea name="comments" class="w-full p-2 border rounded-lg" rows="4" placeholder="Any comments or expectations from the mentorship programme">{{ comments }}</textarea>
         </div>
 
         <!-- Terms Agreement -->
         <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
             <h3 class="text-2xl font-semibold text-gray-700 mb-4">Terms & Conditions</h3>
-            <select name="terms_agreement" class="w-full p-2 border rounded-lg">
-                <option value="Yes" {% if terms_agreement == "Yes" %}selected{% endif %}>Yes</option>
-                <option value="No" {% if terms_agreement == "No" %}selected{% endif %}>No</option>
-            </select>
+            <div class="flex items-center">
+                <input type="checkbox" id="terms_checkbox" name="terms_agreement" value="Yes" class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500" {% if terms_agreement == 'Yes' %}checked{% endif %} required>
+                <label for="terms_checkbox" class="ml-2 text-gray-700">I agree to the Terms & Conditions of the mentorship programme</label>
+            </div>
         </div>
 
         <!-- Submit Button -->
@@ -145,8 +184,62 @@
         </div>
     </form>
 </div>
+
 <script>
-    document.getElementById('institution').addEventListener('change', function() {
+// Datalist for country codes
+const countryCodesDatalist = `
+<datalist id="country_codes">
+    <option value="+91">India</option>
+    <option value="+1">USA/Canada</option>
+    <option value="+44">UK</option>
+    <option value="+971">UAE</option>
+    <option value="+966">Saudi Arabia</option>
+    <option value="+65">Singapore</option>
+    <option value="+61">Australia</option>
+    <option value="+49">Germany</option>
+    <option value="+33">France</option>
+    <option value="+81">Japan</option>
+    <option value="+86">China</option>
+    <option value="+92">Pakistan</option>
+    <option value="+880">Bangladesh</option>
+    <option value="+977">Nepal</option>
+    <option value="+94">Sri Lanka</option>
+    <option value="+60">Malaysia</option>
+    <option value="+63">Philippines</option>
+    <option value="+82">South Korea</option>
+    <option value="+39">Italy</option>
+    <option value="+34">Spain</option>
+    <option value="+7">Russia</option>
+    <option value="+55">Brazil</option>
+    <option value="+52">Mexico</option>
+    <option value="+27">South Africa</option>
+    <option value="+20">Egypt</option>
+    <option value="+234">Nigeria</option>
+    <option value="+254">Kenya</option>
+    <option value="+352">Luxembourg</option>
+    <option value="+32">Belgium</option>
+    <option value="+43">Austria</option>
+    <option value="+358">Finland</option>
+    <option value="+351">Portugal</option>
+    <option value="+30">Greece</option>
+</datalist>`;
+document.body.insertAdjacentHTML('beforeend', countryCodesDatalist);
+
+// Toggle WhatsApp field based on checkbox
+document.getElementById('same_as_whatsapp').addEventListener('change', function() {
+    const whatsappField = document.getElementById('whatsapp_field');
+    const whatsappInput = document.getElementById('whatsapp_number_input');
+    
+    if (this.checked) {
+        whatsappField.style.display = 'none';
+        whatsappInput.removeAttribute('required');
+    } else {
+        whatsappField.style.display = 'block';
+    }
+});
+
+// Institution dropdown handler
+document.getElementById('institution').addEventListener('change', function() {
     const otherField = document.getElementById('other_institution_field');
     if (this.value === 'Other') {
         otherField.style.display = 'block';
@@ -157,14 +250,39 @@
     }
 });
 
+// Government/Private dropdown handler
+document.getElementById('govt_private_select').addEventListener('change', function() {
+    const otherField = document.getElementById('other_govt_private_field');
+    if (this.value === 'Other') {
+        otherField.style.display = 'block';
+        document.getElementById('other_govt_private').required = true;
+    } else {
+        otherField.style.display = 'none';
+        document.getElementById('other_govt_private').required = false;
+    }
+});
+
+// Stream dropdown handler
+document.getElementById('stream_select').addEventListener('change', function() {
+    const otherField = document.getElementById('other_stream_field');
+    if (this.value === 'Other') {
+        otherField.style.display = 'block';
+        document.getElementById('other_stream').required = true;
+    } else {
+        otherField.style.display = 'none';
+        document.getElementById('other_stream').required = false;
+    }
+});
+
 // Form validation function for mentee
 function validateMenteeForm() {
     const form = document.getElementById('menteeProfileForm');
+    const sameAsWhatsapp = document.getElementById('same_as_whatsapp').checked;
+    
     const requiredFields = [
         { name: 'dob', label: 'Date of Birth' },
         { name: 'school_college_name', label: 'School / College Name' },
         { name: 'mobile_number', label: 'Mobile Number' },
-        { name: 'whatsapp_number', label: 'WhatsApp Number' },
         { name: 'govt_private', label: 'Government / Private' },
         { name: 'stream', label: 'Stream' },
         { name: 'class_year', label: 'Class / Year' },
@@ -172,9 +290,38 @@ function validateMenteeForm() {
         { name: 'goal', label: 'Goal' },
         { name: 'parent_name', label: 'Parent Name' },
         { name: 'parent_mobile', label: 'Parent Mobile' },
-        { name: 'comments', label: 'Comments' },
-        { name: 'terms_agreement', label: 'Terms Agreement' }
+        { name: 'comments', label: 'Comments' }
     ];
+
+    // Check if "Other" is selected and validate the other fields
+    const govtPrivateSelect = document.getElementById('govt_private_select');
+    if (govtPrivateSelect && govtPrivateSelect.value === 'Other') {
+        const otherGovtPrivate = document.getElementById('other_govt_private');
+        if (!otherGovtPrivate.value.trim()) {
+            requiredFields.push({ name: 'other_govt_private', label: 'Specify Institution Type' });
+        }
+    }
+
+    const streamSelect = document.getElementById('stream_select');
+    if (streamSelect && streamSelect.value === 'Other') {
+        const otherStream = document.getElementById('other_stream');
+        if (!otherStream.value.trim()) {
+            requiredFields.push({ name: 'other_stream', label: 'Specify Stream' });
+        }
+    }
+
+    const institutionSelect = document.getElementById('institution');
+    if (institutionSelect && institutionSelect.value === 'Other') {
+        const otherInstitution = document.getElementById('other_institution_name');
+        if (!otherInstitution.value.trim()) {
+            requiredFields.push({ name: 'other_institution_name', label: 'Specify Institution' });
+        }
+    }
+
+    // Add WhatsApp to required fields only if checkbox is not checked
+    if (!sameAsWhatsapp) {
+        requiredFields.push({ name: 'whatsapp_number', label: 'WhatsApp Number' });
+    }
 
     let emptyFields = [];
 
@@ -203,6 +350,15 @@ function validateMenteeForm() {
             element.style.borderWidth = '';
         }
     });
+
+    // Check terms agreement
+    const termsCheckbox = document.getElementById('terms_checkbox');
+    if (!termsCheckbox.checked) {
+        emptyFields.push('Terms & Conditions Agreement');
+        termsCheckbox.style.outline = '2px solid #ef4444';
+    } else {
+        termsCheckbox.style.outline = '';
+    }
 
     if (emptyFields.length > 0) {
         alert('❌ Please fill all mandatory fields:\n\n' + emptyFields.join('\n'));
