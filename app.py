@@ -5033,6 +5033,12 @@ def create_meeting_ajax():
 
     # Calculate start and end datetime
     start_datetime = dt.datetime.strptime(f"{date} {start_time}", "%Y-%m-%d %H:%M")
+    
+    # ✅ VALIDATION: Check if meeting date/time is in the past
+    current_datetime = dt.datetime.now()
+    if start_datetime <= current_datetime:
+        return jsonify({"error": "Cannot create meeting for past or current date/time. Please select a future date and time."}), 400
+    
     end_datetime = start_datetime + dt.timedelta(minutes=int(duration))
 
     start_str = start_datetime.isoformat()

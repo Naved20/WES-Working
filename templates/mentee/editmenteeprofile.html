@@ -59,7 +59,7 @@
                     <label class="block text-gray-700 font-semibold">Mobile Number *</label>
                     <div class="flex gap-2">
                         <input type="text" name="mobile_country_code" list="country_codes" value="{{ mobile_country_code or '+91' }}" class="w-24 p-2 border rounded-lg" placeholder="+91">
-                        <input type="tel" name="mobile_number" value="{{ mobile_number }}" class="flex-1 p-2 border rounded-lg" placeholder="Enter mobile number" pattern="[0-9]{10}" maxlength="10">
+                        <input type="tel" name="mobile_number" value="{{ mobile_number }}" class="flex-1 p-2 border rounded-lg" placeholder="Enter mobile number">
                     </div>
 
                     <!-- Same as WhatsApp Checkbox -->
@@ -73,7 +73,7 @@
                         <label class="block text-gray-700 font-semibold">WhatsApp Number</label>
                         <div class="flex gap-2">
                             <input type="text" name="whatsapp_country_code" list="country_codes" value="{{ whatsapp_country_code or '+91' }}" class="w-24 p-2 border rounded-lg" placeholder="+91">
-                            <input type="tel" name="whatsapp_number" id="whatsapp_number_input" value="{{ whatsapp_number }}" class="flex-1 p-2 border rounded-lg" placeholder="Enter WhatsApp number" pattern="[0-9]{10}" maxlength="10">
+                            <input type="tel" name="whatsapp_number" id="whatsapp_number_input" value="{{ whatsapp_number }}" class="flex-1 p-2 border rounded-lg" placeholder="Enter WhatsApp number">
                         </div>
                     </div>
 
@@ -155,7 +155,7 @@
                     <label class="block text-gray-700 font-semibold">Parent's Mobile Number</label>
                     <div class="flex gap-2">
                         <input type="text" name="parent_country_code" list="country_codes" value="{{ parent_country_code or '+91' }}" class="w-24 p-2 border rounded-lg" placeholder="+91">
-                        <input type="tel" name="parent_mobile" value="{{ parent_mobile }}" class="flex-1 p-2 border rounded-lg" placeholder="Parent's mobile number" pattern="[0-9]{10}" maxlength="10">
+                        <input type="tel" name="parent_mobile" value="{{ parent_mobile }}" class="flex-1 p-2 border rounded-lg" placeholder="Parent's mobile number">
                     </div>
                 </div>
             </div>
