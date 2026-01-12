@@ -22,7 +22,7 @@ from flask_migrate import Migrate
 # PRODUCTION CONFIGURATION
 # ============================================================
 # Set to True for production, False for local development
-PRODUCTION = False  # Change to True when deploying to production
+PRODUCTION = True  # Change to False for local development
 
 app = Flask(__name__)
 
