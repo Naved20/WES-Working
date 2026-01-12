@@ -18,9 +18,21 @@ import datetime as dt
 from flask_migrate import Migrate
 
 
+# ============================================================
+# PRODUCTION CONFIGURATION
+# ============================================================
+# Set to True for production, False for local development
+PRODUCTION = False  # Change to True when deploying to production
 
 app = Flask(__name__)
-app.secret_key = "1234"
+
+# Secret key - USE A STRONG RANDOM KEY IN PRODUCTION!
+# Generate with: python -c "import secrets; print(secrets.token_hex(32))"
+if PRODUCTION:
+    app.secret_key = os.environ.get("SECRET_KEY", "your-production-secret-key-change-this")
+else:
+    app.secret_key = "1234"  # Only for local development
+
 app.permanent_session_lifetime = timedelta(days=10)
 
 # Image upload configuration
@@ -45,9 +57,19 @@ def load_user(user_id):
     return User.query.get(int(user_id))
 
 
-# ----------config---------- 
-os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"  # ONLY for local dev (http). Remove in production.
-CLIENT_SECRETS_FILE = "client_secret.json"
+# ============================================================
+# GOOGLE OAUTH CONFIGURATION
+# ============================================================
+if PRODUCTION:
+    # Production settings - HTTPS required
+    # Remove OAUTHLIB_INSECURE_TRANSPORT in production
+    CLIENT_SECRETS_FILE = "client_secret.json"
+    REDIRECT_URI = "https://yourdomain.com/callback"  # Change to your production domain
+else:
+    # Development settings - HTTP allowed
+    os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"  # ONLY for local dev (http)
+    CLIENT_SECRETS_FILE = "client_secret.json"
+    REDIRECT_URI = "http://127.0.0.1:5000/callback"
 
 # Scopes for Google OAuth Login (user info only)
 LOGIN_SCOPES = [
@@ -64,8 +86,6 @@ CALENDAR_SCOPES = [
 # Combined scopes (for backward compatibility)
 SCOPES = LOGIN_SCOPES
 
-REDIRECT_URI = "http://127.0.0.1:5000/callback"
-
 
 
 #--------------User_type Code------------------------
@@ -73,7 +93,17 @@ REDIRECT_URI = "http://127.0.0.1:5000/callback"
 # -------------mentor = "1"--------------------------
 # -------------mantee = "2"--------------------------
 
-app.config["SQLALCHEMY_DATABASE_URI"] ="sqlite:///mentors_connect.db"
+# ============================================================
+# DATABASE CONFIGURATION
+# ============================================================
+if PRODUCTION:
+    # Production database - Use PostgreSQL or MySQL
+    # Example: app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("DATABASE_URL")
+    # For now, using SQLite (not recommended for production with multiple workers)
+    app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("DATABASE_URL", "sqlite:///mentors_connect.db")
+else:
+    app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///mentors_connect.db"
+
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 db = SQLAlchemy(app)
@@ -5200,4 +5230,9 @@ def create_sample_institutions():
     db.session.commit()
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    if PRODUCTION:
+        # Production mode - don't use debug, use a proper WSGI server
+        app.run(debug=False, host="0.0.0.0", port=5000)
+    else:
+        # Development mode
+        app.run(debug=True)
