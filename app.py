@@ -64,7 +64,7 @@ if PRODUCTION:
     # Production settings - HTTPS required
     # Remove OAUTHLIB_INSECURE_TRANSPORT in production
     CLIENT_SECRETS_FILE = "client_secret.json"
-    REDIRECT_URI = "https://yourdomain.com/callback"  # Change to your production domain
+    REDIRECT_URI = "https://mentorship.weslux.lu/callback"
 else:
     # Development settings - HTTP allowed
     os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"  # ONLY for local dev (http)
@@ -773,6 +773,7 @@ def signup():
         session["email"] = email
         session["user_type"] = user_type
         session["user_id"] = new_user.id
+        session["user_name"] = name
 
         # Redirect to profile completion (mandatory)
         if user_type == "1":
@@ -819,6 +820,7 @@ def signin():
         session["email"] = user.email
         session["user_type"] = user.user_type
         session["user_id"] = user.id
+        session["user_name"] = user.name
 
         # Redirect based on role
         if user.user_type == "1":
@@ -964,6 +966,7 @@ def callback():
             session["email"] = user.email
             session["user_type"] = user.user_type
             session["user_id"] = user.id
+            session["user_name"] = user.name
             print(f"   ✅ Session set")
             print(f"      Email: {session.get('email')}")
             print(f"      Type: {session.get('user_type')}")
@@ -1016,6 +1019,7 @@ def callback():
             session["email"] = email
             session["user_id"] = new_user.id
             session["oauth_user"] = True
+            session["user_name"] = new_user.name
             print(f"   ✅ Session set")
             print(f"      Email: {session.get('email')}")
             print(f"      ID: {session.get('user_id')}")
@@ -1087,6 +1091,7 @@ def select_user_type():
         session.permanent = True
         session["user_type"] = user_type
         session["user_id"] = user.id
+        session["user_name"] = user.name
         
         print(f"📝 Session updated - Type: {session.get('user_type')}, ID: {session.get('user_id')}")
         
