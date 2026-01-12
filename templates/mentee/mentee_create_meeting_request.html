@@ -58,6 +58,15 @@ async function createMeeting() {
     return;
   }
 
+  // ✅ Validate that meeting date/time is in the future
+  const meetingDateTime = new Date(`${date}T${start_time}`);
+  const now = new Date();
+  
+  if (meetingDateTime <= now) {
+    Swal.fire("Error", "Cannot create meeting for past or current date/time. Please select a future date and time.", "error");
+    return;
+  }
+
   // 🌀 Show loading state
   Swal.fire({
     title: "Creating Meeting...",
@@ -98,6 +107,13 @@ async function createMeeting() {
     console.error(error);
   }
 }
+
+// Set minimum date to today
+document.addEventListener('DOMContentLoaded', function() {
+  const dateInput = document.getElementById('date');
+  const today = new Date().toISOString().split('T')[0];
+  dateInput.min = today;
+});
 </script>
 
 {% endblock %}
