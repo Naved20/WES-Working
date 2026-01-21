@@ -4,16 +4,23 @@
 {% block user %}Mentee Profile{% endblock %}
 
 {% block Sidebar %}
-
     <a href="{{ url_for('profile')}}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">👤 My Profile</a>
     <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">⚙️ Settings</a>
     <a href="{{ url_for('logout')}}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">🚪 Sign out</a>
-
 {% endblock %}
-
 
 {% block content %}
 <div class="max-w-4xl mx-auto mt-8 p-6 bg-gray-50 rounded-lg shadow-lg">
+    <!-- Back Button -->
+    <div class="mb-6">
+        <a href="{{ url_for('menteedashboard') }}" class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-medium">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+            </svg>
+            Back to Dashboard
+        </a>
+    </div>
+    
     <!-- Back Button for Institution Admin -->
     {% if session.get('user_type') == '3' %}
     <div class="mb-6">
@@ -43,8 +50,9 @@
         <div class="text-center md:text-left flex-1">
             <h2 class="text-3xl font-bold text-gray-800">{{ full_name }}</h2>
             <p class="text-gray-600 mt-1">{{ email }}</p>
-            <p class="text-gray-500 mt-2"><strong>Date of Birth:</strong> {{ dob }}</p>
-            <p class="text-gray-500"><strong>School/College:</strong> {{ school_college_name }}</p>
+            {% if age %}
+            <p class="text-gray-500 mt-2"><strong>Age:</strong> {{ age }}</p>
+            {% endif %}
             <div class="mt-4">
                 <a href="{{ url_for('editmenteeprofile') }}" class="inline-flex items-center px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition">
                     <i class="fas fa-edit mr-2"></i>
@@ -54,82 +62,134 @@
         </div>
     </div>
 
-    <!-- Institution Profile Picture and Name -->
-    {% if institution %}
-    <div class="flex items-center space-x-4 mb-8">
-        <div class="flex-shrink-0">
-            {% if institution_profile_picture %}
-            <img src="{{ url_for('static', filename='uploads/' + institution_profile_picture) }}" alt="Institution Logo" class="w-20 h-20 object-cover rounded-full shadow-md border-2 border-gray-200">
-            {% else %}
-            <div class="w-20 h-20 flex items-center justify-center bg-gray-50 text-gray-400 rounded-full text-md font-semibold border-2 border-gray-200">
-                <i class="fas fa-building text-2xl text-gray-400"></i>
-            </div>
+    <!-- Who am I Badge -->
+    {% if who_am_i %}
+    <div class="bg-gradient-to-r from-blue-500 to-blue-600 p-4 rounded-lg shadow-md mb-6">
+        <p class="text-white text-center text-lg font-semibold">
+            {% if who_am_i == 'school_student' %}🎒 School Student
+            {% elif who_am_i == 'university_student' %}🎓 University Student
+            {% elif who_am_i == 'seeking_internship' %}💼 Seeking Student Job / Internship
+            {% elif who_am_i == 'young_professional' %}👔 Young Professional
+            {% elif who_am_i == 'exploring' %}🔍 Exploring, Still Unsure
             {% endif %}
-        </div>
-        <div>
-            <h3 class="text-xl font-semibold text-gray-700">{{ institution }}</h3>
-            <p class="text-gray-500">Associated Institution</p>
+        </p>
+    </div>
+    {% endif %}
+
+    <!-- SCHOOL STUDENT DETAILS -->
+    {% if who_am_i == 'school_student' %}
+    <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200 mb-6">
+        <h3 class="text-2xl font-semibold text-gray-700 mb-4">School Details</h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {% if school_name %}<p class="text-gray-600"><span class="font-semibold">School Name:</span> {{ school_name }}</p>{% endif %}
+            {% if class_year %}<p class="text-gray-600"><span class="font-semibold">Class/Grade:</span> {{ class_year }}</p>{% endif %}
+            {% if school_board %}<p class="text-gray-600"><span class="font-semibold">Board:</span> {{ school_board }}</p>{% endif %}
+            {% if course_stream %}<p class="text-gray-600"><span class="font-semibold">Stream:</span> {{ course_stream }}</p>{% endif %}
+            {% if favourite_subject %}<p class="text-gray-600"><span class="font-semibold">Favourite Subject:</span> {{ favourite_subject }}</p>{% endif %}
+            {% if career_interest %}<p class="text-gray-600"><span class="font-semibold">Career Interest:</span> {{ career_interest }}</p>{% endif %}
         </div>
     </div>
     {% endif %}
 
-    <!-- Profile Details -->
-    <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-        <h3 class="text-2xl font-semibold text-gray-700 mb-4">Profile Details</h3>
+    <!-- UNIVERSITY STUDENT DETAILS -->
+    {% if who_am_i == 'university_student' %}
+    <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200 mb-6">
+        <h3 class="text-2xl font-semibold text-gray-700 mb-4">University Details</h3>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-                <p class="text-gray-600">
-                    <span class="font-semibold">Mobile Number:</span> 
-                    <span class="inline-flex items-center">
-                        <span class="bg-gray-100 px-2 py-1 rounded text-sm mr-1">{{ mobile_country_code or '+91' }}</span>
-                        {{ mobile_number }}
-                    </span>
-                </p>
-                <p class="text-gray-600 mt-2">
-                    <span class="font-semibold">WhatsApp Number:</span> 
-                    {% if same_as_whatsapp == 'yes' or mobile_number == whatsapp_number %}
-                        <span class="text-green-600">Same as Mobile</span>
-                    {% else %}
-                        <span class="inline-flex items-center">
-                            <span class="bg-gray-100 px-2 py-1 rounded text-sm mr-1">{{ whatsapp_country_code or '+91' }}</span>
-                            {{ whatsapp_number }}
-                        </span>
-                    {% endif %}
-                </p>
-                <p class="text-gray-600 mt-2"><span class="font-semibold">Government/Private:</span> {{ govt_private }}</p>
-                <p class="text-gray-600 mt-2"><span class="font-semibold">Stream:</span> {{ stream }}</p>
-            </div>
-            <div>
-                <p class="text-gray-600"><span class="font-semibold">Class / Year:</span> {{ class_year }}</p>
-                <p class="text-gray-600 mt-2"><span class="font-semibold">Favourite Subject:</span> {{ favourite_subject }}</p>
-                <p class="text-gray-600 mt-2"><span class="font-semibold">Goal / Future Aspiration:</span> {{ goal }}</p>
-            </div>
+            {% if institution_name %}<p class="text-gray-600"><span class="font-semibold">University/College:</span> {{ institution_name }}</p>{% endif %}
+            {% if education_level %}<p class="text-gray-600"><span class="font-semibold">Degree Level:</span> {{ education_level }}</p>{% endif %}
+            {% if course_stream %}<p class="text-gray-600"><span class="font-semibold">Course/Major:</span> {{ course_stream }}</p>{% endif %}
+            {% if class_year %}<p class="text-gray-600"><span class="font-semibold">Year/Semester:</span> {{ class_year }}</p>{% endif %}
+            {% if favourite_subject %}<p class="text-gray-600"><span class="font-semibold">Area of Interest:</span> {{ favourite_subject }}</p>{% endif %}
+            {% if career_interest %}<p class="text-gray-600"><span class="font-semibold">Career Goal:</span> {{ career_interest }}</p>{% endif %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- SEEKING INTERNSHIP DETAILS -->
+    {% if who_am_i == 'seeking_internship' %}
+    <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200 mb-6">
+        <h3 class="text-2xl font-semibold text-gray-700 mb-4">Education & Career Details</h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {% if education_level %}<p class="text-gray-600"><span class="font-semibold">Education Status:</span> {{ education_level }}</p>{% endif %}
+            {% if course_stream %}<p class="text-gray-600"><span class="font-semibold">Qualification:</span> {{ course_stream }}</p>{% endif %}
+            {% if institution_name %}<p class="text-gray-600"><span class="font-semibold">Institution:</span> {{ institution_name }}</p>{% endif %}
+            {% if career_interest %}<p class="text-gray-600"><span class="font-semibold">Field of Interest:</span> {{ career_interest }}</p>{% endif %}
+            {% if key_skills %}<p class="text-gray-600"><span class="font-semibold">Key Skills:</span> {{ key_skills }}</p>{% endif %}
+            {% if career_goal %}<p class="text-gray-600"><span class="font-semibold">Opportunity Seeking:</span> {{ career_goal }}</p>{% endif %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- YOUNG PROFESSIONAL DETAILS -->
+    {% if who_am_i == 'young_professional' %}
+    <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200 mb-6">
+        <h3 class="text-2xl font-semibold text-gray-700 mb-4">Professional Details</h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {% if current_role %}<p class="text-gray-600"><span class="font-semibold">Current Role:</span> {{ current_role }}</p>{% endif %}
+            {% if industry %}<p class="text-gray-600"><span class="font-semibold">Industry/Domain:</span> {{ industry }}</p>{% endif %}
+            {% if years_experience %}<p class="text-gray-600"><span class="font-semibold">Years of Experience:</span> {{ years_experience }}</p>{% endif %}
+            {% if current_organization %}<p class="text-gray-600"><span class="font-semibold">Current Organization:</span> {{ current_organization }}</p>{% endif %}
+            {% if key_skills %}<p class="text-gray-600"><span class="font-semibold">Key Skills:</span> {{ key_skills }}</p>{% endif %}
+            {% if career_goal %}<p class="text-gray-600"><span class="font-semibold">Career Goal:</span> {{ career_goal }}</p>{% endif %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- EXPLORING DETAILS -->
+    {% if who_am_i == 'exploring' %}
+    <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200 mb-6">
+        <h3 class="text-2xl font-semibold text-gray-700 mb-4">About You</h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {% if education_level %}<p class="text-gray-600"><span class="font-semibold">Current Status:</span> {{ education_level }}</p>{% endif %}
+            {% if last_role %}<p class="text-gray-600"><span class="font-semibold">Last Education/Role:</span> {{ last_role }}</p>{% endif %}
+            {% if career_interest %}<p class="text-gray-600"><span class="font-semibold">Areas of Interest:</span> {{ career_interest }}</p>{% endif %}
+            {% if support_expected %}<p class="text-gray-600"><span class="font-semibold">Support Needed:</span> {{ support_expected }}</p>{% endif %}
+        </div>
+        {% if restart_field %}
+        <div class="mt-4">
+            <p class="text-gray-600"><span class="font-semibold">What I'm Exploring:</span></p>
+            <p class="text-gray-600 mt-2 bg-gray-50 p-3 rounded">{{ restart_field }}</p>
+        </div>
+        {% endif %}
+    </div>
+    {% endif %}
+
+    <!-- Contact Information -->
+    <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200 mb-6">
+        <h3 class="text-2xl font-semibold text-gray-700 mb-4">Contact Information</h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {% if mobile_number %}
+            <p class="text-gray-600">
+                <span class="font-semibold">Mobile Number:</span> 
+                <span class="inline-flex items-center">
+                    <span class="bg-gray-100 px-2 py-1 rounded text-sm mr-1">{{ mobile_country_code or '+91' }}</span>
+                    {{ mobile_number }}
+                </span>
+            </p>
+            {% endif %}
+            {% if whatsapp_number %}
+            <p class="text-gray-600">
+                <span class="font-semibold">WhatsApp Number:</span> 
+                <span class="inline-flex items-center">
+                    <span class="bg-gray-100 px-2 py-1 rounded text-sm mr-1">{{ whatsapp_country_code or '+91' }}</span>
+                    {{ whatsapp_number }}
+                </span>
+            </p>
+            {% endif %}
         </div>
     </div>
 
-    <!-- Parents Info -->
-    <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200 mt-6">
-        <h3 class="text-2xl font-semibold text-gray-700 mb-4">Parent's Information</h3>
-        <p class="text-gray-600"><span class="font-semibold">Father's/Mother's Name:</span> {{ parent_name }}</p>
-        <p class="text-gray-600 mt-2">
-            <span class="font-semibold">Father's/Mother's Mobile Number:</span> 
-            <span class="inline-flex items-center">
-                <span class="bg-gray-100 px-2 py-1 rounded text-sm mr-1">{{ parent_country_code or '+91' }}</span>
-                {{ parent_mobile }}
-            </span>
-        </p>
-    </div>
-
-    <!-- Comments -->
-    {% if comments %}
-    <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200 mt-6">
-        <h3 class="text-2xl font-semibold text-gray-700 mb-4">Comments about Programme</h3>
-        <p class="text-gray-600">{{ comments }}</p>
+    <!-- Mentorship Expectations -->
+    {% if mentorship_expectations %}
+    <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200 mb-6">
+        <h3 class="text-2xl font-semibold text-gray-700 mb-4">My Expectations from Mentorship</h3>
+        <p class="text-gray-600 bg-gray-50 p-4 rounded">{{ mentorship_expectations }}</p>
     </div>
     {% endif %}
 
     <!-- Terms Agreement -->
-    <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200 mt-6">
+    <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200 mb-6">
         <h3 class="text-2xl font-semibold text-gray-700 mb-4">Terms & Conditions</h3>
         <p class="text-gray-600">
             <span class="font-semibold">Agreed:</span> 

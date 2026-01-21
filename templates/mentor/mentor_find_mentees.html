@@ -126,19 +126,53 @@
 <button 
     class="view-profile-btn w-full px-4 py-2 bg-gray-100 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-200 transition"
     data-mentee='{{ {
-        "name": mentee.user.name,
-        "stream": mentee.stream,
-        "school": mentee.school_college_name,
-        "goal": mentee.goal,
-        "dob": mentee.dob,
-        "mobileNumber": mentee.mobile_number,
-        "whatsappNumber": mentee.whatsapp_number,
-        "parentName": mentee.parent_name,
-        "parentMobile": mentee.parent_mobile,
-        "comments": mentee.comments,
-        "profilePic": mentee.profile_picture,
-        "classYear": mentee.class_year,
-        "favouriteSubject": mentee.favourite_subject
+        "name": mentee.user.name or "",
+        "stream": mentee.stream or "",
+        "school": mentee.school_college_name or "",
+        "goal": mentee.goal or "",
+        "whoAmI": mentee.who_am_i or "",
+        "profilePic": mentee.profile_picture or "",
+        "dob": mentee.dob or "",
+        "fatherName": mentee.father_name or "",
+        "addressLine1": mentee.address_line1 or "",
+        "addressLine2": mentee.address_line2 or "",
+        "city": mentee.city or "",
+        "state": mentee.state or "",
+        "postalCode": mentee.postal_code or "",
+        "country": mentee.country or "",
+        "govtPrivate": mentee.govt_private or "",
+        "classYear": mentee.class_year or "",
+        "schoolName": mentee.school_name or "",
+        "schoolBoard": mentee.school_board or "",
+        "schoolPassingYear": mentee.school_passing_year or "",
+        "favouriteSubject": mentee.favourite_subject or "",
+        "educationLevel": mentee.education_level or "",
+        "institutionName": mentee.institution_name or "",
+        "boardUniversity": mentee.board_university or "",
+        "courseStream": mentee.course_stream or "",
+        "careerInterest": mentee.career_interest or "",
+        "keySkills": mentee.key_skills or "",
+        "currentRole": mentee.current_role or "",
+        "industry": mentee.industry or "",
+        "yearsExperience": mentee.years_experience or "",
+        "currentOrganization": mentee.current_organization or "",
+        "careerGoal": mentee.career_goal or "",
+        "startupStage": mentee.startup_stage or "",
+        "startupName": mentee.startup_name or "",
+        "startupIndustry": mentee.startup_industry or "",
+        "teamSize": mentee.team_size or "",
+        "mainChallenge": mentee.main_challenge or "",
+        "mentorshipType": mentee.mentorship_type or "",
+        "freelanceSkill": mentee.freelance_skill or "",
+        "freelanceExperience": mentee.freelance_experience or "",
+        "freelancePlatforms": mentee.freelance_platforms or "",
+        "freelanceChallenge": mentee.freelance_challenge or "",
+        "lastRole": mentee.last_role or "",
+        "careerBreakReason": mentee.career_break_reason or "",
+        "restartField": mentee.restart_field or "",
+        "supportExpected": mentee.support_expected or "",
+        "mentorshipExpectations": mentee.mentorship_expectations or "",
+        "comments": mentee.comments or ""
     }|tojson }}'>
     View Profile
 </button>
@@ -201,88 +235,405 @@
       </div>
 
       <!-- Details Grid -->
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-gray-700 mb-8">
-        <div class="space-y-4">
-          <div class="flex items-start">
-            <svg class="w-5 h-5 text-gray-400 mr-3 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                    d="M8 9a3 3 0 016 0v1a3 3 0 01-6 0V9z" />
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                    d="M12 14v7m0 0h4m-4 0H8" />
-            </svg>
-            <div>
-              <p class="font-medium text-gray-600">Date of Birth</p>
-              <p id="menteeModalDOB" class="text-gray-800"></p>
+      <div class="space-y-6 text-gray-700 mb-8">
+        <!-- Contact Information Section -->
+        <div id="contactInfoSection" style="display: none;">
+          <h4 class="font-semibold text-gray-800 mb-3 text-sm uppercase tracking-wide">📞 Contact Information</h4>
+          <div class="space-y-3">
+            <div class="flex items-start" id="dobSection" style="display: none;">
+              <svg class="w-5 h-5 text-gray-400 mr-3 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+              </svg>
+              <div>
+                <p class="font-medium text-gray-600">Date of Birth</p>
+                <p id="menteeModalDob" class="text-gray-800"></p>
+              </div>
             </div>
           </div>
-
-          <div class="flex items-start">
-            <svg class="w-5 h-5 text-gray-400 mr-3 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                    d="M12 14l9-5-9-5-9 5 9 5z"></path>
-            </svg>
-            <div>
-              <p class="font-medium text-gray-600">Class / Year</p>
-              <p id="menteeModalClass" class="text-gray-800"></p>
+        </div>
+        <!-- General Details Section -->
+        <div id="generalDetailsSection" style="display: none;">
+          <h4 class="font-semibold text-gray-800 mb-3 text-sm uppercase tracking-wide">📋 General Details</h4>
+          <div class="space-y-3">
+            <div class="flex items-start" id="fatherNameSection" style="display: none;">
+              <svg class="w-5 h-5 text-gray-400 mr-3 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+              </svg>
+              <div>
+                <p class="font-medium text-gray-600">Father's Name</p>
+                <p id="menteeModalFatherName" class="text-gray-800"></p>
+              </div>
             </div>
-          </div>
-
-          <div class="flex items-start">
-            <svg class="w-5 h-5 text-gray-400 mr-3 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M12 20h9"></path>
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M12 4h9M4 9h16M4 15h16"></path>
-            </svg>
-            <div>
-              <p class="font-medium text-gray-600">Favourite Subject</p>
-              <p id="menteeModalSubject" class="text-gray-800"></p>
+            <div class="flex items-start" id="addressSection" style="display: none;">
+              <svg class="w-5 h-5 text-gray-400 mr-3 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+              </svg>
+              <div>
+                <p class="font-medium text-gray-600">Address</p>
+                <p id="menteeModalAddress" class="text-gray-800"></p>
+              </div>
+            </div>
+            <div class="flex items-start" id="schoolCollegeSection" style="display: none;">
+              <svg class="w-5 h-5 text-gray-400 mr-3 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+              </svg>
+              <div>
+                <p class="font-medium text-gray-600">School/College Name</p>
+                <p id="menteeModalSchoolCollege" class="text-gray-800"></p>
+              </div>
+            </div>
+            <div class="flex items-start" id="govtPrivateSection" style="display: none;">
+              <svg class="w-5 h-5 text-gray-400 mr-3 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+              </svg>
+              <div>
+                <p class="font-medium text-gray-600">Institution Type</p>
+                <p id="menteeModalGovtPrivate" class="text-gray-800"></p>
+              </div>
+            </div>
+            <div class="flex items-start" id="classYearSection" style="display: none;">
+              <svg class="w-5 h-5 text-gray-400 mr-3 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+              </svg>
+              <div>
+                <p class="font-medium text-gray-600">Class/Year</p>
+                <p id="menteeModalClassYear" class="text-gray-800"></p>
+              </div>
             </div>
           </div>
         </div>
 
-        <div class="space-y-4">
+        <!-- Who Am I Section -->
+        <div id="whoAmISection" style="display: none;">
+          <h4 class="font-semibold text-gray-800 mb-3 text-sm uppercase tracking-wide">🎯 Who Am I</h4>
           <div class="flex items-start">
             <svg class="w-5 h-5 text-gray-400 mr-3 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M16 12a4 4 0 01-8 0V6a4 4 0 118 0v6zM12 14v7"></path>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
             </svg>
             <div>
-              <p class="font-medium text-gray-600">Parent Name</p>
-              <p id="menteeModalParentName" class="text-gray-800"></p>
+              <p class="font-medium text-gray-600">Category</p>
+              <p id="menteeModalWhoAmI" class="text-gray-800 capitalize"></p>
             </div>
           </div>
+        </div>
 
-          <div class="flex items-start">
-            <svg class="w-5 h-5 text-gray-400 mr-3 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"></path>
-            </svg>
-            <div>
-              <p class="font-medium text-gray-600">Parent Mobile</p>
-              <p id="menteeModalParentMobile" class="text-gray-800"></p>
+        <!-- School Student Section -->
+        <div id="schoolStudentSection" style="display: none;">
+          <h4 class="font-semibold text-gray-800 mb-3 text-sm uppercase tracking-wide">🎓 School Student</h4>
+          <div class="space-y-3">
+            <div class="flex items-start" id="schoolNameSection" style="display: none;">
+              <svg class="w-5 h-5 text-gray-400 mr-3 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+              </svg>
+              <div>
+                <p class="font-medium text-gray-600">School Name</p>
+                <p id="menteeModalSchoolName" class="text-gray-800"></p>
+              </div>
+            </div>
+            <div class="flex items-start" id="schoolBoardSection" style="display: none;">
+              <svg class="w-5 h-5 text-gray-400 mr-3 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+              </svg>
+              <div>
+                <p class="font-medium text-gray-600">Board</p>
+                <p id="menteeModalSchoolBoard" class="text-gray-800"></p>
+              </div>
+            </div>
+            <div class="flex items-start" id="schoolPassingYearSection" style="display: none;">
+              <svg class="w-5 h-5 text-gray-400 mr-3 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+              </svg>
+              <div>
+                <p class="font-medium text-gray-600">Passing Year</p>
+                <p id="menteeModalSchoolPassingYear" class="text-gray-800"></p>
+              </div>
+            </div>
+            <div class="flex items-start" id="favouriteSubjectSection" style="display: none;">
+              <svg class="w-5 h-5 text-gray-400 mr-3 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+              </svg>
+              <div>
+                <p class="font-medium text-gray-600">Favourite Subject</p>
+                <p id="menteeModalFavouriteSubject" class="text-gray-800"></p>
+              </div>
             </div>
           </div>
+        </div>
 
-          <div class="flex items-start">
-            <svg class="w-5 h-5 text-gray-400 mr-3 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M3 10h18M3 14h18M7 10v4m10-4v4"></path>
-            </svg>
-            <div>
-              <p class="font-medium text-gray-600">Mobile / WhatsApp</p>
-              <p id="menteeModalMobile" class="text-gray-800"></p>
+        <!-- University Student Section -->
+        <div id="universityStudentSection" style="display: none;">
+          <h4 class="font-semibold text-gray-800 mb-3 text-sm uppercase tracking-wide">🎓 University Student</h4>
+          <div class="space-y-3">
+            <div class="flex items-start" id="institutionNameSection" style="display: none;">
+              <svg class="w-5 h-5 text-gray-400 mr-3 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+              </svg>
+              <div>
+                <p class="font-medium text-gray-600">Institution</p>
+                <p id="menteeModalInstitutionName" class="text-gray-800"></p>
+              </div>
+            </div>
+            <div class="flex items-start" id="boardUniversitySection" style="display: none;">
+              <svg class="w-5 h-5 text-gray-400 mr-3 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+              </svg>
+              <div>
+                <p class="font-medium text-gray-600">University</p>
+                <p id="menteeModalBoardUniversity" class="text-gray-800"></p>
+              </div>
+            </div>
+            <div class="flex items-start" id="courseStreamSection" style="display: none;">
+              <svg class="w-5 h-5 text-gray-400 mr-3 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+              <div>
+                <p class="font-medium text-gray-600">Course / Stream</p>
+                <p id="menteeModalCourseStream" class="text-gray-800"></p>
+              </div>
+            </div>
+            <div class="flex items-start" id="educationLevelSection" style="display: none;">
+              <svg class="w-5 h-5 text-gray-400 mr-3 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"></path>
+              </svg>
+              <div>
+                <p class="font-medium text-gray-600">Education Level</p>
+                <p id="menteeModalEducationLevel" class="text-gray-800"></p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Seeking Internship Section -->
+        <div id="seekingInternshipSection" style="display: none;">
+          <h4 class="font-semibold text-gray-800 mb-3 text-sm uppercase tracking-wide">💼 Seeking Internship</h4>
+          <div class="space-y-3">
+            <div class="flex items-start" id="careerInterestSection" style="display: none;">
+              <svg class="w-5 h-5 text-gray-400 mr-3 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+              </svg>
+              <div>
+                <p class="font-medium text-gray-600">Career Interest</p>
+                <p id="menteeModalCareerInterest" class="text-gray-800"></p>
+              </div>
+            </div>
+            <div class="flex items-start" id="keySkillsSection" style="display: none;">
+              <svg class="w-5 h-5 text-gray-400 mr-3 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+              <div>
+                <p class="font-medium text-gray-600">Key Skills</p>
+                <p id="menteeModalKeySkills" class="text-gray-800"></p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Young Professional Section -->
+        <div id="youngProfessionalSection" style="display: none;">
+          <h4 class="font-semibold text-gray-800 mb-3 text-sm uppercase tracking-wide">💼 Young Professional</h4>
+          <div class="space-y-3">
+            <div class="flex items-start" id="currentRoleSection" style="display: none;">
+              <svg class="w-5 h-5 text-gray-400 mr-3 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-.5a2 2 0 00-2 2v2m0 0h-2.5a2 2 0 00-2 2v3.061h0z"></path>
+              </svg>
+              <div>
+                <p class="font-medium text-gray-600">Current Role</p>
+                <p id="menteeModalCurrentRole" class="text-gray-800"></p>
+              </div>
+            </div>
+            <div class="flex items-start" id="industrySection" style="display: none;">
+              <svg class="w-5 h-5 text-gray-400 mr-3 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+              </svg>
+              <div>
+                <p class="font-medium text-gray-600">Industry</p>
+                <p id="menteeModalIndustry" class="text-gray-800"></p>
+              </div>
+            </div>
+            <div class="flex items-start" id="yearsExperienceSection" style="display: none;">
+              <svg class="w-5 h-5 text-gray-400 mr-3 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+              </svg>
+              <div>
+                <p class="font-medium text-gray-600">Years of Experience</p>
+                <p id="menteeModalYearsExperience" class="text-gray-800"></p>
+              </div>
+            </div>
+            <div class="flex items-start" id="currentOrganizationSection" style="display: none;">
+              <svg class="w-5 h-5 text-gray-400 mr-3 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+              </svg>
+              <div>
+                <p class="font-medium text-gray-600">Current Organization</p>
+                <p id="menteeModalCurrentOrganization" class="text-gray-800"></p>
+              </div>
+            </div>
+            <div class="flex items-start" id="careerGoalSection" style="display: none;">
+              <svg class="w-5 h-5 text-gray-400 mr-3 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+              <div>
+                <p class="font-medium text-gray-600">Career Goal</p>
+                <p id="menteeModalCareerGoal" class="text-gray-800"></p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Exploring Section -->
+        <div id="exploringSection" style="display: none;">
+          <h4 class="font-semibold text-gray-800 mb-3 text-sm uppercase tracking-wide">🔍 Additional Information</h4>
+          <div class="space-y-3">
+            <div class="flex items-start" id="mentorshipTypeSection" style="display: none;">
+              <svg class="w-5 h-5 text-gray-400 mr-3 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+              <div>
+                <p class="font-medium text-gray-600">Mentorship Type</p>
+                <p id="menteeModalMentorshipType" class="text-gray-800"></p>
+              </div>
+            </div>
+            <div class="flex items-start" id="mainChallengeSection" style="display: none;">
+              <svg class="w-5 h-5 text-gray-400 mr-3 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+              <div>
+                <p class="font-medium text-gray-600">Main Challenge</p>
+                <p id="menteeModalMainChallenge" class="text-gray-800"></p>
+              </div>
+            </div>
+            <div class="flex items-start" id="startupNameSection" style="display: none;">
+              <svg class="w-5 h-5 text-gray-400 mr-3 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+              </svg>
+              <div>
+                <p class="font-medium text-gray-600">Startup Name</p>
+                <p id="menteeModalStartupName" class="text-gray-800"></p>
+              </div>
+            </div>
+            <div class="flex items-start" id="startupStageSection" style="display: none;">
+              <svg class="w-5 h-5 text-gray-400 mr-3 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+              <div>
+                <p class="font-medium text-gray-600">Startup Stage</p>
+                <p id="menteeModalStartupStage" class="text-gray-800"></p>
+              </div>
+            </div>
+            <div class="flex items-start" id="startupIndustrySection" style="display: none;">
+              <svg class="w-5 h-5 text-gray-400 mr-3 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+              </svg>
+              <div>
+                <p class="font-medium text-gray-600">Startup Industry</p>
+                <p id="menteeModalStartupIndustry" class="text-gray-800"></p>
+              </div>
+            </div>
+            <div class="flex items-start" id="teamSizeSection" style="display: none;">
+              <svg class="w-5 h-5 text-gray-400 mr-3 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+              </svg>
+              <div>
+                <p class="font-medium text-gray-600">Team Size</p>
+                <p id="menteeModalTeamSize" class="text-gray-800"></p>
+              </div>
+            </div>
+            <div class="flex items-start" id="freelanceSkillSection" style="display: none;">
+              <svg class="w-5 h-5 text-gray-400 mr-3 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+              <div>
+                <p class="font-medium text-gray-600">Freelance Skill</p>
+                <p id="menteeModalFreelanceSkill" class="text-gray-800"></p>
+              </div>
+            </div>
+            <div class="flex items-start" id="freelanceExperienceSection" style="display: none;">
+              <svg class="w-5 h-5 text-gray-400 mr-3 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+              </svg>
+              <div>
+                <p class="font-medium text-gray-600">Freelance Experience</p>
+                <p id="menteeModalFreelanceExperience" class="text-gray-800"></p>
+              </div>
+            </div>
+            <div class="flex items-start" id="freelancePlatformsSection" style="display: none;">
+              <svg class="w-5 h-5 text-gray-400 mr-3 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.658 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path>
+              </svg>
+              <div>
+                <p class="font-medium text-gray-600">Freelance Platforms</p>
+                <p id="menteeModalFreelancePlatforms" class="text-gray-800"></p>
+              </div>
+            </div>
+            <div class="flex items-start" id="freelanceChallengeSection" style="display: none;">
+              <svg class="w-5 h-5 text-gray-400 mr-3 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+              <div>
+                <p class="font-medium text-gray-600">Freelance Challenge</p>
+                <p id="menteeModalFreelanceChallenge" class="text-gray-800"></p>
+              </div>
+            </div>
+            <div class="flex items-start" id="lastRoleSection" style="display: none;">
+              <svg class="w-5 h-5 text-gray-400 mr-3 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-.5a2 2 0 00-2 2v2m0 0h-2.5a2 2 0 00-2 2v3.061h0z"></path>
+              </svg>
+              <div>
+                <p class="font-medium text-gray-600">Last Role</p>
+                <p id="menteeModalLastRole" class="text-gray-800"></p>
+              </div>
+            </div>
+            <div class="flex items-start" id="careerBreakReasonSection" style="display: none;">
+              <svg class="w-5 h-5 text-gray-400 mr-3 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+              <div>
+                <p class="font-medium text-gray-600">Career Break Reason</p>
+                <p id="menteeModalCareerBreakReason" class="text-gray-800"></p>
+              </div>
+            </div>
+            <div class="flex items-start" id="restartFieldSection" style="display: none;">
+              <svg class="w-5 h-5 text-gray-400 mr-3 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+              </svg>
+              <div>
+                <p class="font-medium text-gray-600">Restart Field</p>
+                <p id="menteeModalRestartField" class="text-gray-800"></p>
+              </div>
+            </div>
+            <div class="flex items-start" id="supportExpectedSection" style="display: none;">
+              <svg class="w-5 h-5 text-gray-400 mr-3 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z"></path>
+              </svg>
+              <div>
+                <p class="font-medium text-gray-600">Support Expected</p>
+                <p id="menteeModalSupportExpected" class="text-gray-800"></p>
+              </div>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- Comments -->
-      <div class="mb-8">
+      <!-- Mentorship Expectations -->
+      <div class="mb-8" id="menteeModalExpectationsSection" style="display: none;">
         <h4 class="font-semibold text-gray-800 flex items-center mb-4">
           <svg class="w-5 h-5 text-blue-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+                  d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+          </svg>
+          Mentorship Expectations
+        </h4>
+        <div class="bg-gray-50 p-5 rounded-lg border border-gray-100">
+          <p id="menteeModalExpectations" class="text-gray-600 italic"></p>
+        </div>
+      </div>
+
+      <!-- Comments -->
+      <div class="mb-8" id="menteeModalCommentsSection" style="display: none;">
+        <h4 class="font-semibold text-gray-800 flex items-center mb-4">
+          <svg class="w-5 h-5 text-blue-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"></path>
           </svg>
           Comments
         </h4>
@@ -394,18 +745,175 @@ function testMeetingRequests() {
 
 
 function openMenteeProfileModal(mentee) {
+    // Helper function to show/hide sections
+    function showField(sectionId, elementId, value) {
+        if (value && value !== "Not specified" && value !== "" && value !== null && value !== "None") {
+            document.getElementById(sectionId).style.display = 'flex';
+            document.getElementById(elementId).innerText = value;
+            return true;
+        } else {
+            document.getElementById(sectionId).style.display = 'none';
+            return false;
+        }
+    }
+
+    // Basic info (always show)
     document.getElementById('menteeModalName').innerText = mentee.name || "Not specified";
-    document.getElementById('menteeModalStream').innerText = (mentee.stream ? mentee.stream + " at " : "") + (mentee.school || "Not specified");
-    document.getElementById('menteeModalGoal').innerText = "Goal: " + (mentee.goal || "Not specified");
-    document.getElementById('menteeModalDOB').innerText = mentee.dob || "Not specified";
-    document.getElementById('menteeModalClass').innerText = mentee.classYear || "Not specified";
-    document.getElementById('menteeModalSubject').innerText = mentee.favouriteSubject || "Not specified";
-    document.getElementById('menteeModalParentName').innerText = mentee.parentName || "Not specified";
-    document.getElementById('menteeModalParentMobile').innerText = mentee.parentMobile || "Not specified";
-    document.getElementById('menteeModalMobile').innerText = mentee.mobileNumber || mentee.whatsappNumber || "Not specified";
-    document.getElementById('menteeModalComments').innerText = mentee.comments || "None";
+    document.getElementById('menteeModalStream').innerText = mentee.stream || "Not specified";
+    document.getElementById('menteeModalGoal').innerText = mentee.goal || "Not specified";
     document.getElementById('menteeModalProfilePic').src = mentee.profilePic ? "/static/uploads/" + mentee.profilePic : "https://via.placeholder.com/100";
 
+    // Hide all sections initially
+    document.getElementById('contactInfoSection').style.display = 'none';
+    document.getElementById('generalDetailsSection').style.display = 'none';
+    document.getElementById('whoAmISection').style.display = 'none';
+    document.getElementById('schoolStudentSection').style.display = 'none';
+    document.getElementById('universityStudentSection').style.display = 'none';
+    document.getElementById('seekingInternshipSection').style.display = 'none';
+    document.getElementById('youngProfessionalSection').style.display = 'none';
+    document.getElementById('exploringSection').style.display = 'none';
+    document.getElementById('menteeModalExpectationsSection').style.display = 'none';
+    document.getElementById('menteeModalCommentsSection').style.display = 'none';
+
+    // Show Contact Information if any field has data
+    let hasContactInfo = false;
+    hasContactInfo |= showField('dobSection', 'menteeModalDob', mentee.dob);
+    if (hasContactInfo) {
+        document.getElementById('contactInfoSection').style.display = 'block';
+    }
+
+    // Show Who Am I if exists
+    if (mentee.whoAmI && mentee.whoAmI !== "") {
+        document.getElementById('whoAmISection').style.display = 'block';
+        document.getElementById('menteeModalWhoAmI').innerText = mentee.whoAmI;
+    }
+
+    // Show General Details if any field has data
+    let hasGeneralDetails = false;
+    hasGeneralDetails |= showField('fatherNameSection', 'menteeModalFatherName', mentee.fatherName);
+    hasGeneralDetails |= showField('schoolCollegeSection', 'menteeModalSchoolCollege', mentee.school);
+    hasGeneralDetails |= showField('govtPrivateSection', 'menteeModalGovtPrivate', mentee.govtPrivate);
+    hasGeneralDetails |= showField('classYearSection', 'menteeModalClassYear', mentee.classYear);
+    
+    // Build address
+    let addressParts = [];
+    if (mentee.addressLine1) addressParts.push(mentee.addressLine1);
+    if (mentee.addressLine2) addressParts.push(mentee.addressLine2);
+    if (mentee.city) addressParts.push(mentee.city);
+    if (mentee.state) addressParts.push(mentee.state);
+    if (mentee.postalCode) addressParts.push(mentee.postalCode);
+    if (mentee.country) addressParts.push(mentee.country);
+    
+    if (addressParts.length > 0) {
+        document.getElementById('addressSection').style.display = 'flex';
+        document.getElementById('menteeModalAddress').innerText = addressParts.join(', ');
+        hasGeneralDetails = true;
+    } else {
+        document.getElementById('addressSection').style.display = 'none';
+    }
+
+    if (hasGeneralDetails) {
+        document.getElementById('generalDetailsSection').style.display = 'block';
+    }
+
+    // Show School Student fields if who_am_i is "School Student"
+    if (mentee.whoAmI === "School Student") {
+        let hasSchoolData = false;
+        hasSchoolData |= showField('schoolNameSection', 'menteeModalSchoolName', mentee.schoolName);
+        hasSchoolData |= showField('schoolBoardSection', 'menteeModalSchoolBoard', mentee.schoolBoard);
+        hasSchoolData |= showField('schoolPassingYearSection', 'menteeModalSchoolPassingYear', mentee.schoolPassingYear);
+        hasSchoolData |= showField('favouriteSubjectSection', 'menteeModalFavouriteSubject', mentee.favouriteSubject);
+        if (hasSchoolData) {
+            document.getElementById('schoolStudentSection').style.display = 'block';
+        }
+    }
+
+    // Show University Student fields if who_am_i is "University Student"
+    if (mentee.whoAmI === "University Student") {
+        let hasUniversityData = false;
+        hasUniversityData |= showField('institutionNameSection', 'menteeModalInstitutionName', mentee.institutionName);
+        hasUniversityData |= showField('boardUniversitySection', 'menteeModalBoardUniversity', mentee.boardUniversity);
+        hasUniversityData |= showField('courseStreamSection', 'menteeModalCourseStream', mentee.courseStream);
+        hasUniversityData |= showField('educationLevelSection', 'menteeModalEducationLevel', mentee.educationLevel);
+        if (hasUniversityData) {
+            document.getElementById('universityStudentSection').style.display = 'block';
+        }
+    }
+
+    // Show Seeking Internship fields if who_am_i is "Seeking Student Job/Internship"
+    if (mentee.whoAmI === "Seeking Student Job/Internship") {
+        let hasInternshipData = false;
+        hasInternshipData |= showField('careerInterestSection', 'menteeModalCareerInterest', mentee.careerInterest);
+        hasInternshipData |= showField('keySkillsSection', 'menteeModalKeySkills', mentee.keySkills);
+        if (hasInternshipData) {
+            document.getElementById('seekingInternshipSection').style.display = 'block';
+        }
+    }
+
+    // Show Young Professional fields if who_am_i is "Young Professional"
+    if (mentee.whoAmI === "Young Professional") {
+        let hasProfessionalData = false;
+        hasProfessionalData |= showField('currentRoleSection', 'menteeModalCurrentRole', mentee.currentRole);
+        hasProfessionalData |= showField('industrySection', 'menteeModalIndustry', mentee.industry);
+        hasProfessionalData |= showField('yearsExperienceSection', 'menteeModalYearsExperience', mentee.yearsExperience);
+        hasProfessionalData |= showField('currentOrganizationSection', 'menteeModalCurrentOrganization', mentee.currentOrganization);
+        hasProfessionalData |= showField('careerGoalSection', 'menteeModalCareerGoal', mentee.careerGoal);
+        if (hasProfessionalData) {
+            document.getElementById('youngProfessionalSection').style.display = 'block';
+        }
+    }
+
+    // Show Exploring Section for various categories
+    let hasExploringData = false;
+    
+    // Entrepreneur fields
+    if (mentee.whoAmI === "Entrepreneur") {
+        hasExploringData |= showField('startupNameSection', 'menteeModalStartupName', mentee.startupName);
+        hasExploringData |= showField('startupStageSection', 'menteeModalStartupStage', mentee.startupStage);
+        hasExploringData |= showField('startupIndustrySection', 'menteeModalStartupIndustry', mentee.startupIndustry);
+        hasExploringData |= showField('teamSizeSection', 'menteeModalTeamSize', mentee.teamSize);
+        hasExploringData |= showField('mentorshipTypeSection', 'menteeModalMentorshipType', mentee.mentorshipType);
+        hasExploringData |= showField('mainChallengeSection', 'menteeModalMainChallenge', mentee.mainChallenge);
+    }
+    
+    // Freelancer fields
+    if (mentee.whoAmI === "Freelancer") {
+        hasExploringData |= showField('freelanceSkillSection', 'menteeModalFreelanceSkill', mentee.freelanceSkill);
+        hasExploringData |= showField('freelanceExperienceSection', 'menteeModalFreelanceExperience', mentee.freelanceExperience);
+        hasExploringData |= showField('freelancePlatformsSection', 'menteeModalFreelancePlatforms', mentee.freelancePlatforms);
+        hasExploringData |= showField('freelanceChallengeSection', 'menteeModalFreelanceChallenge', mentee.freelanceChallenge);
+    }
+    
+    // Career Break fields
+    if (mentee.whoAmI === "Career Break") {
+        hasExploringData |= showField('lastRoleSection', 'menteeModalLastRole', mentee.lastRole);
+        hasExploringData |= showField('careerBreakReasonSection', 'menteeModalCareerBreakReason', mentee.careerBreakReason);
+        hasExploringData |= showField('restartFieldSection', 'menteeModalRestartField', mentee.restartField);
+        hasExploringData |= showField('supportExpectedSection', 'menteeModalSupportExpected', mentee.supportExpected);
+    }
+    
+    // Exploring Still Unsure
+    if (mentee.whoAmI === "Exploring Still Unsure") {
+        hasExploringData |= showField('mainChallengeSection', 'menteeModalMainChallenge', mentee.mainChallenge);
+    }
+    
+    if (hasExploringData) {
+        document.getElementById('exploringSection').style.display = 'block';
+    }
+
+    // Mentorship Expectations
+    if (mentee.mentorshipExpectations && mentee.mentorshipExpectations !== "" && mentee.mentorshipExpectations !== null) {
+        document.getElementById('menteeModalExpectationsSection').style.display = 'block';
+        document.getElementById('menteeModalExpectations').innerText = mentee.mentorshipExpectations;
+    }
+
+    // Comments
+    if (mentee.comments && mentee.comments !== "" && mentee.comments !== null) {
+        document.getElementById('menteeModalCommentsSection').style.display = 'block';
+        document.getElementById('menteeModalComments').innerText = mentee.comments;
+    }
+
+    // Show modal
     document.getElementById('menteeProfileModal').classList.remove('hidden');
 }
 
