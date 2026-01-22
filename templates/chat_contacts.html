@@ -1,0 +1,243 @@
+{% extends "base2.html" %}
+
+{% block title %}Select Contact{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto">
+    <!-- Header -->
+    <div class="mb-8">
+        <div class="flex items-center gap-4 mb-6">
+            <a href="{{ url_for('chat') }}" class="p-2 hover:bg-gray-100 rounded-lg transition">
+                <svg class="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                </svg>
+            </a>
+            <div>
+                <h1 class="text-3xl font-bold text-gray-800">Select a Contact</h1>
+                <p class="text-gray-600">Choose who you want to chat with</p>
+            </div>
+        </div>
+
+        <!-- Search and Filter -->
+        <div class="flex gap-4 mb-6">
+            <div class="flex-1 relative">
+                <input type="text" 
+                       id="contactSearch" 
+                       placeholder="Search by name or email..." 
+                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <svg class="absolute right-3 top-2.5 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                </svg>
+            </div>
+            <select id="contactFilter" class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <option value="">All Types</option>
+                <option value="mentor">Mentors</option>
+                <option value="mentee">Mentees</option>
+                <option value="supervisor">Supervisors</option>
+                <option value="institution">Institutions</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- Contacts Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <!-- Contact Card -->
+        <div class="contact-card bg-white rounded-lg shadow-md p-4 hover:shadow-lg transition cursor-pointer border-2 border-transparent hover:border-blue-500" data-type="mentor">
+            <div class="flex items-start justify-between mb-3">
+                <div class="flex items-center gap-3 flex-1">
+                    <div class="w-12 h-12 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center text-white font-bold">
+                        JD
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <h3 class="font-semibold text-gray-800 truncate">John Doe</h3>
+                        <p class="text-xs text-gray-500">john.doe@example.com</p>
+                    </div>
+                </div>
+                <span class="bg-blue-100 text-blue-700 text-xs font-semibold px-2 py-1 rounded-full whitespace-nowrap ml-2">Mentor</span>
+            </div>
+            <p class="text-sm text-gray-600 mb-3">Senior Software Engineer with 10+ years experience</p>
+            <div class="flex items-center justify-between text-xs text-gray-500 mb-3">
+                <span>📍 New York, USA</span>
+                <span>🟢 Active now</span>
+            </div>
+            <button class="w-full py-2 px-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-medium text-sm">
+                Start Chat
+            </button>
+        </div>
+
+        <!-- Contact Card -->
+        <div class="contact-card bg-white rounded-lg shadow-md p-4 hover:shadow-lg transition cursor-pointer border-2 border-transparent hover:border-purple-500" data-type="mentee">
+            <div class="flex items-start justify-between mb-3">
+                <div class="flex items-center gap-3 flex-1">
+                    <div class="w-12 h-12 bg-gradient-to-br from-purple-400 to-purple-600 rounded-full flex items-center justify-center text-white font-bold">
+                        SM
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <h3 class="font-semibold text-gray-800 truncate">Sarah Miller</h3>
+                        <p class="text-xs text-gray-500">sarah.miller@example.com</p>
+                    </div>
+                </div>
+                <span class="bg-purple-100 text-purple-700 text-xs font-semibold px-2 py-1 rounded-full whitespace-nowrap ml-2">Mentee</span>
+            </div>
+            <p class="text-sm text-gray-600 mb-3">University student seeking career guidance</p>
+            <div class="flex items-center justify-between text-xs text-gray-500 mb-3">
+                <span>📍 London, UK</span>
+                <span>🟡 Away</span>
+            </div>
+            <button class="w-full py-2 px-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition font-medium text-sm">
+                Start Chat
+            </button>
+        </div>
+
+        <!-- Contact Card -->
+        <div class="contact-card bg-white rounded-lg shadow-md p-4 hover:shadow-lg transition cursor-pointer border-2 border-transparent hover:border-green-500" data-type="supervisor">
+            <div class="flex items-start justify-between mb-3">
+                <div class="flex items-center gap-3 flex-1">
+                    <div class="w-12 h-12 bg-gradient-to-br from-green-400 to-green-600 rounded-full flex items-center justify-center text-white font-bold">
+                        RP
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <h3 class="font-semibold text-gray-800 truncate">Robert Park</h3>
+                        <p class="text-xs text-gray-500">robert.park@example.com</p>
+                    </div>
+                </div>
+                <span class="bg-green-100 text-green-700 text-xs font-semibold px-2 py-1 rounded-full whitespace-nowrap ml-2">Supervisor</span>
+            </div>
+            <p class="text-sm text-gray-600 mb-3">Program coordinator and mentorship supervisor</p>
+            <div class="flex items-center justify-between text-xs text-gray-500 mb-3">
+                <span>📍 Toronto, Canada</span>
+                <span>🟢 Active now</span>
+            </div>
+            <button class="w-full py-2 px-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition font-medium text-sm">
+                Start Chat
+            </button>
+        </div>
+
+        <!-- Contact Card -->
+        <div class="contact-card bg-white rounded-lg shadow-md p-4 hover:shadow-lg transition cursor-pointer border-2 border-transparent hover:border-orange-500" data-type="institution">
+            <div class="flex items-start justify-between mb-3">
+                <div class="flex items-center gap-3 flex-1">
+                    <div class="w-12 h-12 bg-gradient-to-br from-orange-400 to-orange-600 rounded-full flex items-center justify-center text-white font-bold">
+                        EC
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <h3 class="font-semibold text-gray-800 truncate">Emma Chen</h3>
+                        <p class="text-xs text-gray-500">emma.chen@institution.edu</p>
+                    </div>
+                </div>
+                <span class="bg-orange-100 text-orange-700 text-xs font-semibold px-2 py-1 rounded-full whitespace-nowrap ml-2">Institution</span>
+            </div>
+            <p class="text-sm text-gray-600 mb-3">Institution Administrator</p>
+            <div class="flex items-center justify-between text-xs text-gray-500 mb-3">
+                <span>📍 Sydney, Australia</span>
+                <span>🟢 Active now</span>
+            </div>
+            <button class="w-full py-2 px-3 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition font-medium text-sm">
+                Start Chat
+            </button>
+        </div>
+
+        <!-- Contact Card -->
+        <div class="contact-card bg-white rounded-lg shadow-md p-4 hover:shadow-lg transition cursor-pointer border-2 border-transparent hover:border-blue-500" data-type="mentor">
+            <div class="flex items-start justify-between mb-3">
+                <div class="flex items-center gap-3 flex-1">
+                    <div class="w-12 h-12 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center text-white font-bold">
+                        MJ
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <h3 class="font-semibold text-gray-800 truncate">Michael Johnson</h3>
+                        <p class="text-xs text-gray-500">michael.j@example.com</p>
+                    </div>
+                </div>
+                <span class="bg-blue-100 text-blue-700 text-xs font-semibold px-2 py-1 rounded-full whitespace-nowrap ml-2">Mentor</span>
+            </div>
+            <p class="text-sm text-gray-600 mb-3">Product Manager with startup experience</p>
+            <div class="flex items-center justify-between text-xs text-gray-500 mb-3">
+                <span>📍 San Francisco, USA</span>
+                <span>🟡 Away</span>
+            </div>
+            <button class="w-full py-2 px-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-medium text-sm">
+                Start Chat
+            </button>
+        </div>
+
+        <!-- Contact Card -->
+        <div class="contact-card bg-white rounded-lg shadow-md p-4 hover:shadow-lg transition cursor-pointer border-2 border-transparent hover:border-purple-500" data-type="mentee">
+            <div class="flex items-start justify-between mb-3">
+                <div class="flex items-center gap-3 flex-1">
+                    <div class="w-12 h-12 bg-gradient-to-br from-purple-400 to-purple-600 rounded-full flex items-center justify-center text-white font-bold">
+                        AK
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <h3 class="font-semibold text-gray-800 truncate">Aisha Khan</h3>
+                        <p class="text-xs text-gray-500">aisha.khan@example.com</p>
+                    </div>
+                </div>
+                <span class="bg-purple-100 text-purple-700 text-xs font-semibold px-2 py-1 rounded-full whitespace-nowrap ml-2">Mentee</span>
+            </div>
+            <p class="text-sm text-gray-600 mb-3">Recent graduate looking for internship opportunities</p>
+            <div class="flex items-center justify-between text-xs text-gray-500 mb-3">
+                <span>📍 Dubai, UAE</span>
+                <span>🟢 Active now</span>
+            </div>
+            <button class="w-full py-2 px-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition font-medium text-sm">
+                Start Chat
+            </button>
+        </div>
+    </div>
+
+    <!-- No Results -->
+    <div id="noResults" class="hidden text-center py-12">
+        <svg class="w-16 h-16 text-gray-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 21l-4.35-4.35M11 19a8 8 0 100-16 8 8 0 000 16z"></path>
+        </svg>
+        <h3 class="text-lg font-semibold text-gray-600 mb-2">No contacts found</h3>
+        <p class="text-gray-500">Try adjusting your search or filter criteria</p>
+    </div>
+</div>
+
+<script>
+    const searchInput = document.getElementById('contactSearch');
+    const filterSelect = document.getElementById('contactFilter');
+    const contactCards = document.querySelectorAll('.contact-card');
+    const noResults = document.getElementById('noResults');
+
+    function filterContacts() {
+        const searchTerm = searchInput.value.toLowerCase();
+        const filterType = filterSelect.value;
+        let visibleCount = 0;
+
+        contactCards.forEach(card => {
+            const name = card.querySelector('h3').textContent.toLowerCase();
+            const email = card.querySelector('p').textContent.toLowerCase();
+            const type = card.dataset.type;
+
+            const matchesSearch = name.includes(searchTerm) || email.includes(searchTerm);
+            const matchesFilter = !filterType || type === filterType;
+
+            if (matchesSearch && matchesFilter) {
+                card.style.display = 'block';
+                visibleCount++;
+            } else {
+                card.style.display = 'none';
+            }
+        });
+
+        noResults.classList.toggle('hidden', visibleCount > 0);
+    }
+
+    searchInput.addEventListener('input', filterContacts);
+    filterSelect.addEventListener('change', filterContacts);
+
+    // Start chat button functionality
+    document.querySelectorAll('.contact-card button').forEach(button => {
+        button.addEventListener('click', function(e) {
+            e.stopPropagation();
+            const contactName = this.closest('.contact-card').querySelector('h3').textContent;
+            console.log('Starting chat with:', contactName);
+            // Redirect to chat page
+            window.location.href = '{{ url_for("chat") }}';
+        });
+    });
+</script>
+{% endblock %}
