@@ -5641,6 +5641,95 @@ def create_sample_institutions():
     
     db.session.commit()
 
+# ==================== CHAT FEATURE ROUTES ====================
+
+@app.route("/chat")
+def chat():
+    """Main chat page - display conversations"""
+    if "email" not in session:
+        return redirect(url_for("signin"))
+    
+    user = User.query.filter_by(email=session["email"]).first()
+    if not user:
+        return redirect(url_for("signin"))
+    
+    return render_template(
+        "chat.html",
+        show_sidebar=True,
+        user_email=session["email"],
+        user_name=session.get("user_name", user.name),
+        user_type=session.get("user_type"),
+        current_user_profile_pic=None  # Will be populated from profile
+    )
+
+@app.route("/new-chat")
+def new_chat():
+    """New chat selection page"""
+    if "email" not in session:
+        return redirect(url_for("signin"))
+    
+    user = User.query.filter_by(email=session["email"]).first()
+    if not user:
+        return redirect(url_for("signin"))
+    
+    return render_template(
+        "new_chat.html",
+        show_sidebar=True,
+        user_email=session["email"],
+        user_name=session.get("user_name", user.name),
+        user_type=session.get("user_type"),
+        current_user_profile_pic=None
+    )
+
+@app.route("/chat-contacts")
+def chat_contacts():
+    """Contact browser for selecting chat recipients"""
+    if "email" not in session:
+        return redirect(url_for("signin"))
+    
+    user = User.query.filter_by(email=session["email"]).first()
+    if not user:
+        return redirect(url_for("signin"))
+    
+    user_type = session.get("user_type")
+    
+    # Get available contacts based on user type
+    available_contacts = []
+    
+    if user_type == "2":  # Mentee
+        # Can chat with mentors and supervisors
+        mentors = User.query.filter_by(user_type="1").all()
+        supervisors = User.query.filter_by(user_type="0").all()
+        available_contacts = mentors + supervisors
+    
+    elif user_type == "1":  # Mentor
+        # Can chat with mentees and supervisors
+        mentees = User.query.filter_by(user_type="2").all()
+        supervisors = User.query.filter_by(user_type="0").all()
+        available_contacts = mentees + supervisors
+    
+    elif user_type == "0":  # Supervisor
+        # Can chat with mentees, mentors, and institutions
+        mentees = User.query.filter_by(user_type="2").all()
+        mentors = User.query.filter_by(user_type="1").all()
+        institutions = User.query.filter_by(user_type="3").all()
+        available_contacts = mentees + mentors + institutions
+    
+    elif user_type == "3":  # Institution
+        # Can chat with supervisors only
+        supervisors = User.query.filter_by(user_type="0").all()
+        available_contacts = supervisors
+    
+    return render_template(
+        "chat_contacts.html",
+        show_sidebar=True,
+        user_email=session["email"],
+        user_name=session.get("user_name", user.name),
+        user_type=user_type,
+        available_contacts=available_contacts,
+        current_user_profile_pic=None
+    )
+
 if __name__ == "__main__":
     if PRODUCTION:
         # Production mode - don't use debug, use a proper WSGI server

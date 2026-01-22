@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}{% endblock %} | Mentor Connect</title>
+    <title>{% block title %}{% endblock %} | Demo Mentor Connect</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Google Font: Inter -->
@@ -65,7 +65,7 @@
             " class="flex items-center">
                 <img src="{{ url_for('static', filename='img/logo.jpg') }}" alt="LOGO" class="h-12 w-12 rounded-full mr-3">
                 <div class="flex flex-col">
-                    <span class="text-lg font-bold text-blue-600">Mentor Connect</span>
+                    <span class="text-lg font-bold text-blue-600">Demo Mentor Connect</span>
                     <span class="text-sm font-medium text-gray-600">{% block user %}{% endblock %}</span>
                 </div>
             </a>
@@ -190,6 +190,12 @@
                         All Tasks
                     </a>
 
+                    <a href="{{ url_for('chat')}}"
+                       class="block px-4 py-2 text-white hover:bg-gray-600 rounded-md flex items-center">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+                        Messages
+                    </a>
+
                     <a href="{{ url_for('create_account')}}"
                        class="block px-4 py-2 text-white hover:bg-gray-600 rounded-md flex items-center">
                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
@@ -247,7 +253,13 @@
                        class="block px-4 py-2 text-white hover:bg-gray-600 rounded-md flex items-center">
                         <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
                         My Task
-                    </a>                    
+                    </a>
+
+                    <a href="{{ url_for('chat')}}"
+                       class="block px-4 py-2 text-white hover:bg-gray-600 rounded-md flex items-center">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+                        Messages
+                    </a>
 
                 {% elif session.get('user_type') == '3' %}
 
@@ -291,6 +303,12 @@
                        class="block px-4 py-2 text-white hover:bg-gray-600 rounded-md flex items-center">
                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
                        Institute Task
+                    </a>
+
+                    <a href="{{ url_for('chat')}}"
+                       class="block px-4 py-2 text-white hover:bg-gray-600 rounded-md flex items-center">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+                        Messages
                     </a>
                     
 
@@ -340,6 +358,12 @@
                        class="block px-4 py-2 text-white hover:bg-gray-600 rounded-md flex items-center">
                         <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
                         My Task
+                    </a>
+
+                    <a href="{{ url_for('chat')}}"
+                       class="block px-4 py-2 text-white hover:bg-gray-600 rounded-md flex items-center">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+                        Messages
                     </a>
 
 
