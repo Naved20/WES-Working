@@ -159,6 +159,12 @@
     <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200 mb-6">
         <h3 class="text-2xl font-semibold text-gray-700 mb-4">Contact Information</h3>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {% if institution %}
+            <p class="text-gray-600">
+                <span class="font-semibold">Institution / Organization:</span> 
+                {{ institution }}
+            </p>
+            {% endif %}
             {% if mobile_number %}
             <p class="text-gray-600">
                 <span class="font-semibold">Mobile Number:</span> 

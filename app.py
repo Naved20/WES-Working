@@ -335,6 +335,8 @@ class MenteeProfile(db.Model):
     state = db.Column(db.String(100))
     postal_code = db.Column(db.String(20))
     country = db.Column(db.String(100))
+    institution = db.Column(db.String(150))
+    institution_other = db.Column(db.String(150))
     
     school_college_name = db.Column(db.String(150))
     mobile_number = db.Column(db.String(20))
@@ -2518,7 +2520,7 @@ def get_institution_tasks_data():
 
 
 @app.route("/institution_profile")
-def institutionprofile():
+def institutionprofile_old():
     if "email" not in session or session.get("user_type") != "3":
         return redirect(url_for("signin"))
 
@@ -2590,7 +2592,7 @@ def institutionprofile():
 
 
 @app.route("/editinstitutionprofile", methods=["GET", "POST"])
-def editinstitutionprofile():
+def editinstitutionprofile_old():
     if "email" not in session or session.get("user_type") != "3":
         return redirect(url_for("signin"))
 
@@ -4761,7 +4763,7 @@ def editmenteeprofile():
         }
         
         # Common mandatory fields for all categories
-        common_mandatory = ['mobile_number', 'whatsapp_number', 'mentorship_expectations']
+        common_mandatory = ['mobile_number', 'whatsapp_number', 'mentorship_expectations', 'institution']
         
         # General details mandatory fields
         general_details_mandatory = ['father_name', 'address_line1', 'city', 'state', 'postal_code', 'country']
@@ -4831,6 +4833,14 @@ def editmenteeprofile():
         profile.state = request.form.get("state")
         profile.postal_code = request.form.get("postal_code")
         profile.country = request.form.get("country")
+        
+        # Save institution field
+        institution_value = request.form.get("institution")
+        profile.institution = institution_value
+        if institution_value == "Other":
+            profile.institution_other = request.form.get("institution_other")
+        else:
+            profile.institution_other = None
 
         # SCHOOL STUDENT fields
         if who_am_i == "school_student":
@@ -4903,7 +4913,6 @@ def editmenteeprofile():
         "mentee/editmenteeprofile.html",
         full_name=user.name,
         email=user.email,
-        institution=user.institution,
         institutions=institutions,
         dob=profile.dob if profile else "",
         mobile_number=profile.mobile_number if profile else "",
@@ -4919,6 +4928,8 @@ def editmenteeprofile():
         state=profile.state if profile else "",
         postal_code=profile.postal_code if profile else "",
         country=profile.country if profile else "",
+        institution=profile.institution if profile else "",
+        institution_other=profile.institution_other if profile else "",
         # Other fields
         education_level=profile.education_level if profile else "",
         institution_name=profile.institution_name if profile else "",
@@ -5728,6 +5739,147 @@ def chat_contacts():
         user_type=user_type,
         available_contacts=available_contacts,
         current_user_profile_pic=None
+    )
+
+#--------------INSTITUTION PROFILE ROUTES------------------
+
+@app.route("/institutionprofile")
+def institutionprofile():
+    """View institution profile"""
+    if "email" not in session or session.get("user_type") != "3":
+        return redirect(url_for("signin"))
+    
+    user = User.query.filter_by(email=session["email"]).first()
+    if not user:
+        return redirect(url_for("signin"))
+    
+    # Get institution profile
+    institution = Institution.query.filter_by(user_id=user.id).first()
+    
+    if not institution:
+        flash("Institution profile not found.", "error")
+        return redirect(url_for("institutiondashboard"))
+    
+    return render_template(
+        "institution/institutionprofile.html",
+        show_sidebar=False,
+        institution_name=institution.name or "",
+        email=institution.contact_email or user.email,
+        institution_type=institution.institution_type or "",
+        email_domain=institution.email_domain or "",
+        website=institution.website or "",
+        address=institution.address or "",
+        city=institution.city or "",
+        state=institution.state or "",
+        country=institution.country or "",
+        contact_person=institution.contact_person or "",
+        contact_email=institution.contact_email or "",
+        contact_phone=institution.contact_phone or "",
+        status=institution.status or "active",
+        profile_picture=institution.profile_picture or None
+    )
+
+@app.route("/editinstitutionprofile", methods=["GET", "POST"])
+def editinstitutionprofile():
+    """Edit institution profile"""
+    if "email" not in session or session.get("user_type") != "3":
+        return redirect(url_for("signin"))
+    
+    user = User.query.filter_by(email=session["email"]).first()
+    if not user:
+        return redirect(url_for("signin"))
+    
+    # Get or create institution profile
+    institution = Institution.query.filter_by(user_id=user.id).first()
+    
+    if request.method == "POST":
+        # Check if AJAX request
+        is_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest'
+        
+        # Create institution if not exists
+        if not institution:
+            institution = Institution(user_id=user.id)
+            db.session.add(institution)
+        
+        # Validate mandatory fields
+        mandatory_fields = {
+            "institution_type": request.form.get("institution_type"),
+            "city": request.form.get("city"),
+            "country": request.form.get("country"),
+            "contact_person": request.form.get("contact_person"),
+            "contact_email": request.form.get("contact_email"),
+            "contact_phone": request.form.get("contact_phone"),
+        }
+        
+        missing_fields = []
+        for field_name, field_value in mandatory_fields.items():
+            if not field_value or (isinstance(field_value, str) and not field_value.strip()):
+                missing_fields.append(field_name.replace("_", " ").title())
+        
+        if missing_fields:
+            error_msg = f"Please fill all mandatory fields: {', '.join(missing_fields)}"
+            if is_ajax:
+                return jsonify({"success": False, "message": error_msg}), 400
+            flash(error_msg, "error")
+            return redirect(url_for("editinstitutionprofile"))
+        
+        # Update institution fields
+        institution.institution_type = request.form.get("institution_type")
+        institution.email_domain = request.form.get("email_domain") or ""
+        institution.website = request.form.get("website") or ""
+        institution.address = request.form.get("address") or ""
+        institution.city = request.form.get("city")
+        institution.state = request.form.get("state") or ""
+        institution.country = request.form.get("country")
+        institution.contact_person = request.form.get("contact_person")
+        institution.contact_email = request.form.get("contact_email")
+        institution.contact_phone = request.form.get("contact_phone")
+        institution.status = request.form.get("status", "active")
+        
+        # Handle profile picture upload
+        file = request.files.get("profile_picture")
+        if file and allowed_file(file.filename):
+            filename = secure_filename(file.filename)
+            file.save(os.path.join(app.config["UPLOAD_FOLDER"], filename))
+            institution.profile_picture = filename
+        
+        try:
+            db.session.commit()
+            success_msg = "Institution profile updated successfully!"
+            if is_ajax:
+                return jsonify({
+                    "success": True,
+                    "message": success_msg,
+                    "redirect_url": url_for("institutionprofile")
+                })
+            flash(success_msg, "success")
+            return redirect(url_for("institutionprofile"))
+        except Exception as e:
+            db.session.rollback()
+            error_msg = f"Error updating profile: {str(e)}"
+            if is_ajax:
+                return jsonify({"success": False, "message": error_msg}), 500
+            flash(error_msg, "error")
+            return redirect(url_for("editinstitutionprofile"))
+    
+    # GET request - pre-fill form with existing data
+    return render_template(
+        "institution/editinstitutionprofile.html",
+        show_sidebar=False,
+        institution_name=institution.name if institution else user.name,
+        email=institution.contact_email if institution else user.email,
+        institution_type=institution.institution_type if institution else "",
+        email_domain=institution.email_domain if institution else "",
+        website=institution.website if institution else "",
+        address=institution.address if institution else "",
+        city=institution.city if institution else "",
+        state=institution.state if institution else "",
+        country=institution.country if institution else "",
+        contact_person=institution.contact_person if institution else "",
+        contact_email=institution.contact_email if institution else "",
+        contact_phone=institution.contact_phone if institution else "",
+        status=institution.status if institution else "active",
+        profile_picture=institution.profile_picture if institution else None
     )
 
 if __name__ == "__main__":
