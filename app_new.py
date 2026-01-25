@@ -1,4 +1,4 @@
-from flask import Flask, redirect, url_for, render_template, request, session, flash, jsonify
+﻿from flask import Flask, redirect, url_for, render_template, request, session, flash, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin, login_user, LoginManager, login_required, logout_user, current_user
 from sqlalchemy import cast, Integer, or_, and_, text
@@ -604,16 +604,16 @@ class ChatMessage(db.Model):
 
 
 def assign_master_tasks_to_mentorship(mentorship_request):
-    print("🔧 assign_master_tasks_to_mentorship function called")
+    print("ðŸ”§ assign_master_tasks_to_mentorship function called")
     
     try:
         # Check mentorship request data
-        print(f"📋 Mentorship Details:")
+        print(f"ðŸ“‹ Mentorship Details:")
         print(f"   - Mentee ID: {mentorship_request.mentee_id}")
         print(f"   - Mentor ID: {mentorship_request.mentor_id}") 
         print(f"   - Duration: {mentorship_request.duration_months} months")
         
-        # ✅ Use current time since created_at doesn't exist or is None
+        # âœ… Use current time since created_at doesn't exist or is None
         start_date = datetime.utcnow()
         print(f"   - Start Date (Current Time): {start_date}")
         
@@ -623,10 +623,10 @@ def assign_master_tasks_to_mentorship(mentorship_request):
             .limit(20)\
             .all()
         
-        print(f"📁 Top {len(master_tasks)} master tasks found (limited to 20)")
+        print(f"ðŸ“ Top {len(master_tasks)} master tasks found (limited to 20)")
         
         if not master_tasks:
-            print("❌ NO MASTER TASKS IN DATABASE!")
+            print("âŒ NO MASTER TASKS IN DATABASE!")
             return []
         
         assigned_tasks = []
@@ -634,10 +634,10 @@ def assign_master_tasks_to_mentorship(mentorship_request):
 
         
         for i, master_task in enumerate(master_tasks):
-            print(f"\n🎯 Processing Task {i+1}:")
+            print(f"\nðŸŽ¯ Processing Task {i+1}:")
             print(f"   Month: {master_task.month}")
             print(f"   Meeting Number: {master_task.meeting_number}")
-            print(f"   Purpose: {master_task.purpose_of_call[:50]}...")  # ✅ Use existing field
+            print(f"   Purpose: {master_task.purpose_of_call[:50]}...")  # âœ… Use existing field
             
             due_date = calculate_due_date(start_date, master_task.month)
             print(f"   Final Due Date: {due_date}")
@@ -656,14 +656,14 @@ def assign_master_tasks_to_mentorship(mentorship_request):
             assigned_tasks.append(mentee_task)
         
         # Commit se pehle
-        print(f"\n💾 Committing {len(assigned_tasks)} tasks to database...")
+        print(f"\nðŸ’¾ Committing {len(assigned_tasks)} tasks to database...")
         db.session.commit()
-        print("✅ Database commit successful!")
+        print("âœ… Database commit successful!")
         
         return assigned_tasks
         
     except Exception as e:
-        print(f"❌ ERROR in task assignment: {str(e)}")
+        print(f"âŒ ERROR in task assignment: {str(e)}")
         import traceback
         traceback.print_exc()
         db.session.rollback()
@@ -674,14 +674,14 @@ def calculate_due_date(start_date, month_string):
     Month string (e.g., "Month 1", "Month 2") ko due date mein convert kare
     """
     try:
-        print(f"📅 CALCULATION STARTED:")
+        print(f"ðŸ“… CALCULATION STARTED:")
         print(f"   Start Date: {start_date}")
         print(f"   Month String: {month_string}")
         
-        # ✅ Ensure start_date is not None
+        # âœ… Ensure start_date is not None
         if start_date is None:
             start_date = datetime.utcnow()
-            print(f"   ⚠️  Start date was None, using current time: {start_date}")
+            print(f"   âš ï¸  Start date was None, using current time: {start_date}")
         
         # Month string se number nikalne ka logic
         if "Month" in month_string:
@@ -701,12 +701,12 @@ def calculate_due_date(start_date, month_string):
         due_date = start_date + timedelta(days=days_to_add)
         
         print(f"   Calculated due date: {due_date}")
-        print("📅 CALCULATION COMPLETED\n")
+        print("ðŸ“… CALCULATION COMPLETED\n")
         
         return due_date
         
     except Exception as e:
-        print(f"❌ Error in calculate_due_date: {str(e)}")
+        print(f"âŒ Error in calculate_due_date: {str(e)}")
         import traceback
         traceback.print_exc()
         # Fallback: 30 days from current time
@@ -717,7 +717,7 @@ def calculate_due_date(start_date, month_string):
     Month string (e.g., "Month 1", "Month 2") ko due date mein convert kare
     """
     try:
-        print(f"📅 CALCULATION STARTED:")
+        print(f"ðŸ“… CALCULATION STARTED:")
         print(f"   Start Date: {start_date}")
         print(f"   Month String: {month_string}")
         print(f"   Start Date Type: {type(start_date)}")
@@ -741,12 +741,12 @@ def calculate_due_date(start_date, month_string):
         
         print(f"   Calculated due date: {due_date}")
         print(f"   Due Date Type: {type(due_date)}")
-        print("📅 CALCULATION COMPLETED\n")
+        print("ðŸ“… CALCULATION COMPLETED\n")
         
         return due_date
         
     except Exception as e:
-        print(f"❌ Error in calculate_due_date: {str(e)}")
+        print(f"âŒ Error in calculate_due_date: {str(e)}")
         import traceback
         traceback.print_exc()
         # Fallback: 30 days from start
@@ -770,11 +770,11 @@ def check_profile_complete(user_id, user_type):
     Check if user profile is FULLY complete with ALL mandatory fields
     Returns True only if ALL required fields are filled, False otherwise
     """
-    print(f"🔍 Checking profile completion for user_id: {user_id}, user_type: {user_type}")
+    print(f"ðŸ” Checking profile completion for user_id: {user_id}, user_type: {user_type}")
     
     if user_type == "1":  # Mentor
         profile = MentorProfile.query.filter_by(user_id=user_id).first()
-        print(f"📊 Mentor profile found: {profile is not None}")
+        print(f"ðŸ“Š Mentor profile found: {profile is not None}")
         if profile:
             # Check if ALL mandatory fields are filled (including profile picture)
             has_all_required = all([
@@ -800,14 +800,14 @@ def check_profile_complete(user_id, user_type):
                 profile.mentorship_motto,
                 profile.profile_picture  # Profile picture is now mandatory
             ])
-            print(f"✅ Mentor profile complete: {has_all_required}")
+            print(f"âœ… Mentor profile complete: {has_all_required}")
             return has_all_required
-        print("❌ No mentor profile found")
+        print("âŒ No mentor profile found")
         return False
     
     elif user_type == "2":  # Mentee
         profile = MenteeProfile.query.filter_by(user_id=user_id).first()
-        print(f"📊 Mentee profile found: {profile is not None}")
+        print(f"ðŸ“Š Mentee profile found: {profile is not None}")
         if profile:
             # Check if ALL mandatory fields are filled (including profile picture)
             # General Details mandatory fields
@@ -827,14 +827,14 @@ def check_profile_complete(user_id, user_type):
                 # Who am I must be selected
                 profile.who_am_i
             ])
-            print(f"✅ Mentee profile complete: {has_all_required}")
+            print(f"âœ… Mentee profile complete: {has_all_required}")
             return has_all_required
-        print("❌ No mentee profile found")
+        print("âŒ No mentee profile found")
         return False
     
     elif user_type == "0":  # Supervisor
         profile = SupervisorProfile.query.filter_by(user_id=user_id).first()
-        print(f"📊 Supervisor profile found: {profile is not None}")
+        print(f"ðŸ“Š Supervisor profile found: {profile is not None}")
         if profile:
             has_all_required = all([
                 profile.organisation,
@@ -844,14 +844,14 @@ def check_profile_complete(user_id, user_type):
                 profile.additional_info,
                 profile.profile_picture  # Profile picture is now mandatory
             ])
-            print(f"✅ Supervisor profile complete: {has_all_required}")
+            print(f"âœ… Supervisor profile complete: {has_all_required}")
             return has_all_required
-        print("❌ No supervisor profile found")
+        print("âŒ No supervisor profile found")
         return False
     
     elif user_type == "3":  # Institution
         institution = Institution.query.filter_by(user_id=user_id).first()
-        print(f"📊 Institution profile found: {institution is not None}")
+        print(f"ðŸ“Š Institution profile found: {institution is not None}")
         if institution:
             has_all_required = all([
                 institution.name,
@@ -864,12 +864,12 @@ def check_profile_complete(user_id, user_type):
                 institution.country,
                 institution.profile_picture  # Profile picture is now mandatory
             ])
-            print(f"✅ Institution profile complete: {has_all_required}")
+            print(f"âœ… Institution profile complete: {has_all_required}")
             return has_all_required
-        print("❌ No institution profile found")
+        print("âŒ No institution profile found")
         return False
     
-    print(f"⚠️ Unknown user type: {user_type}")
+    print(f"âš ï¸ Unknown user type: {user_type}")
     return True  # Default to True for unknown types (no popup)
 
 # Decorator to enforce profile completion
@@ -1196,40 +1196,40 @@ def google_login():
 def callback():
     """Handle Google OAuth callback"""
     print("\n" + "="*60)
-    print("🔄 CALLBACK ROUTE CALLED")
+    print("ðŸ”„ CALLBACK ROUTE CALLED")
     print("="*60)
     
     try:
-        print(f"📍 Step 1: Getting state from session")
+        print(f"ðŸ“ Step 1: Getting state from session")
         state = session.get('state')
         print(f"   State: {state}")
         
-        print(f"📍 Step 2: Creating Flow from client secrets")
+        print(f"ðŸ“ Step 2: Creating Flow from client secrets")
         flow = Flow.from_client_secrets_file(
             CLIENT_SECRETS_FILE,
             scopes=LOGIN_SCOPES,  # Use login scopes
             state=state,
             redirect_uri=REDIRECT_URI
         )
-        print(f"   ✅ Flow created")
+        print(f"   âœ… Flow created")
         
-        print(f"📍 Step 3: Getting authorization response")
+        print(f"ðŸ“ Step 3: Getting authorization response")
         authorization_response = request.url
         print(f"   URL: {authorization_response}")
         
-        print(f"📍 Step 4: Fetching token")
+        print(f"ðŸ“ Step 4: Fetching token")
         # Set environment variable to allow scope changes
         os.environ['OAUTHLIB_RELAX_TOKEN_SCOPE'] = '1'
         flow.fetch_token(authorization_response=authorization_response)
-        print(f"   ✅ Token fetched")
+        print(f"   âœ… Token fetched")
         
-        print(f"📍 Step 5: Getting credentials")
+        print(f"ðŸ“ Step 5: Getting credentials")
         credentials = flow.credentials
         access_token = credentials.token
-        print(f"   ✅ Credentials obtained")
+        print(f"   âœ… Credentials obtained")
         print(f"   Token: {access_token[:30]}..." if access_token else "   No token")
         
-        print(f"📍 Step 6: Getting user info via HTTP request")
+        print(f"ðŸ“ Step 6: Getting user info via HTTP request")
         # Use requests library to get user info directly with access token
         import requests as http_requests
         
@@ -1242,34 +1242,34 @@ def callback():
         print(f"   Response status: {user_info_response.status_code}")
         
         if user_info_response.status_code != 200:
-            print(f"   ❌ Error response: {user_info_response.text}")
+            print(f"   âŒ Error response: {user_info_response.text}")
             flash("Error getting user info from Google. Please try again.", "error")
             return redirect(url_for("signin"))
         
         user_info = user_info_response.json()
-        print(f"   ✅ User info retrieved")
+        print(f"   âœ… User info retrieved")
         
         google_id = user_info.get('id')
         email = user_info.get('email')
         name = user_info.get('name', email.split('@')[0] if email else 'User')
         picture_url = user_info.get('picture')
         
-        print(f"\n📊 Google User Data:")
+        print(f"\nðŸ“Š Google User Data:")
         print(f"   Name: {name}")
         print(f"   Email: {email}")
         print(f"   Google ID: {google_id}")
         print(f"   Picture: {picture_url}")
         
         if not email:
-            print(f"   ❌ ERROR: No email in response!")
+            print(f"   âŒ ERROR: No email in response!")
             flash("Could not get email from Google. Please try again.", "error")
             return redirect(url_for("signin"))
         
-        print(f"\n📍 Step 7: Checking if user exists in database")
+        print(f"\nðŸ“ Step 7: Checking if user exists in database")
         user = User.query.filter_by(email=email).first()
         
         if user:
-            print(f"   ✅ Existing user found: {user.email}")
+            print(f"   âœ… Existing user found: {user.email}")
             print(f"   User ID: {user.id}")
             print(f"   User Type: {user.user_type}")
             
@@ -1279,39 +1279,39 @@ def callback():
                 user.oauth_provider = 'google'
                 user.profile_picture_url = picture_url
                 db.session.commit()
-                print(f"   ✅ Updated user with Google ID")
+                print(f"   âœ… Updated user with Google ID")
             
-            print(f"\n📍 Step 8: Setting session for existing user")
+            print(f"\nðŸ“ Step 8: Setting session for existing user")
             session.permanent = True
             session["email"] = user.email
             session["user_type"] = user.user_type
             session["user_id"] = user.id
             session["user_name"] = user.name
-            print(f"   ✅ Session set")
+            print(f"   âœ… Session set")
             print(f"      Email: {session.get('email')}")
             print(f"      Type: {session.get('user_type')}")
             print(f"      ID: {session.get('user_id')}")
             
-            print(f"\n📍 Step 9: Redirecting based on user type")
+            print(f"\nðŸ“ Step 9: Redirecting based on user type")
             if user.user_type == "1":
-                print(f"   ➡️ Redirecting to mentordashboard")
+                print(f"   âž¡ï¸ Redirecting to mentordashboard")
                 return redirect(url_for("mentordashboard"))
             elif user.user_type == "2":
-                print(f"   ➡️ Redirecting to menteedashboard")
+                print(f"   âž¡ï¸ Redirecting to menteedashboard")
                 return redirect(url_for("menteedashboard"))
             elif user.user_type == "0":
-                print(f"   ➡️ Redirecting to supervisordashboard")
+                print(f"   âž¡ï¸ Redirecting to supervisordashboard")
                 return redirect(url_for("supervisordashboard"))
             elif user.user_type == "3":
-                print(f"   ➡️ Redirecting to institutiondashboard")
+                print(f"   âž¡ï¸ Redirecting to institutiondashboard")
                 return redirect(url_for("institutiondashboard"))
             else:
-                print(f"   ➡️ No user type set, redirecting to select_user_type")
+                print(f"   âž¡ï¸ No user type set, redirecting to select_user_type")
                 return redirect(url_for("select_user_type"))
         else:
-            print(f"   ❌ User not found, creating new account")
+            print(f"   âŒ User not found, creating new account")
             
-            print(f"\n📍 Step 8: Creating new user object")
+            print(f"\nðŸ“ Step 8: Creating new user object")
             new_user = User(
                 name=name,
                 email=email,
@@ -1320,37 +1320,37 @@ def callback():
                 profile_picture_url=picture_url,
                 oauth_created_at=datetime.utcnow()
             )
-            print(f"   ✅ User object created")
+            print(f"   âœ… User object created")
             print(f"      Name: {new_user.name}")
             print(f"      Email: {new_user.email}")
             print(f"      Google ID: {new_user.google_id}")
             
-            print(f"\n📍 Step 9: Adding user to database session")
+            print(f"\nðŸ“ Step 9: Adding user to database session")
             db.session.add(new_user)
-            print(f"   ✅ User added to session")
+            print(f"   âœ… User added to session")
             
-            print(f"\n📍 Step 10: Committing to database")
+            print(f"\nðŸ“ Step 10: Committing to database")
             db.session.commit()
-            print(f"   ✅ Committed successfully")
+            print(f"   âœ… Committed successfully")
             print(f"   New User ID: {new_user.id}")
             
-            print(f"\n📍 Step 11: Setting session for new user")
+            print(f"\nðŸ“ Step 11: Setting session for new user")
             session.permanent = True
             session["email"] = email
             session["user_id"] = new_user.id
             session["oauth_user"] = True
             session["user_name"] = new_user.name
-            print(f"   ✅ Session set")
+            print(f"   âœ… Session set")
             print(f"      Email: {session.get('email')}")
             print(f"      ID: {session.get('user_id')}")
             
-            print(f"\n📍 Step 12: Redirecting to select_user_type")
-            print(f"   ➡️ Redirecting to select_user_type")
+            print(f"\nðŸ“ Step 12: Redirecting to select_user_type")
+            print(f"   âž¡ï¸ Redirecting to select_user_type")
             print("="*60 + "\n")
             return redirect(url_for("select_user_type"))
     
     except Exception as e:
-        print(f"\n❌ ERROR in callback: {str(e)}")
+        print(f"\nâŒ ERROR in callback: {str(e)}")
         import traceback
         print("\nFull traceback:")
         traceback.print_exc()
@@ -1362,18 +1362,18 @@ def callback():
 def select_user_type():
     """Allow OAuth users to select their user type"""
     if "email" not in session:
-        print("❌ No email in session - redirecting to signin")
+        print("âŒ No email in session - redirecting to signin")
         return redirect(url_for("signin"))
     
-    print(f"✅ Email in session: {session.get('email')}")
+    print(f"âœ… Email in session: {session.get('email')}")
     
     user = User.query.filter_by(email=session["email"]).first()
     
     if not user:
-        print(f"❌ User not found for email: {session.get('email')}")
+        print(f"âŒ User not found for email: {session.get('email')}")
         return redirect(url_for("signin"))
     
-    print(f"✅ User found: {user.email}, Current type: {user.user_type}")
+    print(f"âœ… User found: {user.email}, Current type: {user.user_type}")
     
     # If user already has a type, redirect to dashboard
     if user.user_type:
@@ -1381,7 +1381,7 @@ def select_user_type():
         session["user_type"] = user.user_type
         session["user_id"] = user.id
         
-        print(f"📝 User already has type: {user.user_type}, redirecting to dashboard")
+        print(f"ðŸ“ User already has type: {user.user_type}, redirecting to dashboard")
         
         if user.user_type == "1":
             return redirect(url_for("mentordashboard"))
@@ -1395,7 +1395,7 @@ def select_user_type():
     if request.method == "POST":
         user_type = request.form.get("user_type")
         
-        print(f"📝 User selected type: {user_type}")
+        print(f"ðŸ“ User selected type: {user_type}")
         
         if user_type not in ["0", "1", "2", "3"]:
             flash("Invalid user type selected", "error")
@@ -1405,7 +1405,7 @@ def select_user_type():
         user.user_type = user_type
         db.session.commit()
         
-        print(f"✅ User type saved to database: {user_type}")
+        print(f"âœ… User type saved to database: {user_type}")
         
         # Update session
         session.permanent = True
@@ -1413,7 +1413,7 @@ def select_user_type():
         session["user_id"] = user.id
         session["user_name"] = user.name
         
-        print(f"📝 Session updated - Type: {session.get('user_type')}, ID: {session.get('user_id')}")
+        print(f"ðŸ“ Session updated - Type: {session.get('user_type')}, ID: {session.get('user_id')}")
         
         # Redirect to profile completion
         if user_type == "1":
@@ -1964,7 +1964,7 @@ def reset_user_password(user_id):
             user.password = hashed_password
             db.session.commit()
             
-            flash(f"✅ Password reset successfully for {user.name} ({user.email})", "success")
+            flash(f"âœ… Password reset successfully for {user.name} ({user.email})", "success")
             return redirect(url_for("supervisordashboard"))
         except Exception as e:
             db.session.rollback()
@@ -2072,7 +2072,7 @@ def create_account():
             
             db.session.commit()
             
-            flash(f"✅ Account created successfully for {name} ({email})", "success")
+            flash(f"âœ… Account created successfully for {name} ({email})", "success")
             return redirect(url_for("manage_created_accounts"))
         except Exception as e:
             db.session.rollback()
@@ -2147,7 +2147,7 @@ def edit_user(user_id):
             user.institution = institution
             db.session.commit()
             
-            flash(f"✅ User details updated successfully for {name}", "success")
+            flash(f"âœ… User details updated successfully for {name}", "success")
             return redirect(url_for("manage_created_accounts"))
         except Exception as e:
             db.session.rollback()
@@ -2201,7 +2201,7 @@ def delete_user(user_id):
         db.session.delete(user)
         db.session.commit()
         
-        flash(f"✅ User {user_name} ({user_email}) has been deleted successfully", "success")
+        flash(f"âœ… User {user_name} ({user_email}) has been deleted successfully", "success")
         return redirect(url_for("manage_created_accounts"))
     except Exception as e:
         db.session.rollback()
@@ -2209,7 +2209,7 @@ def delete_user(user_id):
         return redirect(url_for("manage_created_accounts"))
 
 
-# ✅ UPDATE THIS ROUTE (remove profile references)
+# âœ… UPDATE THIS ROUTE (remove profile references)
 
 @app.route("/institutiondashboard")
 @profile_required
@@ -3313,7 +3313,7 @@ def mentee_tasks():
     # Get logged-in mentee
     mentee = User.query.filter_by(email=session["email"]).first()
     
-    # ✅ FETCH MENTORS FOR DROPDOWN (only approved mentors)
+    # âœ… FETCH MENTORS FOR DROPDOWN (only approved mentors)
     approved_mentors = MentorshipRequest.query\
         .filter_by(
             mentee_id=mentee.id,
@@ -3370,7 +3370,7 @@ def mentee_tasks():
         pending_tasks=pending_tasks,
         overdue_tasks=overdue_tasks,
         today=today,
-        mentors_list=mentors_list,  # ✅ PASS MENTORS TO TEMPLATE
+        mentors_list=mentors_list,  # âœ… PASS MENTORS TO TEMPLATE
         profile_complete=check_profile_complete(mentee.id, "2")
     )
 
@@ -3496,7 +3496,7 @@ def create_personal_task():
         # Get current mentee
         mentee = User.query.filter_by(email=session["email"]).first()
         
-        # ✅ Validate mentor (if provided)
+        # âœ… Validate mentor (if provided)
         selected_mentor = None
         if mentor_id and mentor_id != 'self':
             selected_mentor = User.query.get(int(mentor_id))
@@ -3511,7 +3511,7 @@ def create_personal_task():
         # Create personal task
         personal_task = PersonalTask(
             mentee_id=mentee.id,
-            mentor_id=selected_mentor.id if selected_mentor else None,  # ✅ SET MENTOR OR NULL
+            mentor_id=selected_mentor.id if selected_mentor else None,  # âœ… SET MENTOR OR NULL
             title=title,
             description=description,
             due_date=due_date,
@@ -4060,14 +4060,14 @@ def supervisor_tasks():
         return redirect(url_for("signin"))
     
     try:
-        print("🔍 Starting supervisor_tasks data fetch...")
+        print("ðŸ” Starting supervisor_tasks data fetch...")
         
         # Get all tasks with proper joins
         personal_tasks = db.session.query(PersonalTask, User).join(
             User, PersonalTask.mentee_id == User.id
         ).all()
         
-        print(f"📊 Found {len(personal_tasks)} personal tasks")
+        print(f"ðŸ“Š Found {len(personal_tasks)} personal tasks")
         
         mentee_tasks = db.session.query(MenteeTask, MasterTask, User).join(
             MasterTask, MenteeTask.task_id == MasterTask.id
@@ -4075,7 +4075,7 @@ def supervisor_tasks():
             User, MenteeTask.mentee_id == User.id
         ).all()
         
-        print(f"📊 Found {len(mentee_tasks)} mentee tasks")
+        print(f"ðŸ“Š Found {len(mentee_tasks)} mentee tasks")
         
         # Prepare tasks data
         all_tasks = []
@@ -4112,7 +4112,7 @@ def supervisor_tasks():
                 'type': 'master'
             })
         
-        print(f"🎯 Total tasks prepared: {len(all_tasks)}")
+        print(f"ðŸŽ¯ Total tasks prepared: {len(all_tasks)}")
         # Add serial numbers to all_tasks (dicts) for display
         for i, task in enumerate(all_tasks, start=1):
             try:
@@ -4128,7 +4128,7 @@ def supervisor_tasks():
         )
         
     except Exception as e:
-        print(f"❌ Error in supervisor_tasks: {str(e)}")
+        print(f"âŒ Error in supervisor_tasks: {str(e)}")
         import traceback
         traceback.print_exc()
         return render_template(
@@ -4723,14 +4723,14 @@ def editmentorprofile():
         try:
             db.session.commit()
             flash("Profile updated successfully!", "success")
-            print("✅ Database commit successful!")
+            print("âœ… Database commit successful!")
             return redirect(url_for("mentorprofile"))
         except Exception as e:
             db.session.rollback()
             flash(f"Error updating profile: {str(e)}", "error")
-            print(f"❌ Database commit failed: {str(e)}")
+            print(f"âŒ Database commit failed: {str(e)}")
 
-    # GET request – pre-fill form with existing data
+    # GET request â€“ pre-fill form with existing data
     # Parse location to get city and country separately
     location = profile.location if profile else ""
     city = ""
@@ -4963,7 +4963,7 @@ def editmenteeprofile():
         flash("Mentee profile updated successfully!", "success")
         return redirect(url_for("menteeprofile"))
 
-    # GET request – pre-fill form with existing data
+    # GET request â€“ pre-fill form with existing data
     return render_template(
         "mentee/editmenteeprofile.html",
         full_name=user.name,
@@ -5152,7 +5152,7 @@ def change_password():
         user.password = generate_password_hash(new_password, method='pbkdf2:sha256', salt_length=8)
         db.session.commit()
         
-        flash("✅ Password changed successfully!", "success")
+        flash("âœ… Password changed successfully!", "success")
         return redirect(url_for("profile"))
     
     return render_template("change_password.html")
@@ -5501,7 +5501,7 @@ def create_meeting_ajax():
     # Calculate start and end datetime
     start_datetime = dt.datetime.strptime(f"{date} {start_time}", "%Y-%m-%d %H:%M")
     
-    # ✅ VALIDATION: Check if meeting date/time is in the past
+    # âœ… VALIDATION: Check if meeting date/time is in the past
     current_datetime = dt.datetime.now()
     if start_datetime <= current_datetime:
         return jsonify({"error": "Cannot create meeting for past or current date/time. Please select a future date and time."}), 400
@@ -5561,7 +5561,7 @@ def create_meeting_ajax():
 
 
     return jsonify({
-        "message": "Meeting Created ✅",
+        "message": "Meeting Created âœ…",
         "meet_link": event.get("hangoutLink"),
         "title": title,
         "start": start_str,
@@ -5938,18 +5938,6 @@ def editinstitutionprofile():
     )
 
 
-# ============================================================
-# CHAT SYSTEM ROUTES
-# ============================================================
-
-def check_chat_access(user_id, other_user_id, user_type):
-    """
-    Check if a user can chat with another user based on roles.
-    
-    Rules:
-    - Mentee (2) can chat with: assigned mentor (1), supervisor (0)
-    - Mentor (1) can chat with: assigned mentees (2), supervisor (0)
-    - Supervisor (0) can chat with: any mentor (1), any mentee (2)
     - Institution (3) can chat with: supervisors (0)
     
     Returns: (allowed: bool, reason: str)
@@ -6389,5 +6377,24 @@ def get_allowed_contacts():
         return jsonify({"success": False, "message": str(e)}), 500
 
 
-if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=5000)
+@app.route("/chat")
+def chat_page():
+    """
+    Render the chat page.
+    """
+    if "email" not in session or "user_id" not in session:
+        return redirect(url_for("signin"))
+    
+    return render_template("chat.html")
+
+
+if __name__ == "__main__":
+
+
+if __name__ == "__main__":
+    if PRODUCTION:
+        # Production mode - don't use debug, use a proper WSGI server
+        app.run(debug=False, host="0.0.0.0", port=5000)
+    else:
+        # Development mode
+        app.run(debug=True)
