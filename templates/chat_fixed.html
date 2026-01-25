@@ -135,33 +135,11 @@
 
     console.log('Chat script loaded');
 
-    // Get current user ID from API
-    function getCurrentUserId() {
-        return fetch('/api/chat/current-user')
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    currentUserId = data.user_id;
-                    console.log('Current user ID:', currentUserId);
-                    return currentUserId;
-                } else {
-                    console.error('Failed to get current user:', data.message);
-                    return null;
-                }
-            })
-            .catch(error => {
-                console.error('Error getting current user:', error);
-                return null;
-            });
-    }
-
     // Initialize
     document.addEventListener('DOMContentLoaded', function() {
         console.log('DOMContentLoaded fired');
         setupEventListeners();
-        getCurrentUserId().then(() => {
-            loadConversations();
-        });
+        loadConversations();
     });
 
     function setupEventListeners() {
@@ -311,15 +289,6 @@
         if (selected) {
             selected.classList.add('active', 'bg-blue-50', 'border-l-blue-500');
             selected.classList.remove('border-l-transparent');
-            
-            // Update chat header with person's name
-            const userName = selected.querySelector('h3').textContent;
-            const userRole = selected.querySelector('.text-xs').textContent;
-            const userInitials = userName.substring(0, 2).toUpperCase();
-            
-            document.getElementById('chatName').textContent = userName;
-            document.getElementById('chatStatus').textContent = userRole;
-            document.getElementById('chatAvatar').textContent = userInitials;
         }
         
         // Enable message input
