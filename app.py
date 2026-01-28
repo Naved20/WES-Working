@@ -4658,10 +4658,14 @@ def editmentorprofile():
         profile.organisation = request.form.get("organisation")
         profile.years_of_experience = request.form.get("years_of_experience")
         
-        # Handle WhatsApp with country code
+        # Handle WhatsApp with country code - combine them
         whatsapp_country_code = request.form.get("whatsapp_country_code", "+91")
         whatsapp_number = request.form.get("whatsapp")
-        profile.whatsapp = whatsapp_number  # Store just the number, or combine: f"{whatsapp_country_code} {whatsapp_number}"
+        if whatsapp_number:
+            # Combine country code and number
+            profile.whatsapp = f"{whatsapp_country_code} {whatsapp_number}"
+        else:
+            profile.whatsapp = None
         
         # Handle "Other" option for country
         country = request.form.get("country")
@@ -4742,6 +4746,21 @@ def editmentorprofile():
     else:
         city = location
     
+    # Parse WhatsApp to get country code and number separately
+    whatsapp_full = profile.whatsapp if profile else ""
+    whatsapp_country_code = "+91"  # Default
+    whatsapp_number = ""
+    
+    if whatsapp_full:
+        # Try to split by space to separate country code and number
+        parts = whatsapp_full.split(" ", 1)
+        if len(parts) == 2 and parts[0].startswith("+"):
+            whatsapp_country_code = parts[0]
+            whatsapp_number = parts[1]
+        else:
+            # If no space or doesn't start with +, treat entire string as number
+            whatsapp_number = whatsapp_full
+    
     return render_template(
         "mentor/editmentorprofile.html",
         full_name=user.name,
@@ -4754,8 +4773,8 @@ def editmentorprofile():
         industry_sector=profile.industry_sector if profile else "",
         organisation=profile.organisation if profile else "",
         years_of_experience=profile.years_of_experience if profile else "",
-        whatsapp=profile.whatsapp if profile else "",
-        whatsapp_country_code="+91",  # Default country code
+        whatsapp=whatsapp_number,
+        whatsapp_country_code=whatsapp_country_code,
         location=location,
         city=city,
         country=country,
@@ -5182,6 +5201,8 @@ def mentorprofile():
             institution=user.institution,
             profession=profile.profession if profile else "",
             organisation=profile.organisation if profile else "",
+            industry_sector=profile.industry_sector if profile else "",
+            role=profile.role if profile else "",
             whatsapp=profile.whatsapp if profile else "",
             location=profile.location if profile else "",
             education=profile.education if profile else "",
@@ -5201,6 +5222,7 @@ def mentorprofile():
             mentorship_type_preference=profile.mentorship_type_preference if profile else "",
             mentorship_philosophy=profile.mentorship_philosophy if profile else "",
             mentorship_motto=profile.mentorship_motto if profile else "",
+            preferred_duration=profile.preferred_duration if profile else "",
             profile_picture=profile.profile_picture if profile else None,
             institution_profile_picture=institution_profile_picture
         )

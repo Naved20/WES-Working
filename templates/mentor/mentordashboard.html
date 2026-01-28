@@ -27,7 +27,7 @@
     </div>
     
     <!-- Stats Overview -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
       <div class="bg-blue-50 p-5 rounded-xl border border-blue-100">
         <div class="flex items-center">
           <div class="rounded-full bg-blue-100 p-3 mr-4">
@@ -66,6 +66,20 @@
           <div>
             <p class="text-sm font-medium text-gray-500">Upcoming Sessions</p>
             <p class="text-2xl font-bold text-gray-800">{{ upcoming_sessions if upcoming_sessions else 0 }}</p>
+          </div>
+        </div>
+      </div>
+      
+      <div class="bg-orange-50 p-5 rounded-xl border border-orange-100">
+        <div class="flex items-center">
+          <div class="rounded-full bg-orange-100 p-3 mr-4">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-orange-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+            </svg>
+          </div>
+          <div>
+            <p class="text-sm font-medium text-gray-500">Pending Requests</p>
+            <p class="text-2xl font-bold text-gray-800">{{ incoming_requests|selectattr('mentor_status', 'equalto', 'pending')|list|length if incoming_requests else 0 }}</p>
           </div>
         </div>
       </div>
@@ -129,6 +143,58 @@
           </div>
         {% endif %}
       </div>
+    </div>
+    
+    <!-- Mentorship Requests -->
+    <div class="mt-8">
+      <div class="flex justify-between items-center mb-4">
+        <h3 class="text-lg font-semibold text-gray-800">Mentorship Requests</h3>
+        <a href="{{ url_for('mentor_mentorship_request') }}" class="text-sm text-blue-600 hover:text-blue-800 font-medium">View all</a>
+      </div>
+      {% if incoming_requests and incoming_requests|length > 0 %}
+      <div class="space-y-3">
+        {% for request in incoming_requests[:3] %}
+        <div class="bg-gray-50 rounded-lg border border-gray-200 p-4">
+          <div class="flex items-center justify-between mb-2">
+            <div class="flex items-center gap-3">
+              {% if request.mentee.mentee_profile and request.mentee.mentee_profile.profile_picture %}
+              <img src="{{ url_for('static', filename='uploads/' ~ request.mentee.mentee_profile.profile_picture) }}" 
+                   alt="{{ request.mentee.name }}" 
+                   class="w-10 h-10 rounded-full object-cover border-2 border-white shadow">
+              {% else %}
+              <div class="w-10 h-10 rounded-full bg-gradient-to-br from-blue-100 to-blue-200 flex items-center justify-center text-blue-600 border-2 border-white shadow">
+                <span class="text-sm font-semibold">{{ request.mentee.name[0] if request.mentee.name else '?' }}</span>
+              </div>
+              {% endif %}
+              <div>
+                <p class="font-medium text-gray-800">{{ request.mentee.name }}</p>
+                <p class="text-xs text-gray-500">{{ request.purpose if request.purpose else 'Mentorship request' }}</p>
+              </div>
+            </div>
+            <div class="text-right">
+              <span class="text-xs px-2 py-1 rounded-full {% if request.mentor_status == 'accepted' %}bg-green-100 text-green-700{% elif request.mentor_status == 'rejected' %}bg-red-100 text-red-700{% else %}bg-yellow-100 text-yellow-700{% endif %}">
+                {{ request.mentor_status|capitalize }}
+              </span>
+            </div>
+          </div>
+          {% if request.mentor_status == 'pending' %}
+          <div class="flex gap-2 mt-3">
+            <button class="btn-accept flex-1 px-3 py-1.5 bg-green-600 text-white text-sm rounded-lg hover:bg-green-700 transition" data-id="{{ request.id }}">
+              Accept
+            </button>
+            <button class="btn-decline flex-1 px-3 py-1.5 bg-red-600 text-white text-sm rounded-lg hover:bg-red-700 transition" data-id="{{ request.id }}">
+              Decline
+            </button>
+          </div>
+          {% endif %}
+        </div>
+        {% endfor %}
+      </div>
+      {% else %}
+      <div class="bg-gray-50 rounded-lg border border-gray-200 p-4 text-center">
+        <p class="text-gray-500">No mentorship requests at the moment</p>
+      </div>
+      {% endif %}
     </div>
   </section>
 
