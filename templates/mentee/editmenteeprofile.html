@@ -64,6 +64,7 @@
                     <label class="block text-gray-700 font-semibold">Institution / Organization *</label>
                     <select name="institution" class="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
                         <option value="">-- Select Institution --</option>
+                        <option value="Self" {% if institution == 'Self' %}selected{% endif %}>Self (Not affiliated with any institution)</option>
                         <option value="University of Luxembourg" {% if institution == 'University of Luxembourg' %}selected{% endif %}>University of Luxembourg</option>
                         <option value="Harvard University" {% if institution == 'Harvard University' %}selected{% endif %}>Harvard University</option>
                         <option value="Stanford University" {% if institution == 'Stanford University' %}selected{% endif %}>Stanford University</option>
