@@ -6128,9 +6128,9 @@ def get_conversations():
                 "other_user_name": other_user.name,
                 "other_user_type": other_user.user_type,
                 "last_message": last_message.content if last_message else None,
-                "last_message_time": last_message.created_at.isoformat() if last_message else None,
+                "last_message_time": last_message.created_at.isoformat() + 'Z' if last_message else None,  # Add 'Z' to indicate UTC
                 "unread_count": unread_count,
-                "updated_at": conv.updated_at.isoformat()
+                "updated_at": conv.updated_at.isoformat() + 'Z'  # Add 'Z' to indicate UTC
             })
         
         return jsonify({"success": True, "conversations": result})
@@ -6206,7 +6206,7 @@ def get_messages(conversation_id):
                 "sender_name": msg.sender.name,
                 "content": msg.content,
                 "is_read": msg.is_read,
-                "created_at": msg.created_at.isoformat()
+                "created_at": msg.created_at.isoformat() + 'Z'  # Add 'Z' to indicate UTC
             })
         
         return jsonify({
@@ -6261,7 +6261,7 @@ def send_message():
         return jsonify({
             "success": True,
             "message_id": message.id,
-            "created_at": message.created_at.isoformat()
+            "created_at": message.created_at.isoformat() + 'Z'  # Add 'Z' to indicate UTC
         })
     
     except Exception as e:

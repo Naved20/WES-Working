@@ -464,6 +464,7 @@
         document.addEventListener('DOMContentLoaded', function() {
             const profilePopup = document.getElementById('profile-complete-popup');
             const remindLaterBtn = document.getElementById('remind-later-btn');
+            const completeProfileBtn = profilePopup ? profilePopup.querySelector('a[href*="profile"]') : null;
             
             console.log('Profile popup element:', profilePopup); // Debug log
             
@@ -478,6 +479,16 @@
                     sessionStorage.setItem('profileRemindLater', 'true');
                     console.log('Popup hidden, remind later set');
                 });
+                
+                // Hide popup when "Complete Profile Now" is clicked
+                if (completeProfileBtn) {
+                    completeProfileBtn.addEventListener('click', function() {
+                        profilePopup.classList.add('hidden');
+                        // Store in sessionStorage so popup doesn't reappear
+                        sessionStorage.setItem('profileRemindLater', 'true');
+                        console.log('Popup hidden, navigating to profile page');
+                    });
+                }
                 
                 // Check if user previously chose "Remind Me Later" in this session
                 if (sessionStorage.getItem('profileRemindLater') === 'true') {
