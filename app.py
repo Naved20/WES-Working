@@ -5509,6 +5509,7 @@ def create_meeting_ajax():
     date = data.get("date")
     start_time = data.get("start_time")
     duration = data.get("duration")  # duration in minutes
+    timezone = data.get("timezone", "Asia/Kolkata")  # default to IST if not provided
     mentor_id = data.get("mentor_id")
 
     if not all([title, date, start_time, duration, mentor_id]):
@@ -5536,9 +5537,9 @@ def create_meeting_ajax():
     service = get_calendar_service()
     event = {
         "summary": title,
-        "description": f"Meeting created by {mentee.name} ({mentee.email})",
-        "start": {"dateTime": start_str, "timeZone": "Asia/Kolkata"},
-        "end": {"dateTime": end_str, "timeZone": "Asia/Kolkata"},
+        "description": f"Meeting created by {mentee.name} ({mentee.email}) in {timezone} timezone",
+        "start": {"dateTime": start_str, "timeZone": timezone},
+        "end": {"dateTime": end_str, "timeZone": timezone},
         "attendees": [
             {"email": mentee.email},
             {"email": mentor.email}
@@ -5588,6 +5589,7 @@ def create_meeting_ajax():
         "title": title,
         "start": start_str,
         "end": end_str,
+        "timezone": timezone,
         "mentee_email": mentee.email,
         "mentor_email": mentor.email
     })
