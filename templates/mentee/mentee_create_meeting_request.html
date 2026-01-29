@@ -35,6 +35,177 @@
     <option value="60">1 hour</option>
   </select>
 
+  <select id="timezone" required
+    style="padding:8px; width:90%; border:1px solid #ccc; border-radius:6px;">
+    <option value="">Select Time Zone</option>
+    
+    <!-- Africa -->
+    <optgroup label="Africa">
+      <option value="Africa/Abidjan">Abidjan (GMT - UTC+0)</option>
+      <option value="Africa/Accra">Accra (GMT - UTC+0)</option>
+      <option value="Africa/Addis_Ababa">Addis Ababa (EAT - UTC+3)</option>
+      <option value="Africa/Algiers">Algiers (CET - UTC+1)</option>
+      <option value="Africa/Cairo">Cairo (EET - UTC+2)</option>
+      <option value="Africa/Casablanca">Casablanca (WET - UTC+0/+1)</option>
+      <option value="Africa/Johannesburg">Johannesburg (SAST - UTC+2)</option>
+      <option value="Africa/Lagos">Lagos (WAT - UTC+1)</option>
+      <option value="Africa/Nairobi">Nairobi (EAT - UTC+3)</option>
+      <option value="Africa/Tunis">Tunis (CET - UTC+1)</option>
+    </optgroup>
+    
+    <!-- Americas -->
+    <optgroup label="Americas - North America">
+      <option value="America/Anchorage">Anchorage (AKST/AKDT - UTC-9/-8)</option>
+      <option value="America/Chicago">Chicago (CST/CDT - UTC-6/-5)</option>
+      <option value="America/Denver">Denver (MST/MDT - UTC-7/-6)</option>
+      <option value="America/Detroit">Detroit (EST/EDT - UTC-5/-4)</option>
+      <option value="America/Halifax">Halifax (AST/ADT - UTC-4/-3)</option>
+      <option value="America/Los_Angeles">Los Angeles (PST/PDT - UTC-8/-7)</option>
+      <option value="America/Mexico_City">Mexico City (CST/CDT - UTC-6/-5)</option>
+      <option value="America/New_York">New York (EST/EDT - UTC-5/-4)</option>
+      <option value="America/Phoenix">Phoenix (MST - UTC-7)</option>
+      <option value="America/Toronto">Toronto (EST/EDT - UTC-5/-4)</option>
+      <option value="America/Vancouver">Vancouver (PST/PDT - UTC-8/-7)</option>
+    </optgroup>
+    
+    <optgroup label="Americas - Central America">
+      <option value="America/Belize">Belize (CST - UTC-6)</option>
+      <option value="America/Costa_Rica">Costa Rica (CST - UTC-6)</option>
+      <option value="America/Guatemala">Guatemala (CST - UTC-6)</option>
+      <option value="America/Havana">Havana (CST/CDT - UTC-5/-4)</option>
+      <option value="America/Panama">Panama (EST - UTC-5)</option>
+    </optgroup>
+    
+    <optgroup label="Americas - South America">
+      <option value="America/Bogota">Bogota (COT - UTC-5)</option>
+      <option value="America/Buenos_Aires">Buenos Aires (ART - UTC-3)</option>
+      <option value="America/Caracas">Caracas (VET - UTC-4)</option>
+      <option value="America/Lima">Lima (PET - UTC-5)</option>
+      <option value="America/Santiago">Santiago (CLT/CLST - UTC-4/-3)</option>
+      <option value="America/Sao_Paulo">São Paulo (BRT/BRST - UTC-3/-2)</option>
+    </optgroup>
+    
+    <!-- Asia -->
+    <optgroup label="Asia - Middle East">
+      <option value="Asia/Amman">Amman (EET/EEST - UTC+2/+3)</option>
+      <option value="Asia/Baghdad">Baghdad (AST - UTC+3)</option>
+      <option value="Asia/Beirut">Beirut (EET/EEST - UTC+2/+3)</option>
+      <option value="Asia/Damascus">Damascus (EET/EEST - UTC+2/+3)</option>
+      <option value="Asia/Dubai">Dubai (GST - UTC+4)</option>
+      <option value="Asia/Jerusalem">Jerusalem (IST/IDT - UTC+2/+3)</option>
+      <option value="Asia/Kuwait">Kuwait (AST - UTC+3)</option>
+      <option value="Asia/Riyadh">Riyadh (AST - UTC+3)</option>
+      <option value="Asia/Tehran">Tehran (IRST/IRDT - UTC+3:30/+4:30)</option>
+    </optgroup>
+    
+    <optgroup label="Asia - Central Asia">
+      <option value="Asia/Almaty">Almaty (ALMT - UTC+6)</option>
+      <option value="Asia/Ashgabat">Ashgabat (TMT - UTC+5)</option>
+      <option value="Asia/Baku">Baku (AZT - UTC+4)</option>
+      <option value="Asia/Kabul">Kabul (AFT - UTC+4:30)</option>
+      <option value="Asia/Karachi">Karachi (PKT - UTC+5)</option>
+      <option value="Asia/Tashkent">Tashkent (UZT - UTC+5)</option>
+      <option value="Asia/Yerevan">Yerevan (AMT - UTC+4)</option>
+    </optgroup>
+    
+    <optgroup label="Asia - South Asia">
+      <option value="Asia/Colombo">Colombo (IST - UTC+5:30)</option>
+      <option value="Asia/Dhaka">Dhaka (BST - UTC+6)</option>
+      <option value="Asia/Kathmandu">Kathmandu (NPT - UTC+5:45)</option>
+      <option value="Asia/Kolkata">Kolkata/India (IST - UTC+5:30)</option>
+    </optgroup>
+    
+    <optgroup label="Asia - Southeast Asia">
+      <option value="Asia/Bangkok">Bangkok (ICT - UTC+7)</option>
+      <option value="Asia/Ho_Chi_Minh">Ho Chi Minh (ICT - UTC+7)</option>
+      <option value="Asia/Jakarta">Jakarta (WIB - UTC+7)</option>
+      <option value="Asia/Kuala_Lumpur">Kuala Lumpur (MYT - UTC+8)</option>
+      <option value="Asia/Manila">Manila (PST - UTC+8)</option>
+      <option value="Asia/Singapore">Singapore (SGT - UTC+8)</option>
+      <option value="Asia/Yangon">Yangon (MMT - UTC+6:30)</option>
+    </optgroup>
+    
+    <optgroup label="Asia - East Asia">
+      <option value="Asia/Hong_Kong">Hong Kong (HKT - UTC+8)</option>
+      <option value="Asia/Seoul">Seoul (KST - UTC+9)</option>
+      <option value="Asia/Shanghai">Shanghai (CST - UTC+8)</option>
+      <option value="Asia/Taipei">Taipei (CST - UTC+8)</option>
+      <option value="Asia/Tokyo">Tokyo (JST - UTC+9)</option>
+    </optgroup>
+    
+    <!-- Europe -->
+    <optgroup label="Europe - Western Europe">
+      <option value="Europe/Dublin">Dublin (GMT/IST - UTC+0/+1)</option>
+      <option value="Europe/Lisbon">Lisbon (WET/WEST - UTC+0/+1)</option>
+      <option value="Europe/London">London (GMT/BST - UTC+0/+1)</option>
+    </optgroup>
+    
+    <optgroup label="Europe - Central Europe">
+      <option value="Europe/Amsterdam">Amsterdam (CET/CEST - UTC+1/+2)</option>
+      <option value="Europe/Berlin">Berlin (CET/CEST - UTC+1/+2)</option>
+      <option value="Europe/Brussels">Brussels (CET/CEST - UTC+1/+2)</option>
+      <option value="Europe/Budapest">Budapest (CET/CEST - UTC+1/+2)</option>
+      <option value="Europe/Copenhagen">Copenhagen (CET/CEST - UTC+1/+2)</option>
+      <option value="Europe/Luxembourg">Luxembourg (CET/CEST - UTC+1/+2)</option>
+      <option value="Europe/Madrid">Madrid (CET/CEST - UTC+1/+2)</option>
+      <option value="Europe/Oslo">Oslo (CET/CEST - UTC+1/+2)</option>
+      <option value="Europe/Paris">Paris (CET/CEST - UTC+1/+2)</option>
+      <option value="Europe/Prague">Prague (CET/CEST - UTC+1/+2)</option>
+      <option value="Europe/Rome">Rome (CET/CEST - UTC+1/+2)</option>
+      <option value="Europe/Stockholm">Stockholm (CET/CEST - UTC+1/+2)</option>
+      <option value="Europe/Vienna">Vienna (CET/CEST - UTC+1/+2)</option>
+      <option value="Europe/Warsaw">Warsaw (CET/CEST - UTC+1/+2)</option>
+      <option value="Europe/Zurich">Zurich (CET/CEST - UTC+1/+2)</option>
+    </optgroup>
+    
+    <optgroup label="Europe - Eastern Europe">
+      <option value="Europe/Athens">Athens (EET/EEST - UTC+2/+3)</option>
+      <option value="Europe/Bucharest">Bucharest (EET/EEST - UTC+2/+3)</option>
+      <option value="Europe/Helsinki">Helsinki (EET/EEST - UTC+2/+3)</option>
+      <option value="Europe/Istanbul">Istanbul (TRT - UTC+3)</option>
+      <option value="Europe/Kiev">Kiev (EET/EEST - UTC+2/+3)</option>
+      <option value="Europe/Moscow">Moscow (MSK - UTC+3)</option>
+      <option value="Europe/Riga">Riga (EET/EEST - UTC+2/+3)</option>
+      <option value="Europe/Sofia">Sofia (EET/EEST - UTC+2/+3)</option>
+      <option value="Europe/Tallinn">Tallinn (EET/EEST - UTC+2/+3)</option>
+      <option value="Europe/Vilnius">Vilnius (EET/EEST - UTC+2/+3)</option>
+    </optgroup>
+    
+    <!-- Pacific -->
+    <optgroup label="Pacific - Australia & New Zealand">
+      <option value="Australia/Adelaide">Adelaide (ACST/ACDT - UTC+9:30/+10:30)</option>
+      <option value="Australia/Brisbane">Brisbane (AEST - UTC+10)</option>
+      <option value="Australia/Darwin">Darwin (ACST - UTC+9:30)</option>
+      <option value="Australia/Melbourne">Melbourne (AEST/AEDT - UTC+10/+11)</option>
+      <option value="Australia/Perth">Perth (AWST - UTC+8)</option>
+      <option value="Australia/Sydney">Sydney (AEST/AEDT - UTC+10/+11)</option>
+      <option value="Pacific/Auckland">Auckland (NZST/NZDT - UTC+12/+13)</option>
+      <option value="Pacific/Fiji">Fiji (FJT/FJST - UTC+12/+13)</option>
+    </optgroup>
+    
+    <optgroup label="Pacific - Pacific Islands">
+      <option value="Pacific/Guam">Guam (ChST - UTC+10)</option>
+      <option value="Pacific/Honolulu">Honolulu (HST - UTC-10)</option>
+      <option value="Pacific/Pago_Pago">Pago Pago (SST - UTC-11)</option>
+      <option value="Pacific/Port_Moresby">Port Moresby (PGT - UTC+10)</option>
+      <option value="Pacific/Tahiti">Tahiti (TAHT - UTC-10)</option>
+      <option value="Pacific/Tongatapu">Tongatapu (TOT - UTC+13)</option>
+    </optgroup>
+    
+    <!-- Atlantic -->
+    <optgroup label="Atlantic">
+      <option value="Atlantic/Azores">Azores (AZOT/AZOST - UTC-1/+0)</option>
+      <option value="Atlantic/Bermuda">Bermuda (AST/ADT - UTC-4/-3)</option>
+      <option value="Atlantic/Cape_Verde">Cape Verde (CVT - UTC-1)</option>
+      <option value="Atlantic/Reykjavik">Reykjavik (GMT - UTC+0)</option>
+    </optgroup>
+    
+    <!-- Other -->
+    <optgroup label="Other">
+      <option value="UTC">UTC (Coordinated Universal Time)</option>
+    </optgroup>
+  </select>
+
   <button onclick="createMeeting()" 
     style="padding:10px 18px; background:#2563eb; color:white; border:none; border-radius:6px; cursor:pointer;">
     Create Meeting
@@ -51,10 +222,11 @@ async function createMeeting() {
   const date = document.getElementById("date").value;
   const start_time = document.getElementById("start_time").value;
   const duration = document.getElementById("duration").value;
+  const timezone = document.getElementById("timezone").value;
   const mentor_id = document.getElementById("mentor_id").value;
 
-  if (!title || !date || !start_time || !duration) {
-    Swal.fire("Error", "Please fill all fields!", "error");
+  if (!title || !date || !start_time || !duration || !timezone) {
+    Swal.fire("Error", "Please fill all fields including time zone!", "error");
     return;
   }
 
@@ -81,7 +253,7 @@ async function createMeeting() {
     const response = await fetch("/create_meeting_ajax", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ title, date, start_time, duration, mentor_id })
+      body: JSON.stringify({ title, date, start_time, duration, timezone, mentor_id })
     });
 
     const data = await response.json();
@@ -92,6 +264,7 @@ async function createMeeting() {
         html: `
           <b>${data.title}</b><br>
           <p>${data.start} → ${data.end}</p>
+          <p><strong>Time Zone:</strong> ${data.timezone}</p>
           <p>Mentee: ${data.mentee_email}<br>Mentor: ${data.mentor_email}</p>
           <a href="${data.meet_link}" target="_blank">${data.meet_link}</a>
         `,
@@ -113,6 +286,24 @@ document.addEventListener('DOMContentLoaded', function() {
   const dateInput = document.getElementById('date');
   const today = new Date().toISOString().split('T')[0];
   dateInput.min = today;
+  
+  // Auto-detect and pre-select user's timezone
+  const timezoneSelect = document.getElementById('timezone');
+  const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+  
+  // Try to match the detected timezone with one of our options
+  const options = timezoneSelect.options;
+  for (let i = 0; i < options.length; i++) {
+    if (options[i].value === userTimezone) {
+      timezoneSelect.selectedIndex = i;
+      break;
+    }
+  }
+  
+  // If no exact match found, default to Asia/Kolkata for Indian users
+  if (!timezoneSelect.value && userTimezone.includes('Asia/Calcutta')) {
+    timezoneSelect.value = 'Asia/Kolkata';
+  }
 });
 </script>
 
