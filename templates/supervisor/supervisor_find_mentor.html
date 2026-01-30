@@ -147,7 +147,24 @@
               '{{ mentor.linkedin_link }}',
               '{{ mentor.github_link }}',
               '{{ mentor.portfolio_link }}',
-              '{{ mentor.preferred_duration }}'
+              '{{ mentor.preferred_duration }}',
+              '{{ mentor.mentorship_type_preference }}',
+              '{{ mentor.connect_frequency }}',
+              '{{ mentor.whatsapp }}',
+              '{{ mentor.country }}',
+              '{{ mentor.city }}',
+              '{{ mentor.whatsapp_country_code }}',
+              '{{ mentor.highest_qualification }}',
+              '{{ mentor.degree_name }}',
+              '{{ mentor.field_of_study }}',
+              '{{ mentor.university_name }}',
+              '{{ mentor.graduation_year }}',
+              '{{ mentor.academic_status }}',
+              '{{ mentor.certifications }}',
+              '{{ mentor.research_work }}',
+              '{{ mentor.mentorship_philosophy }}',
+              '{{ mentor.mentorship_motto }}',
+              '{{ mentor.other_social_link }}'
           )" class="flex-1 px-4 py-2 bg-gray-100 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-200 transition">
               View Profile
           </button>
@@ -166,8 +183,6 @@
       <p class="text-gray-500">There are no mentors registered in the system yet.</p>
     </div>
     {% endif %}
-
-
 
 <!-- Updated Profile Modal Content -->
 <div id="profileModal" class="fixed inset-0 hidden bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
@@ -357,13 +372,160 @@
         </div>
       </div>
 
+      <!-- Educational Information Section -->
+      <div class="mb-8 p-6 bg-gradient-to-r from-indigo-50 to-blue-50 rounded-lg border border-indigo-100">
+        <h4 class="font-semibold text-gray-800 flex items-center mb-4">
+          <svg class="w-5 h-5 text-indigo-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C6.5 6.253 2 10.998 2 17.25m20-11.002c0 5.251-4.5 9.999-10 9.999M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+          Educational Information
+        </h4>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="flex items-start">
+            <svg class="w-4 h-4 text-indigo-600 mr-2 mt-1 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5.951-1.429 5.951 1.429a1 1 0 001.169-1.409l-7-14z"></path></svg>
+            <div>
+              <p class="font-medium text-gray-700">Highest Qualification</p>
+              <p id="modalHighestQualification" class="text-gray-600"></p>
+            </div>
+          </div>
+          <div class="flex items-start">
+            <svg class="w-4 h-4 text-indigo-600 mr-2 mt-1 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5.951-1.429 5.951 1.429a1 1 0 001.169-1.409l-7-14z"></path></svg>
+            <div>
+              <p class="font-medium text-gray-700">Degree Name</p>
+              <p id="modalDegreeName" class="text-gray-600"></p>
+            </div>
+          </div>
+          <div class="flex items-start">
+            <svg class="w-4 h-4 text-indigo-600 mr-2 mt-1 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5.951-1.429 5.951 1.429a1 1 0 001.169-1.409l-7-14z"></path></svg>
+            <div>
+              <p class="font-medium text-gray-700">Field of Study</p>
+              <p id="modalFieldOfStudy" class="text-gray-600"></p>
+            </div>
+          </div>
+          <div class="flex items-start">
+            <svg class="w-4 h-4 text-indigo-600 mr-2 mt-1 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5.951-1.429 5.951 1.429a1 1 0 001.169-1.409l-7-14z"></path></svg>
+            <div>
+              <p class="font-medium text-gray-700">University/Institution</p>
+              <p id="modalUniversityName" class="text-gray-600"></p>
+            </div>
+          </div>
+          <div class="flex items-start">
+            <svg class="w-4 h-4 text-indigo-600 mr-2 mt-1 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5.951-1.429 5.951 1.429a1 1 0 001.169-1.409l-7-14z"></path></svg>
+            <div>
+              <p class="font-medium text-gray-700">Graduation Year</p>
+              <p id="modalGraduationYear" class="text-gray-600"></p>
+            </div>
+          </div>
+          <div class="flex items-start">
+            <svg class="w-4 h-4 text-indigo-600 mr-2 mt-1 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5.951-1.429 5.951 1.429a1 1 0 001.169-1.409l-7-14z"></path></svg>
+            <div>
+              <p class="font-medium text-gray-700">Academic Status</p>
+              <p id="modalAcademicStatus" class="text-gray-600"></p>
+            </div>
+          </div>
+          <div class="flex items-start col-span-1 md:col-span-2">
+            <svg class="w-4 h-4 text-indigo-600 mr-2 mt-1 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5.951-1.429 5.951 1.429a1 1 0 001.169-1.409l-7-14z"></path></svg>
+            <div>
+              <p class="font-medium text-gray-700">Certifications</p>
+              <p id="modalCertifications" class="text-gray-600"></p>
+            </div>
+          </div>
+          <div class="flex items-start col-span-1 md:col-span-2">
+            <svg class="w-4 h-4 text-indigo-600 mr-2 mt-1 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5.951-1.429 5.951 1.429a1 1 0 001.169-1.409l-7-14z"></path></svg>
+            <div>
+              <p class="font-medium text-gray-700">Research Work</p>
+              <p id="modalResearchWork" class="text-gray-600"></p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mentorship Preferences Section -->
+      <div class="mb-8 p-6 bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg border border-green-100">
+        <h4 class="font-semibold text-gray-800 flex items-center mb-4">
+          <svg class="w-5 h-5 text-green-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+          Mentorship Preferences
+        </h4>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="flex items-start">
+            <svg class="w-4 h-4 text-green-600 mr-2 mt-1 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5.951-1.429 5.951 1.429a1 1 0 001.169-1.409l-7-14z"></path></svg>
+            <div>
+              <p class="font-medium text-gray-700">Mentee Type Preference</p>
+              <p id="modalMentorshipTypePreference" class="text-gray-600"></p>
+            </div>
+          </div>
+          <div class="flex items-start">
+            <svg class="w-4 h-4 text-green-600 mr-2 mt-1 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5.951-1.429 5.951 1.429a1 1 0 001.169-1.409l-7-14z"></path></svg>
+            <div>
+              <p class="font-medium text-gray-700">Connection Frequency</p>
+              <p id="modalConnectFrequency" class="text-gray-600"></p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mentor Philosophy Section -->
+      <div class="mb-8 p-6 bg-gradient-to-r from-purple-50 to-pink-50 rounded-lg border border-purple-100">
+        <h4 class="font-semibold text-gray-800 flex items-center mb-4">
+          <svg class="w-5 h-5 text-purple-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+          </svg>
+          Mentor Philosophy
+        </h4>
+        <div class="space-y-3">
+          <div>
+            <p class="font-medium text-gray-700 mb-1">Philosophy</p>
+            <p id="modalMentorshipPhilosophy" class="text-gray-600 italic bg-white p-3 rounded border border-purple-100"></p>
+          </div>
+          <div>
+            <p class="font-medium text-gray-700 mb-1">Motto</p>
+            <p id="modalMentorshipMotto" class="text-gray-600 italic bg-white p-3 rounded border border-purple-100"></p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Contact & Location Section -->
+      <div class="mb-8 p-6 bg-gradient-to-r from-orange-50 to-red-50 rounded-lg border border-orange-100">
+        <h4 class="font-semibold text-gray-800 flex items-center mb-4">
+          <svg class="w-5 h-5 text-orange-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+          </svg>
+          Contact & Location
+        </h4>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="flex items-start">
+            <svg class="w-4 h-4 text-orange-600 mr-2 mt-1 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773c.346.766.868 1.611 1.498 2.24.63.63 1.474 1.152 2.24 1.498l.773-1.548a1 1 0 011.06-.54l4.435.74a1 1 0 01.836.986V17a2 2 0 01-2 2h-2.5A8.5 8.5 0 013.5 5.5H2z"></path></svg>
+            <div>
+              <p class="font-medium text-gray-700">WhatsApp</p>
+              <p id="modalWhatsApp" class="text-gray-600"></p>
+            </div>
+          </div>
+          <div class="flex items-start">
+            <svg class="w-4 h-4 text-orange-600 mr-2 mt-1 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"></path></svg>
+            <div>
+              <p class="font-medium text-gray-700">Country</p>
+              <p id="modalCountry" class="text-gray-600"></p>
+            </div>
+          </div>
+          <div class="flex items-start">
+            <svg class="w-4 h-4 text-orange-600 mr-2 mt-1 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"></path></svg>
+            <div>
+              <p class="font-medium text-gray-700">City</p>
+              <p id="modalCity" class="text-gray-600"></p>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <!-- Social Links -->
       <div class="mb-8">
         <h4 class="font-semibold text-gray-800 flex items-center mb-4">
           <svg class="w-5 h-5 text-blue-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path>
           </svg>
-          Social Links
+          Social Links & Portfolio
         </h4>
         <div class="flex flex-wrap gap-4">
           <a id="modalLinkedin" href="#" target="_blank" class="flex items-center gap-2 px-4 py-2 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition">
@@ -377,6 +539,10 @@
           <a id="modalPortfolio" href="#" target="_blank" class="flex items-center gap-2 px-4 py-2 bg-purple-50 text-purple-600 rounded-lg hover:bg-purple-100 transition">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9v-9m0-9v9"/></svg>
             Portfolio
+          </a>
+          <a id="modalOtherSocial" href="#" target="_blank" class="flex items-center gap-2 px-4 py-2 bg-yellow-50 text-yellow-600 rounded-lg hover:bg-yellow-100 transition">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+            Other
           </a>
         </div>
       </div>
@@ -474,19 +640,21 @@ function showSection(id) {
 
 
 
-// Updated openProfileModal function
+// Comprehensive openProfileModal function with all mentor information
 function openProfileModal(
     name, profession, organisation, location, experience, profilePic, 
     email, education, language, communication, whyMentor,
-    // NEW FIELDS
     role, industry, skills, availability, mentorshipTopics,
-    linkedin, github, portfolio, preferredDuration
+    linkedin, github, portfolio, preferredDuration,
+    mentorshipTypePreference, connectFrequency, whatsapp, country, city, whatsappCode,
+    highestQualification, degreeName, fieldOfStudy, universityName, graduationYear,
+    academicStatus, certifications, researchWork, mentorshipPhilosophy, mentorshipMotto, otherSocialLink
 ) {
-  // Basic Info
-  document.getElementById('modalName').innerText = name;
+  // ===== BASIC INFORMATION =====
+  document.getElementById('modalName').innerText = name || "Not specified";
   document.getElementById('modalEmail').innerText = email || "Not specified";
   
-  // Professional Details
+  // ===== PROFESSIONAL INFORMATION =====
   document.getElementById('modalProfession').innerText = profession || "Not specified";
   document.getElementById('modalRoleBadge').innerText = role || "Not specified";
   document.getElementById('modalRole').innerText = role || "Not specified";
@@ -494,52 +662,94 @@ function openProfileModal(
   document.getElementById('modalIndustry').innerText = industry || "Not specified";
   document.getElementById('modalEducation').innerText = education || "Not specified";
   
-  // Experience & Skills
+  // ===== EXPERIENCE & SKILLS =====
   document.getElementById('modalExperience').innerText = experience ? experience + " years" : "Not specified";
   document.getElementById('modalSkills').innerText = skills || "Not specified";
   document.getElementById('modalLanguage').innerText = language || "Not specified";
   
-  // Contact & Preferences
+  // ===== CONTACT & PREFERENCES =====
   document.getElementById('modalLocation').innerText = location || "Not specified";
   document.getElementById('modalCommunication').innerText = communication || "Not specified";
   document.getElementById('modalAvailability').innerText = availability || "Not specified";
   document.getElementById('modalPreferredDuration').innerText = preferredDuration || "Not specified";
   
-  // Mentorship Details
+  // ===== MENTORSHIP TOPICS =====
   document.getElementById('modalMentorshipTopics').innerText = mentorshipTopics || "Not specified";
+  
+  // ===== WHY MENTOR =====
   document.getElementById('modalWhyMentor').innerText = whyMentor || "Not specified";
   
-  // Social Links
+  // ===== EDUCATIONAL INFORMATION =====
+  document.getElementById('modalHighestQualification').innerText = highestQualification || "Not specified";
+  document.getElementById('modalDegreeName').innerText = degreeName || "Not specified";
+  document.getElementById('modalFieldOfStudy').innerText = fieldOfStudy || "Not specified";
+  document.getElementById('modalUniversityName').innerText = universityName || "Not specified";
+  document.getElementById('modalGraduationYear').innerText = graduationYear || "Not specified";
+  document.getElementById('modalAcademicStatus').innerText = academicStatus || "Not specified";
+  document.getElementById('modalCertifications').innerText = certifications || "Not specified";
+  document.getElementById('modalResearchWork').innerText = researchWork || "Not specified";
+  
+  // ===== MENTORSHIP PREFERENCES =====
+  document.getElementById('modalMentorshipTypePreference').innerText = mentorshipTypePreference || "Not specified";
+  document.getElementById('modalConnectFrequency').innerText = connectFrequency || "Not specified";
+  
+  // ===== MENTOR PHILOSOPHY =====
+  document.getElementById('modalMentorshipPhilosophy').innerText = mentorshipPhilosophy || "Not specified";
+  document.getElementById('modalMentorshipMotto').innerText = mentorshipMotto || "Not specified";
+  
+  // ===== CONTACT & LOCATION =====
+  const whatsappDisplay = whatsappCode ? (whatsappCode + ' ' + (whatsapp || '')) : (whatsapp || 'Not specified');
+  document.getElementById('modalWhatsApp').innerText = whatsappDisplay.trim() || "Not specified";
+  document.getElementById('modalCountry').innerText = country || "Not specified";
+  document.getElementById('modalCity').innerText = city || "Not specified";
+  
+  // ===== SOCIAL LINKS =====
   const linkedinLink = document.getElementById('modalLinkedin');
   const githubLink = document.getElementById('modalGithub');
   const portfolioLink = document.getElementById('modalPortfolio');
+  const otherLink = document.getElementById('modalOtherSocial');
   
-  if (linkedin) {
+  // LinkedIn
+  if (linkedin && linkedin.trim()) {
     linkedinLink.href = linkedin;
-    linkedinLink.classList.remove('hidden');
+    linkedinLink.style.display = 'flex';
   } else {
-    linkedinLink.classList.add('hidden');
+    linkedinLink.style.display = 'none';
   }
   
-  if (github) {
+  // GitHub
+  if (github && github.trim()) {
     githubLink.href = github;
-    githubLink.classList.remove('hidden');
+    githubLink.style.display = 'flex';
   } else {
-    githubLink.classList.add('hidden');
+    githubLink.style.display = 'none';
   }
   
-  if (portfolio) {
+  // Portfolio
+  if (portfolio && portfolio.trim()) {
     portfolioLink.href = portfolio;
-    portfolioLink.classList.remove('hidden');
+    portfolioLink.style.display = 'flex';
   } else {
-    portfolioLink.classList.add('hidden');
+    portfolioLink.style.display = 'none';
   }
   
-  // Profile Picture
-  document.getElementById('modalProfilePic').src = profilePic
-    ? "/static/uploads/" + profilePic
-    : "https://via.placeholder.com/100";
+  // Other Social Link
+  if (otherSocialLink && otherSocialLink.trim()) {
+    otherLink.href = otherSocialLink;
+    otherLink.style.display = 'flex';
+  } else {
+    otherLink.style.display = 'none';
+  }
+  
+  // ===== PROFILE PICTURE =====
+  const profilePicElement = document.getElementById('modalProfilePic');
+  if (profilePic && profilePic.trim()) {
+    profilePicElement.src = "/static/uploads/" + profilePic;
+  } else {
+    profilePicElement.src = "https://via.placeholder.com/112?text=" + encodeURIComponent(name ? name.charAt(0) : '?');
+  }
 
+  // Show the modal
   document.getElementById('profileModal').classList.remove('hidden');
 }
   

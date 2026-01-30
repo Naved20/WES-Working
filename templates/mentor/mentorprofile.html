@@ -147,6 +147,78 @@
                 </div>
             </div>
 
+            <!-- Educational Information -->
+            {% if highest_qualification or degree_name or field_of_study or university_name or graduation_year or academic_status or certifications or research_work %}
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                <div class="flex items-center mb-4">
+                    <div class="bg-indigo-100 p-2 rounded-lg mr-3">
+                        <svg class="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-800">Educational Information</h3>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="space-y-4">
+                        {% if highest_qualification %}
+                        <div>
+                            <p class="text-sm font-medium text-gray-500">Highest Qualification</p>
+                            <p class="text-gray-800 mt-1">{{ highest_qualification }}</p>
+                        </div>
+                        {% endif %}
+                        {% if degree_name %}
+                        <div>
+                            <p class="text-sm font-medium text-gray-500">Degree Name</p>
+                            <p class="text-gray-800 mt-1">{{ degree_name }}</p>
+                        </div>
+                        {% endif %}
+                        {% if field_of_study %}
+                        <div>
+                            <p class="text-sm font-medium text-gray-500">Field of Study / Specialization</p>
+                            <p class="text-gray-800 mt-1">{{ field_of_study }}</p>
+                        </div>
+                        {% endif %}
+                        {% if university_name %}
+                        <div>
+                            <p class="text-sm font-medium text-gray-500">University / Institution</p>
+                            <p class="text-gray-800 mt-1">{{ university_name }}</p>
+                        </div>
+                        {% endif %}
+                    </div>
+                    <div class="space-y-4">
+                        {% if graduation_year %}
+                        <div>
+                            <p class="text-sm font-medium text-gray-500">Year of Graduation</p>
+                            <p class="text-gray-800 mt-1">{{ graduation_year }}</p>
+                        </div>
+                        {% endif %}
+                        {% if academic_status %}
+                        <div>
+                            <p class="text-sm font-medium text-gray-500">Academic Status</p>
+                            <p class="text-gray-800 mt-1">{{ academic_status }}</p>
+                        </div>
+                        {% endif %}
+                        {% if certifications %}
+                        <div>
+                            <p class="text-sm font-medium text-gray-500">Certifications / Professional Courses</p>
+                            <div class="flex flex-wrap gap-2 mt-2">
+                                {% for cert in (certifications or '').split(',') %}
+                                <span class="bg-indigo-50 text-indigo-700 px-3 py-1 rounded-full text-sm">{{ cert.strip() }}</span>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        {% endif %}
+                        {% if research_work %}
+                        <div>
+                            <p class="text-sm font-medium text-gray-500">Research Work / Thesis Title</p>
+                            <p class="text-gray-800 mt-1 italic">{{ research_work }}</p>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
             <!-- Mentorship Preferences -->
             <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
                 <div class="flex items-center mb-4">

@@ -252,6 +252,16 @@ class MentorProfile(db.Model):
     education = db.Column(db.String(150))
     language = db.Column(db.String(100))  # Can store multiple languages comma separated
     
+    # Educational Information (New)
+    highest_qualification = db.Column(db.String(100))  # Bachelor's, Master's, PhD, etc.
+    degree_name = db.Column(db.String(150))  # B.Tech, MBA, M.Sc, etc.
+    field_of_study = db.Column(db.String(150))  # Specialization/Major
+    university_name = db.Column(db.String(200))  # University or Institution name
+    graduation_year = db.Column(db.String(10))  # Year of graduation
+    academic_status = db.Column(db.String(50))  # Completed / Pursuing
+    certifications = db.Column(db.Text)  # Professional certifications (comma separated)
+    research_work = db.Column(db.Text)  # Research work or thesis title
+    
     # Social Links
     linkedin_link = db.Column(db.String(200))  # New field
     github_link = db.Column(db.String(200))  # New field
@@ -4717,6 +4727,16 @@ def editmentorprofile():
         
         profile.additional_info = request.form.get("additional_info")
 
+        # Educational Information
+        profile.highest_qualification = request.form.get("highest_qualification")
+        profile.degree_name = request.form.get("degree_name")
+        profile.field_of_study = request.form.get("field_of_study")
+        profile.university_name = request.form.get("university_name")
+        profile.graduation_year = request.form.get("graduation_year")
+        profile.academic_status = request.form.get("academic_status")
+        profile.certifications = request.form.get("certifications")
+        profile.research_work = request.form.get("research_work")
+
         # Handle profile picture upload
         file = request.files.get("profile_picture")
         if file and allowed_file(file.filename):
@@ -4794,7 +4814,16 @@ def editmentorprofile():
         mentorship_philosophy=profile.mentorship_philosophy if profile else "",
         mentorship_motto=profile.mentorship_motto if profile else "",
         additional_info=profile.additional_info if profile else "",
-        profile_picture=profile.profile_picture if profile else None 
+        profile_picture=profile.profile_picture if profile else None,
+        # Educational Information
+        highest_qualification=profile.highest_qualification if profile else "",
+        degree_name=profile.degree_name if profile else "",
+        field_of_study=profile.field_of_study if profile else "",
+        university_name=profile.university_name if profile else "",
+        graduation_year=profile.graduation_year if profile else "",
+        academic_status=profile.academic_status if profile else "",
+        certifications=profile.certifications if profile else "",
+        research_work=profile.research_work if profile else ""
     )
 
 
@@ -5224,7 +5253,16 @@ def mentorprofile():
             mentorship_motto=profile.mentorship_motto if profile else "",
             preferred_duration=profile.preferred_duration if profile else "",
             profile_picture=profile.profile_picture if profile else None,
-            institution_profile_picture=institution_profile_picture
+            institution_profile_picture=institution_profile_picture,
+            # Educational Information
+            highest_qualification=profile.highest_qualification if profile else "",
+            degree_name=profile.degree_name if profile else "",
+            field_of_study=profile.field_of_study if profile else "",
+            university_name=profile.university_name if profile else "",
+            graduation_year=profile.graduation_year if profile else "",
+            academic_status=profile.academic_status if profile else "",
+            certifications=profile.certifications if profile else "",
+            research_work=profile.research_work if profile else ""
         )
     return redirect(url_for("signin"))
 
