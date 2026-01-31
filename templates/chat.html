@@ -3,137 +3,175 @@
 {% block title %}Chat{% endblock %}
 
 {% block content %}
-<div class="flex h-full gap-4 p-4">
-    <!-- Chat Sidebar - Conversations List -->
-    <div class="w-80 bg-white rounded-lg shadow-md flex flex-col border-r border-gray-200">
-        <!-- Header -->
-        <div class="p-4 border-b border-gray-200">
-            <h2 class="text-xl font-bold text-gray-800 mb-4">Messages</h2>
-            
-            <!-- Search Bar -->
-            <div class="relative">
-                <input type="text" 
-                       id="searchConversation" 
-                       placeholder="Search conversations..." 
-                       class="w-full px-4 py-2 bg-gray-100 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
-                <svg class="absolute right-3 top-2.5 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                </svg>
-            </div>
-        </div>
+<style>
+    /* Custom Scrollbar for Chat */
+    .chat-scroll::-webkit-scrollbar {
+        width: 6px;
+    }
 
-        <!-- Conversations List -->
-        <div class="flex-1 overflow-y-auto" id="conversationsList">
-            <div class="p-4 text-center text-gray-500">
-                <p>Loading conversations...</p>
-            </div>
-        </div>
+    .chat-scroll::-webkit-scrollbar-track {
+        background: transparent;
+    }
 
-        <!-- New Chat Button -->
-        <div class="p-4 border-t border-gray-200">
-            <button id="newChatBtn" class="w-full py-2 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-medium flex items-center justify-center gap-2">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
-                </svg>
-                New Chat
-            </button>
-        </div>
+    .chat-scroll::-webkit-scrollbar-thumb {
+        background: rgba(156, 163, 175, 0.5);
+        border-radius: 20px;
+    }
+
+    .chat-scroll::-webkit-scrollbar-thumb:hover {
+        background: rgba(107, 114, 128, 0.8);
+    }
+</style>
+
+<main class="max-w-7xl mx-auto h-[calc(100vh-140px)] flex flex-col animate-slide-up">
+    <!-- Page Header -->
+    <div class="mb-4 flex-shrink-0">
+        <h2 class="text-2xl font-bold text-slate-800 font-poppins">Messages</h2>
+        <p class="text-slate-500 text-sm">Connect with your mentors and mentees</p>
     </div>
 
-    <!-- Chat Main Area -->
-    <div class="flex-1 bg-white rounded-lg shadow-md flex flex-col">
-        <!-- Chat Header -->
-        <div class="p-4 border-b border-gray-200 flex items-center justify-between">
-            <div class="flex items-center gap-3">
-                <div class="w-12 h-12 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center text-white font-bold" id="chatAvatar">
-                    --
-                </div>
-                <div>
-                    <h3 class="font-bold text-gray-800" id="chatName">Select a conversation</h3>
-                    <p class="text-sm text-gray-500" id="chatStatus">No conversation selected</p>
+    <div class="flex flex-1 gap-6 overflow-hidden min-h-0">
+        <!-- Chat Sidebar - Conversations List -->
+        <div class="w-80 bg-white rounded-2xl shadow-lg border border-slate-100 flex flex-col flex-shrink-0">
+            <!-- Header -->
+            <div class="p-4 border-b border-slate-100">
+                <h3 class="text-lg font-bold text-slate-800 mb-3">Conversations</h3>
+
+                <!-- Search Bar -->
+                <div class="relative">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <svg class="h-5 w-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                        </svg>
+                    </div>
+                    <input type="text" id="searchConversation" placeholder="Search messages..."
+                        class="input w-full pl-10 h-10 text-sm bg-slate-50 border-slate-200 focus:bg-white">
                 </div>
             </div>
-        </div>
 
-        <!-- Messages Area -->
-        <div class="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50" id="messagesArea">
-            <div class="text-center text-gray-500 py-8">
-                <p>Select a conversation to start messaging</p>
-            </div>
-        </div>
-
-        <!-- Message Input Area -->
-        <div class="p-4 border-t border-gray-200 bg-white">
-            <div class="flex gap-3 items-end">
-                <!-- Message Input -->
-                <div class="flex-1 relative">
-                    <input type="text" 
-                           id="messageInput" 
-                           placeholder="Type your message..." 
-                           class="w-full px-4 py-2 bg-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
-                           rows="1"
-                           disabled>
+            <!-- Conversations List -->
+            <div class="flex-1 overflow-y-auto chat-scroll custom-scrollbar" id="conversationsList">
+                <div class="p-8 text-center text-slate-400 flex flex-col items-center">
+                    <div class="w-8 h-8 border-2 border-slate-200 border-t-primary rounded-full animate-spin mb-2">
+                    </div>
+                    <p class="text-sm">Loading...</p>
                 </div>
+            </div>
 
-                <!-- Send Button -->
-                <button id="sendBtn" class="p-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition flex-shrink-0" title="Send" disabled>
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
+            <!-- New Chat Button -->
+            <div class="p-4 border-t border-slate-100 bg-slate-50/50">
+                <button id="newChatBtn" class="w-full btn btn-primary py-2.5 shadow-lg shadow-blue-500/20">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
                     </svg>
+                    New Chat
                 </button>
             </div>
         </div>
+
+        <!-- Chat Main Area -->
+        <div
+            class="flex-1 bg-white rounded-2xl shadow-lg border border-slate-100 flex flex-col overflow-hidden relative">
+            <!-- Chat Header -->
+            <div
+                class="p-4 border-b border-slate-100 flex items-center justify-between bg-white/80 backdrop-blur-sm z-10">
+                <div class="flex items-center gap-4">
+                    <div class="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center text-slate-400 font-bold text-lg shadow-inner"
+                        id="chatAvatar">
+                        --
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-slate-800 text-lg" id="chatName">Select a conversation</h3>
+                        <div class="flex items-center gap-2">
+                            <span class="w-2 h-2 rounded-full bg-slate-300" id="statusDot"></span>
+                            <p class="text-sm text-slate-500" id="chatStatus">No conversation selected</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Messages Area -->
+            <div class="flex-1 overflow-y-auto p-6 space-y-6 bg-slate-50/50 chat-scroll custom-scrollbar"
+                id="messagesArea">
+                <div class="h-full flex flex-col items-center justify-center text-center p-8 opacity-60">
+                    <div class="w-24 h-24 bg-slate-100 rounded-full flex items-center justify-center mb-4">
+                        <svg class="w-12 h-12 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z">
+                            </path>
+                        </svg>
+                    </div>
+                    <h3 class="text-lg font-semibold text-slate-700">Your Messages</h3>
+                    <p class="text-slate-500 max-w-xs mx-auto mt-1">Select a conversation from the sidebar to start
+                        chatting with your mentors or mentees.</p>
+                </div>
+            </div>
+
+            <!-- Message Input Area -->
+            <div class="p-4 border-t border-slate-100 bg-white">
+                <div class="flex gap-3 items-end">
+                    <!-- Message Input -->
+                    <div class="flex-1 relative">
+                        <textarea id="messageInput" placeholder="Type a message..."
+                            class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all resize-none custom-scrollbar text-slate-700 placeholder-slate-400"
+                            rows="1" disabled></textarea>
+                    </div>
+
+                    <!-- Send Button -->
+                    <button id="sendBtn"
+                        class="p-3 bg-slate-100 text-slate-400 rounded-xl hover:bg-primary hover:text-white transition-all duration-200 flex-shrink-0 disabled:opacity-50 disabled:cursor-not-allowed"
+                        title="Send" disabled>
+                        <svg class="w-6 h-6 transform rotate-90" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
     </div>
-</div>
+</main>
 
 <!-- New Chat Modal -->
-<div id="newChatModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-    <div class="bg-white rounded-lg shadow-lg p-6 w-96">
-        <h2 class="text-xl font-bold text-gray-800 mb-4">Start New Chat</h2>
-        
-        <div class="mb-4">
-            <input type="text" 
-                   id="contactSearch" 
-                   placeholder="Search contacts..." 
-                   class="w-full px-4 py-2 bg-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+<div id="newChatModal"
+    class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center z-[100] p-4 animate-fade-in">
+    <div class="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-md animate-scale-in border border-slate-100">
+        <div class="flex justify-between items-center mb-6">
+            <h2 class="text-xl font-bold text-slate-800 font-poppins">Start New Conversation</h2>
+            <button id="closeModalBtn" class="text-slate-400 hover:text-slate-600 transition-colors">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">
+                    </path>
+                </svg>
+            </button>
         </div>
-        
-        <div id="contactsList" class="max-h-96 overflow-y-auto space-y-2 mb-4">
-            <div class="text-center text-gray-500 py-4">Loading contacts...</div>
+
+        <div class="mb-4 relative">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                </svg>
+            </div>
+            <input type="text" id="contactSearch" placeholder="Search contacts by name..."
+                class="input w-full pl-10 bg-slate-50 border-slate-200">
         </div>
-        
-        <div class="flex gap-2 justify-end">
-            <button id="closeModalBtn" class="px-4 py-2 text-gray-700 bg-gray-200 rounded-lg hover:bg-gray-300">Cancel</button>
+
+        <div id="contactsList" class="max-h-80 overflow-y-auto space-y-2 mb-2 custom-scrollbar p-1">
+            <div class="text-center text-slate-400 py-8 flex flex-col items-center">
+                <div class="w-6 h-6 border-2 border-slate-200 border-t-primary rounded-full animate-spin mb-2"></div>
+                Loading contacts...
+            </div>
         </div>
     </div>
 </div>
-
-<style>
-    .conversation-item {
-        transition: all 0.2s ease;
-    }
-
-    .conversation-item:hover {
-        background-color: rgba(59, 130, 246, 0.05);
-    }
-
-    .conversation-item.active {
-        background-color: rgba(59, 130, 246, 0.1);
-        border-left-color: rgb(59, 130, 246);
-    }
-
-    #messageInput {
-        max-height: 120px;
-    }
-</style>
 
 <script>
     let currentConversationId = null;
     let currentUserId = null;
     let allContacts = [];
     let messageRefreshInterval = null;
-
-    console.log('Chat script loaded');
 
     // Get current user ID from API
     function getCurrentUserId() {
@@ -142,12 +180,9 @@
             .then(data => {
                 if (data.success) {
                     currentUserId = data.user_id;
-                    console.log('Current user ID:', currentUserId);
                     return currentUserId;
-                } else {
-                    console.error('Failed to get current user:', data.message);
-                    return null;
                 }
+                return null;
             })
             .catch(error => {
                 console.error('Error getting current user:', error);
@@ -155,9 +190,7 @@
             });
     }
 
-    // Initialize
-    document.addEventListener('DOMContentLoaded', function() {
-        console.log('DOMContentLoaded fired');
+    document.addEventListener('DOMContentLoaded', function () {
         setupEventListeners();
         getCurrentUserId().then(() => {
             loadConversations();
@@ -165,174 +198,146 @@
     });
 
     function setupEventListeners() {
-        console.log('Setting up event listeners');
-        
-        // New chat button
         const newChatBtn = document.getElementById('newChatBtn');
-        if (newChatBtn) {
-            newChatBtn.addEventListener('click', openNewChatModal);
-            console.log('New chat button listener added');
-        }
-        
+        if (newChatBtn) newChatBtn.addEventListener('click', openNewChatModal);
+
         const closeModalBtn = document.getElementById('closeModalBtn');
-        if (closeModalBtn) {
-            closeModalBtn.addEventListener('click', closeNewChatModal);
-            console.log('Close modal button listener added');
-        }
-        
-        // Message input
+        if (closeModalBtn) closeModalBtn.addEventListener('click', closeNewChatModal);
+
         const messageInput = document.getElementById('messageInput');
         if (messageInput) {
-            messageInput.addEventListener('keypress', function(e) {
+            messageInput.addEventListener('keypress', function (e) {
                 if (e.key === 'Enter' && !e.shiftKey && currentConversationId) {
                     e.preventDefault();
                     sendMessage();
                 }
             });
-            
-            messageInput.addEventListener('input', function() {
+            messageInput.addEventListener('input', function () {
                 this.style.height = 'auto';
                 this.style.height = Math.min(this.scrollHeight, 120) + 'px';
             });
         }
-        
-        // Send button
+
         const sendBtn = document.getElementById('sendBtn');
-        if (sendBtn) {
-            sendBtn.addEventListener('click', sendMessage);
-        }
-        
-        // Search conversations
+        if (sendBtn) sendBtn.addEventListener('click', sendMessage);
+
         const searchConv = document.getElementById('searchConversation');
         if (searchConv) {
-            searchConv.addEventListener('input', function(e) {
+            searchConv.addEventListener('input', function (e) {
                 const searchTerm = e.target.value.toLowerCase();
                 document.querySelectorAll('.conversation-item').forEach(item => {
                     const name = item.querySelector('h3')?.textContent.toLowerCase() || '';
-                    if (name.includes(searchTerm)) {
-                        item.style.display = 'block';
-                    } else {
-                        item.style.display = 'none';
-                    }
+                    if (name.includes(searchTerm)) item.style.display = 'block';
+                    else item.style.display = 'none';
                 });
             });
         }
-        
-        // Contact search in modal
+
         const contactSearch = document.getElementById('contactSearch');
         if (contactSearch) {
-            contactSearch.addEventListener('input', function(e) {
+            contactSearch.addEventListener('input', function (e) {
                 const searchTerm = e.target.value.toLowerCase();
                 document.querySelectorAll('.contact-item').forEach(item => {
                     const name = item.textContent.toLowerCase();
-                    if (name.includes(searchTerm)) {
-                        item.style.display = 'block';
-                    } else {
-                        item.style.display = 'none';
-                    }
+                    if (name.includes(searchTerm)) item.style.display = 'flex';
+                    else item.style.display = 'none';
                 });
             });
         }
     }
 
     function loadConversations() {
-        console.log('Loading conversations...');
         fetch('/api/chat/conversations')
-            .then(response => {
-                console.log('Response status:', response.status);
-                return response.json();
-            })
+            .then(response => response.json())
             .then(data => {
-                console.log('Conversations data:', data);
                 if (data.success) {
                     renderConversations(data.conversations);
                 } else {
-                    console.error('API error:', data.message);
-                    document.getElementById('conversationsList').innerHTML = 
-                        '<div class="p-4 text-center text-red-500"><p>Error: ' + data.message + '</p></div>';
+                    document.getElementById('conversationsList').innerHTML =
+                        '<div class="p-8 text-center text-red-400 text-sm"><p>Error: ' + data.message + '</p></div>';
                 }
             })
             .catch(error => {
-                console.error('Error loading conversations:', error);
-                document.getElementById('conversationsList').innerHTML = 
-                    '<div class="p-4 text-center text-red-500"><p>Error loading conversations</p></div>';
+                document.getElementById('conversationsList').innerHTML =
+                    '<div class="p-8 text-center text-red-400 text-sm"><p>Connection error</p></div>';
             });
     }
 
     function renderConversations(conversations) {
-        console.log('Rendering conversations:', conversations.length);
         const container = document.getElementById('conversationsList');
-        
+
         if (conversations.length === 0) {
-            container.innerHTML = '<div class="p-4 text-center text-gray-500"><p>No conversations yet. Click "New Chat" to start one!</p></div>';
+            container.innerHTML = `
+                <div class="p-8 text-center text-slate-400 flex flex-col items-center">
+                    <svg class="w-12 h-12 mb-3 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path></svg>
+                    <p class="text-sm font-medium">No conversations yet</p>
+                    <button onclick="document.getElementById('newChatModal').classList.remove('hidden');loadAllowedContacts();" class="mt-4 text-primary hover:underline text-sm font-semibold">Start a new chat</button>
+                </div>`;
             return;
         }
-        
+
         container.innerHTML = conversations.map(conv => `
-            <div class="conversation-item p-4 border-l-4 border-transparent hover:bg-gray-50 cursor-pointer transition" data-conversation-id="${conv.id}">
-                <div class="flex items-center justify-between mb-2">
-                    <div class="flex items-center gap-3 flex-1">
-                        <div class="w-12 h-12 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center text-white font-bold">
+            <div class="conversation-item p-4 hover:bg-slate-50 cursor-pointer transition-all duration-200 border-l-[3px] border-transparent" data-conversation-id="${conv.id}">
+                <div class="flex items-center justify-between mb-1">
+                    <div class="flex items-center gap-3 flex-1 min-w-0">
+                        <div class="w-10 h-10 bg-gradient-to-br from-blue-200 to-sky-200 rounded-full flex items-center justify-center text-blue-700 font-bold text-sm shadow-sm flex-shrink-0">
                             ${conv.other_user_name.substring(0, 2).toUpperCase()}
                         </div>
                         <div class="flex-1 min-w-0">
-                            <h3 class="font-semibold text-gray-800 truncate">${conv.other_user_name}</h3>
-                            <p class="text-sm text-gray-600 truncate">${conv.last_message || 'No messages yet'}</p>
+                            <h3 class="font-semibold text-slate-800 truncate text-sm">${conv.other_user_name}</h3>
+                            <p class="text-xs text-slate-500 truncate mt-0.5 font-medium">${conv.last_message || 'Draft'}</p>
                         </div>
                     </div>
-                    <span class="text-xs text-gray-500 whitespace-nowrap ml-2">${formatTime(conv.last_message_time)}</span>
-                </div>
-                <div class="flex items-center justify-between">
-                    <span class="text-xs text-gray-500">${getRoleLabel(conv.other_user_type)}</span>
-                    ${conv.unread_count > 0 ? `<span class="bg-blue-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">${conv.unread_count}</span>` : ''}
+                    <div class="flex flex-col items-end ml-2">
+                        <span class="text-[10px] text-slate-400 font-medium">${formatTime(conv.last_message_time)}</span>
+                        ${conv.unread_count > 0 ? `<span class="mt-1 bg-primary text-white text-[10px] font-bold rounded-full min-w-[1.25rem] h-5 flex items-center justify-center px-1 shadow-sm shadow-blue-500/30">${conv.unread_count}</span>` : ''}
+                    </div>
                 </div>
             </div>
         `).join('');
-        
-        // Add click handlers
+
         document.querySelectorAll('.conversation-item').forEach(item => {
-            item.addEventListener('click', function() {
+            item.addEventListener('click', function () {
                 selectConversation(this.dataset.conversationId);
             });
         });
     }
 
     function selectConversation(conversationId) {
-        console.log('Selecting conversation:', conversationId);
         currentConversationId = conversationId;
-        
-        // Update UI
+
         document.querySelectorAll('.conversation-item').forEach(item => {
-            item.classList.remove('active', 'bg-blue-50', 'border-l-blue-500');
+            item.classList.remove('bg-blue-50', 'border-l-primary');
             item.classList.add('border-l-transparent');
         });
-        
+
         const selected = document.querySelector(`[data-conversation-id="${conversationId}"]`);
         if (selected) {
-            selected.classList.add('active', 'bg-blue-50', 'border-l-blue-500');
-            selected.classList.remove('border-l-transparent');
-            
-            // Update chat header with person's name
+            selected.classList.add('bg-blue-50', 'border-l-primary');
+            selected.classList.remove('border-l-transparent', 'hover:bg-slate-50');
+
             const userName = selected.querySelector('h3').textContent;
-            const userRole = selected.querySelector('.text-xs').textContent;
             const userInitials = userName.substring(0, 2).toUpperCase();
-            
+
             document.getElementById('chatName').textContent = userName;
-            document.getElementById('chatStatus').textContent = userRole;
+            document.getElementById('chatStatus').textContent = 'Online'; // Placeholder
             document.getElementById('chatAvatar').textContent = userInitials;
+            document.getElementById('chatAvatar').className = "w-10 h-10 rounded-full bg-gradient-to-br from-blue-200 to-sky-200 flex items-center justify-center text-blue-700 font-bold shadow-md";
+            document.getElementById('statusDot').className = "w-2 h-2 rounded-full bg-green-500 animate-pulse";
         }
-        
-        // Enable message input
-        document.getElementById('messageInput').disabled = false;
-        document.getElementById('sendBtn').disabled = false;
-        
-        // Load messages
+
+        const msgInput = document.getElementById('messageInput');
+        msgInput.disabled = false;
+        msgInput.focus();
+
+        const sendBtn = document.getElementById('sendBtn');
+        sendBtn.disabled = false;
+        sendBtn.classList.add('bg-primary', 'text-white', 'shadow-lg');
+        sendBtn.classList.remove('bg-slate-100', 'text-slate-400');
+
         loadMessages(conversationId);
-        
-        // Mark as read
-        fetch(`/api/chat/mark-read/${conversationId}`, { method: 'POST' });
-        
-        // Set up auto-refresh
+        fetch(`/api/chat/mark-read/${conversationId}`, { method: 'POST' }); // Async mark read
+
         if (messageRefreshInterval) clearInterval(messageRefreshInterval);
         messageRefreshInterval = setInterval(() => loadMessages(conversationId), 3000);
     }
@@ -350,175 +355,124 @@
 
     function renderMessages(messages) {
         const container = document.getElementById('messagesArea');
-        
+
         if (messages.length === 0) {
-            container.innerHTML = '<div class="text-center text-gray-500 py-8"><p>No messages yet. Start the conversation!</p></div>';
+            container.innerHTML = `
+                <div class="h-full flex flex-col items-center justify-center opacity-50">
+                    <p class="text-sm font-medium text-slate-500 bg-white/50 px-4 py-2 rounded-full">No messages yet. Say hello!</p>
+                </div>`;
             return;
         }
-        
-        container.innerHTML = messages.map(msg => `
-            <div class="flex gap-3 ${msg.sender_id === currentUserId ? 'justify-end' : ''}">
-                ${msg.sender_id !== currentUserId ? `
-                    <div class="w-8 h-8 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
+
+        container.innerHTML = messages.map(msg => {
+            const isMe = msg.sender_id === currentUserId;
+            return `
+            <div class="flex gap-3 mb-2 animate-scale-in ${isMe ? 'justify-end' : 'justify-start'}">
+                ${!isMe ? `
+                    <div class="w-8 h-8 bg-slate-200 rounded-full flex items-center justify-center text-slate-600 text-xs font-bold flex-shrink-0 self-end mb-1">
                         ${msg.sender_name.substring(0, 2).toUpperCase()}
                     </div>
                 ` : ''}
-                <div class="max-w-xs">
-                    <div class="bg-${msg.sender_id === currentUserId ? 'blue-600 text-white' : 'white'} rounded-lg ${msg.sender_id === currentUserId ? 'rounded-tr-none' : 'rounded-tl-none'} p-3 shadow-sm">
-                        <p class="text-sm">${escapeHtml(msg.content)}</p>
+                <div class="max-w-[75%] flex flex-col ${isMe ? 'items-end' : 'items-start'}">
+                    <div class="px-5 py-3 shadow-sm text-sm leading-relaxed whitespace-pre-wrap break-words ${isMe
+                    ? 'bg-primary text-white rounded-2xl rounded-br-xs'
+                    : 'bg-white text-slate-700 rounded-2xl rounded-bl-xs border border-slate-100'}">
+                        ${escapeHtml(msg.content)}
                     </div>
-                    <span class="text-xs text-gray-500 mt-1 block ${msg.sender_id === currentUserId ? 'text-right' : ''}">${formatTime(msg.created_at)}</span>
+                    <span class="text-[10px] text-slate-400 mt-1 px-1">${formatTime(msg.created_at)}</span>
                 </div>
-                ${msg.sender_id === currentUserId ? `
-                    <div class="w-8 h-8 bg-gradient-to-br from-green-400 to-green-600 rounded-full flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
-                        ME
-                    </div>
-                ` : ''}
             </div>
-        `).join('');
-        
-        // Scroll to bottom
+            `;
+        }).join('');
+
         container.scrollTop = container.scrollHeight;
     }
 
     function sendMessage() {
-        const content = document.getElementById('messageInput').value.trim();
-        
+        const input = document.getElementById('messageInput');
+        const content = input.value.trim();
+
         if (!content || !currentConversationId) return;
-        
-        console.log('Sending message:', content);
-        
+
+        // Optimistic UI update could go here
+
         fetch('/api/chat/send', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                conversation_id: currentConversationId,
-                content: content
-            })
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ conversation_id: currentConversationId, content: content })
         })
-        .then(response => response.json())
-        .then(data => {
-            console.log('Send response:', data);
-            if (data.success) {
-                document.getElementById('messageInput').value = '';
-                document.getElementById('messageInput').style.height = 'auto';
-                loadMessages(currentConversationId);
-                loadConversations();
-            }
-        })
-        .catch(error => console.error('Error sending message:', error));
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    input.value = '';
+                    input.style.height = 'auto'; // Reset height
+                    input.focus();
+                    loadMessages(currentConversationId);
+                    loadConversations(); // Update "last message" in sidebar
+                }
+            });
     }
 
     function openNewChatModal() {
-        console.log('Opening new chat modal');
         document.getElementById('newChatModal').classList.remove('hidden');
         loadAllowedContacts();
     }
 
     function closeNewChatModal() {
-        console.log('Closing new chat modal');
         document.getElementById('newChatModal').classList.add('hidden');
     }
 
     function loadAllowedContacts() {
-        console.log('Loading allowed contacts...');
+        const list = document.getElementById('contactsList');
         fetch('/api/chat/allowed-contacts')
-            .then(response => {
-                console.log('Contacts response status:', response.status);
-                return response.json();
-            })
+            .then(res => res.json())
             .then(data => {
-                console.log('Allowed contacts data:', data);
-                if (data.success) {
-                    allContacts = data.contacts;
-                    renderContacts(data.contacts);
-                } else {
-                    console.error('API error:', data.message);
-                    document.getElementById('contactsList').innerHTML = 
-                        '<div class="text-center text-red-500 py-4"><p>Error: ' + data.message + '</p></div>';
-                }
-            })
-            .catch(error => {
-                console.error('Error loading contacts:', error);
-                document.getElementById('contactsList').innerHTML = 
-                    '<div class="text-center text-red-500 py-4"><p>Error loading contacts</p></div>';
-            });
-    }
+                if (data.success && data.contacts.length > 0) {
+                    list.innerHTML = data.contacts.map(c => `
+                        <div class="contact-item p-3 hover:bg-slate-50 rounded-xl cursor-pointer transition-colors flex items-center justify-between group border border-transparent hover:border-slate-100" data-contact-id="${c.id}">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 bg-slate-100 rounded-full flex items-center justify-center text-slate-500 font-bold text-sm group-hover:bg-white group-hover:shadow-sm transition-all">
+                                    ${c.name.substring(0, 2).toUpperCase()}
+                                </div>
+                                <div>
+                                    <p class="font-semibold text-slate-800 text-sm">${c.name}</p>
+                                    <p class="text-xs text-slate-500">${c.role}</p>
+                                </div>
+                            </div>
+                            <button class="px-4 py-1.5 bg-slate-100 text-slate-600 text-xs font-bold rounded-lg group-hover:bg-primary group-hover:text-white transition-all">Chat</button>
+                        </div>
+                    `).join('');
 
-    function renderContacts(contacts) {
-        console.log('Rendering contacts:', contacts.length);
-        const container = document.getElementById('contactsList');
-        
-        if (contacts.length === 0) {
-            container.innerHTML = '<div class="text-center text-gray-500 py-4"><p>No contacts available</p></div>';
-            return;
-        }
-        
-        container.innerHTML = contacts.map(contact => `
-            <div class="contact-item p-3 bg-gray-50 rounded-lg hover:bg-gray-100 cursor-pointer transition flex items-center justify-between" data-contact-id="${contact.id}">
-                <div>
-                    <p class="font-semibold text-gray-800">${contact.name}</p>
-                    <p class="text-xs text-gray-500">${contact.role}</p>
-                </div>
-                <button class="px-3 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700">Chat</button>
-            </div>
-        `).join('');
-        
-        // Add click handlers
-        document.querySelectorAll('.contact-item button').forEach(btn => {
-            btn.addEventListener('click', function(e) {
-                e.stopPropagation();
-                const contactId = this.closest('.contact-item').dataset.contactId;
-                console.log('Starting conversation with contact:', contactId);
-                startNewConversation(contactId);
+                    list.querySelectorAll('.contact-item').forEach(item => {
+                        item.addEventListener('click', () => startNewConversation(item.dataset.contactId));
+                    });
+                } else {
+                    list.innerHTML = '<div class="text-center text-slate-400 py-8 text-sm">No contacts available found</div>';
+                }
             });
-        });
     }
 
     function startNewConversation(otherUserId) {
-        console.log('Starting new conversation with user:', otherUserId);
         fetch(`/api/chat/start/${otherUserId}`, { method: 'POST' })
-            .then(response => response.json())
+            .then(res => res.json())
             .then(data => {
-                console.log('Start conversation response:', data);
                 if (data.success) {
                     closeNewChatModal();
                     loadConversations();
-                    setTimeout(() => selectConversation(data.conversation_id), 500);
-                } else {
-                    alert('Error: ' + data.message);
+                    setTimeout(() => selectConversation(data.conversation_id), 300);
                 }
-            })
-            .catch(error => {
-                console.error('Error starting conversation:', error);
-                alert('Error starting conversation');
             });
     }
 
     function formatTime(isoString) {
         if (!isoString) return '';
-        const date = new Date(isoString);
+        const d = new Date(isoString);
         const now = new Date();
-        const diff = now - date;
-        
-        if (diff < 60000) return 'now';
-        if (diff < 3600000) return Math.floor(diff / 60000) + 'm';
-        if (diff < 86400000) return Math.floor(diff / 3600000) + 'h';
-        if (diff < 604800000) return Math.floor(diff / 86400000) + 'd';
-        
-        return date.toLocaleDateString();
-    }
-
-    function getRoleLabel(userType) {
-        const roles = {
-            '0': 'Supervisor',
-            '1': 'Mentor',
-            '2': 'Mentee',
-            '3': 'Institution'
-        };
-        return roles[userType] || 'User';
+        const diff = now - d;
+        if (diff < 60000) return 'Just now';
+        if (diff < 3600000) return Math.floor(diff / 60000) + 'm ago';
+        if (diff < 86400000) return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        return d.toLocaleDateString();
     }
 
     function escapeHtml(text) {

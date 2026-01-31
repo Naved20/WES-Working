@@ -7,287 +7,253 @@
 <style>
   .nav-btn {
     background: transparent;
-    color: #6b7280;
+    color: #64748b;
   }
-  
-  .nav-btn.active, .nav-btn:hover {
+
+  .nav-btn.active,
+  .nav-btn:hover {
     background: white;
-    color: #111827;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    color: #2563eb;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
   }
 </style>
-            <!-- Main Content Container -->
-  <main class="max-w-7xl mx-auto px-2 sm:px-3 lg:px-3 py-2">
-  
-            <!-- Dashboard Section -->
-  <section id="dashboard" class="p-6 bg-white rounded-xl shadow-sm">
-    <div class="mb-8">
-      <h2 class="text-xl font-semibold text-gray-800 mb-2">Welcome back!</h2>
-      <p class="text-gray-600">Here's your mentorship summary and upcoming sessions.</p>
+<!-- Main Content Container -->
+<main class="max-w-7xl mx-auto py-2 animate-slide-up">
+
+  <!-- Dashboard Section -->
+  <section id="dashboard" class="p-6 sm:p-8 glass-card rounded-2xl shadow-xl">
+    <div class="mb-8 flex items-end justify-between">
+      <div>
+        <h2 class="text-3xl font-bold text-slate-800 mb-2 font-poppins">Welcome back!</h2>
+        <p class="text-slate-500">Here's your mentorship summary and upcoming sessions.</p>
+      </div>
+      <div class="hidden sm:block text-sm font-semibold text-primary bg-primary/10 px-4 py-2 rounded-lg">
+        {{ now().strftime('%B %d, %Y') if now else '' }}
+      </div>
     </div>
-    
+
     <!-- Stats Overview -->
-    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-      <div class="bg-blue-50 p-5 rounded-xl border border-blue-100">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+      <div
+        class="bg-blue-50/50 p-6 rounded-2xl border border-blue-100 hover:shadow-lg transition-all duration-300 group">
         <div class="flex items-center">
-          <div class="rounded-full bg-blue-100 p-3 mr-4">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+          <div class="rounded-xl bg-blue-100 p-3 mr-4 text-blue-600 group-hover:scale-110 transition-transform">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+              stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
             </svg>
           </div>
           <div>
-            <p class="text-sm font-medium text-gray-500">Active Mentees</p>
-            <p class="text-2xl font-bold text-gray-800">{{ my_mentees|length if my_mentees else 0 }}</p>
+            <p class="text-sm font-semibold text-slate-500">Active Mentees</p>
+            <p class="text-3xl font-bold text-slate-800">{{ my_mentees|length if my_mentees else 0 }}</p>
           </div>
         </div>
       </div>
-      
-      <div class="bg-green-50 p-5 rounded-xl border border-green-100">
+
+      <div
+        class="bg-emerald-50/50 p-6 rounded-2xl border border-emerald-100 hover:shadow-lg transition-all duration-300 group">
         <div class="flex items-center">
-          <div class="rounded-full bg-green-100 p-3 mr-4">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+          <div class="rounded-xl bg-emerald-100 p-3 mr-4 text-emerald-600 group-hover:scale-110 transition-transform">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+              stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
             </svg>
           </div>
           <div>
-            <p class="text-sm font-medium text-gray-500">Completed Sessions</p>
-            <p class="text-2xl font-bold text-gray-800">{{ completed_sessions if completed_sessions else 0 }}</p>
+            <p class="text-sm font-semibold text-slate-500">Sessions Done</p>
+            <p class="text-3xl font-bold text-slate-800">{{ completed_sessions if completed_sessions else 0 }}</p>
           </div>
         </div>
       </div>
-      
-      <div class="bg-purple-50 p-5 rounded-xl border border-purple-100">
+
+      <div class="bg-sky-50/50 p-6 rounded-2xl border border-sky-100 hover:shadow-lg transition-all duration-300 group">
         <div class="flex items-center">
-          <div class="rounded-full bg-purple-100 p-3 mr-4">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+          <div class="rounded-xl bg-sky-100 p-3 mr-4 text-sky-600 group-hover:scale-110 transition-transform">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+              stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
             </svg>
           </div>
           <div>
-            <p class="text-sm font-medium text-gray-500">Upcoming Sessions</p>
-            <p class="text-2xl font-bold text-gray-800">{{ upcoming_sessions if upcoming_sessions else 0 }}</p>
+            <p class="text-sm font-semibold text-slate-500">Upcoming</p>
+            <p class="text-3xl font-bold text-slate-800">{{ upcoming_sessions if upcoming_sessions else 0 }}</p>
           </div>
         </div>
       </div>
-      
-      <div class="bg-orange-50 p-5 rounded-xl border border-orange-100">
+
+      <div
+        class="bg-amber-50/50 p-6 rounded-2xl border border-amber-100 hover:shadow-lg transition-all duration-300 group">
         <div class="flex items-center">
-          <div class="rounded-full bg-orange-100 p-3 mr-4">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-orange-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+          <div class="rounded-xl bg-amber-100 p-3 mr-4 text-amber-600 group-hover:scale-110 transition-transform">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+              stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
             </svg>
           </div>
           <div>
-            <p class="text-sm font-medium text-gray-500">Pending Requests</p>
-            <p class="text-2xl font-bold text-gray-800">{{ incoming_requests|selectattr('mentor_status', 'equalto', 'pending')|list|length if incoming_requests else 0 }}</p>
+            <p class="text-sm font-semibold text-slate-500">Requests</p>
+            <p class="text-3xl font-bold text-slate-800">{{ incoming_requests|selectattr('mentor_status', 'equalto',
+              'pending')|list|length if incoming_requests else 0 }}</p>
           </div>
         </div>
       </div>
     </div>
-    
-    <!-- Upcoming Sessions -->
-    <div class="mb-8">
-      <div class="flex justify-between items-center mb-4">
-        <h3 class="text-lg font-semibold text-gray-800">Upcoming Sessions</h3>
-        <a href="#" class="text-sm text-blue-600 hover:text-blue-800 font-medium">View all</a>
-      </div>
-      <div class="bg-gray-50 rounded-lg border border-gray-200 p-4">
-        {% if upcoming_sessions_list and upcoming_sessions_list|length > 0 %}
+
+    <div class="grid lg:grid-cols-2 gap-8">
+      <!-- Upcoming Sessions -->
+      <div>
+        <div class="flex justify-between items-center mb-6">
+          <h3 class="text-xl font-bold text-slate-800">Upcoming Sessions</h3>
+          <a href="#" class="text-sm text-primary hover:text-accent font-semibold flex items-center group">
+            View all
+            <svg class="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor"
+              viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+            </svg>
+          </a>
+        </div>
+        <div class="space-y-4">
+          {% if upcoming_sessions_list and upcoming_sessions_list|length > 0 %}
           {% for session in upcoming_sessions_list %}
-          <div class="flex justify-between items-center py-3 border-b border-gray-200 last:border-b-0">
-            <div>
-              <p class="font-medium">{{ session.mentee_name }}</p>
-              <p class="text-sm text-gray-500">{{ session.date }} at {{ session.time }}</p>
-            </div>
-            <button class="px-3 py-1 bg-blue-100 text-blue-700 rounded-lg text-sm">Details</button>
-          </div>
-          {% endfor %}
-        {% else %}
-          <p class="text-gray-500 text-center py-4">No upcoming sessions scheduled</p>
-        {% endif %}
-      </div>
-    </div>
-    
-    <!-- Recent Activity -->
-    <div>
-      <div class="flex justify-between items-center mb-4">
-        <h3 class="text-lg font-semibold text-gray-800">Recent Activity</h3>
-        <a href="#" class="text-sm text-blue-600 hover:text-blue-800 font-medium">View all</a>
-      </div>
-      <div class="space-y-3">
-        {% if recent_activities and recent_activities|length > 0 %}
-          {% for activity in recent_activities %}
-          <div class="flex items-start p-3 bg-gray-50 rounded-lg">
-            <div class="rounded-full bg-blue-100 p-2 mr-3 mt-1">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-            </div>
-            <div>
-              <p class="text-sm font-medium">{{ activity.message }}</p>
-              <p class="text-xs text-gray-500">{{ activity.time }}</p>
-            </div>
-          </div>
-          {% endfor %}
-        {% else %}
-          <div class="flex items-start p-3 bg-gray-50 rounded-lg">
-            <div class="rounded-full bg-blue-100 p-2 mr-3 mt-1">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-            </div>
-            <div>
-              <p class="text-sm font-medium">No recent activity</p>
-              <p class="text-xs text-gray-500">Your activity will appear here</p>
-            </div>
-          </div>
-        {% endif %}
-      </div>
-    </div>
-    
-    <!-- Mentorship Requests -->
-    <div class="mt-8">
-      <div class="flex justify-between items-center mb-4">
-        <h3 class="text-lg font-semibold text-gray-800">Mentorship Requests</h3>
-        <a href="{{ url_for('mentor_mentorship_request') }}" class="text-sm text-blue-600 hover:text-blue-800 font-medium">View all</a>
-      </div>
-      {% if incoming_requests and incoming_requests|length > 0 %}
-      <div class="space-y-3">
-        {% for request in incoming_requests[:3] %}
-        <div class="bg-gray-50 rounded-lg border border-gray-200 p-4">
-          <div class="flex items-center justify-between mb-2">
-            <div class="flex items-center gap-3">
-              {% if request.mentee.mentee_profile and request.mentee.mentee_profile.profile_picture %}
-              <img src="{{ url_for('static', filename='uploads/' ~ request.mentee.mentee_profile.profile_picture) }}" 
-                   alt="{{ request.mentee.name }}" 
-                   class="w-10 h-10 rounded-full object-cover border-2 border-white shadow">
-              {% else %}
-              <div class="w-10 h-10 rounded-full bg-gradient-to-br from-blue-100 to-blue-200 flex items-center justify-center text-blue-600 border-2 border-white shadow">
-                <span class="text-sm font-semibold">{{ request.mentee.name[0] if request.mentee.name else '?' }}</span>
+          <div
+            class="flex justify-between items-center p-4 bg-slate-50 rounded-xl border border-slate-100 hover:bg-white hover:shadow-md transition-all">
+            <div class="flex items-center gap-4">
+              <div
+                class="w-12 h-12 bg-white rounded-xl flex flex-col items-center justify-center border border-slate-100 shadow-sm text-xs font-bold text-slate-600">
+                <span>{{ session.date.split('-')[2] if session.date else '01' }}</span>
+                <span class="text-[10px] text-slate-400 uppercase">DAY</span>
               </div>
-              {% endif %}
               <div>
-                <p class="font-medium text-gray-800">{{ request.mentee.name }}</p>
-                <p class="text-xs text-gray-500">{{ request.purpose if request.purpose else 'Mentorship request' }}</p>
+                <p class="font-bold text-slate-800">{{ session.mentee_name }}</p>
+                <p class="text-sm text-slate-500">{{ session.time }}</p>
               </div>
             </div>
-            <div class="text-right">
-              <span class="text-xs px-2 py-1 rounded-full {% if request.mentor_status == 'accepted' %}bg-green-100 text-green-700{% elif request.mentor_status == 'rejected' %}bg-red-100 text-red-700{% else %}bg-yellow-100 text-yellow-700{% endif %}">
-                {{ request.mentor_status|capitalize }}
-              </span>
-            </div>
+            <button class="btn btn-sm btn-outline text-primary border-primary">Details</button>
           </div>
-          {% if request.mentor_status == 'pending' %}
-          <div class="flex gap-2 mt-3">
-            <button class="btn-accept flex-1 px-3 py-1.5 bg-green-600 text-white text-sm rounded-lg hover:bg-green-700 transition" data-id="{{ request.id }}">
-              Accept
-            </button>
-            <button class="btn-decline flex-1 px-3 py-1.5 bg-red-600 text-white text-sm rounded-lg hover:bg-red-700 transition" data-id="{{ request.id }}">
-              Decline
-            </button>
+          {% endfor %}
+          {% else %}
+          <div class="p-8 text-center bg-slate-50 rounded-xl border border-slate-100 border-dashed">
+            <p class="text-slate-400">No upcoming sessions scheduled</p>
           </div>
           {% endif %}
         </div>
-        {% endfor %}
       </div>
-      {% else %}
-      <div class="bg-gray-50 rounded-lg border border-gray-200 p-4 text-center">
-        <p class="text-gray-500">No mentorship requests at the moment</p>
+
+      <!-- Mentorship Requests -->
+      <div>
+        <div class="flex justify-between items-center mb-6">
+          <h3 class="text-xl font-bold text-slate-800">Mentorship Requests</h3>
+          <a href="{{ url_for('mentor_mentorship_request') }}"
+            class="text-sm text-primary hover:text-accent font-semibold flex items-center group">
+            View all
+            <svg class="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor"
+              viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+            </svg>
+          </a>
+        </div>
+
+        <div class="space-y-4">
+          {% if incoming_requests and incoming_requests|length > 0 %}
+          {% for request in incoming_requests[:3] %}
+          <div class="p-4 bg-white rounded-xl border border-slate-100 shadow-sm">
+            <div class="flex items-center justify-between mb-4">
+              <div class="flex items-center gap-3">
+                {% if request.mentee.mentee_profile and request.mentee.mentee_profile.profile_picture %}
+                <img src="{{ url_for('static', filename='uploads/' ~ request.mentee.mentee_profile.profile_picture) }}"
+                  alt="{{ request.mentee.name }}" class="w-10 h-10 rounded-full object-cover ring-2 ring-primary/20">
+                {% else %}
+                <div
+                  class="w-10 h-10 rounded-full bg-gradient-to-br from-blue-100 to-sky-100 flex items-center justify-center text-primary font-bold ring-2 ring-primary/20">
+                  {{ request.mentee.name[0] if request.mentee.name else '?' }}
+                </div>
+                {% endif %}
+                <div>
+                  <p class="font-bold text-slate-800">{{ request.mentee.name }}</p>
+                  <p class="text-xs text-slate-500 line-clamp-1">{{ request.purpose if request.purpose else 'Mentorship
+                    request' }}</p>
+                </div>
+              </div>
+              <span
+                class="text-[10px] uppercase font-bold px-2 py-1 rounded-full {% if request.mentor_status == 'accepted' %}bg-emerald-100 text-emerald-700{% elif request.mentor_status == 'rejected' %}bg-red-100 text-red-700{% else %}bg-amber-100 text-amber-700{% endif %}">
+                {{ request.mentor_status }}
+              </span>
+            </div>
+
+            {% if request.mentor_status == 'pending' %}
+            <div class="flex gap-3">
+              <button
+                class="btn-accept flex-1 py-2 bg-emerald-500 text-white text-xs font-bold rounded-lg hover:bg-emerald-600 transition shadow-sm"
+                data-id="{{ request.id }}">
+                Accept
+              </button>
+              <button
+                class="btn-decline flex-1 py-2 bg-slate-100 text-slate-600 text-xs font-bold rounded-lg hover:bg-red-50 hover:text-red-500 transition"
+                data-id="{{ request.id }}">
+                Decline
+              </button>
+            </div>
+            {% endif %}
+          </div>
+          {% endfor %}
+          {% else %}
+          <div class="p-8 text-center bg-slate-50 rounded-xl border border-slate-100 border-dashed">
+            <p class="text-slate-400">No new mentorship requests</p>
+          </div>
+          {% endif %}
+        </div>
       </div>
-      {% endif %}
     </div>
   </section>
 
 </main>
 <script>
-function showSection(id) {
-  // Hide all sections
-  document.querySelectorAll("section").forEach(sec => sec.classList.add("hidden"));
-  
-  // Show selected section
-  document.getElementById(id).classList.remove("hidden");
-  
-  // Update active navigation button
-  document.querySelectorAll('.nav-btn').forEach(btn => {
-    btn.classList.remove('active');
-  });
-  
-  // Find the button that corresponds to this section and activate it
-  const buttons = document.querySelectorAll('.nav-btn');
-  buttons.forEach(btn => {
-    if (btn.textContent.trim() === 'Overview' && id === 'dashboard') {
-      btn.classList.add('active');
-    } else if (btn.textContent.trim() === 'My Mentees' && id === 'mymentees') {
-      btn.classList.add('active');
-    } else if (btn.textContent.trim() === 'Meeting Requests' && id === 'meetingrequests') {
-      btn.classList.add('active');
-    } else if (btn.textContent.trim() === 'Find Mentees' && id === 'findmentees') {
-      btn.classList.add('active');
-    }
-  });
-}
+  function showSection(id) {
+    document.querySelectorAll("section").forEach(sec => sec.classList.add("hidden"));
+    document.getElementById(id).classList.remove("hidden");
 
-//  Auto-open correct section using Jinja-injected variable
-document.addEventListener("DOMContentLoaded", function() {
-  var activeSection = "{{ active_section|default('dashboard') }}";
-  showSection(activeSection);
-});
+    document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+  }
 
-function filterMentees() {
-  const input = document.getElementById('findMenteeSearch').value.toLowerCase();
-  const menteeCards = document.querySelectorAll('.mentee-card');
-  
-  menteeCards.forEach(card => {
-    const name = card.querySelector('.mentee-name').textContent.toLowerCase();
-    const stream = card.querySelector('.mentee-stream').textContent.toLowerCase();
-    const school = card.querySelector('.mentee-school').textContent.toLowerCase();
-    
-    if (name.includes(input) || stream.includes(input) || school.includes(input)) {
-      card.style.display = 'block';
-    } else {
-      card.style.display = 'none';
-    }
+  document.addEventListener("DOMContentLoaded", function () {
+    // Basic setup if needed
   });
-}
 
-document.querySelectorAll('.btn-accept').forEach(btn => {
+  document.querySelectorAll('.btn-accept').forEach(btn => {
     btn.addEventListener('click', async () => {
-        const requestId = btn.dataset.id;
+      const requestId = btn.dataset.id;
+      try {
         const res = await fetch("/mentor_response", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ request_id: requestId, action: "accept" })
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ request_id: requestId, action: "accept" })
+        });
+        const data = await res.json();
+        // Assuming we use a toast or alert, here simple alert matches old logic
+        alert(data.message);
+        location.reload();
+      } catch (e) { console.error(e); }
+    });
+  });
+
+  document.querySelectorAll('.btn-decline').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const requestId = btn.dataset.id;
+      try {
+        const res = await fetch("/mentor_response", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ request_id: requestId, action: "decline" })
         });
         const data = await res.json();
         alert(data.message);
         location.reload();
+      } catch (e) { console.error(e); }
     });
-});
-
-document.querySelectorAll('.btn-decline').forEach(btn => {
-    btn.addEventListener('click', async () => {
-        const requestId = btn.dataset.id;
-        const res = await fetch("/mentor_response", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ request_id: requestId, action: "decline" })
-        });
-        const data = await res.json();
-        alert(data.message);
-        location.reload();
-    });
-});
-
-function testMeetingRequests() {
-    console.log("Testing meeting requests section...");
-    const section = document.getElementById('meetingrequests');
-    if (section) {
-        console.log("Section found!");
-        section.classList.remove('hidden');
-    } else {
-        console.log("Section NOT found!");
-    }
-}
-
+  });
 </script>
 {% endblock %}

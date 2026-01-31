@@ -5858,6 +5858,53 @@ def chat_contacts():
         current_user_profile_pic=None
     )
 
+@app.route("/customer-support")
+def customer_support():
+    """Redirect to chat with a supervisor for customer support"""
+    if "email" not in session:
+        flash("Please sign in to contact customer support", "info")
+        return redirect(url_for("signin"))
+    
+    user_id = session.get("user_id")
+    user_type = session.get("user_type")
+    
+    # Get first available supervisor
+    supervisor = User.query.filter_by(user_type="0").first()
+    
+    if not supervisor:
+        flash("No supervisors available at the moment. Please try again later or email us at info@wazireducationsocity.com", "error")
+        return redirect(url_for("home"))
+    
+    try:
+        # Check if conversation already exists
+        conversation = ChatConversation.query.filter(
+            db.or_(
+                db.and_(
+                    ChatConversation.participant1_id == min(user_id, supervisor.id),
+                    ChatConversation.participant2_id == max(user_id, supervisor.id)
+                )
+            ),
+            ChatConversation.conversation_type == "direct"
+        ).first()
+        
+        # If no conversation exists, create one
+        if not conversation:
+            conversation = ChatConversation(
+                conversation_type="direct",
+                participant1_id=min(user_id, supervisor.id),
+                participant2_id=max(user_id, supervisor.id)
+            )
+            db.session.add(conversation)
+            db.session.commit()
+        
+        # Redirect to chat page with conversation ID
+        return redirect(url_for("chat") + f"?conversation_id={conversation.id}")
+    
+    except Exception as e:
+        print(f"Error creating support conversation: {e}")
+        flash("Unable to start chat. Please try again or email us at info@wazireducationsocity.com", "error")
+        return redirect(url_for("home"))
+
 #--------------INSTITUTION PROFILE ROUTES------------------
 
 @app.route("/institutionprofile")

@@ -4,220 +4,366 @@
 {% block user %}Mentee Profile{% endblock %}
 
 {% block Sidebar %}
-    <a href="{{ url_for('profile')}}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">👤 My Profile</a>
-    <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">⚙️ Settings</a>
-    <a href="{{ url_for('logout')}}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">🚪 Sign out</a>
+<a href="{{ url_for('profile')}}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">👤 My Profile</a>
+<a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">⚙️ Settings</a>
+<a href="{{ url_for('logout')}}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">🚪 Sign out</a>
 {% endblock %}
 
 {% block content %}
-<div class="max-w-4xl mx-auto mt-8 p-6 bg-gray-50 rounded-lg shadow-lg">
+<div class="max-w-4xl mx-auto mt-8 mb-12 animate-fade-in">
     <!-- Back Button -->
-    <div class="mb-6">
-        <a href="{{ url_for('menteedashboard') }}" class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-medium">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
-            </svg>
+    <div class="mb-6 flex justify-between items-center">
+        <a href="{{ url_for('menteedashboard') }}"
+            class="group inline-flex items-center text-sm font-medium text-slate-600 hover:text-blue-600 transition-colors">
+            <div
+                class="w-8 h-8 rounded-full bg-white flex items-center justify-center shadow-sm border border-slate-200 mr-3 group-hover:border-blue-200 group-hover:bg-blue-50 transition-all">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                </svg>
+            </div>
             Back to Dashboard
         </a>
-    </div>
-    
-    <!-- Back Button for Institution Admin -->
-    {% if session.get('user_type') == '3' %}
-    <div class="mb-6">
-        <a href="{{ url_for('institution_mentees') }}" class="inline-flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition font-medium">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+
+        {% if session.get('user_type') == '3' %}
+        <a href="{{ url_for('institution_mentees') }}"
+            class="inline-flex items-center px-4 py-2 bg-emerald-600 text-white text-sm font-medium rounded-lg hover:bg-emerald-700 transition shadow-sm hover:shadow-md">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24"
+                stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
             </svg>
-            Back to Institution Mentees
+            Institution Mentees
         </a>
+        {% endif %}
     </div>
-    {% endif %}
 
-    <!-- Profile Header -->
-    <div class="flex flex-col items-center md:flex-row md:items-center md:justify-between space-y-4 md:space-y-0 md:space-x-6 mb-8">
-        <!-- Profile Picture -->
-        <div class="flex-shrink-0">
-            {% if profile_picture %}
-            <img src="{{ url_for('static', filename='uploads/' + profile_picture) }}" alt="Profile Picture" class="w-32 h-32 md:w-40 md:h-40 object-cover rounded-full shadow-md border-4 border-blue-100">
-            {% else %}
-            <div class="w-32 h-32 md:w-40 md:h-40 flex items-center justify-center bg-blue-50 text-gray-500 rounded-full text-lg font-semibold border-4 border-blue-100">
-                <i class="fas fa-user text-3xl text-blue-500"></i>
+    <div class="bg-white rounded-2xl shadow-xl border border-slate-100 overflow-hidden mb-8">
+        <!-- Header Banner -->
+        <div class="h-32 bg-gradient-to-r from-blue-600 to-indigo-600 relative">
+            <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10">
             </div>
-            {% endif %}
-        </div>
 
-        <!-- Name & Email -->
-        <div class="text-center md:text-left flex-1">
-            <h2 class="text-3xl font-bold text-gray-800">{{ full_name }}</h2>
-            <p class="text-gray-600 mt-1">{{ email }}</p>
-            {% if age %}
-            <p class="text-gray-500 mt-2"><strong>Age:</strong> {{ age }}</p>
-            {% endif %}
-            <div class="mt-4">
-                <a href="{{ url_for('editmenteeprofile') }}" class="inline-flex items-center px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition">
-                    <i class="fas fa-edit mr-2"></i>
+            <div class="absolute top-4 right-4">
+                <a href="{{ url_for('editmenteeprofile') }}"
+                    class="inline-flex items-center px-4 py-2 bg-white/10 backdrop-blur-md text-white rounded-lg hover:bg-white/20 transition border border-white/20 text-sm font-medium">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z">
+                        </path>
+                    </svg>
                     Edit Profile
                 </a>
             </div>
         </div>
-    </div>
 
-    <!-- Who am I Badge -->
-    {% if who_am_i %}
-    <div class="bg-gradient-to-r from-blue-500 to-blue-600 p-4 rounded-lg shadow-md mb-6">
-        <p class="text-white text-center text-lg font-semibold">
-            {% if who_am_i == 'school_student' %}🎒 School Student
-            {% elif who_am_i == 'university_student' %}🎓 University Student
-            {% elif who_am_i == 'seeking_internship' %}💼 Seeking Student Job / Internship
-            {% elif who_am_i == 'young_professional' %}👔 Young Professional
-            {% elif who_am_i == 'exploring' %}🔍 Exploring, Still Unsure
-            {% endif %}
-        </p>
-    </div>
-    {% endif %}
+        <div class="px-8 pb-8">
+            <!-- Profile Header & Picture -->
+            <div class="flex flex-col md:flex-row items-start md:items-end gap-6 -mt-12 mb-8 relative z-10">
+                <!-- Profile Picture -->
+                <div
+                    class="w-32 h-32 md:w-36 md:h-36 rounded-full border-4 border-white shadow-lg bg-white overflow-hidden relative">
+                    {% if profile_picture %}
+                    <img src="{{ url_for('static', filename='uploads/' + profile_picture) }}" alt="Profile Picture"
+                        class="w-full h-full object-cover">
+                    {% else %}
+                    <div class="w-full h-full bg-slate-100 flex items-center justify-center text-slate-400">
+                        <svg class="w-16 h-16" fill="currentColor" viewBox="0 0 24 24">
+                            <path
+                                d="M24 20.993V24H0v-2.996A14.977 14.977 0 0112.004 15c4.904 0 9.26 2.354 11.996 5.993zM16.002 8.999a4 4 0 11-8 0 4 4 0 018 0z" />
+                        </svg>
+                    </div>
+                    {% endif %}
+                </div>
 
-    <!-- SCHOOL STUDENT DETAILS -->
-    {% if who_am_i == 'school_student' %}
-    <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200 mb-6">
-        <h3 class="text-2xl font-semibold text-gray-700 mb-4">School Details</h3>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {% if school_name %}<p class="text-gray-600"><span class="font-semibold">School Name:</span> {{ school_name }}</p>{% endif %}
-            {% if class_year %}<p class="text-gray-600"><span class="font-semibold">Class/Grade:</span> {{ class_year }}</p>{% endif %}
-            {% if school_board %}<p class="text-gray-600"><span class="font-semibold">Board:</span> {{ school_board }}</p>{% endif %}
-            {% if course_stream %}<p class="text-gray-600"><span class="font-semibold">Stream:</span> {{ course_stream }}</p>{% endif %}
-            {% if favourite_subject %}<p class="text-gray-600"><span class="font-semibold">Favourite Subject:</span> {{ favourite_subject }}</p>{% endif %}
-            {% if career_interest %}<p class="text-gray-600"><span class="font-semibold">Career Interest:</span> {{ career_interest }}</p>{% endif %}
-        </div>
-    </div>
-    {% endif %}
+                <!-- Name & Info -->
+                <div class="flex-1 pb-2">
+                    <h1 class="text-3xl font-bold text-slate-800">{{ full_name }}</h1>
+                    <div class="flex items-center gap-4 mt-1 text-slate-500 font-medium">
+                        <span class="flex items-center gap-1.5">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z">
+                                </path>
+                            </svg>
+                            {{ email }}
+                        </span>
+                        {% if age %}
+                        <span class="w-1 h-1 rounded-full bg-slate-300"></span>
+                        <span>{{ age }} years old</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
 
-    <!-- UNIVERSITY STUDENT DETAILS -->
-    {% if who_am_i == 'university_student' %}
-    <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200 mb-6">
-        <h3 class="text-2xl font-semibold text-gray-700 mb-4">University Details</h3>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {% if institution_name %}<p class="text-gray-600"><span class="font-semibold">University/College:</span> {{ institution_name }}</p>{% endif %}
-            {% if education_level %}<p class="text-gray-600"><span class="font-semibold">Degree Level:</span> {{ education_level }}</p>{% endif %}
-            {% if course_stream %}<p class="text-gray-600"><span class="font-semibold">Course/Major:</span> {{ course_stream }}</p>{% endif %}
-            {% if class_year %}<p class="text-gray-600"><span class="font-semibold">Year/Semester:</span> {{ class_year }}</p>{% endif %}
-            {% if favourite_subject %}<p class="text-gray-600"><span class="font-semibold">Area of Interest:</span> {{ favourite_subject }}</p>{% endif %}
-            {% if career_interest %}<p class="text-gray-600"><span class="font-semibold">Career Goal:</span> {{ career_interest }}</p>{% endif %}
-        </div>
-    </div>
-    {% endif %}
-
-    <!-- SEEKING INTERNSHIP DETAILS -->
-    {% if who_am_i == 'seeking_internship' %}
-    <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200 mb-6">
-        <h3 class="text-2xl font-semibold text-gray-700 mb-4">Education & Career Details</h3>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {% if education_level %}<p class="text-gray-600"><span class="font-semibold">Education Status:</span> {{ education_level }}</p>{% endif %}
-            {% if course_stream %}<p class="text-gray-600"><span class="font-semibold">Qualification:</span> {{ course_stream }}</p>{% endif %}
-            {% if institution_name %}<p class="text-gray-600"><span class="font-semibold">Institution:</span> {{ institution_name }}</p>{% endif %}
-            {% if career_interest %}<p class="text-gray-600"><span class="font-semibold">Field of Interest:</span> {{ career_interest }}</p>{% endif %}
-            {% if key_skills %}<p class="text-gray-600"><span class="font-semibold">Key Skills:</span> {{ key_skills }}</p>{% endif %}
-            {% if career_goal %}<p class="text-gray-600"><span class="font-semibold">Opportunity Seeking:</span> {{ career_goal }}</p>{% endif %}
-        </div>
-    </div>
-    {% endif %}
-
-    <!-- YOUNG PROFESSIONAL DETAILS -->
-    {% if who_am_i == 'young_professional' %}
-    <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200 mb-6">
-        <h3 class="text-2xl font-semibold text-gray-700 mb-4">Professional Details</h3>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {% if current_role %}<p class="text-gray-600"><span class="font-semibold">Current Role:</span> {{ current_role }}</p>{% endif %}
-            {% if industry %}<p class="text-gray-600"><span class="font-semibold">Industry/Domain:</span> {{ industry }}</p>{% endif %}
-            {% if years_experience %}<p class="text-gray-600"><span class="font-semibold">Years of Experience:</span> {{ years_experience }}</p>{% endif %}
-            {% if current_organization %}<p class="text-gray-600"><span class="font-semibold">Current Organization:</span> {{ current_organization }}</p>{% endif %}
-            {% if key_skills %}<p class="text-gray-600"><span class="font-semibold">Key Skills:</span> {{ key_skills }}</p>{% endif %}
-            {% if career_goal %}<p class="text-gray-600"><span class="font-semibold">Career Goal:</span> {{ career_goal }}</p>{% endif %}
-        </div>
-    </div>
-    {% endif %}
-
-    <!-- EXPLORING DETAILS -->
-    {% if who_am_i == 'exploring' %}
-    <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200 mb-6">
-        <h3 class="text-2xl font-semibold text-gray-700 mb-4">About You</h3>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {% if education_level %}<p class="text-gray-600"><span class="font-semibold">Current Status:</span> {{ education_level }}</p>{% endif %}
-            {% if last_role %}<p class="text-gray-600"><span class="font-semibold">Last Education/Role:</span> {{ last_role }}</p>{% endif %}
-            {% if career_interest %}<p class="text-gray-600"><span class="font-semibold">Areas of Interest:</span> {{ career_interest }}</p>{% endif %}
-            {% if support_expected %}<p class="text-gray-600"><span class="font-semibold">Support Needed:</span> {{ support_expected }}</p>{% endif %}
-        </div>
-        {% if restart_field %}
-        <div class="mt-4">
-            <p class="text-gray-600"><span class="font-semibold">What I'm Exploring:</span></p>
-            <p class="text-gray-600 mt-2 bg-gray-50 p-3 rounded">{{ restart_field }}</p>
-        </div>
-        {% endif %}
-    </div>
-    {% endif %}
-
-    <!-- Contact Information -->
-    <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200 mb-6">
-        <h3 class="text-2xl font-semibold text-gray-700 mb-4">Contact Information</h3>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {% if institution %}
-            <p class="text-gray-600">
-                <span class="font-semibold">Institution / Organization:</span> 
-                {{ institution }}
-            </p>
-            {% endif %}
-            {% if mobile_number %}
-            <p class="text-gray-600">
-                <span class="font-semibold">Mobile Number:</span> 
-                <span class="inline-flex items-center">
-                    <span class="bg-gray-100 px-2 py-1 rounded text-sm mr-1">{{ mobile_country_code or '+91' }}</span>
-                    {{ mobile_number }}
+            <!-- Who am I Badge -->
+            {% if who_am_i %}
+            <div
+                class="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-100 p-4 rounded-xl mb-8 flex items-center justify-center md:justify-start">
+                <span class="text-lg font-semibold text-blue-800 flex items-center gap-2">
+                    {% if who_am_i == 'school_student' %}🎒 School Student
+                    {% elif who_am_i == 'university_student' %}🎓 University Student
+                    {% elif who_am_i == 'seeking_internship' %}💼 Seeking Student Job / Internship
+                    {% elif who_am_i == 'young_professional' %}👔 Young Professional
+                    {% elif who_am_i == 'exploring' %}🔍 Exploring, Still Unsure
+                    {% endif %}
                 </span>
-            </p>
+            </div>
             {% endif %}
-            {% if whatsapp_number %}
-            <p class="text-gray-600">
-                <span class="font-semibold">WhatsApp Number:</span> 
-                <span class="inline-flex items-center">
-                    <span class="bg-gray-100 px-2 py-1 rounded text-sm mr-1">{{ whatsapp_country_code or '+91' }}</span>
-                    {{ whatsapp_number }}
-                </span>
-            </p>
-            {% endif %}
+
+            <!-- Sections Container -->
+            <div class="space-y-8">
+                <!-- SCHOOL STUDENT DETAILS -->
+                {% if who_am_i == 'school_student' %}
+                <div class="bg-slate-50 p-6 md:p-8 rounded-2xl border border-slate-100">
+                    <h3 class="text-xl font-bold text-slate-800 mb-6 flex items-center gap-2">
+                        <span
+                            class="w-8 h-8 rounded-lg bg-teal-100 flex items-center justify-center text-teal-600 text-sm">🎒</span>
+                        School Details
+                    </h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
+                        {% if school_name %}<div class="flex flex-col"><span
+                                class="text-xs font-semibold text-slate-400 uppercase tracking-wide">School
+                                Name</span><span class="text-slate-700 font-medium">{{ school_name }}</span></div>{%
+                        endif %}
+                        {% if class_year %}<div class="flex flex-col"><span
+                                class="text-xs font-semibold text-slate-400 uppercase tracking-wide">Class/Grade</span><span
+                                class="text-slate-700 font-medium">{{ class_year }}</span></div>{% endif %}
+                        {% if school_board %}<div class="flex flex-col"><span
+                                class="text-xs font-semibold text-slate-400 uppercase tracking-wide">Board</span><span
+                                class="text-slate-700 font-medium">{{ school_board }}</span></div>{% endif %}
+                        {% if course_stream %}<div class="flex flex-col"><span
+                                class="text-xs font-semibold text-slate-400 uppercase tracking-wide">Stream</span><span
+                                class="text-slate-700 font-medium">{{ course_stream }}</span></div>{% endif %}
+                        {% if favourite_subject %}<div class="flex flex-col"><span
+                                class="text-xs font-semibold text-slate-400 uppercase tracking-wide">Favourite
+                                Subject</span><span class="text-slate-700 font-medium">{{ favourite_subject }}</span>
+                        </div>{% endif %}
+                        {% if career_interest %}<div class="flex flex-col"><span
+                                class="text-xs font-semibold text-slate-400 uppercase tracking-wide">Career
+                                Interest</span><span class="text-slate-700 font-medium">{{ career_interest }}</span>
+                        </div>{% endif %}
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- UNIVERSITY STUDENT DETAILS -->
+                {% if who_am_i == 'university_student' %}
+                <div class="bg-slate-50 p-6 md:p-8 rounded-2xl border border-slate-100">
+                    <h3 class="text-xl font-bold text-slate-800 mb-6 flex items-center gap-2">
+                        <span
+                            class="w-8 h-8 rounded-lg bg-indigo-100 flex items-center justify-center text-indigo-600 text-sm">🎓</span>
+                        University Details
+                    </h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
+                        {% if institution_name %}<div class="flex flex-col"><span
+                                class="text-xs font-semibold text-slate-400 uppercase tracking-wide">University/College</span><span
+                                class="text-slate-700 font-medium">{{ institution_name }}</span></div>{% endif %}
+                        {% if education_level %}<div class="flex flex-col"><span
+                                class="text-xs font-semibold text-slate-400 uppercase tracking-wide">Degree
+                                Level</span><span class="text-slate-700 font-medium">{{ education_level }}</span></div>
+                        {% endif %}
+                        {% if course_stream %}<div class="flex flex-col"><span
+                                class="text-xs font-semibold text-slate-400 uppercase tracking-wide">Course/Major</span><span
+                                class="text-slate-700 font-medium">{{ course_stream }}</span></div>{% endif %}
+                        {% if class_year %}<div class="flex flex-col"><span
+                                class="text-xs font-semibold text-slate-400 uppercase tracking-wide">Year/Semester</span><span
+                                class="text-slate-700 font-medium">{{ class_year }}</span></div>{% endif %}
+                        {% if favourite_subject %}<div class="flex flex-col"><span
+                                class="text-xs font-semibold text-slate-400 uppercase tracking-wide">Area of
+                                Interest</span><span class="text-slate-700 font-medium">{{ favourite_subject }}</span>
+                        </div>{% endif %}
+                        {% if career_interest %}<div class="flex flex-col"><span
+                                class="text-xs font-semibold text-slate-400 uppercase tracking-wide">Career
+                                Goal</span><span class="text-slate-700 font-medium">{{ career_interest }}</span></div>{%
+                        endif %}
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- SEEKING INTERNSHIP DETAILS -->
+                {% if who_am_i == 'seeking_internship' %}
+                <div class="bg-slate-50 p-6 md:p-8 rounded-2xl border border-slate-100">
+                    <h3 class="text-xl font-bold text-slate-800 mb-6 flex items-center gap-2">
+                        <span
+                            class="w-8 h-8 rounded-lg bg-sky-100 flex items-center justify-center text-sky-600 text-sm">💼</span>
+                        Education & Career Details
+                    </h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
+                        {% if education_level %}<div class="flex flex-col"><span
+                                class="text-xs font-semibold text-slate-400 uppercase tracking-wide">Education
+                                Status</span><span class="text-slate-700 font-medium">{{ education_level }}</span></div>
+                        {% endif %}
+                        {% if course_stream %}<div class="flex flex-col"><span
+                                class="text-xs font-semibold text-slate-400 uppercase tracking-wide">Qualification</span><span
+                                class="text-slate-700 font-medium">{{ course_stream }}</span></div>{% endif %}
+                        {% if institution_name %}<div class="flex flex-col"><span
+                                class="text-xs font-semibold text-slate-400 uppercase tracking-wide">Institution</span><span
+                                class="text-slate-700 font-medium">{{ institution_name }}</span></div>{% endif %}
+                        {% if career_interest %}<div class="flex flex-col"><span
+                                class="text-xs font-semibold text-slate-400 uppercase tracking-wide">Field of
+                                Interest</span><span class="text-slate-700 font-medium">{{ career_interest }}</span>
+                        </div>{% endif %}
+                        {% if key_skills %}<div class="flex flex-col"><span
+                                class="text-xs font-semibold text-slate-400 uppercase tracking-wide">Key
+                                Skills</span><span class="text-slate-700 font-medium">{{ key_skills }}</span></div>{%
+                        endif %}
+                        {% if career_goal %}<div class="flex flex-col"><span
+                                class="text-xs font-semibold text-slate-400 uppercase tracking-wide">Opportunity
+                                Seeking</span><span class="text-slate-700 font-medium">{{ career_goal }}</span></div>{%
+                        endif %}
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- YOUNG PROFESSIONAL DETAILS -->
+                {% if who_am_i == 'young_professional' %}
+                <div class="bg-slate-50 p-6 md:p-8 rounded-2xl border border-slate-100">
+                    <h3 class="text-xl font-bold text-slate-800 mb-6 flex items-center gap-2">
+                        <span
+                            class="w-8 h-8 rounded-lg bg-blue-100 flex items-center justify-center text-blue-600 text-sm">👔</span>
+                        Professional Details
+                    </h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
+                        {% if current_role %}<div class="flex flex-col"><span
+                                class="text-xs font-semibold text-slate-400 uppercase tracking-wide">Current
+                                Role</span><span class="text-slate-700 font-medium">{{ current_role }}</span></div>{%
+                        endif %}
+                        {% if industry %}<div class="flex flex-col"><span
+                                class="text-xs font-semibold text-slate-400 uppercase tracking-wide">Industry/Domain</span><span
+                                class="text-slate-700 font-medium">{{ industry }}</span></div>{% endif %}
+                        {% if years_experience %}<div class="flex flex-col"><span
+                                class="text-xs font-semibold text-slate-400 uppercase tracking-wide">Years of
+                                Experience</span><span class="text-slate-700 font-medium">{{ years_experience }}</span>
+                        </div>{% endif %}
+                        {% if current_organization %}<div class="flex flex-col"><span
+                                class="text-xs font-semibold text-slate-400 uppercase tracking-wide">Current
+                                Organization</span><span class="text-slate-700 font-medium">{{ current_organization
+                                }}</span></div>{% endif %}
+                        {% if key_skills %}<div class="flex flex-col"><span
+                                class="text-xs font-semibold text-slate-400 uppercase tracking-wide">Key
+                                Skills</span><span class="text-slate-700 font-medium">{{ key_skills }}</span></div>{%
+                        endif %}
+                        {% if career_goal %}<div class="flex flex-col"><span
+                                class="text-xs font-semibold text-slate-400 uppercase tracking-wide">Career
+                                Goal</span><span class="text-slate-700 font-medium">{{ career_goal }}</span></div>{%
+                        endif %}
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- EXPLORING DETAILS -->
+                {% if who_am_i == 'exploring' %}
+                <div class="bg-slate-50 p-6 md:p-8 rounded-2xl border border-slate-100">
+                    <h3 class="text-xl font-bold text-slate-800 mb-6 flex items-center gap-2">
+                        <span
+                            class="w-8 h-8 rounded-lg bg-orange-100 flex items-center justify-center text-orange-600 text-sm">🔍</span>
+                        About You
+                    </h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
+                        {% if education_level %}<div class="flex flex-col"><span
+                                class="text-xs font-semibold text-slate-400 uppercase tracking-wide">Current
+                                Status</span><span class="text-slate-700 font-medium">{{ education_level }}</span></div>
+                        {% endif %}
+                        {% if last_role %}<div class="flex flex-col"><span
+                                class="text-xs font-semibold text-slate-400 uppercase tracking-wide">Last
+                                Education/Role</span><span class="text-slate-700 font-medium">{{ last_role }}</span>
+                        </div>{% endif %}
+                        {% if career_interest %}<div class="flex flex-col"><span
+                                class="text-xs font-semibold text-slate-400 uppercase tracking-wide">Areas of
+                                Interest</span><span class="text-slate-700 font-medium">{{ career_interest }}</span>
+                        </div>{% endif %}
+                        {% if support_expected %}<div class="flex flex-col"><span
+                                class="text-xs font-semibold text-slate-400 uppercase tracking-wide">Support
+                                Needed</span><span class="text-slate-700 font-medium">{{ support_expected }}</span>
+                        </div>{% endif %}
+                    </div>
+                    {% if restart_field %}
+                    <div class="mt-6 pt-6 border-t border-slate-200">
+                        <p class="text-xs font-semibold text-slate-400 uppercase tracking-wide mb-2">What I'm Exploring
+                        </p>
+                        <p class="text-slate-700 bg-white p-4 rounded-xl border border-slate-200 shadow-sm">{{
+                            restart_field }}</p>
+                    </div>
+                    {% endif %}
+                </div>
+                {% endif %}
+
+                <!-- Contact Information -->
+                <div class="bg-slate-50 p-6 md:p-8 rounded-2xl border border-slate-100">
+                    <h3 class="text-xl font-bold text-slate-800 mb-6 flex items-center gap-2">
+                        <span
+                            class="w-8 h-8 rounded-lg bg-emerald-100 flex items-center justify-center text-emerald-600 text-sm">📞</span>
+                        Contact Information
+                    </h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
+                        {% if institution %}
+                        <div class="flex flex-col">
+                            <span class="text-xs font-semibold text-slate-400 uppercase tracking-wide">Institution /
+                                Organization</span>
+                            <span class="text-slate-700 font-medium">{{ institution }}</span>
+                        </div>
+                        {% endif %}
+                        {% if mobile_number %}
+                        <div class="flex flex-col">
+                            <span class="text-xs font-semibold text-slate-400 uppercase tracking-wide">Mobile
+                                Number</span>
+                            <span class="text-slate-700 font-medium flex items-center gap-2">
+                                <span class="bg-slate-200 px-1.5 py-0.5 rounded text-xs text-slate-600">{{
+                                    mobile_country_code or '+91' }}</span>
+                                {{ mobile_number }}
+                            </span>
+                        </div>
+                        {% endif %}
+                        {% if whatsapp_number %}
+                        <div class="flex flex-col">
+                            <span class="text-xs font-semibold text-slate-400 uppercase tracking-wide">WhatsApp
+                                Number</span>
+                            <span class="text-slate-700 font-medium flex items-center gap-2">
+                                <span class="bg-slate-200 px-1.5 py-0.5 rounded text-xs text-slate-600">{{
+                                    whatsapp_country_code or '+91' }}</span>
+                                {{ whatsapp_number }}
+                            </span>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Mentorship Expectations -->
+                {% if mentorship_expectations %}
+                <div class="bg-slate-50 p-6 md:p-8 rounded-2xl border border-slate-100">
+                    <h3 class="text-xl font-bold text-slate-800 mb-6 flex items-center gap-2">
+                        <span
+                            class="w-8 h-8 rounded-lg bg-pink-100 flex items-center justify-center text-pink-600 text-sm">🎯</span>
+                        My Expectations from Mentorship
+                    </h3>
+                    <p class="text-slate-700 bg-white p-4 rounded-xl border border-slate-200 shadow-sm leading-relaxed">
+                        {{ mentorship_expectations }}</p>
+                </div>
+                {% endif %}
+
+                <!-- Terms Agreement -->
+                <div class="bg-slate-50 p-6 md:p-8 rounded-2xl border border-slate-100">
+                    <h3 class="text-xl font-bold text-slate-800 mb-6">Terms & Conditions</h3>
+                    <div class="flex items-center gap-2">
+                        <span class="text-sm font-semibold text-slate-500">Agreed:</span>
+                        {% if terms_agreement == 'Yes' %}
+                        <span
+                            class="inline-flex items-center text-green-600 font-bold bg-green-50 px-2 py-1 rounded-lg border border-green-100 text-xs uppercase tracking-wide">
+                            <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd"
+                                    d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                                    clip-rule="evenodd" />
+                            </svg>
+                            Yes
+                        </span>
+                        {% else %}
+                        <span
+                            class="inline-flex items-center text-red-600 font-bold bg-red-50 px-2 py-1 rounded-lg border border-red-100 text-xs uppercase tracking-wide">No</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
         </div>
-    </div>
-
-    <!-- Mentorship Expectations -->
-    {% if mentorship_expectations %}
-    <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200 mb-6">
-        <h3 class="text-2xl font-semibold text-gray-700 mb-4">My Expectations from Mentorship</h3>
-        <p class="text-gray-600 bg-gray-50 p-4 rounded">{{ mentorship_expectations }}</p>
-    </div>
-    {% endif %}
-
-    <!-- Terms Agreement -->
-    <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200 mb-6">
-        <h3 class="text-2xl font-semibold text-gray-700 mb-4">Terms & Conditions</h3>
-        <p class="text-gray-600">
-            <span class="font-semibold">Agreed:</span> 
-            {% if terms_agreement == 'Yes' %}
-                <span class="inline-flex items-center text-green-600">
-                    <svg class="w-5 h-5 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-                    </svg>
-                    Yes
-                </span>
-            {% else %}
-                <span class="text-red-600">No</span>
-            {% endif %}
-        </p>
-    </div>
-
-    <!-- Edit Profile Button -->
-    <div class="mt-6 text-center">
-        <a href="{{ url_for('editmenteeprofile') }}"
-           class="px-6 py-2 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700">
-            Edit Profile
-        </a>
     </div>
 </div>
 {% endblock %}
