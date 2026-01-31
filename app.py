@@ -144,7 +144,7 @@ migrate = Migrate(app, db)
 SMTP_SERVER = "smtp.gmail.com"
 SMTP_PORT = 587
 SMTP_EMAIL = os.environ.get("SMTP_EMAIL", "mentorship@wazireducationsociety.com")  # Change this
-SMTP_PASSWORD = os.environ.get("SMTP_PASSWORD", "zxgp ivqd obwf csnj")  # Gmail App Password
+SMTP_PASSWORD = os.environ.get("SMTP_PASSWORD", "kmbiechgqjxtfoef")  # Gmail App Password
 
 def send_otp_email(to_email, otp):
     """Send OTP to user's email"""
@@ -180,6 +180,100 @@ def send_otp_email(to_email, otp):
         return True
     except Exception as e:
         print(f"Error sending email: {e}")
+        return False
+
+def send_welcome_email(to_email, user_name, signup_method="traditional"):
+    """Send welcome email to new users after signup"""
+    try:
+        msg = MIMEMultipart()
+        msg['From'] = SMTP_EMAIL
+        msg['To'] = to_email
+        msg['Subject'] = "Welcome to Mentor Connect! 🎉"
+        
+        # Determine signup method text
+        signup_text = "signing up" if signup_method == "traditional" else "signing up with Google"
+        
+        body = f"""
+        <html>
+        <body style="font-family: Arial, sans-serif; padding: 20px; background-color: #f8fafc;">
+            <div style="max-width: 600px; margin: 0 auto; background-color: white; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+                <!-- Header -->
+                <div style="background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%); padding: 40px 20px; text-align: center;">
+                    <h1 style="color: white; margin: 0; font-size: 32px;">Welcome to Mentor Connect! 🎉</h1>
+                    <p style="color: #e0e7ff; margin: 10px 0 0 0; font-size: 16px;">Your journey to growth begins here</p>
+                </div>
+                
+                <!-- Content -->
+                <div style="padding: 40px 30px;">
+                    <h2 style="color: #1e293b; margin-top: 0;">Hi {user_name},</h2>
+                    
+                    <p style="color: #475569; font-size: 16px; line-height: 1.6;">
+                        Thank you for {signup_text} with <strong>Mentor Connect</strong>! We're thrilled to have you join our community of mentors and mentees dedicated to personal and professional growth.
+                    </p>
+                    
+                    <div style="background-color: #f1f5f9; border-left: 4px solid #2563eb; padding: 20px; margin: 30px 0; border-radius: 8px;">
+                        <h3 style="color: #1e293b; margin-top: 0; font-size: 18px;">🚀 Next Steps:</h3>
+                        <ol style="color: #475569; line-height: 1.8; margin: 10px 0;">
+                            <li><strong>Complete Your Profile</strong> - Add your details to help others connect with you</li>
+                            <li><strong>Explore the Platform</strong> - Discover mentors or mentees that match your goals</li>
+                            <li><strong>Start Connecting</strong> - Send mentorship requests and begin your journey</li>
+                        </ol>
+                    </div>
+                    
+                    <div style="background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); padding: 25px; border-radius: 12px; margin: 30px 0;">
+                        <h3 style="color: #1e40af; margin-top: 0; font-size: 18px;">✨ What You Can Do:</h3>
+                        <ul style="color: #1e40af; line-height: 1.8; margin: 10px 0;">
+                            <li>Connect with experienced mentors or eager mentees</li>
+                            <li>Schedule meetings and track your progress</li>
+                            <li>Manage tasks and receive feedback</li>
+                            <li>Chat in real-time with your connections</li>
+                            <li>Access resources and guidance for your journey</li>
+                        </ul>
+                    </div>
+                    
+                    <div style="text-align: center; margin: 40px 0;">
+                        <a href="https://mentorship.weslux.lu" style="display: inline-block; background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%); color: white; padding: 16px 40px; text-decoration: none; border-radius: 12px; font-weight: bold; font-size: 16px; box-shadow: 0 4px 6px rgba(37, 99, 235, 0.3);">
+                            Get Started Now →
+                        </a>
+                    </div>
+                    
+                    <p style="color: #64748b; font-size: 14px; line-height: 1.6; margin-top: 30px;">
+                        Need help getting started? Our support team is here for you. Simply click the support button in the application or reply to this email.
+                    </p>
+                    
+                    <p style="color: #475569; font-size: 16px; margin-top: 30px;">
+                        Best regards,<br>
+                        <strong style="color: #2563eb;">The Mentor Connect Team</strong><br>
+                        <span style="color: #64748b; font-size: 14px;">Wazir Education Society</span>
+                    </p>
+                </div>
+                
+                <!-- Footer -->
+                <div style="background-color: #f8fafc; padding: 30px; text-align: center; border-top: 1px solid #e2e8f0;">
+                    <p style="color: #64748b; font-size: 12px; margin: 0;">
+                        © 2024 Mentor Connect - Wazir Education Society. All rights reserved.
+                    </p>
+                    <p style="color: #94a3b8; font-size: 11px; margin: 10px 0 0 0;">
+                        This email was sent to {to_email} because you signed up for Mentor Connect.
+                    </p>
+                </div>
+            </div>
+        </body>
+        </html>
+        """
+        
+        msg.attach(MIMEText(body, 'html'))
+        
+        server = smtplib.SMTP(SMTP_SERVER, SMTP_PORT)
+        server.starttls()
+        server.login(SMTP_EMAIL, SMTP_PASSWORD)
+        server.send_message(msg)
+        server.quit()
+        
+        print(f"✅ Welcome email sent successfully to {to_email}")
+        return True
+    except Exception as e:
+        print(f"❌ Error sending welcome email: {e}")
         return False
 
 def mentor_login_required(f):
@@ -973,6 +1067,12 @@ def signup():
         
         db.session.commit()
 
+        # Send welcome email (non-blocking - don't stop signup if email fails)
+        try:
+            send_welcome_email(email, name, signup_method="traditional")
+        except Exception as e:
+            print(f"⚠️ Welcome email failed but signup successful: {e}")
+
         # Store in session
         session["email"] = email
         session["user_type"] = user_type
@@ -1343,6 +1443,14 @@ def callback():
             db.session.commit()
             print(f"   ✅ Committed successfully")
             print(f"   New User ID: {new_user.id}")
+            
+            # Send welcome email for new OAuth user (non-blocking)
+            print(f"\n📍 Step 10.5: Sending welcome email")
+            try:
+                send_welcome_email(email, name, signup_method="oauth")
+                print(f"   ✅ Welcome email sent")
+            except Exception as e:
+                print(f"   ⚠️ Welcome email failed but signup successful: {e}")
             
             print(f"\n📍 Step 11: Setting session for new user")
             session.permanent = True
