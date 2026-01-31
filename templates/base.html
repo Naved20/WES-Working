@@ -1,82 +1,110 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>{% block title %}{% endblock %} |  Mentor Connect</title>
+  <title>{% block title %}{% endblock %} | Mentor Connect</title>
+
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: 'hsl(221, 83%, 53%)',
+            accent: 'hsl(213, 94%, 68%)',
+          }
+        }
+      }
+    }
+  </script>
 
-  <!-- Inter font -->
+  <!-- Fonts: Poppins + Inter -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap"
+    rel="stylesheet">
+
+  <!-- Custom Design System -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='design-system.css') }}">
+
   <link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('static', filename='img/logo.jpg') }}">
+  <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
+  <meta name="theme-color" content="#2563eb">
+
   <style>
     body {
       font-family: 'Inter', sans-serif;
+      background-color: hsl(220, 30%, 98%);
+    }
+
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+      font-family: 'Poppins', sans-serif;
     }
   </style>
-
-
-  <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
-
-  <meta name="theme-color" content="#317EFB">
 </head>
-<body class="bg-gray-100 min-h-screen flex flex-col items-center">
 
+<body class="min-h-screen text-slate-800">
 
-
-  <!-- Main Container -->
-  <div id="app-container" class="w-full max-w-6xl px-4 md:px-8 py-6 space-y-12">
-    
-    
-    <!-- Header -->
-    <header class="flex justify-between items-center py-4">
-      <!-- Logo -->
-      <a href="{{ url_for('home')}}" class="flex items-center">
-        <img src="{{ url_for('static', filename='img/logo.jpg') }}" alt="LOGO" class="h-10 w-10 md:h-12 md:w-12 rounded-full mr-2">
-        <h1 class="text-2xl md:text-3xl font-bold text-[#149CFC]"> Mentor Connect</h1>
-      </a>
-
-      <!-- Desktop Nav -->
-      <nav class="hidden md:flex space-x-4">
-        <a href="{{ url_for('signin') }}" 
-           class="px-4 py-2 font-medium text-[#149CFC] rounded-lg hover:bg-blue-50 transition-colors duration-200">
-           Sign In
-        </a>
-        <a href="{{ url_for('signup') }}" 
-           class="px-4 py-2 font-medium text-white bg-[#149CFC] rounded-lg shadow-lg hover:bg-blue-700 transition-colors duration-200">
-           Sign Up
+  <!-- Header (Fixed) -->
+  <header class="fixed top-0 left-0 right-0 z-50 glass-nav">
+    <div class="container mx-auto px-4 md:px-8">
+      <div class="flex justify-between items-center h-20">
+        <!-- Logo -->
+        <a href="{{ url_for('home')}}" class="flex items-center gap-3 hover:opacity-80 transition-all hover:scale-105">
+          <img src="{{ url_for('static', filename='img/logo.jpg') }}" alt="Logo"
+            class="h-10 w-10 rounded-xl shadow-lg ring-2 ring-white/50">
+          <span class="text-xl md:text-2xl font-bold text-gradient">Mentor Connect</span>
         </a>
 
-        
-      </nav>
+        <!-- Desktop Nav -->
+        <nav class="hidden md:flex items-center gap-4">
+          <a href="{{ url_for('signin') }}"
+            class="px-5 py-2.5 font-medium text-slate-600 rounded-xl hover:bg-slate-100/50 hover:text-primary transition-all duration-200">
+            Sign In
+          </a>
+          <a href="{{ url_for('signup') }}" class="btn btn-primary shadow-lg shadow-blue-500/20">
+            Sign Up
+          </a>
+        </nav>
 
-      <!-- Mobile Menu Button -->
-      <button id="menu-btn" class="md:hidden focus:outline-none">
-        <svg class="w-6 h-6 text-[#149CFC]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-            d="M4 6h16M4 12h16M4 18h16"/>
-        </svg>
-      </button>
-    </header>
+        <!-- Mobile Menu Button -->
+        <button id="menu-btn"
+          class="md:hidden p-2 rounded-xl hover:bg-slate-100 transition-colors focus:outline-none text-slate-600">
+          <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+          </svg>
+        </button>
+      </div>
+    </div>
 
     <!-- Mobile Nav -->
-    <nav id="mobile-menu" class="hidden flex-col space-y-2 md:hidden bg-white shadow-lg rounded-lg p-4">
-      <a href="{{ url_for('signin') }}" 
-         class="block px-4 py-2 font-medium text-[#149CFC] rounded-lg hover:bg-blue-50 transition-colors duration-200">
-         Sign In
-      </a>
-      <a href="{{ url_for('signup') }}" 
-         class="block px-4 py-2 font-medium text-white bg-[#149CFC] rounded-lg shadow-lg hover:bg-blue-700 transition-colors duration-200">
-         Sign Up
-      </a>
+    <nav id="mobile-menu"
+      class="hidden md:hidden bg-white/95 backdrop-blur-xl border-t border-slate-100 shadow-xl absolute w-full left-0">
+      <div class="container mx-auto px-4 py-6 space-y-4">
+        <a href="{{ url_for('signin') }}"
+          class="block px-4 py-3 font-medium text-slate-600 rounded-xl hover:bg-slate-50 transition-colors border border-transparent hover:border-slate-100">
+          Sign In
+        </a>
+        <a href="{{ url_for('signup') }}"
+          class="block px-4 py-3 font-medium text-white gradient-primary rounded-xl text-center shadow-lg hover:shadow-xl hover:opacity-90 transition-all">
+          Sign Up
+        </a>
+      </div>
     </nav>
+  </header>
 
-    <!-- Page Content -->
+  <!-- Main Content (with top padding for fixed header) -->
+  <div class="pt-20">
     {% block content %}{% endblock %}
-
   </div>
 
   <!-- Script to toggle mobile menu -->
@@ -85,76 +113,39 @@
     const mobileMenu = document.getElementById('mobile-menu');
     menuBtn.addEventListener('click', () => {
       mobileMenu.classList.toggle('hidden');
+      const isOpen = !mobileMenu.classList.contains('hidden');
+      if (isOpen) {
+        mobileMenu.classList.add('animate-slide-up');
+      }
     });
 
-      if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register("{{ url_for('static', filename='service-worker.js') }}")
-      .then(() => console.log("Service worker registered"));
-  }
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register("{{ url_for('static', filename='service-worker.js') }}")
+        .then(() => console.log("Service worker registered"));
+    }
   </script>
 
   <!-- Customer Support Floating Button -->
-  <div id="supportBtn" onclick="openSupportModal()" class="fixed bottom-6 right-6 bg-blue-600 hover:bg-blue-700 text-white p-4 rounded-full shadow-lg cursor-pointer z-50 transition-all duration-300 hover:scale-110">
+  <div id="supportBtn" onclick="redirectToSupport()"
+    class="fixed bottom-8 right-8 z-50 animate-float cursor-pointer group">
+    <div
+      class="absolute inset-0 bg-blue-600 rounded-full blur opacity-40 group-hover:opacity-60 transition-opacity duration-300">
+    </div>
+    <div
+      class="relative bg-gradient-to-tr from-blue-600 to-sky-500 text-white p-4 rounded-full shadow-2xl transition-all duration-300 group-hover:scale-110 flex items-center justify-center">
       <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z"></path>
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+          d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z">
+        </path>
       </svg>
-  </div>
-
-  <!-- Customer Support Modal -->
-  <div id="supportModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
-      <div class="bg-white rounded-xl shadow-2xl max-w-md w-full mx-4 p-6 transform transition-all">
-          <div class="flex justify-between items-center mb-4">
-              <h3 class="text-xl font-bold text-gray-800">Customer Support</h3>
-              <button onclick="closeSupportModal()" class="text-gray-500 hover:text-gray-700">
-                  <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                  </svg>
-              </button>
-          </div>
-          
-          <div class="text-center mb-6">
-              <div class="bg-blue-100 p-4 rounded-full inline-block mb-4">
-                  <svg class="w-12 h-12 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
-                  </svg>
-              </div>
-              <p class="text-gray-600 mb-4">Need help? Contact our support team</p>
-          </div>
-
-          <div class="bg-blue-50 border-l-4 border-blue-500 p-4 rounded mb-6">
-              <p class="text-sm text-gray-700 mb-1"><strong>Email Us:</strong></p>
-              <a href="mailto:info@wazireducationsocity.com" class="text-lg font-semibold text-blue-600 hover:text-blue-800">
-                  info@wazireducationsocity.com
-              </a>
-          </div>
-
-          <p class="text-center text-sm text-gray-500 mb-4">
-              We typically respond within 24-48 hours
-          </p>
-
-          <button onclick="closeSupportModal()" class="w-full py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium transition">
-              Close
-          </button>
-      </div>
+    </div>
   </div>
 
   <script>
-      function openSupportModal() {
-          document.getElementById('supportModal').classList.remove('hidden');
-          document.getElementById('supportModal').classList.add('flex');
-      }
-
-      function closeSupportModal() {
-          document.getElementById('supportModal').classList.add('hidden');
-          document.getElementById('supportModal').classList.remove('flex');
-      }
-
-      // Close modal when clicking outside
-      document.getElementById('supportModal').addEventListener('click', function(e) {
-          if (e.target === this) {
-              closeSupportModal();
-          }
-      });
+    function redirectToSupport() {
+      window.location.href = "{{ url_for('customer_support') }}";
+    }
   </script>
 </body>
+
 </html>

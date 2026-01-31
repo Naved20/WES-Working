@@ -1,335 +1,255 @@
 {% extends "base2.html" %}
 {% block title %}Mentee Dashboard{% endblock %}
 {% block user %}Mentee{% endblock %}
-
 {% block profiledrop %}{% endblock %}
-
 {% block content %}
 
 <style>
   .nav-btn {
     background: transparent;
-    color: #6b7280;
+    color: #64748b;
   }
-  
-  .nav-btn.active, .nav-btn:hover {
+
+  .nav-btn.active,
+  .nav-btn:hover {
     background: white;
-    color: #111827;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    color: #2563eb;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
   }
 </style>
 
 <!-- Main Content Container -->
-<main class="max-w-7xl mx-auto px-2 sm:px-3 lg:px-3 py-2">
-  
+<main class="max-w-7xl mx-auto py-2 animate-slide-up">
+
   <!-- Dashboard Section -->
-  <section id="dashboard" class="p-6 bg-white rounded-xl shadow-sm">
-    <div class="mb-8">
-      <h2 class="text-xl font-semibold text-gray-800 mb-2">Welcome back!</h2>
-      <p class="text-gray-600">Here's your progress summary and upcoming sessions.</p>
+  <section id="dashboard" class="p-6 sm:p-8 glass-card rounded-2xl shadow-xl">
+    <div class="mb-8 flex items-end justify-between">
+      <div>
+        <h2 class="text-3xl font-bold text-slate-800 mb-2 font-poppins">Welcome back!</h2>
+        <p class="text-slate-500">Here's your progress summary and upcoming sessions.</p>
+      </div>
+      <div class="hidden sm:block text-sm font-semibold text-primary bg-primary/10 px-4 py-2 rounded-lg">
+        {{ now().strftime('%B %d, %Y') if now else '' }}
+      </div>
     </div>
-    
+
     <!-- Stats Overview -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-      <div class="bg-blue-50 p-5 rounded-xl border border-blue-100">
-        <div class="flex items-center">
-          <div class="rounded-full bg-blue-100 p-3 mr-4">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+      <div
+        class="relative overflow-hidden bg-white p-6 rounded-2xl shadow-sm border border-slate-100 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group">
+        <div
+          class="absolute top-0 right-0 -mt-4 -mr-4 w-24 h-24 bg-blue-50 rounded-full opacity-50 blur-xl group-hover:bg-blue-100 transition-colors">
+        </div>
+        <div class="relative z-10 flex items-center">
+          <div
+            class="rounded-xl bg-blue-50 p-3.5 mr-4 text-blue-600 group-hover:bg-blue-600 group-hover:text-white transition-all duration-300 shadow-sm">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+              stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
             </svg>
           </div>
           <div>
-            <p class="text-sm font-medium text-gray-500">Active Mentors</p>
-            <p class="text-2xl font-bold text-gray-800">{{ my_mentors|length if my_mentors else 0 }}</p>
+            <p class="text-sm font-semibold text-slate-500 uppercase tracking-wide">Active Mentors</p>
+            <p class="text-3xl font-bold text-slate-800 mt-1">{{ my_mentors|length if my_mentors else 0 }}</p>
           </div>
         </div>
       </div>
-      
-      <div class="bg-green-50 p-5 rounded-xl border border-green-100">
-        <div class="flex items-center">
-          <div class="rounded-full bg-green-100 p-3 mr-4">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+
+      <div
+        class="relative overflow-hidden bg-white p-6 rounded-2xl shadow-sm border border-slate-100 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group">
+        <div
+          class="absolute top-0 right-0 -mt-4 -mr-4 w-24 h-24 bg-emerald-50 rounded-full opacity-50 blur-xl group-hover:bg-emerald-100 transition-colors">
+        </div>
+        <div class="relative z-10 flex items-center">
+          <div
+            class="rounded-xl bg-emerald-50 p-3.5 mr-4 text-emerald-600 group-hover:bg-emerald-600 group-hover:text-white transition-all duration-300 shadow-sm">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+              stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
             </svg>
           </div>
           <div>
-            <p class="text-sm font-medium text-gray-500">Completed Sessions</p>
-            <p class="text-2xl font-bold text-gray-800">{{ completed_sessions if completed_sessions else 0 }}</p>
+            <p class="text-sm font-semibold text-slate-500 uppercase tracking-wide">Sessions Done</p>
+            <p class="text-3xl font-bold text-slate-800 mt-1">{{ completed_sessions if completed_sessions else 0 }}</p>
           </div>
         </div>
       </div>
-      
-      <div class="bg-purple-50 p-5 rounded-xl border border-purple-100">
-        <div class="flex items-center">
-          <div class="rounded-full bg-purple-100 p-3 mr-4">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+
+      <div
+        class="relative overflow-hidden bg-white p-6 rounded-2xl shadow-sm border border-slate-100 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group">
+        <div
+          class="absolute top-0 right-0 -mt-4 -mr-4 w-24 h-24 bg-sky-50 rounded-full opacity-50 blur-xl group-hover:bg-sky-100 transition-colors">
+        </div>
+        <div class="relative z-10 flex items-center">
+          <div
+            class="rounded-xl bg-sky-50 p-3.5 mr-4 text-sky-600 group-hover:bg-sky-600 group-hover:text-white transition-all duration-300 shadow-sm">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+              stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
             </svg>
           </div>
           <div>
-            <p class="text-sm font-medium text-gray-500">Upcoming Sessions</p>
-            <p class="text-2xl font-bold text-gray-800">{{ upcoming_sessions if upcoming_sessions else 0 }}</p>
+            <p class="text-sm font-semibold text-slate-500 uppercase tracking-wide">Upcoming</p>
+            <p class="text-3xl font-bold text-slate-800 mt-1">{{ upcoming_sessions if upcoming_sessions else 0 }}</p>
           </div>
         </div>
       </div>
     </div>
-    
-    <!-- Upcoming Sessions -->
-    <div class="mb-8">
-      <div class="flex justify-between items-center mb-4">
-        <h3 class="text-lg font-semibold text-gray-800">Upcoming Sessions</h3>
-        <a href="#" class="text-sm text-blue-600 hover:text-blue-800 font-medium">View all</a>
-      </div>
-      <div class="bg-gray-50 rounded-lg border border-gray-200 p-4">
-        {% if upcoming_sessions_list and upcoming_sessions_list|length > 0 %}
+
+    <div class="grid lg:grid-cols-2 gap-8">
+      <!-- Upcoming Sessions -->
+      <div>
+        <div class="flex justify-between items-center mb-6">
+          <h3 class="text-xl font-bold text-slate-800">Upcoming Sessions</h3>
+          <a href="#" class="text-sm text-primary hover:text-accent font-semibold flex items-center group">
+            View all
+            <svg class="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor"
+              viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+            </svg>
+          </a>
+        </div>
+        <div class="space-y-4">
+          {% if upcoming_sessions_list and upcoming_sessions_list|length > 0 %}
           {% for session in upcoming_sessions_list %}
-          <div class="flex justify-between items-center py-3 border-b border-gray-200 last:border-b-0">
-            <div>
-              <p class="font-medium">{{ session.mentor_name }}</p>
-              <p class="text-sm text-gray-500">{{ session.date }} at {{ session.time }}</p>
+          <div
+            class="flex justify-between items-center p-4 bg-white rounded-xl border border-slate-100 hover:shadow-lg hover:border-blue-200 transition-all duration-300 group">
+            <div class="flex items-center gap-4">
+              <div
+                class="w-14 h-14 bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl flex flex-col items-center justify-center border border-blue-200 text-xs font-bold text-blue-700 shadow-sm group-hover:scale-105 transition-transform">
+                <span class="text-lg leading-none">{{ session.date.split('-')[2] if session.date else '01' }}</span>
+                <span class="text-[10px] uppercase tracking-wide opacity-80">DAY</span>
+              </div>
+              <div>
+                <p class="font-bold text-slate-800 text-lg group-hover:text-blue-700 transition-colors">{{
+                  session.mentor_name }}</p>
+                <div class="flex items-center gap-2 mt-1">
+                  <span class="px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 text-xs font-medium">{{ session.time
+                    }}</span>
+                  {% if session.topic %}
+                  <span
+                    class="px-2 py-0.5 rounded-full bg-blue-50 text-blue-600 text-xs font-medium truncate max-w-[150px]">{{
+                    session.topic }}</span>
+                  {% endif %}
+                </div>
+              </div>
             </div>
-            <button class="px-3 py-1 bg-blue-100 text-blue-700 rounded-lg text-sm">Details</button>
+            <button
+              class="btn btn-sm btn-outline text-blue-600 border-blue-200 hover:bg-blue-50 hover:border-blue-300 transition-all">Details</button>
           </div>
           {% endfor %}
-        {% else %}
-          <p class="text-gray-500 text-center py-4">No upcoming sessions scheduled</p>
-        {% endif %}
+          {% else %}
+          <div class="p-8 text-center bg-slate-50 rounded-xl border border-slate-100 border-dashed">
+            <p class="text-slate-400">No upcoming sessions scheduled</p>
+          </div>
+          {% endif %}
+        </div>
       </div>
-    </div>
-    
-    <!-- Recent Activity -->
-    <div>
-      <div class="flex justify-between items-center mb-4">
-        <h3 class="text-lg font-semibold text-gray-800">Recent Activity</h3>
-        <a href="#" class="text-sm text-blue-600 hover:text-blue-800 font-medium">View all</a>
-      </div>
-      <div class="space-y-3">
-        {% if recent_activities and recent_activities|length > 0 %}
+
+      <!-- Recent Activity -->
+      <div>
+        <div class="flex justify-between items-center mb-6">
+          <h3 class="text-xl font-bold text-slate-800">Recent Activity</h3>
+          <a href="#" class="text-sm text-primary hover:text-accent font-semibold flex items-center group">
+            View all
+            <svg class="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor"
+              viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+            </svg>
+          </a>
+        </div>
+        <div class="space-y-4">
+          {% if recent_activities and recent_activities|length > 0 %}
           {% for activity in recent_activities %}
-          <div class="flex items-start p-3 bg-gray-50 rounded-lg">
-            <div class="rounded-full bg-blue-100 p-2 mr-3 mt-1">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          <div
+            class="flex items-start p-4 bg-white rounded-xl border border-slate-100 hover:shadow-md hover:bg-slate-50/50 transition-all duration-300">
+            <div class="rounded-full bg-blue-100 p-2.5 mr-4 mt-0.5 text-blue-600 shrink-0">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+                stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
             </div>
             <div>
-              <p class="text-sm font-medium">{{ activity.message }}</p>
-              <p class="text-xs text-gray-500">{{ activity.time }}</p>
+              <p class="text-sm font-medium text-slate-800 leading-relaxed">{{ activity.message }}</p>
+              <p class="text-xs text-slate-400 mt-1.5 flex items-center gap-1">
+                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                {{ activity.time }}
+              </p>
             </div>
           </div>
           {% endfor %}
-        {% else %}
-          <div class="flex items-start p-3 bg-gray-50 rounded-lg">
-            <div class="rounded-full bg-blue-100 p-2 mr-3 mt-1">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-            </div>
-            <div>
-              <p class="text-sm font-medium">No recent activity</p>
-              <p class="text-xs text-gray-500">Your activity will appear here</p>
-            </div>
+          {% else %}
+          <div class="p-8 text-center bg-slate-50 rounded-xl border border-slate-100 border-dashed">
+            <p class="text-slate-400">No recent activity</p>
           </div>
-        {% endif %}
+          {% endif %}
+        </div>
       </div>
     </div>
   </section>
 
-
-
-
 </main>
 
 <script>
-function showSection(id) {
-  // Hide all sections
-  document.querySelectorAll("section").forEach(sec => sec.classList.add("hidden"));
-  
-  // Show selected section
-  document.getElementById(id).classList.remove("hidden");
-  
-  // Update active navigation button
-  document.querySelectorAll('.nav-btn').forEach(btn => {
-    btn.classList.remove('active');
+  function showSection(id) {
+    document.querySelectorAll("section").forEach(sec => sec.classList.add("hidden"));
+    const target = document.getElementById(id);
+    if (target) target.classList.remove("hidden");
+
+    document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+  }
+
+  document.addEventListener("DOMContentLoaded", function () {
+    var activeSection = "{{ active_section|default('dashboard') }}";
+    showSection(activeSection);
   });
-  
-  // Find the button that corresponds to this section and activate it
-  const buttons = document.querySelectorAll('.nav-btn');
-  buttons.forEach(btn => {
-    if (btn.textContent.trim() === 'Overview' && id === 'dashboard') {
-      btn.classList.add('active');
-    } else if (btn.textContent.trim() === 'My Mentors' && id === 'mymentors') {
-      btn.classList.add('active');
-    } else if (btn.textContent.trim() === 'Find Mentors' && id === 'findmentor') {
-      btn.classList.add('active');
-    }
-  });
-}
 
-//  Auto-open correct section using Jinja-injected variable
-document.addEventListener("DOMContentLoaded", function() {
-  var activeSection = "{{ active_section|default('dashboard') }}";
-  showSection(activeSection);
-});
-
-function filterMentors() {
-  const input = document.getElementById('findMentorSearch').value.toLowerCase();
-  const mentorCards = document.querySelectorAll('.mentor-card');
-  
-  mentorCards.forEach(card => {
-    const name = card.querySelector('.mentor-name').textContent.toLowerCase();
-    const profession = card.querySelector('.mentor-profession').textContent.toLowerCase();
-    const location = card.querySelector('.mentor-location').textContent.toLowerCase();
-    
-    if (name.includes(input) || profession.includes(input) || location.includes(input)) {
-      card.style.display = 'block';
-    } else {
-      card.style.display = 'none';
-    }
-  });
-}
-
-
-
-function openProfileModal(name, profession, organisation, location, experience, profilePic, email, education, language, communication, whyMentor) {
-    document.getElementById('modalName').innerText = name;
-    document.getElementById('modalProfession').innerText = profession || "Not specified";
-    document.getElementById('modalOrganisation').innerText = organisation || "Not specified";
-    document.getElementById('modalLocation').innerText = location || "Not specified";
-    document.getElementById('modalExperience').innerText = experience || "Not specified";
-    document.getElementById('modalEmail').innerText = email || "Not specified";
-    document.getElementById('modalEducation').innerText = education || "Not specified";
-    document.getElementById('modalLanguage').innerText = language || "Not specified";
-    document.getElementById('modalCommunication').innerText = communication || "Not specified";
-    document.getElementById('modalWhyMentor').innerText = whyMentor || "Not specified";
-
-    // Profile picture logic
-    if (profilePic) {
-        document.getElementById('modalProfilePic').src = "/static/uploads/" + profilePic;
-    } else {
-        document.getElementById('modalProfilePic').src = "https://via.placeholder.com/100";
-    }
-
-    document.getElementById('profileModal').classList.remove('hidden');
-}
-
-function closeProfileModal() {
-    document.getElementById('profileModal').classList.add('hidden');
-}
-
-
-function closeProfileModal() {
-  document.getElementById('profileModal').classList.add('hidden');
-}
-
-
-
-
-// menteedashboard.html
-// ... (after your existing script functions) ...
-
-function openRequestModal(mentorId) {
+  // Original logic functions preserved
+  function openRequestModal(mentorId) {
     document.getElementById('mentorIdInput').value = mentorId;
     document.getElementById('requestModal').classList.remove('hidden');
-}
+  }
 
-function closeRequestModal() {
+  function closeRequestModal() {
     document.getElementById('requestModal').classList.add('hidden');
-    document.getElementById('mentorshipRequestForm').reset(); // Reset form fields
-}
+    document.getElementById('mentorshipRequestForm').reset();
+  }
 
-// Handle the form submission with AJAX
-document.getElementById('mentorshipRequestForm').addEventListener('submit', function(e) {
-    e.preventDefault(); // Prevent default form submission
+  const form = document.getElementById('mentorshipRequestForm');
+  if (form) {
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      const formData = new FormData(form);
+      const jsonData = {};
+      formData.forEach((value, key) => jsonData[key] = value);
 
-    const form = e.target;
-    const formData = new FormData(form);
-    const jsonData = {};
-    formData.forEach((value, key) => {
-        jsonData[key] = value;
-    });
-
-    fetch('/request_mentorship', {
+      fetch('/request_mentorship', {
         method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(jsonData),
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            alert(data.message); // Show success message
+      })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            alert(data.message);
             closeRequestModal();
-        } else {
-            alert('Error: ' + data.message); // Show error message
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        alert('An error occurred while sending the request.');
+          } else {
+            alert('Error: ' + data.message);
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          alert('An error occurred.');
+        });
     });
-});
-
-
-
-
-// Add this function with your other JavaScript functions
-function validateDateTime(input) {
-    const errorElement = document.getElementById('datetimeError');
-    const value = input.value;
-    
-    // Check if the value is a 5-digit number (common mistake)
-    if (/^\d{5}$/.test(value)) {
-        errorElement.classList.remove('hidden');
-        errorElement.textContent = "It looks like you entered a number. Please use the date picker or enter in YYYY-MM-DD HH:MM format.";
-        return false;
-    }
-    
-    // Check if it's a valid datetime format
-    const datetimeRegex = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/;
-    if (value && !datetimeRegex.test(value)) {
-        errorElement.classList.remove('hidden');
-        errorElement.textContent = "Please enter a valid date and time in the format YYYY-MM-DD HH:MM";
-        return false;
-    }
-    
-    errorElement.classList.add('hidden');
-    return true;
-}
-
-// Add form validation before submission - add this to your existing form submit handler
-document.getElementById('mentorshipRequestForm').addEventListener('submit', function(e) {
-    const datetimeInput = document.getElementById('meeting_time');
-    if (!validateDateTime(datetimeInput)) {
-        e.preventDefault();
-        datetimeInput.focus();
-    }
-    
-    // Your existing AJAX code should go here after the validation
-    // ... [your existing AJAX code] ...
-});
-
-// Add date picker with minimum date set to today - add this to your DOMContentLoaded event
-document.addEventListener('DOMContentLoaded', function() {
-    const meetingTimeInput = document.getElementById('meeting_time');
-    if (meetingTimeInput) {
-        // Set min attribute to today
-        const now = new Date();
-        const year = now.getFullYear();
-        const month = (now.getMonth() + 1).toString().padStart(2, '0');
-        const day = now.getDate().toString().padStart(2, '0');
-        const hours = now.getHours().toString().padStart(2, '0');
-        const minutes = now.getMinutes().toString().padStart(2, '0');
-        
-        meetingTimeInput.min = `${year}-${month}-${day}T${hours}:${minutes}`;
-    }
-    
-    // Your existing active section code should remain here
-    // var activeSection = "{{ active_section|default('dashboard') }}";
-    // showSection(activeSection);
-});
-
+  }
 </script>
 
 {% endblock %}

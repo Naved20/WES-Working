@@ -1,0 +1,440 @@
+/* ============================================================
+   MENTOR CONNECT - DESIGN SYSTEM
+   Based on Dastawez UI Documentation
+   ============================================================ */
+
+/* ============================================================
+   CSS VARIABLES (Design Tokens)
+   ============================================================ */
+:root {
+  /* Primary Colors - Modern Blue Theme */
+  --primary: 221 83% 53%;
+  --primary-foreground: 0 0% 100%;
+  --accent: 213 94% 68%;
+
+  /* Background Colors */
+  --background: 220 30% 98%;
+  --foreground: 222 47% 11%;
+  --card: 0 0% 100%;
+  --card-foreground: 222 47% 11%;
+
+  /* Muted Colors */
+  --muted: 220 20% 94%;
+  --muted-foreground: 220 10% 46%;
+
+  /* Border Colors */
+  --border: 220 20% 90%;
+  --border-hover: 221 83% 53%;
+
+  /* Status Colors */
+  --success: 150 80% 40%;
+  --warning: 40 95% 50%;
+  --destructive: 0 85% 60%;
+  --info: 210 90% 55%;
+
+  /* Sidebar Colors (Dark Theme) */
+  --sidebar-background: 260 50% 10%;
+  --sidebar-foreground: 220 20% 95%;
+  --sidebar-accent: 215 25% 27%;
+  --sidebar-border: 215 25% 20%;
+  --sidebar-primary: 221 83% 70%;
+  --sidebar-primary-foreground: 0 0% 100%;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.08);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.08), 0 4px 6px -4px rgb(0 0 0 / 0.04);
+  --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.08), 0 8px 10px -6px rgb(0 0 0 / 0.04);
+  --shadow-2xl: 0 25px 50px -12px rgb(0 0 0 / 0.25);
+  --shadow-glow: 0 0 20px -5px hsl(var(--primary) / 0.5);
+}
+
+/* ============================================================
+   GRADIENT UTILITIES
+   ============================================================ */
+.gradient-primary {
+  background: linear-gradient(135deg, hsl(221 83% 53%), hsl(213 94% 68%));
+}
+
+.gradient-hero {
+  background: linear-gradient(135deg, hsl(222 47% 11%), hsl(221 83% 53%), hsl(213 94% 68%));
+}
+
+.gradient-dark {
+  background: linear-gradient(to right, hsl(260 50% 10%), hsl(256 60% 15%));
+}
+
+.text-gradient {
+  background: linear-gradient(135deg, hsl(221 83% 53%), hsl(213 94% 68%));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ============================================================
+   GLASS EFFECT
+   ============================================================ */
+.glass-card {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+}
+
+.glass-nav {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+/* ============================================================
+   HOVER EFFECTS
+   ============================================================ */
+.hover-lift {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.hover-lift:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--shadow-lg), var(--shadow-glow);
+}
+
+.hover-scale {
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.hover-scale:hover {
+  transform: scale(1.03);
+}
+
+/* ============================================================
+   ANIMATIONS
+   ============================================================ */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes float {
+
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-15px);
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.6s ease-out;
+}
+
+.animate-slide-up {
+  animation: slideUp 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.animate-float {
+  animation: float 4s ease-in-out infinite;
+}
+
+.animate-scale-in {
+  animation: scaleIn 0.3s ease-out;
+}
+
+/* ============================================================
+   SIDEBAR STYLES
+   ============================================================ */
+.sidebar {
+  background-color: hsl(var(--sidebar-background));
+  color: hsl(var(--sidebar-foreground));
+  border-right: 1px solid hsl(var(--sidebar-border));
+}
+
+.sidebar-nav-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  border-radius: 0.75rem;
+  font-weight: 500;
+  transition: all 0.2s;
+  color: hsl(var(--sidebar-foreground));
+  margin-bottom: 0.25rem;
+}
+
+.sidebar-nav-item:hover {
+  background-color: hsl(var(--sidebar-accent));
+  color: hsl(221 83% 90%);
+}
+
+.sidebar-nav-item.active {
+  background: linear-gradient(to right, hsl(var(--sidebar-primary)), hsl(var(--primary)));
+  color: hsl(var(--sidebar-primary-foreground));
+  box-shadow: var(--shadow-md);
+}
+
+/* ============================================================
+   BUTTON STYLES
+   ============================================================ */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.025em;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+  border: none;
+  outline: none;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, hsl(221 83% 53%), hsl(213 94% 68%));
+  color: white;
+  padding: 0.625rem 1.25rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-primary::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: 0.5s;
+}
+
+.btn-primary:hover::after {
+  left: 100%;
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg), 0 0 15px -3px hsl(var(--primary) / 0.4);
+}
+
+.btn-outline {
+  border: 1.5px solid hsl(var(--border) / 1.5);
+  background: transparent;
+  padding: 0.625rem 1.25rem;
+}
+
+.btn-outline:hover {
+  border-color: hsl(var(--primary));
+  color: hsl(var(--primary));
+  background-color: hsl(var(--primary) / 0.05);
+}
+
+.btn-ghost {
+  background: transparent;
+  padding: 0.5rem 1rem;
+}
+
+.btn-ghost:hover {
+  background-color: hsl(var(--muted));
+  color: hsl(var(--primary));
+}
+
+.btn-sm {
+  padding: 0.375rem 0.875rem;
+  font-size: 0.875rem;
+  border-radius: 0.5rem;
+}
+
+.btn-lg {
+  padding: 0.875rem 2.5rem;
+  font-size: 1.125rem;
+  border-radius: 1rem;
+}
+
+/* ============================================================
+   CARD STYLES
+   ============================================================ */
+.card {
+  background-color: hsl(var(--card));
+  border: 1px solid hsl(var(--border));
+  border-radius: 1.25rem;
+  box-shadow: var(--shadow-sm);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.card:hover {
+  box-shadow: var(--shadow-xl);
+  border-color: hsl(var(--primary) / 0.2);
+  transform: translateY(-3px);
+}
+
+.card-header {
+  padding: 1.75rem;
+  border-bottom: 1px solid hsl(var(--border));
+}
+
+.card-content {
+  padding: 1.75rem;
+}
+
+.card-footer {
+  padding: 1.75rem;
+  border-top: 1px solid hsl(var(--border));
+  background-color: hsl(var(--muted) / 0.3);
+}
+
+/* ============================================================
+   BADGE STYLES
+   ============================================================ */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 9999px;
+  padding: 0.35rem 0.875rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.badge-primary {
+  background-color: hsl(221 83% 53% / 0.1);
+  color: hsl(221 83% 53%);
+  border: 1px solid hsl(221 83% 53% / 0.2);
+}
+
+.badge-success {
+  background-color: hsl(150 80% 40% / 0.1);
+  color: hsl(150 80% 40%);
+  border: 1px solid hsl(150 80% 40% / 0.2);
+}
+
+.badge-warning {
+  background-color: hsl(40 95% 50% / 0.1);
+  color: hsl(40 95% 45%);
+  border: 1px solid hsl(40 95% 50% / 0.2);
+}
+
+.badge-error {
+  background-color: hsl(0 85% 60% / 0.1);
+  color: hsl(0 85% 60%);
+  border: 1px solid hsl(0 85% 60% / 0.2);
+}
+
+/* ============================================================
+   INPUT STYLES
+   ============================================================ */
+.input {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 1.5px solid hsl(var(--border));
+  border-radius: 0.75rem;
+  background-color: hsl(var(--background));
+  color: hsl(var(--foreground));
+  transition: all 0.2s ease-out;
+  font-size: 0.95rem;
+}
+
+.input:focus {
+  outline: none;
+  border-color: hsl(var(--primary));
+  box-shadow: 0 0 0 4px hsl(var(--primary) / 0.15);
+  background-color: white;
+}
+
+.input:hover:not(:disabled):not(:focus) {
+  border-color: hsl(var(--border-hover) / 0.5);
+}
+
+/* ============================================================
+   UTILITY CLASSES
+   ============================================================ */
+.text-muted {
+  color: hsl(var(--muted-foreground));
+}
+
+.text-primary {
+  color: hsl(var(--primary));
+}
+
+.bg-muted {
+  background-color: hsl(var(--muted));
+}
+
+.border-primary {
+  border-color: hsl(var(--primary));
+}
+
+/* ============================================================
+   RESPONSIVE UTILITIES
+   ============================================================ */
+@media (max-width: 768px) {
+  .sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    z-index: 50;
+    transform: translateX(-100%);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: var(--shadow-2xl);
+  }
+
+  .sidebar.open {
+    transform: translateX(0);
+  }
+}
+
+/* ============================================================
+   SCROLLBAR STYLING
+   ============================================================ */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: hsl(var(--muted-foreground) / 0.3);
+  border-radius: 99px;
+  border: 2px solid hsl(var(--background));
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--primary) / 0.6);
+}

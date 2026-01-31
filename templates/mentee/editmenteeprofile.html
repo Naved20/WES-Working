@@ -4,790 +4,960 @@
 {% block user %}Mentee Profile{% endblock %}
 
 {% block Sidebar %}
-    <a href="{{ url_for('profile')}}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">👤 My Profile</a>
-    <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">⚙️ Settings</a>
-    <a href="{{ url_for('logout')}}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">🚪 Sign out</a>
+<a href="{{ url_for('profile')}}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">👤 My Profile</a>
+<a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">⚙️ Settings</a>
+<a href="{{ url_for('logout')}}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">🚪 Sign out</a>
 {% endblock %}
 
 {% block content %}
-<div class="max-w-4xl mx-auto mt-8 p-6 bg-gray-50 rounded-lg shadow-lg">
+<div class="max-w-4xl mx-auto mt-8 mb-12 animate-fade-in">
     <!-- Back Button -->
     <div class="mb-6">
-        <a href="{{ url_for('menteedashboard') }}" class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-medium">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
-            </svg>
+        <a href="{{ url_for('menteedashboard') }}"
+            class="group inline-flex items-center text-sm font-medium text-slate-600 hover:text-blue-600 transition-colors">
+            <div
+                class="w-8 h-8 rounded-full bg-white flex items-center justify-center shadow-sm border border-slate-200 mr-3 group-hover:border-blue-200 group-hover:bg-blue-50 transition-all">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                </svg>
+            </div>
             Back to Dashboard
         </a>
     </div>
-    
-    <form id="menteeProfileForm" action="{{ url_for('editmenteeprofile') }}" method="POST" enctype="multipart/form-data" class="space-y-6" onsubmit="return validateMenteeForm()" novalidate>
-        
-        <!-- Profile Header -->
-        <div class="flex flex-col items-center md:flex-row md:items-center md:justify-start space-y-4 md:space-y-0 md:space-x-6 mb-8">
-            <!-- Profile Picture Upload -->
-            <div>
-                {% if profile_picture %}
-                <img src="{{ url_for('static', filename='uploads/' + profile_picture) }}" 
-                     alt="Profile Picture" 
-                     class="w-32 h-32 md:w-40 md:h-40 object-cover rounded-full shadow-md border-2 border-gray-200 mb-2">
-                <p class="text-xs text-gray-500 mb-1">Current picture uploaded</p>
-                <input type="file" name="profile_picture" class="block text-sm text-gray-600" accept="image/*">
-                <p class="text-xs text-gray-400">Leave empty to keep current picture</p>
-                {% else %}
-                <div class="w-32 h-32 md:w-40 md:h-40 flex items-center justify-center bg-gray-200 text-gray-500 rounded-full text-lg font-semibold mb-2">
-                    No Picture
-                </div>
-                <input type="file" name="profile_picture" class="block text-sm text-gray-600" accept="image/*">
-                <p class="text-xs text-red-500">* Profile picture is required</p>
-                {% endif %}
-            </div>
 
-            <!-- Name & Email -->
-            <div class="text-center md:text-left w-full">
-                <label class="block text-gray-700 font-semibold">Full Name</label>
-                <input type="text" name="full_name" value="{{ full_name }}" class="w-full p-2 border rounded-lg" readonly>
-
-                <label class="block text-gray-700 font-semibold mt-2">Email</label>
-                <input type="email" name="email" value="{{ email }}" class="w-full p-2 border rounded-lg" readonly>
-
-                <label class="block text-gray-700 font-semibold mt-2">Date of Birth</label>
-                <input type="date" name="dob" value="{{ dob or '' }}" class="w-full p-2 border rounded-lg">
+    <div class="bg-white rounded-2xl shadow-xl border border-slate-100 overflow-hidden">
+        <!-- Header Banner -->
+        <div class="h-32 bg-gradient-to-r from-blue-600 to-indigo-600 relative">
+            <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10">
             </div>
         </div>
-        <!-- GENERAL DETAILS SECTION -->
-        <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-            <h3 class="text-2xl font-semibold text-gray-700 mb-4">📋 General Details *</h3>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <!-- Institution -->
-                <div class="md:col-span-2">
-                    <label class="block text-gray-700 font-semibold">Institution / Organization *</label>
-                    <select name="institution" class="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-                        <option value="">-- Select Institution --</option>
-                        <option value="Self" {% if institution == 'Self' %}selected{% endif %}>Self (Not affiliated with any institution)</option>
-                        <option value="University of Luxembourg" {% if institution == 'University of Luxembourg' %}selected{% endif %}>University of Luxembourg</option>
-                        <option value="Harvard University" {% if institution == 'Harvard University' %}selected{% endif %}>Harvard University</option>
-                        <option value="Stanford University" {% if institution == 'Stanford University' %}selected{% endif %}>Stanford University</option>
-                        <option value="MIT" {% if institution == 'MIT' %}selected{% endif %}>MIT</option>
-                        <option value="Yale University" {% if institution == 'Yale University' %}selected{% endif %}>Yale University</option>
-                        <option value="Princeton University" {% if institution == 'Princeton University' %}selected{% endif %}>Princeton University</option>
-                        <option value="University of Oxford" {% if institution == 'University of Oxford' %}selected{% endif %}>University of Oxford</option>
-                        <option value="University of Cambridge" {% if institution == 'University of Cambridge' %}selected{% endif %}>University of Cambridge</option>
-                        <option value="Imperial College London" {% if institution == 'Imperial College London' %}selected{% endif %}>Imperial College London</option>
-                        <option value="University of Toronto" {% if institution == 'University of Toronto' %}selected{% endif %}>University of Toronto</option>
-                        <option value="University of Melbourne" {% if institution == 'University of Melbourne' %}selected{% endif %}>University of Melbourne</option>
-                        <option value="University of Tokyo" {% if institution == 'University of Tokyo' %}selected{% endif %}>University of Tokyo</option>
-                        <option value="Tsinghua University" {% if institution == 'Tsinghua University' %}selected{% endif %}>Tsinghua University</option>
-                        <option value="IIT Delhi" {% if institution == 'IIT Delhi' %}selected{% endif %}>IIT Delhi</option>
-                        <option value="Delhi University" {% if institution == 'Delhi University' %}selected{% endif %}>Delhi University</option>
-                        <option value="Other">Other (Please specify below)</option>
+
+        <form id="menteeProfileForm" action="{{ url_for('editmenteeprofile') }}" method="POST"
+            enctype="multipart/form-data" class="px-8 pb-8" onsubmit="return validateMenteeForm()" novalidate>
+
+            <!-- Profile Header & Picture -->
+            <div class="flex flex-col md:flex-row items-start md:items-end gap-6 -mt-12 mb-10 relative z-10">
+                <!-- Profile Picture Upload -->
+                <div class="group relative">
+                    <div
+                        class="w-32 h-32 md:w-36 md:h-36 rounded-full border-4 border-white shadow-lg bg-white overflow-hidden relative">
+                        {% if profile_picture %}
+                        <img src="{{ url_for('static', filename='uploads/' + profile_picture) }}" alt="Profile Picture"
+                            class="w-full h-full object-cover">
+                        {% else %}
+                        <div class="w-full h-full bg-slate-100 flex items-center justify-center text-slate-400">
+                            <svg class="w-16 h-16" fill="currentColor" viewBox="0 0 24 24">
+                                <path
+                                    d="M24 20.993V24H0v-2.996A14.977 14.977 0 0112.004 15c4.904 0 9.26 2.354 11.996 5.993zM16.002 8.999a4 4 0 11-8 0 4 4 0 018 0z" />
+                            </svg>
+                        </div>
+                        {% endif %}
+
+                        <!-- Overlay for upload -->
+                        <div
+                            class="absolute inset-0 bg-black/50 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer">
+                            <svg class="w-8 h-8 text-white mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z">
+                                </path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                            </svg>
+                            <span class="text-white text-xs font-medium">Change</span>
+                        </div>
+                        <input type="file" name="profile_picture"
+                            class="absolute inset-0 opacity-0 cursor-pointer w-full h-full" accept="image/*"
+                            title="Change profile picture">
+                    </div>
+                </div>
+
+                <!-- Name & Email -->
+                <div class="flex-1 pb-2">
+                    <h1 class="text-3xl font-bold text-slate-800">{{ full_name }}</h1>
+                    <p class="text-slate-500 font-medium">{{ email }}</p>
+                </div>
+
+                <div class="w-full md:w-auto pb-2">
+                    <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Date of
+                        Birth</label>
+                    <input type="date" name="dob" value="{{ dob or '' }}"
+                        class="block w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-700 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                </div>
+            </div>
+
+            <!-- GENERAL DETAILS SECTION -->
+            <div class="bg-slate-50 p-8 rounded-2xl border border-slate-100 mb-8">
+                <h3 class="text-xl font-bold text-slate-800 mb-6 flex items-center gap-2">
+                    <span
+                        class="w-8 h-8 rounded-lg bg-blue-100 flex items-center justify-center text-blue-600 text-sm">📋</span>
+                    General Details <span class="text-red-500">*</span>
+                </h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- Institution -->
+                    <div class="md:col-span-2">
+                        <label class="block text-gray-700 font-semibold">Institution / Organization *</label>
+                        <select name="institution"
+                            class="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <option value="">-- Select Institution --</option>
+                            <option value="Self" {% if institution=='Self' %}selected{% endif %}>Self (Not affiliated
+                                with any institution)</option>
+                            <option value="University of Luxembourg" {% if institution=='University of Luxembourg'
+                                %}selected{% endif %}>University of Luxembourg</option>
+                            <option value="Harvard University" {% if institution=='Harvard University' %}selected{%
+                                endif %}>Harvard University</option>
+                            <option value="Stanford University" {% if institution=='Stanford University' %}selected{%
+                                endif %}>Stanford University</option>
+                            <option value="MIT" {% if institution=='MIT' %}selected{% endif %}>MIT</option>
+                            <option value="Yale University" {% if institution=='Yale University' %}selected{% endif %}>
+                                Yale University</option>
+                            <option value="Princeton University" {% if institution=='Princeton University' %}selected{%
+                                endif %}>Princeton University</option>
+                            <option value="University of Oxford" {% if institution=='University of Oxford' %}selected{%
+                                endif %}>University of Oxford</option>
+                            <option value="University of Cambridge" {% if institution=='University of Cambridge'
+                                %}selected{% endif %}>University of Cambridge</option>
+                            <option value="Imperial College London" {% if institution=='Imperial College London'
+                                %}selected{% endif %}>Imperial College London</option>
+                            <option value="University of Toronto" {% if institution=='University of Toronto'
+                                %}selected{% endif %}>University of Toronto</option>
+                            <option value="University of Melbourne" {% if institution=='University of Melbourne'
+                                %}selected{% endif %}>University of Melbourne</option>
+                            <option value="University of Tokyo" {% if institution=='University of Tokyo' %}selected{%
+                                endif %}>University of Tokyo</option>
+                            <option value="Tsinghua University" {% if institution=='Tsinghua University' %}selected{%
+                                endif %}>Tsinghua University</option>
+                            <option value="IIT Delhi" {% if institution=='IIT Delhi' %}selected{% endif %}>IIT Delhi
+                            </option>
+                            <option value="Delhi University" {% if institution=='Delhi University' %}selected{% endif
+                                %}>Delhi University</option>
+                            <option value="Other">Other (Please specify below)</option>
+                        </select>
+                        <input type="text" name="institution_other" value="{{ institution_other or '' }}"
+                            class="w-full p-2 border rounded-lg mt-2"
+                            placeholder="If 'Other', please specify your institution">
+                    </div>
+
+                    <!-- Father's Name -->
+                    <div class="md:col-span-2">
+                        <label class="block text-gray-700 font-semibold">Father's Name *</label>
+                        <input type="text" name="father_name" value="{{ father_name or '' }}"
+                            class="w-full p-2 border rounded-lg" placeholder="Father's full name">
+                    </div>
+
+                    <!-- Address Line 1 -->
+                    <div class="md:col-span-2">
+                        <label class="block text-gray-700 font-semibold">Address Line 1 *</label>
+                        <input type="text" name="address_line1" value="{{ address_line1 or '' }}"
+                            class="w-full p-2 border rounded-lg" placeholder="Street address, P.O. box">
+                    </div>
+
+                    <!-- Address Line 2 -->
+                    <div class="md:col-span-2">
+                        <label class="block text-gray-700 font-semibold">Address Line 2</label>
+                        <input type="text" name="address_line2" value="{{ address_line2 or '' }}"
+                            class="w-full p-2 border rounded-lg"
+                            placeholder="Apartment, suite, unit, building, floor, etc. (Optional)">
+                    </div>
+
+                    <!-- City -->
+                    <div>
+                        <label class="block text-gray-700 font-semibold">City *</label>
+                        <input type="text" name="city" value="{{ city or '' }}" class="w-full p-2 border rounded-lg"
+                            placeholder="City">
+                    </div>
+
+                    <!-- State/Province -->
+                    <div>
+                        <label class="block text-gray-700 font-semibold">State / Province *</label>
+                        <input type="text" name="state" value="{{ state or '' }}" class="w-full p-2 border rounded-lg"
+                            placeholder="State or Province">
+                    </div>
+
+                    <!-- Postal Code -->
+                    <div>
+                        <label class="block text-gray-700 font-semibold">Postal Code *</label>
+                        <input type="text" name="postal_code" value="{{ postal_code or '' }}"
+                            class="w-full p-2 border rounded-lg" placeholder="Postal/ZIP code">
+                    </div>
+
+                    <!-- Country -->
+                    <div>
+                        <label class="block text-gray-700 font-semibold">Country *</label>
+                        <input type="text" name="country" value="{{ country or '' }}"
+                            class="w-full p-2 border rounded-lg" placeholder="Country">
+                    </div>
+                </div>
+            </div>
+
+            <!-- MANDATORY: Who am I? -->
+            <!-- Who am I? - Always Editable -->
+            <div id="who_am_i_section" class="bg-slate-50 p-8 rounded-2xl border border-slate-100 mb-8">
+                <h3 class="text-xl font-bold text-slate-800 mb-6 flex items-center gap-2">
+                    <span
+                        class="w-8 h-8 rounded-lg bg-indigo-100 flex items-center justify-center text-indigo-600 text-sm">🤔</span>
+                    Who am I? <span class="text-red-500">*</span>
+                </h3>
+                <div class="relative">
+                    <select name="who_am_i" id="who_am_i_select"
+                        class="w-full p-3 border-2 border-gray-300 rounded-lg appearance-none bg-white cursor-pointer focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition"
+                        onchange="updateFormFields()">
+                        <option value="">-- Select who you are --</option>
+                        <option value="school_student" {% if who_am_i=='school_student' %}selected{% endif %}>🎒 School
+                            Student</option>
+                        <option value="university_student" {% if who_am_i=='university_student' %}selected{% endif %}>🎓
+                            University Student</option>
+                        <option value="seeking_internship" {% if who_am_i=='seeking_internship' %}selected{% endif %}>💼
+                            Seeking Student Job / Internship</option>
+                        <option value="young_professional" {% if who_am_i=='young_professional' %}selected{% endif %}>👔
+                            Young Professional</option>
+                        <option value="exploring" {% if who_am_i=='exploring' %}selected{% endif %}>🔍 Exploring, Still
+                            Unsure</option>
                     </select>
-                    <input type="text" name="institution_other" value="{{ institution_other or '' }}" class="w-full p-2 border rounded-lg mt-2" placeholder="If 'Other', please specify your institution">
-                </div>
-                
-                <!-- Father's Name -->
-                <div class="md:col-span-2">
-                    <label class="block text-gray-700 font-semibold">Father's Name *</label>
-                    <input type="text" name="father_name" value="{{ father_name or '' }}" class="w-full p-2 border rounded-lg" placeholder="Father's full name">
-                </div>
-                
-                <!-- Address Line 1 -->
-                <div class="md:col-span-2">
-                    <label class="block text-gray-700 font-semibold">Address Line 1 *</label>
-                    <input type="text" name="address_line1" value="{{ address_line1 or '' }}" class="w-full p-2 border rounded-lg" placeholder="Street address, P.O. box">
-                </div>
-                
-                <!-- Address Line 2 -->
-                <div class="md:col-span-2">
-                    <label class="block text-gray-700 font-semibold">Address Line 2</label>
-                    <input type="text" name="address_line2" value="{{ address_line2 or '' }}" class="w-full p-2 border rounded-lg" placeholder="Apartment, suite, unit, building, floor, etc. (Optional)">
-                </div>
-                
-                <!-- City -->
-                <div>
-                    <label class="block text-gray-700 font-semibold">City *</label>
-                    <input type="text" name="city" value="{{ city or '' }}" class="w-full p-2 border rounded-lg" placeholder="City">
-                </div>
-                
-                <!-- State/Province -->
-                <div>
-                    <label class="block text-gray-700 font-semibold">State / Province *</label>
-                    <input type="text" name="state" value="{{ state or '' }}" class="w-full p-2 border rounded-lg" placeholder="State or Province">
-                </div>
-                
-                <!-- Postal Code -->
-                <div>
-                    <label class="block text-gray-700 font-semibold">Postal Code *</label>
-                    <input type="text" name="postal_code" value="{{ postal_code or '' }}" class="w-full p-2 border rounded-lg" placeholder="Postal/ZIP code">
-                </div>
-                
-                <!-- Country -->
-                <div>
-                    <label class="block text-gray-700 font-semibold">Country *</label>
-                    <input type="text" name="country" value="{{ country or '' }}" class="w-full p-2 border rounded-lg" placeholder="Country">
-                </div>
-            </div>
-        </div>
-
-        <!-- MANDATORY: Who am I? -->
-        <!-- Who am I? - Always Editable -->
-        <div id="who_am_i_section" class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-            <h3 class="text-2xl font-semibold text-gray-700 mb-4">Who am I? *</h3>
-            <div class="relative">
-                <select name="who_am_i" id="who_am_i_select" class="w-full p-3 border-2 border-gray-300 rounded-lg appearance-none bg-white cursor-pointer focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition" onchange="updateFormFields()">
-                    <option value="">-- Select who you are --</option>
-                    <option value="school_student" {% if who_am_i == 'school_student' %}selected{% endif %}>🎒 School Student</option>
-                    <option value="university_student" {% if who_am_i == 'university_student' %}selected{% endif %}>🎓 University Student</option>
-                    <option value="seeking_internship" {% if who_am_i == 'seeking_internship' %}selected{% endif %}>💼 Seeking Student Job / Internship</option>
-                    <option value="young_professional" {% if who_am_i == 'young_professional' %}selected{% endif %}>👔 Young Professional</option>
-                    <option value="exploring" {% if who_am_i == 'exploring' %}selected{% endif %}>🔍 Exploring, Still Unsure</option>
-                </select>
-                <!-- Custom dropdown arrow SVG -->
-                <svg class="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-600 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"/>
-                </svg>
-            </div>
-            <p class="text-xs text-gray-500 mt-2">💡 You can change this selection at any time</p>
-        </div>
-
-        <!-- SCHOOL STUDENT SECTION -->
-        <div id="school_student_section" class="hidden space-y-4">
-            <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-                <h3 class="text-2xl font-semibold text-gray-700 mb-4">School Details</h3>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-gray-700 font-semibold">School Name *</label>
-                        <input type="text" name="school_name" value="{{ school_name or '' }}" class="w-full p-2 border rounded-lg" placeholder="Your school name">
-                    </div>
-                    <div>
-                        <label class="block text-gray-700 font-semibold">Class / Grade *</label>
-                        <select name="class_year" class="w-full p-2 border rounded-lg">
-                            <option value="">Select Class</option>
-                            <option value="9th" {% if class_year == '9th' %}selected{% endif %}>9th</option>
-                            <option value="10th" {% if class_year == '10th' %}selected{% endif %}>10th</option>
-                            <option value="11th" {% if class_year == '11th' %}selected{% endif %}>11th</option>
-                            <option value="12th" {% if class_year == '12th' %}selected{% endif %}>12th</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-gray-700 font-semibold">Board *</label>
-                        <input type="text" name="school_board" value="{{ school_board or '' }}" class="w-full p-2 border rounded-lg" placeholder="e.g., CBSE, ICSE, State Board">
-                    </div>
-                    <div>
-                        <label class="block text-gray-700 font-semibold">Stream (if applicable)</label>
-                        <select name="course_stream" class="w-full p-2 border rounded-lg">
-                            <option value="">Select Stream</option>
-                            <option value="Science" {% if course_stream == 'Science' %}selected{% endif %}>Science</option>
-                            <option value="Commerce" {% if course_stream == 'Commerce' %}selected{% endif %}>Commerce</option>
-                            <option value="Arts" {% if course_stream == 'Arts' %}selected{% endif %}>Arts/Humanities</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-gray-700 font-semibold">Favourite Subject</label>
-                        <input type="text" name="favourite_subject" value="{{ favourite_subject or '' }}" class="w-full p-2 border rounded-lg" placeholder="e.g., Mathematics, Physics">
-                    </div>
-                    <div>
-                        <label class="block text-gray-700 font-semibold">Career Interest *</label>
-                        <input type="text" name="career_interest" value="{{ career_interest or '' }}" class="w-full p-2 border rounded-lg" placeholder="What career are you interested in?">
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- UNIVERSITY STUDENT SECTION -->
-        <div id="university_student_section" class="hidden space-y-4">
-            <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-                <h3 class="text-2xl font-semibold text-gray-700 mb-4">University Details</h3>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-gray-700 font-semibold">University / College Name *</label>
-                        <input type="text" name="institution_name" value="{{ institution_name or '' }}" class="w-full p-2 border rounded-lg" placeholder="Your university/college name">
-                    </div>
-                    <div>
-                        <label class="block text-gray-700 font-semibold">Degree Level *</label>
-                        <select name="education_level" class="w-full p-2 border rounded-lg">
-                            <option value="">Select Level</option>
-                            <option value="Diploma" {% if education_level == 'Diploma' %}selected{% endif %}>Diploma</option>
-                            <option value="Undergraduate" {% if education_level == 'Undergraduate' %}selected{% endif %}>Undergraduate (Bachelor's)</option>
-                            <option value="Postgraduate" {% if education_level == 'Postgraduate' %}selected{% endif %}>Postgraduate (Master's)</option>
-                            <option value="PhD" {% if education_level == 'PhD' %}selected{% endif %}>PhD</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-gray-700 font-semibold">Course / Major *</label>
-                        <input type="text" name="course_stream" value="{{ course_stream or '' }}" class="w-full p-2 border rounded-lg" placeholder="e.g., Computer Science, Business">
-                    </div>
-                    <div>
-                        <label class="block text-gray-700 font-semibold">Year / Semester *</label>
-                        <input type="text" name="class_year" value="{{ class_year or '' }}" class="w-full p-2 border rounded-lg" placeholder="e.g., 2nd Year, 5th Semester">
-                    </div>
-                    <div>
-                        <label class="block text-gray-700 font-semibold">Area of Interest</label>
-                        <input type="text" name="favourite_subject" value="{{ favourite_subject or '' }}" class="w-full p-2 border rounded-lg" placeholder="Specialization or interest area">
-                    </div>
-                    <div>
-                        <label class="block text-gray-700 font-semibold">Career Goal *</label>
-                        <input type="text" name="career_interest" value="{{ career_interest or '' }}" class="w-full p-2 border rounded-lg" placeholder="What's your career goal?">
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- SEEKING INTERNSHIP SECTION -->
-        <div id="seeking_internship_section" class="hidden space-y-4">
-            <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-                <h3 class="text-2xl font-semibold text-gray-700 mb-4">Education & Career Details</h3>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-gray-700 font-semibold">Current Education Status *</label>
-                        <select name="education_level" class="w-full p-2 border rounded-lg">
-                            <option value="">Select Status</option>
-                            <option value="Pursuing" {% if education_level == 'Pursuing' %}selected{% endif %}>Currently Pursuing</option>
-                            <option value="Completed" {% if education_level == 'Completed' %}selected{% endif %}>Recently Completed</option>
-                            <option value="Final Year" {% if education_level == 'Final Year' %}selected{% endif %}>Final Year</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-gray-700 font-semibold">Qualification *</label>
-                        <input type="text" name="course_stream" value="{{ course_stream or '' }}" class="w-full p-2 border rounded-lg" placeholder="e.g., B.Tech CSE, MBA, 12th Pass">
-                    </div>
-                    <div>
-                        <label class="block text-gray-700 font-semibold">Institution Name *</label>
-                        <input type="text" name="institution_name" value="{{ institution_name or '' }}" class="w-full p-2 border rounded-lg" placeholder="School/College/University">
-                    </div>
-                    <div>
-                        <label class="block text-gray-700 font-semibold">Field of Interest *</label>
-                        <input type="text" name="career_interest" value="{{ career_interest or '' }}" class="w-full p-2 border rounded-lg" placeholder="What field/role are you seeking?">
-                    </div>
-                    <div>
-                        <label class="block text-gray-700 font-semibold">Key Skills</label>
-                        <input type="text" name="key_skills" value="{{ key_skills or '' }}" class="w-full p-2 border rounded-lg" placeholder="e.g., Python, Excel, Communication">
-                    </div>
-                    <div>
-                        <label class="block text-gray-700 font-semibold">Type of Opportunity Seeking *</label>
-                        <select name="career_goal" class="w-full p-2 border rounded-lg">
-                            <option value="">Select Type</option>
-                            <option value="Internship" {% if career_goal == 'Internship' %}selected{% endif %}>Internship</option>
-                            <option value="Part-time Job" {% if career_goal == 'Part-time Job' %}selected{% endif %}>Part-time Job</option>
-                            <option value="Full-time Job" {% if career_goal == 'Full-time Job' %}selected{% endif %}>Full-time Job</option>
-                            <option value="Freelance" {% if career_goal == 'Freelance' %}selected{% endif %}>Freelance Projects</option>
-                        </select>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- YOUNG PROFESSIONAL SECTION -->
-        <div id="young_professional_section" class="hidden space-y-4">
-            <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-                <h3 class="text-2xl font-semibold text-gray-700 mb-4">Professional Details</h3>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-gray-700 font-semibold">Current Role / Designation *</label>
-                        <input type="text" name="current_role" value="{{ current_role or '' }}" class="w-full p-2 border rounded-lg" placeholder="e.g., Software Engineer, Teacher">
-                    </div>
-                    <div>
-                        <label class="block text-gray-700 font-semibold">Industry / Domain *</label>
-                        <input type="text" name="industry" value="{{ industry or '' }}" class="w-full p-2 border rounded-lg" placeholder="e.g., IT, Education, Finance">
-                    </div>
-                    <div>
-                        <label class="block text-gray-700 font-semibold">Years of Experience *</label>
-                        <input type="number" name="years_experience" value="{{ years_experience or '' }}" class="w-full p-2 border rounded-lg" placeholder="e.g., 2" min="0" max="10">
-                    </div>
-                    <div>
-                        <label class="block text-gray-700 font-semibold">Current Organization *</label>
-                        <input type="text" name="current_organization" value="{{ current_organization or '' }}" class="w-full p-2 border rounded-lg" placeholder="Company name">
-                    </div>
-                    <div>
-                        <label class="block text-gray-700 font-semibold">Key Skills *</label>
-                        <input type="text" name="key_skills" value="{{ key_skills or '' }}" class="w-full p-2 border rounded-lg" placeholder="e.g., Python, Leadership, Marketing">
-                    </div>
-                    <div>
-                        <label class="block text-gray-700 font-semibold">Career Goal *</label>
-                        <select name="career_goal" class="w-full p-2 border rounded-lg">
-                            <option value="">Select Goal</option>
-                            <option value="Career Growth" {% if career_goal == 'Career Growth' %}selected{% endif %}>Career Growth</option>
-                            <option value="Career Switch" {% if career_goal == 'Career Switch' %}selected{% endif %}>Career Switch</option>
-                            <option value="Leadership Role" {% if career_goal == 'Leadership Role' %}selected{% endif %}>Leadership Role</option>
-                            <option value="Skill Development" {% if career_goal == 'Skill Development' %}selected{% endif %}>Skill Development</option>
-                            <option value="Work-Life Balance" {% if career_goal == 'Work-Life Balance' %}selected{% endif %}>Work-Life Balance</option>
-                        </select>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- EXPLORING SECTION -->
-        <div id="exploring_section" class="hidden space-y-4">
-            <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-                <h3 class="text-2xl font-semibold text-gray-700 mb-4">Tell Us About Yourself</h3>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-gray-700 font-semibold">Current Status *</label>
-                        <select name="education_level" class="w-full p-2 border rounded-lg">
-                            <option value="">Select Status</option>
-                            <option value="Student" {% if education_level == 'Student' %}selected{% endif %}>Student</option>
-                            <option value="Recent Graduate" {% if education_level == 'Recent Graduate' %}selected{% endif %}>Recent Graduate</option>
-                            <option value="Career Break" {% if education_level == 'Career Break' %}selected{% endif %}>On Career Break</option>
-                            <option value="Job Seeker" {% if education_level == 'Job Seeker' %}selected{% endif %}>Job Seeker</option>
-                            <option value="Other" {% if education_level == 'Other' %}selected{% endif %}>Other</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-gray-700 font-semibold">Last Education / Role *</label>
-                        <input type="text" name="last_role" value="{{ last_role or '' }}" class="w-full p-2 border rounded-lg" placeholder="e.g., 12th Pass, B.Tech, Software Engineer">
-                    </div>
-                    <div class="md:col-span-2">
-                        <label class="block text-gray-700 font-semibold">Areas of Interest *</label>
-                        <input type="text" name="career_interest" value="{{ career_interest or '' }}" class="w-full p-2 border rounded-lg" placeholder="What fields or careers interest you?">
-                    </div>
-                    <div class="md:col-span-2">
-                        <label class="block text-gray-700 font-semibold">What are you exploring? *</label>
-                        <textarea name="restart_field" class="w-full p-2 border rounded-lg" rows="3" placeholder="Tell us what you're trying to figure out or explore...">{{ restart_field or '' }}</textarea>
-                    </div>
-                    <div>
-                        <label class="block text-gray-700 font-semibold">Type of Support Needed *</label>
-                        <select name="support_expected" class="w-full p-2 border rounded-lg">
-                            <option value="">Select Support</option>
-                            <option value="Career Clarity" {% if support_expected == 'Career Clarity' %}selected{% endif %}>Career Clarity</option>
-                            <option value="Skill Guidance" {% if support_expected == 'Skill Guidance' %}selected{% endif %}>Skill Guidance</option>
-                            <option value="Industry Insights" {% if support_expected == 'Industry Insights' %}selected{% endif %}>Industry Insights</option>
-                            <option value="Confidence Building" {% if support_expected == 'Confidence Building' %}selected{% endif %}>Confidence Building</option>
-                            <option value="General Guidance" {% if support_expected == 'General Guidance' %}selected{% endif %}>General Guidance</option>
-                        </select>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- COMMON FIELDS FOR ALL -->
-        <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-            <h3 class="text-2xl font-semibold text-gray-700 mb-4">Contact Information</h3>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                    <label class="block text-gray-700 font-semibold">Mobile Number *</label>
-                    <div class="flex gap-2">
-                        <input type="text" name="mobile_country_code" list="country_codes" value="{{ mobile_country_code or '+91' }}" class="w-24 p-2 border rounded-lg" placeholder="+91">
-                        <input type="tel" name="mobile_number" value="{{ mobile_number or '' }}" class="flex-1 p-2 border rounded-lg" placeholder="Enter mobile number">
-                    </div>
-                </div>
-                <div>
-                    <label class="block text-gray-700 font-semibold">WhatsApp Number *</label>
-                    <div class="flex gap-2">
-                        <input type="text" name="whatsapp_country_code" list="country_codes" value="{{ whatsapp_country_code or '+91' }}" class="w-24 p-2 border rounded-lg" placeholder="+91">
-                        <input type="tel" name="whatsapp_number" value="{{ whatsapp_number or '' }}" class="flex-1 p-2 border rounded-lg" placeholder="Enter WhatsApp number">
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- MENTORSHIP EXPECTATIONS -->
-        <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-            <h3 class="text-2xl font-semibold text-gray-700 mb-4">My Expectation from Mentorship Programme *</h3>
-            <p class="text-gray-600 text-sm mb-3">Briefly describe what you expect to gain from this mentorship (guidance, clarity, skills, career direction, networking, etc.)</p>
-            <textarea name="mentorship_expectations" class="w-full p-2 border rounded-lg" rows="4" placeholder="Share your expectations...">{{ mentorship_expectations or '' }}</textarea>
-        </div>
-
-        <!-- Terms Agreement -->
-        <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-            <h3 class="text-2xl font-semibold text-gray-700 mb-4">Terms & Conditions</h3>
-            <div class="flex items-center mb-2">
-                <input type="checkbox" id="terms_checkbox" name="terms_agreement" value="Yes" class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500" {% if terms_agreement == 'Yes' %}checked{% endif %}>
-                <label for="terms_checkbox" class="ml-2 text-gray-700">I agree to the Terms & Conditions of the mentorship programme</label>
-            </div>
-            <div class="flex items-center">
-                <input type="checkbox" id="gdpr_checkbox" name="gdpr_agreement" value="Yes" class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500" {% if terms_agreement == 'Yes' %}checked{% endif %}>
-                <label for="gdpr_checkbox" class="ml-2 text-gray-700">Your personal data will be treated in accordance with GDPR</label>
-            </div>
-        </div>
-
-        <!-- Submit Button -->
-        <div class="text-center">
-            <button type="submit" id="saveProfileBtn" class="px-6 py-2 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 transition-colors">
-                <span id="btnText">Save Profile</span>
-                <span id="btnLoader" class="hidden">
-                    <svg class="inline w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
-                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    <!-- Custom dropdown arrow SVG -->
+                    <svg class="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-600 pointer-events-none"
+                        fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M19 14l-7 7m0 0l-7-7m7 7V3" />
                     </svg>
-                    Saving...
-                </span>
-            </button>
-        </div>
-        
-        <!-- Success/Error Message Display -->
-        <div id="formMessage" class="hidden mt-4 p-4 rounded-lg"></div>
-    </form>
-</div>
+                </div>
+                <p class="text-xs text-gray-500 mt-2">💡 You can change this selection at any time</p>
+            </div>
 
-<script>
-// Handle form submission via AJAX
-document.getElementById('menteeProfileForm').addEventListener('submit', function(e) {
-    e.preventDefault(); // Prevent default form submission
-    console.log('📝 Form submission intercepted for AJAX handling');
-    
-    // Run validation first
-    if (!validateMenteeForm()) {
-        console.log('❌ Validation failed, not submitting');
-        return false;
-    }
-    
-    console.log('✅ Validation passed, submitting via AJAX...');
-    
-    // Get form elements
-    const form = this;
-    const formData = new FormData(form);
-    const submitBtn = document.getElementById('saveProfileBtn');
-    const btnText = document.getElementById('btnText');
-    const btnLoader = document.getElementById('btnLoader');
-    const messageDiv = document.getElementById('formMessage');
-    
-    // Disable button and show loader
-    submitBtn.disabled = true;
-    btnText.classList.add('hidden');
-    btnLoader.classList.remove('hidden');
-    
-    // Hide previous messages
-    messageDiv.classList.add('hidden');
-    
-    // Submit form via AJAX
-    fetch(form.action, {
-        method: 'POST',
-        body: formData,
-        headers: {
-            'X-Requested-With': 'XMLHttpRequest'
-        }
-    })
-    .then(response => {
-        console.log('Response status:', response.status);
-        
-        // Try to parse as JSON first
-        const contentType = response.headers.get('content-type');
-        if (contentType && contentType.includes('application/json')) {
-            return response.json().then(data => ({ json: data, status: response.status }));
-        } else {
-            return response.text().then(text => ({ html: text, status: response.status }));
-        }
-    })
-    .then(result => {
-        if (result.json) {
-            // JSON response from backend
-            const data = result.json;
-            
-            if (data.success) {
-                console.log('✅ Profile saved successfully');
-                showMessage(data.message || '✅ Profile saved successfully!', 'success');
-                
-                // Redirect to profile view page after 2 seconds
-                setTimeout(() => {
-                    window.location.href = data.redirect_url || "{{ url_for('menteeprofile') }}";
-                }, 2000);
-            } else {
-                console.error('❌ Validation error:', data.message);
-                showMessage(data.message || '❌ Please check the form and try again.', 'error');
+            <!-- SCHOOL STUDENT SECTION -->
+            <div id="school_student_section" class="hidden space-y-4">
+                <div class="bg-slate-50 p-8 rounded-2xl border border-slate-100 mb-8">
+                    <h3 class="text-xl font-bold text-slate-800 mb-6 flex items-center gap-2">
+                        <span
+                            class="w-8 h-8 rounded-lg bg-teal-100 flex items-center justify-center text-teal-600 text-sm">🎒</span>
+                        School Details
+                    </h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-gray-700 font-semibold">School Name *</label>
+                            <input type="text" name="school_name" value="{{ school_name or '' }}"
+                                class="w-full p-2 border rounded-lg" placeholder="Your school name">
+                        </div>
+                        <div>
+                            <label class="block text-gray-700 font-semibold">Class / Grade *</label>
+                            <select name="class_year" class="w-full p-2 border rounded-lg">
+                                <option value="">Select Class</option>
+                                <option value="9th" {% if class_year=='9th' %}selected{% endif %}>9th</option>
+                                <option value="10th" {% if class_year=='10th' %}selected{% endif %}>10th</option>
+                                <option value="11th" {% if class_year=='11th' %}selected{% endif %}>11th</option>
+                                <option value="12th" {% if class_year=='12th' %}selected{% endif %}>12th</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-gray-700 font-semibold">Board *</label>
+                            <input type="text" name="school_board" value="{{ school_board or '' }}"
+                                class="w-full p-2 border rounded-lg" placeholder="e.g., CBSE, ICSE, State Board">
+                        </div>
+                        <div>
+                            <label class="block text-gray-700 font-semibold">Stream (if applicable)</label>
+                            <select name="course_stream" class="w-full p-2 border rounded-lg">
+                                <option value="">Select Stream</option>
+                                <option value="Science" {% if course_stream=='Science' %}selected{% endif %}>Science
+                                </option>
+                                <option value="Commerce" {% if course_stream=='Commerce' %}selected{% endif %}>Commerce
+                                </option>
+                                <option value="Arts" {% if course_stream=='Arts' %}selected{% endif %}>Arts/Humanities
+                                </option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-gray-700 font-semibold">Favourite Subject</label>
+                            <input type="text" name="favourite_subject" value="{{ favourite_subject or '' }}"
+                                class="w-full p-2 border rounded-lg" placeholder="e.g., Mathematics, Physics">
+                        </div>
+                        <div>
+                            <label class="block text-gray-700 font-semibold">Career Interest *</label>
+                            <input type="text" name="career_interest" value="{{ career_interest or '' }}"
+                                class="w-full p-2 border rounded-lg" placeholder="What career are you interested in?">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- UNIVERSITY STUDENT SECTION -->
+            <div id="university_student_section" class="hidden space-y-4">
+                <div class="bg-slate-50 p-8 rounded-2xl border border-slate-100 mb-8">
+                    <h3 class="text-xl font-bold text-slate-800 mb-6 flex items-center gap-2">
+                        <span
+                            class="w-8 h-8 rounded-lg bg-indigo-100 flex items-center justify-center text-indigo-600 text-sm">🎓</span>
+                        University Details
+                    </h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-gray-700 font-semibold">University / College Name *</label>
+                            <input type="text" name="institution_name" value="{{ institution_name or '' }}"
+                                class="w-full p-2 border rounded-lg" placeholder="Your university/college name">
+                        </div>
+                        <div>
+                            <label class="block text-gray-700 font-semibold">Degree Level *</label>
+                            <select name="education_level" class="w-full p-2 border rounded-lg">
+                                <option value="">Select Level</option>
+                                <option value="Diploma" {% if education_level=='Diploma' %}selected{% endif %}>Diploma
+                                </option>
+                                <option value="Undergraduate" {% if education_level=='Undergraduate' %}selected{% endif
+                                    %}>Undergraduate (Bachelor's)</option>
+                                <option value="Postgraduate" {% if education_level=='Postgraduate' %}selected{% endif
+                                    %}>Postgraduate (Master's)</option>
+                                <option value="PhD" {% if education_level=='PhD' %}selected{% endif %}>PhD</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-gray-700 font-semibold">Course / Major *</label>
+                            <input type="text" name="course_stream" value="{{ course_stream or '' }}"
+                                class="w-full p-2 border rounded-lg" placeholder="e.g., Computer Science, Business">
+                        </div>
+                        <div>
+                            <label class="block text-gray-700 font-semibold">Year / Semester *</label>
+                            <input type="text" name="class_year" value="{{ class_year or '' }}"
+                                class="w-full p-2 border rounded-lg" placeholder="e.g., 2nd Year, 5th Semester">
+                        </div>
+                        <div>
+                            <label class="block text-gray-700 font-semibold">Area of Interest</label>
+                            <input type="text" name="favourite_subject" value="{{ favourite_subject or '' }}"
+                                class="w-full p-2 border rounded-lg" placeholder="Specialization or interest area">
+                        </div>
+                        <div>
+                            <label class="block text-gray-700 font-semibold">Career Goal *</label>
+                            <input type="text" name="career_interest" value="{{ career_interest or '' }}"
+                                class="w-full p-2 border rounded-lg" placeholder="What's your career goal?">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SEEKING INTERNSHIP SECTION -->
+            <div id="seeking_internship_section" class="hidden space-y-4">
+                <div class="bg-slate-50 p-8 rounded-2xl border border-slate-100 mb-8">
+                    <h3 class="text-xl font-bold text-slate-800 mb-6 flex items-center gap-2">
+                        <span
+                            class="w-8 h-8 rounded-lg bg-sky-100 flex items-center justify-center text-sky-600 text-sm">💼</span>
+                        Education & Career Details
+                    </h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-gray-700 font-semibold">Current Education Status *</label>
+                            <select name="education_level" class="w-full p-2 border rounded-lg">
+                                <option value="">Select Status</option>
+                                <option value="Pursuing" {% if education_level=='Pursuing' %}selected{% endif %}>
+                                    Currently Pursuing</option>
+                                <option value="Completed" {% if education_level=='Completed' %}selected{% endif %}>
+                                    Recently Completed</option>
+                                <option value="Final Year" {% if education_level=='Final Year' %}selected{% endif %}>
+                                    Final Year</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-gray-700 font-semibold">Qualification *</label>
+                            <input type="text" name="course_stream" value="{{ course_stream or '' }}"
+                                class="w-full p-2 border rounded-lg" placeholder="e.g., B.Tech CSE, MBA, 12th Pass">
+                        </div>
+                        <div>
+                            <label class="block text-gray-700 font-semibold">Institution Name *</label>
+                            <input type="text" name="institution_name" value="{{ institution_name or '' }}"
+                                class="w-full p-2 border rounded-lg" placeholder="School/College/University">
+                        </div>
+                        <div>
+                            <label class="block text-gray-700 font-semibold">Field of Interest *</label>
+                            <input type="text" name="career_interest" value="{{ career_interest or '' }}"
+                                class="w-full p-2 border rounded-lg" placeholder="What field/role are you seeking?">
+                        </div>
+                        <div>
+                            <label class="block text-gray-700 font-semibold">Key Skills</label>
+                            <input type="text" name="key_skills" value="{{ key_skills or '' }}"
+                                class="w-full p-2 border rounded-lg" placeholder="e.g., Python, Excel, Communication">
+                        </div>
+                        <div>
+                            <label class="block text-gray-700 font-semibold">Type of Opportunity Seeking *</label>
+                            <select name="career_goal" class="w-full p-2 border rounded-lg">
+                                <option value="">Select Type</option>
+                                <option value="Internship" {% if career_goal=='Internship' %}selected{% endif %}>
+                                    Internship</option>
+                                <option value="Part-time Job" {% if career_goal=='Part-time Job' %}selected{% endif %}>
+                                    Part-time Job</option>
+                                <option value="Full-time Job" {% if career_goal=='Full-time Job' %}selected{% endif %}>
+                                    Full-time Job</option>
+                                <option value="Freelance" {% if career_goal=='Freelance' %}selected{% endif %}>Freelance
+                                    Projects</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- YOUNG PROFESSIONAL SECTION -->
+            <div id="young_professional_section" class="hidden space-y-4">
+                <div class="bg-slate-50 p-8 rounded-2xl border border-slate-100 mb-8">
+                    <h3 class="text-xl font-bold text-slate-800 mb-6 flex items-center gap-2">
+                        <span
+                            class="w-8 h-8 rounded-lg bg-blue-100 flex items-center justify-center text-blue-600 text-sm">👔</span>
+                        Professional Details
+                    </h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-gray-700 font-semibold">Current Role / Designation *</label>
+                            <input type="text" name="current_role" value="{{ current_role or '' }}"
+                                class="w-full p-2 border rounded-lg" placeholder="e.g., Software Engineer, Teacher">
+                        </div>
+                        <div>
+                            <label class="block text-gray-700 font-semibold">Industry / Domain *</label>
+                            <input type="text" name="industry" value="{{ industry or '' }}"
+                                class="w-full p-2 border rounded-lg" placeholder="e.g., IT, Education, Finance">
+                        </div>
+                        <div>
+                            <label class="block text-gray-700 font-semibold">Years of Experience *</label>
+                            <input type="number" name="years_experience" value="{{ years_experience or '' }}"
+                                class="w-full p-2 border rounded-lg" placeholder="e.g., 2" min="0" max="10">
+                        </div>
+                        <div>
+                            <label class="block text-gray-700 font-semibold">Current Organization *</label>
+                            <input type="text" name="current_organization" value="{{ current_organization or '' }}"
+                                class="w-full p-2 border rounded-lg" placeholder="Company name">
+                        </div>
+                        <div>
+                            <label class="block text-gray-700 font-semibold">Key Skills *</label>
+                            <input type="text" name="key_skills" value="{{ key_skills or '' }}"
+                                class="w-full p-2 border rounded-lg" placeholder="e.g., Python, Leadership, Marketing">
+                        </div>
+                        <div>
+                            <label class="block text-gray-700 font-semibold">Career Goal *</label>
+                            <select name="career_goal" class="w-full p-2 border rounded-lg">
+                                <option value="">Select Goal</option>
+                                <option value="Career Growth" {% if career_goal=='Career Growth' %}selected{% endif %}>
+                                    Career Growth</option>
+                                <option value="Career Switch" {% if career_goal=='Career Switch' %}selected{% endif %}>
+                                    Career Switch</option>
+                                <option value="Leadership Role" {% if career_goal=='Leadership Role' %}selected{% endif
+                                    %}>Leadership Role</option>
+                                <option value="Skill Development" {% if career_goal=='Skill Development' %}selected{%
+                                    endif %}>Skill Development</option>
+                                <option value="Work-Life Balance" {% if career_goal=='Work-Life Balance' %}selected{%
+                                    endif %}>Work-Life Balance</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- EXPLORING SECTION -->
+            <div id="exploring_section" class="hidden space-y-4">
+                <div class="bg-slate-50 p-8 rounded-2xl border border-slate-100 mb-8">
+                    <h3 class="text-xl font-bold text-slate-800 mb-6 flex items-center gap-2">
+                        <span
+                            class="w-8 h-8 rounded-lg bg-orange-100 flex items-center justify-center text-orange-600 text-sm">🔍</span>
+                        Tell Us About Yourself
+                    </h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-gray-700 font-semibold">Current Status *</label>
+                            <select name="education_level" class="w-full p-2 border rounded-lg">
+                                <option value="">Select Status</option>
+                                <option value="Student" {% if education_level=='Student' %}selected{% endif %}>Student
+                                </option>
+                                <option value="Recent Graduate" {% if education_level=='Recent Graduate' %}selected{%
+                                    endif %}>Recent Graduate</option>
+                                <option value="Career Break" {% if education_level=='Career Break' %}selected{% endif
+                                    %}>On Career Break</option>
+                                <option value="Job Seeker" {% if education_level=='Job Seeker' %}selected{% endif %}>Job
+                                    Seeker</option>
+                                <option value="Other" {% if education_level=='Other' %}selected{% endif %}>Other
+                                </option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-gray-700 font-semibold">Last Education / Role *</label>
+                            <input type="text" name="last_role" value="{{ last_role or '' }}"
+                                class="w-full p-2 border rounded-lg"
+                                placeholder="e.g., 12th Pass, B.Tech, Software Engineer">
+                        </div>
+                        <div class="md:col-span-2">
+                            <label class="block text-gray-700 font-semibold">Areas of Interest *</label>
+                            <input type="text" name="career_interest" value="{{ career_interest or '' }}"
+                                class="w-full p-2 border rounded-lg" placeholder="What fields or careers interest you?">
+                        </div>
+                        <div class="md:col-span-2">
+                            <label class="block text-gray-700 font-semibold">What are you exploring? *</label>
+                            <textarea name="restart_field" class="w-full p-2 border rounded-lg" rows="3"
+                                placeholder="Tell us what you're trying to figure out or explore...">{{ restart_field or '' }}</textarea>
+                        </div>
+                        <div>
+                            <label class="block text-gray-700 font-semibold">Type of Support Needed *</label>
+                            <select name="support_expected" class="w-full p-2 border rounded-lg">
+                                <option value="">Select Support</option>
+                                <option value="Career Clarity" {% if support_expected=='Career Clarity' %}selected{%
+                                    endif %}>Career Clarity</option>
+                                <option value="Skill Guidance" {% if support_expected=='Skill Guidance' %}selected{%
+                                    endif %}>Skill Guidance</option>
+                                <option value="Industry Insights" {% if support_expected=='Industry Insights'
+                                    %}selected{% endif %}>Industry Insights</option>
+                                <option value="Confidence Building" {% if support_expected=='Confidence Building'
+                                    %}selected{% endif %}>Confidence Building</option>
+                                <option value="General Guidance" {% if support_expected=='General Guidance' %}selected{%
+                                    endif %}>General Guidance</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- COMMON FIELDS FOR ALL -->
+            <div class="bg-slate-50 p-8 rounded-2xl border border-slate-100 mb-8">
+                <h3 class="text-xl font-bold text-slate-800 mb-6 flex items-center gap-2">
+                    <span
+                        class="w-8 h-8 rounded-lg bg-emerald-100 flex items-center justify-center text-emerald-600 text-sm">📞</span>
+                    Contact Information
+                </h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-gray-700 font-semibold">Mobile Number *</label>
+                        <div class="flex gap-2">
+                            <input type="text" name="mobile_country_code" list="country_codes"
+                                value="{{ mobile_country_code or '+91' }}" class="w-24 p-2 border rounded-lg"
+                                placeholder="+91">
+                            <input type="tel" name="mobile_number" value="{{ mobile_number or '' }}"
+                                class="flex-1 p-2 border rounded-lg" placeholder="Enter mobile number">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-gray-700 font-semibold">WhatsApp Number *</label>
+                        <div class="flex gap-2">
+                            <input type="text" name="whatsapp_country_code" list="country_codes"
+                                value="{{ whatsapp_country_code or '+91' }}" class="w-24 p-2 border rounded-lg"
+                                placeholder="+91">
+                            <input type="tel" name="whatsapp_number" value="{{ whatsapp_number or '' }}"
+                                class="flex-1 p-2 border rounded-lg" placeholder="Enter WhatsApp number">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- MENTORSHIP EXPECTATIONS -->
+            <div class="bg-slate-50 p-8 rounded-2xl border border-slate-100 mb-8">
+                <h3 class="text-xl font-bold text-slate-800 mb-6 flex items-center gap-2">
+                    <span
+                        class="w-8 h-8 rounded-lg bg-pink-100 flex items-center justify-center text-pink-600 text-sm">🎯</span>
+                    My Expectation from Mentorship Programme <span class="text-red-500">*</span>
+                </h3>
+                <p class="text-gray-600 text-sm mb-3">Briefly describe what you expect to gain from this mentorship
+                    (guidance, clarity, skills, career direction, networking, etc.)</p>
+                <textarea name="mentorship_expectations" class="w-full p-2 border rounded-lg" rows="4"
+                    placeholder="Share your expectations...">{{ mentorship_expectations or '' }}</textarea>
+            </div>
+
+            <!-- Terms Agreement -->
+            <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+                <h3 class="text-2xl font-semibold text-gray-700 mb-4">Terms & Conditions</h3>
+                <div class="flex items-center mb-2">
+                    <input type="checkbox" id="terms_checkbox" name="terms_agreement" value="Yes"
+                        class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500" {% if
+                        terms_agreement=='Yes' %}checked{% endif %}>
+                    <label for="terms_checkbox" class="ml-2 text-gray-700">I agree to the Terms & Conditions of the
+                        mentorship programme</label>
+                </div>
+                <div class="flex items-center">
+                    <input type="checkbox" id="gdpr_checkbox" name="gdpr_agreement" value="Yes"
+                        class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500" {% if
+                        terms_agreement=='Yes' %}checked{% endif %}>
+                    <label for="gdpr_checkbox" class="ml-2 text-gray-700">Your personal data will be treated in
+                        accordance with GDPR</label>
+                </div>
+            </div>
+
+            <!-- Submit Button -->
+            <div class="text-center">
+                <button type="submit" id="saveProfileBtn"
+                    class="px-6 py-2 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 transition-colors">
+                    <span id="btnText">Save Profile</span>
+                    <span id="btnLoader" class="hidden">
+                        <svg class="inline w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4">
+                            </circle>
+                            <path class="opacity-75" fill="currentColor"
+                                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                            </path>
+                        </svg>
+                        Saving...
+                    </span>
+                </button>
+            </div>
+
+            <!-- Success/Error Message Display -->
+            <div id="formMessage" class="hidden mt-4 p-4 rounded-lg"></div>
+        </form>
+    </div>
+
+    <script>
+        // Handle form submission via AJAX
+        document.getElementById('menteeProfileForm').addEventListener('submit', function (e) {
+            e.preventDefault(); // Prevent default form submission
+            console.log('📝 Form submission intercepted for AJAX handling');
+
+            // Run validation first
+            if (!validateMenteeForm()) {
+                console.log('❌ Validation failed, not submitting');
+                return false;
             }
-        } else {
-            // HTML response (fallback for non-AJAX handling)
-            const html = result.html;
-            
-            if (html.includes('successfully') || result.status === 200) {
-                showMessage('✅ Profile saved successfully!', 'success');
-                setTimeout(() => {
-                    window.location.href = "{{ url_for('menteeprofile') }}";
-                }, 2000);
-            } else {
-                showMessage('❌ Error saving profile. Please check the form and try again.', 'error');
-            }
-        }
-    })
-    .catch(error => {
-        console.error('❌ Error submitting form:', error);
-        showMessage('❌ Error saving profile. Please try again.', 'error');
-    })
-    .finally(() => {
-        // Re-enable button and hide loader
-        submitBtn.disabled = false;
-        btnText.classList.remove('hidden');
-        btnLoader.classList.add('hidden');
-    });
-    
-    return false;
-});
 
-// Function to show success/error messages
-function showMessage(message, type) {
-    const messageDiv = document.getElementById('formMessage');
-    messageDiv.textContent = message;
-    messageDiv.classList.remove('hidden', 'bg-green-100', 'text-green-700', 'bg-red-100', 'text-red-700');
-    
-    if (type === 'success') {
-        messageDiv.classList.add('bg-green-100', 'text-green-700', 'border', 'border-green-400');
-    } else {
-        messageDiv.classList.add('bg-red-100', 'text-red-700', 'border', 'border-red-400');
-    }
-    
-    // Scroll to message
-    messageDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-}
-</script>
+            console.log('✅ Validation passed, submitting via AJAX...');
 
-<datalist id="country_codes">
-    <option value="+91">India</option>
-    <option value="+1">USA/Canada</option>
-    <option value="+44">UK</option>
-    <option value="+971">UAE</option>
-    <option value="+966">Saudi Arabia</option>
-    <option value="+65">Singapore</option>
-    <option value="+61">Australia</option>
-    <option value="+49">Germany</option>
-    <option value="+33">France</option>
-    <option value="+352">Luxembourg</option>
-</datalist>
+            // Get form elements
+            const form = this;
+            const formData = new FormData(form);
+            const submitBtn = document.getElementById('saveProfileBtn');
+            const btnText = document.getElementById('btnText');
+            const btnLoader = document.getElementById('btnLoader');
+            const messageDiv = document.getElementById('formMessage');
 
-<script>
-// Dynamic form updates - user can change "Who am I" at any time
+            // Disable button and show loader
+            submitBtn.disabled = true;
+            btnText.classList.add('hidden');
+            btnLoader.classList.remove('hidden');
 
-const whoAmILabels = {
-    'school_student': '🎒 School Student',
-    'university_student': '🎓 University Student',
-    'seeking_internship': '💼 Seeking Student Job / Internship',
-    'young_professional': '👔 Young Professional',
-    'exploring': '🔍 Exploring, Still Unsure'
-};
+            // Hide previous messages
+            messageDiv.classList.add('hidden');
 
-function updateFormFields() {
-    console.log('🔄 Updating form fields based on "Who am I" selection...');
-    
-    const selectInput = document.getElementById('who_am_i_select');
-    const whoAmI = selectInput ? selectInput.value : '';
-    
-    console.log('Selected "Who am I":', whoAmI);
-    
-    // Hide all sections
-    document.getElementById('school_student_section').classList.add('hidden');
-    document.getElementById('university_student_section').classList.add('hidden');
-    document.getElementById('seeking_internship_section').classList.add('hidden');
-    document.getElementById('young_professional_section').classList.add('hidden');
-    document.getElementById('exploring_section').classList.add('hidden');
-    
-    // Show relevant section based on selection
-    if (whoAmI === 'school_student') {
-        document.getElementById('school_student_section').classList.remove('hidden');
-        console.log('✓ Showing school student section');
-    } else if (whoAmI === 'university_student') {
-        document.getElementById('university_student_section').classList.remove('hidden');
-        console.log('✓ Showing university student section');
-    } else if (whoAmI === 'seeking_internship') {
-        document.getElementById('seeking_internship_section').classList.remove('hidden');
-        console.log('✓ Showing seeking internship section');
-    } else if (whoAmI === 'young_professional') {
-        document.getElementById('young_professional_section').classList.remove('hidden');
-        console.log('✓ Showing young professional section');
-    } else if (whoAmI === 'exploring') {
-        document.getElementById('exploring_section').classList.remove('hidden');
-        console.log('✓ Showing exploring section');
-    }
-    
-    // Update required attributes for visible fields
-    updateRequiredAttributes();
-}
-
-function validateMenteeForm() {
-    console.log('🔍 Starting form validation...');
-    
-    const selectInput = document.getElementById('who_am_i_select');
-    const whoAmI = selectInput ? selectInput.value : '';
-    
-    console.log('Who am I value:', whoAmI);
-    
-    if (!whoAmI) {
-        alert('❌ Please select "Who am I?"');
-        return false;
-    }
-
-    // Define mandatory fields for each category
-    const mandatoryFieldsByCategory = {
-        school_student: ['school_name', 'school_board'],
-        university_student: ['institution_name'],
-        seeking_internship: ['institution_name'],
-        young_professional: ['current_role', 'industry', 'years_experience', 'current_organization'],
-        exploring: ['last_role', 'restart_field', 'support_expected']
-    };
-
-    // Common mandatory fields for all categories
-    const commonMandatory = ['mobile_number', 'whatsapp_number', 'mentorship_expectations', 'institution'];
-    
-    // General details mandatory fields
-    const generalDetailsMandatory = ['father_name', 'address_line1', 'city', 'state', 'postal_code', 'country'];
-    
-    let emptyFields = [];
-
-    // Check if profile picture exists (only if no current picture)
-    const currentPicture = "{{ profile_picture }}";
-    const profilePictureInput = document.querySelector('input[name="profile_picture"]');
-    if (!currentPicture && profilePictureInput && !profilePictureInput.files.length) {
-        console.log('✓ Checking profile_picture: empty');
-        emptyFields.push('Profile Picture');
-    }
-
-    // Check common mandatory fields
-    commonMandatory.forEach(field => {
-        try {
-            const element = document.querySelector(`[name="${field}"]`);
-            if (element) {
-                const value = element.value ? element.value.trim() : '';
-                console.log(`✓ Checking ${field}: "${value}"`);
-                if (!value) {
-                    emptyFields.push(field.replace(/_/g, ' '));
+            // Submit form via AJAX
+            fetch(form.action, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
                 }
-            }
-        } catch (e) {
-            console.error(`Error checking field ${field}:`, e);
-        }
-    });
+            })
+                .then(response => {
+                    console.log('Response status:', response.status);
 
-    // Check general details mandatory fields
-    generalDetailsMandatory.forEach(field => {
-        try {
-            const element = document.querySelector(`[name="${field}"]`);
-            if (element) {
-                const value = element.value ? element.value.trim() : '';
-                console.log(`✓ Checking ${field}: "${value}"`);
-                if (!value) {
-                    emptyFields.push(field.replace(/_/g, ' '));
-                }
-            }
-        } catch (e) {
-            console.error(`Error checking field ${field}:`, e);
-        }
-    });
-
-    // Check terms and GDPR checkboxes
-    try {
-        const termsCheckbox = document.getElementById('terms_checkbox');
-        if (termsCheckbox && !termsCheckbox.checked) {
-            console.log('✓ Checking terms_agreement: unchecked');
-            emptyFields.push('Terms & Conditions');
-        }
-    } catch (e) {
-        console.error('Error checking terms checkbox:', e);
-    }
-
-    try {
-        const gdprCheckbox = document.getElementById('gdpr_checkbox');
-        if (gdprCheckbox && !gdprCheckbox.checked) {
-            console.log('✓ Checking gdpr_agreement: unchecked');
-            emptyFields.push('GDPR Agreement');
-        }
-    } catch (e) {
-        console.error('Error checking GDPR checkbox:', e);
-    }
-
-    // Check category-specific mandatory fields ONLY if they are visible
-    const categoryFields = mandatoryFieldsByCategory[whoAmI] || [];
-    console.log(`Category fields for ${whoAmI}:`, categoryFields);
-    
-    categoryFields.forEach(field => {
-        try {
-            const element = document.querySelector(`[name="${field}"]`);
-            if (element) {
-                // Check if the field's parent section is visible
-                const parentSection = element.closest('[id$="_section"]');
-                const isVisible = parentSection ? !parentSection.classList.contains('hidden') : true;
-                
-                if (isVisible) {
-                    const value = element.value ? element.value.trim() : '';
-                    console.log(`✓ Checking ${field} (visible): "${value}"`);
-                    if (!value) {
-                        emptyFields.push(field.replace(/_/g, ' '));
+                    // Try to parse as JSON first
+                    const contentType = response.headers.get('content-type');
+                    if (contentType && contentType.includes('application/json')) {
+                        return response.json().then(data => ({ json: data, status: response.status }));
+                    } else {
+                        return response.text().then(text => ({ html: text, status: response.status }));
                     }
-                } else {
-                    console.log(`⊘ Skipping ${field} (hidden)`);
-                }
-            }
-        } catch (e) {
-            console.error(`Error checking field ${field}:`, e);
-        }
-    });
+                })
+                .then(result => {
+                    if (result.json) {
+                        // JSON response from backend
+                        const data = result.json;
 
-    console.log('Empty fields found:', emptyFields);
+                        if (data.success) {
+                            console.log('✅ Profile saved successfully');
+                            showMessage(data.message || '✅ Profile saved successfully!', 'success');
 
-    if (emptyFields.length > 0) {
-        const errorMsg = '❌ Please fill all mandatory fields:\n\n' + emptyFields.join('\n');
-        console.error(errorMsg);
-        alert(errorMsg);
-        return false;
-    }
+                            // Redirect to profile view page after 2 seconds
+                            setTimeout(() => {
+                                window.location.href = data.redirect_url || "{{ url_for('menteeprofile') }}";
+                            }, 2000);
+                        } else {
+                            console.error('❌ Validation error:', data.message);
+                            showMessage(data.message || '❌ Please check the form and try again.', 'error');
+                        }
+                    } else {
+                        // HTML response (fallback for non-AJAX handling)
+                        const html = result.html;
 
-    console.log('✅ All validations passed! Submitting form...');
-    return true;
-}
+                        if (html.includes('successfully') || result.status === 200) {
+                            showMessage('✅ Profile saved successfully!', 'success');
+                            setTimeout(() => {
+                                window.location.href = "{{ url_for('menteeprofile') }}";
+                            }, 2000);
+                        } else {
+                            showMessage('❌ Error saving profile. Please check the form and try again.', 'error');
+                        }
+                    }
+                })
+                .catch(error => {
+                    console.error('❌ Error submitting form:', error);
+                    showMessage('❌ Error saving profile. Please try again.', 'error');
+                })
+                .finally(() => {
+                    // Re-enable button and hide loader
+                    submitBtn.disabled = false;
+                    btnText.classList.remove('hidden');
+                    btnLoader.classList.add('hidden');
+                });
 
-// Function to ensure NO field has required attribute (HTML5 validation is disabled)
-function updateRequiredAttributes() {
-    console.log('🔧 Removing all required attributes from form fields...');
-    
-    // List of ALL possible fields in the form
-    const allPossibleFields = [
-        // School student fields
-        'school_name', 'class_year', 'school_board', 'course_stream', 'favourite_subject', 'career_interest',
-        // University student fields
-        'institution_name', 'education_level',
-        // Seeking internship fields
-        'key_skills', 'career_goal',
-        // Young professional fields
-        'current_role', 'industry', 'years_experience', 'current_organization',
-        // Exploring fields
-        'last_role', 'restart_field', 'support_expected',
-        // Common fields
-        'mobile_number', 'whatsapp_number', 'mentorship_expectations',
-        'profile_picture', 'who_am_i', 'dob',
-        'mobile_country_code', 'whatsapp_country_code',
-        'terms_agreement', 'gdpr_agreement',
-        'institution', 'institution_other'
-    ];
-
-    // Remove required attribute from ALL fields
-    allPossibleFields.forEach(field => {
-        const elements = document.querySelectorAll(`[name="${field}"]`);
-        elements.forEach(element => {
-            if (element.hasAttribute('required')) {
-                element.removeAttribute('required');
-                console.log(`  ✓ Removed required from: ${field}`);
-            }
+            return false;
         });
-    });
-    
-    // Also remove from any select/input/textarea that might have it
-    const allInputs = document.querySelectorAll('input[required], select[required], textarea[required]');
-    allInputs.forEach(input => {
-        input.removeAttribute('required');
-        console.log(`  ✓ Removed required from: ${input.name || input.id}`);
-    });
-    
-    console.log('✅ All required attributes removed');
-}
 
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('📄 Page loaded - initializing form...');
-    
-    const selectInput = document.getElementById('who_am_i_select');
-    
-    if (selectInput) {
-        const whoAmI = selectInput.value;
-        console.log('Initial "Who am I" value:', whoAmI);
-        
-        if (whoAmI && whoAmI !== '') {
-            // Show the relevant section on page load
-            updateFormFields();
+        // Function to show success/error messages
+        function showMessage(message, type) {
+            const messageDiv = document.getElementById('formMessage');
+            messageDiv.textContent = message;
+            messageDiv.classList.remove('hidden', 'bg-green-100', 'text-green-700', 'bg-red-100', 'text-red-700');
+
+            if (type === 'success') {
+                messageDiv.classList.add('bg-green-100', 'text-green-700', 'border', 'border-green-400');
+            } else {
+                messageDiv.classList.add('bg-red-100', 'text-red-700', 'border', 'border-red-400');
+            }
+
+            // Scroll to message
+            messageDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         }
-        
-        // Always remove required attributes (HTML5 validation is disabled)
-        updateRequiredAttributes();
-    }
-    
-    console.log('✅ Form initialized');
-});
-</script>
+    </script>
 
-{% endblock %}
+    <datalist id="country_codes">
+        <option value="+91">India</option>
+        <option value="+1">USA/Canada</option>
+        <option value="+44">UK</option>
+        <option value="+971">UAE</option>
+        <option value="+966">Saudi Arabia</option>
+        <option value="+65">Singapore</option>
+        <option value="+61">Australia</option>
+        <option value="+49">Germany</option>
+        <option value="+33">France</option>
+        <option value="+352">Luxembourg</option>
+    </datalist>
+
+    <script>
+        // Dynamic form updates - user can change "Who am I" at any time
+
+        const whoAmILabels = {
+            'school_student': '🎒 School Student',
+            'university_student': '🎓 University Student',
+            'seeking_internship': '💼 Seeking Student Job / Internship',
+            'young_professional': '👔 Young Professional',
+            'exploring': '🔍 Exploring, Still Unsure'
+        };
+
+        function updateFormFields() {
+            console.log('🔄 Updating form fields based on "Who am I" selection...');
+
+            const selectInput = document.getElementById('who_am_i_select');
+            const whoAmI = selectInput ? selectInput.value : '';
+
+            console.log('Selected "Who am I":', whoAmI);
+
+            // Hide all sections
+            document.getElementById('school_student_section').classList.add('hidden');
+            document.getElementById('university_student_section').classList.add('hidden');
+            document.getElementById('seeking_internship_section').classList.add('hidden');
+            document.getElementById('young_professional_section').classList.add('hidden');
+            document.getElementById('exploring_section').classList.add('hidden');
+
+            // Show relevant section based on selection
+            if (whoAmI === 'school_student') {
+                document.getElementById('school_student_section').classList.remove('hidden');
+                console.log('✓ Showing school student section');
+            } else if (whoAmI === 'university_student') {
+                document.getElementById('university_student_section').classList.remove('hidden');
+                console.log('✓ Showing university student section');
+            } else if (whoAmI === 'seeking_internship') {
+                document.getElementById('seeking_internship_section').classList.remove('hidden');
+                console.log('✓ Showing seeking internship section');
+            } else if (whoAmI === 'young_professional') {
+                document.getElementById('young_professional_section').classList.remove('hidden');
+                console.log('✓ Showing young professional section');
+            } else if (whoAmI === 'exploring') {
+                document.getElementById('exploring_section').classList.remove('hidden');
+                console.log('✓ Showing exploring section');
+            }
+
+            // Update required attributes for visible fields
+            updateRequiredAttributes();
+        }
+
+        function validateMenteeForm() {
+            console.log('🔍 Starting form validation...');
+
+            const selectInput = document.getElementById('who_am_i_select');
+            const whoAmI = selectInput ? selectInput.value : '';
+
+            console.log('Who am I value:', whoAmI);
+
+            if (!whoAmI) {
+                alert('❌ Please select "Who am I?"');
+                return false;
+            }
+
+            // Define mandatory fields for each category
+            const mandatoryFieldsByCategory = {
+                school_student: ['school_name', 'school_board'],
+                university_student: ['institution_name'],
+                seeking_internship: ['institution_name'],
+                young_professional: ['current_role', 'industry', 'years_experience', 'current_organization'],
+                exploring: ['last_role', 'restart_field', 'support_expected']
+            };
+
+            // Common mandatory fields for all categories
+            const commonMandatory = ['mobile_number', 'whatsapp_number', 'mentorship_expectations', 'institution'];
+
+            // General details mandatory fields
+            const generalDetailsMandatory = ['father_name', 'address_line1', 'city', 'state', 'postal_code', 'country'];
+
+            let emptyFields = [];
+
+            // Check if profile picture exists (only if no current picture)
+            const currentPicture = "{{ profile_picture }}";
+            const profilePictureInput = document.querySelector('input[name="profile_picture"]');
+            if (!currentPicture && profilePictureInput && !profilePictureInput.files.length) {
+                console.log('✓ Checking profile_picture: empty');
+                emptyFields.push('Profile Picture');
+            }
+
+            // Check common mandatory fields
+            commonMandatory.forEach(field => {
+                try {
+                    const element = document.querySelector(`[name="${field}"]`);
+                    if (element) {
+                        const value = element.value ? element.value.trim() : '';
+                        console.log(`✓ Checking ${field}: "${value}"`);
+                        if (!value) {
+                            emptyFields.push(field.replace(/_/g, ' '));
+                        }
+                    }
+                } catch (e) {
+                    console.error(`Error checking field ${field}:`, e);
+                }
+            });
+
+            // Check general details mandatory fields
+            generalDetailsMandatory.forEach(field => {
+                try {
+                    const element = document.querySelector(`[name="${field}"]`);
+                    if (element) {
+                        const value = element.value ? element.value.trim() : '';
+                        console.log(`✓ Checking ${field}: "${value}"`);
+                        if (!value) {
+                            emptyFields.push(field.replace(/_/g, ' '));
+                        }
+                    }
+                } catch (e) {
+                    console.error(`Error checking field ${field}:`, e);
+                }
+            });
+
+            // Check terms and GDPR checkboxes
+            try {
+                const termsCheckbox = document.getElementById('terms_checkbox');
+                if (termsCheckbox && !termsCheckbox.checked) {
+                    console.log('✓ Checking terms_agreement: unchecked');
+                    emptyFields.push('Terms & Conditions');
+                }
+            } catch (e) {
+                console.error('Error checking terms checkbox:', e);
+            }
+
+            try {
+                const gdprCheckbox = document.getElementById('gdpr_checkbox');
+                if (gdprCheckbox && !gdprCheckbox.checked) {
+                    console.log('✓ Checking gdpr_agreement: unchecked');
+                    emptyFields.push('GDPR Agreement');
+                }
+            } catch (e) {
+                console.error('Error checking GDPR checkbox:', e);
+            }
+
+            // Check category-specific mandatory fields ONLY if they are visible
+            const categoryFields = mandatoryFieldsByCategory[whoAmI] || [];
+            console.log(`Category fields for ${whoAmI}:`, categoryFields);
+
+            categoryFields.forEach(field => {
+                try {
+                    const element = document.querySelector(`[name="${field}"]`);
+                    if (element) {
+                        // Check if the field's parent section is visible
+                        const parentSection = element.closest('[id$="_section"]');
+                        const isVisible = parentSection ? !parentSection.classList.contains('hidden') : true;
+
+                        if (isVisible) {
+                            const value = element.value ? element.value.trim() : '';
+                            console.log(`✓ Checking ${field} (visible): "${value}"`);
+                            if (!value) {
+                                emptyFields.push(field.replace(/_/g, ' '));
+                            }
+                        } else {
+                            console.log(`⊘ Skipping ${field} (hidden)`);
+                        }
+                    }
+                } catch (e) {
+                    console.error(`Error checking field ${field}:`, e);
+                }
+            });
+
+            console.log('Empty fields found:', emptyFields);
+
+            if (emptyFields.length > 0) {
+                const errorMsg = '❌ Please fill all mandatory fields:\n\n' + emptyFields.join('\n');
+                console.error(errorMsg);
+                alert(errorMsg);
+                return false;
+            }
+
+            console.log('✅ All validations passed! Submitting form...');
+            return true;
+        }
+
+        // Function to ensure NO field has required attribute (HTML5 validation is disabled)
+        function updateRequiredAttributes() {
+            console.log('🔧 Removing all required attributes from form fields...');
+
+            // List of ALL possible fields in the form
+            const allPossibleFields = [
+                // School student fields
+                'school_name', 'class_year', 'school_board', 'course_stream', 'favourite_subject', 'career_interest',
+                // University student fields
+                'institution_name', 'education_level',
+                // Seeking internship fields
+                'key_skills', 'career_goal',
+                // Young professional fields
+                'current_role', 'industry', 'years_experience', 'current_organization',
+                // Exploring fields
+                'last_role', 'restart_field', 'support_expected',
+                // Common fields
+                'mobile_number', 'whatsapp_number', 'mentorship_expectations',
+                'profile_picture', 'who_am_i', 'dob',
+                'mobile_country_code', 'whatsapp_country_code',
+                'terms_agreement', 'gdpr_agreement',
+                'institution', 'institution_other'
+            ];
+
+            // Remove required attribute from ALL fields
+            allPossibleFields.forEach(field => {
+                const elements = document.querySelectorAll(`[name="${field}"]`);
+                elements.forEach(element => {
+                    if (element.hasAttribute('required')) {
+                        element.removeAttribute('required');
+                        console.log(`  ✓ Removed required from: ${field}`);
+                    }
+                });
+            });
+
+            // Also remove from any select/input/textarea that might have it
+            const allInputs = document.querySelectorAll('input[required], select[required], textarea[required]');
+            allInputs.forEach(input => {
+                input.removeAttribute('required');
+                console.log(`  ✓ Removed required from: ${input.name || input.id}`);
+            });
+
+            console.log('✅ All required attributes removed');
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            console.log('📄 Page loaded - initializing form...');
+
+            const selectInput = document.getElementById('who_am_i_select');
+
+            if (selectInput) {
+                const whoAmI = selectInput.value;
+                console.log('Initial "Who am I" value:', whoAmI);
+
+                if (whoAmI && whoAmI !== '') {
+                    // Show the relevant section on page load
+                    updateFormFields();
+                }
+
+                // Always remove required attributes (HTML5 validation is disabled)
+                updateRequiredAttributes();
+            }
+
+            console.log('✅ Form initialized');
+        });
+    </script>
+
+    {% endblock %}
