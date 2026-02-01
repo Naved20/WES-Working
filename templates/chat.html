@@ -23,30 +23,47 @@
     }
 </style>
 
-<main class="max-w-7xl mx-auto h-[calc(100vh-140px)] flex flex-col animate-slide-up">
+<main class="max-w-7xl mx-auto h-[calc(100vh-140px)] flex flex-col animate-slide-up px-2 sm:px-4 lg:px-0">
     <!-- Page Header -->
-    <div class="mb-4 flex-shrink-0">
-        <h2 class="text-2xl font-bold text-slate-800 font-poppins">Messages</h2>
-        <p class="text-slate-500 text-sm">Connect with your mentors and mentees</p>
+    <div class="mb-3 sm:mb-4 flex-shrink-0 flex items-center justify-between">
+        <div>
+            <h2 class="text-xl sm:text-2xl font-bold text-slate-800 font-poppins">Messages</h2>
+            <p class="text-slate-500 text-xs sm:text-sm hidden sm:block">Connect with your mentors and mentees</p>
+        </div>
+        <!-- Mobile Menu Toggle -->
+        <button id="mobileSidebarToggle" class="lg:hidden p-2 hover:bg-slate-100 rounded-lg transition">
+            <svg class="w-6 h-6 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+            </svg>
+        </button>
     </div>
 
-    <div class="flex flex-1 gap-6 overflow-hidden min-h-0">
+    <div class="flex flex-1 gap-3 sm:gap-4 lg:gap-6 overflow-hidden min-h-0 relative">
         <!-- Chat Sidebar - Conversations List -->
-        <div class="w-80 bg-white rounded-2xl shadow-lg border border-slate-100 flex flex-col flex-shrink-0">
+        <div id="chatSidebar" class="fixed lg:relative inset-0 lg:inset-auto z-50 lg:z-auto bg-slate-900/50 lg:bg-transparent -translate-x-full lg:translate-x-0 transition-transform duration-300">
+            <div class="w-80 max-w-[85vw] h-full bg-white rounded-none lg:rounded-2xl shadow-lg border-r lg:border border-slate-100 flex flex-col flex-shrink-0">
             <!-- Header -->
-            <div class="p-4 border-b border-slate-100">
-                <h3 class="text-lg font-bold text-slate-800 mb-3">Conversations</h3>
+            <div class="p-3 sm:p-4 border-b border-slate-100">
+                <div class="flex items-center justify-between mb-3">
+                    <h3 class="text-base sm:text-lg font-bold text-slate-800">Conversations</h3>
+                    <!-- Close button for mobile -->
+                    <button id="closeSidebar" class="lg:hidden p-1 hover:bg-slate-100 rounded-lg transition">
+                        <svg class="w-5 h-5 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
 
                 <!-- Search Bar -->
                 <div class="relative">
                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <svg class="h-5 w-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg class="h-4 sm:h-5 w-4 sm:w-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                         </svg>
                     </div>
                     <input type="text" id="searchConversation" placeholder="Search messages..."
-                        class="input w-full pl-10 h-10 text-sm bg-slate-50 border-slate-200 focus:bg-white">
+                        class="input w-full pl-9 sm:pl-10 h-9 sm:h-10 text-xs sm:text-sm bg-slate-50 border-slate-200 focus:bg-white">
                 </div>
             </div>
 
@@ -60,69 +77,76 @@
             </div>
 
             <!-- New Chat Button -->
-            <div class="p-4 border-t border-slate-100 bg-slate-50/50">
-                <button id="newChatBtn" class="w-full btn btn-primary py-2.5 shadow-lg shadow-blue-500/20">
-                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div class="p-3 sm:p-4 border-t border-slate-100 bg-slate-50/50">
+                <button id="newChatBtn" class="w-full btn btn-primary py-2 sm:py-2.5 text-sm shadow-lg shadow-blue-500/20">
+                    <svg class="w-4 sm:w-5 h-4 sm:h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
                     </svg>
                     New Chat
                 </button>
             </div>
+            </div>
         </div>
 
         <!-- Chat Main Area -->
         <div
-            class="flex-1 bg-white rounded-2xl shadow-lg border border-slate-100 flex flex-col overflow-hidden relative">
+            class="flex-1 bg-white rounded-xl sm:rounded-2xl shadow-lg border border-slate-100 flex flex-col overflow-hidden relative">
             <!-- Chat Header -->
             <div
-                class="p-4 border-b border-slate-100 flex items-center justify-between bg-white/80 backdrop-blur-sm z-10">
-                <div class="flex items-center gap-4">
-                    <div class="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center text-slate-400 font-bold text-lg shadow-inner"
+                class="p-3 sm:p-4 border-b border-slate-100 flex items-center justify-between bg-white/80 backdrop-blur-sm z-10">
+                <div class="flex items-center gap-2 sm:gap-4 flex-1 min-w-0">
+                    <!-- Mobile back button -->
+                    <button id="mobileBackBtn" class="lg:hidden p-1 hover:bg-slate-100 rounded-lg transition flex-shrink-0">
+                        <svg class="w-5 h-5 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                        </svg>
+                    </button>
+                    <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-slate-100 flex items-center justify-center text-slate-400 font-bold text-base sm:text-lg shadow-inner flex-shrink-0"
                         id="chatAvatar">
                         --
                     </div>
-                    <div>
-                        <h3 class="font-bold text-slate-800 text-lg" id="chatName">Select a conversation</h3>
+                    <div class="flex-1 min-w-0">
+                        <h3 class="font-bold text-slate-800 text-sm sm:text-lg truncate" id="chatName">Select a conversation</h3>
                         <div class="flex items-center gap-2">
-                            <span class="w-2 h-2 rounded-full bg-slate-300" id="statusDot"></span>
-                            <p class="text-sm text-slate-500" id="chatStatus">No conversation selected</p>
+                            <span class="w-1.5 sm:w-2 h-1.5 sm:h-2 rounded-full bg-slate-300" id="statusDot"></span>
+                            <p class="text-xs sm:text-sm text-slate-500 truncate" id="chatStatus">No conversation selected</p>
                         </div>
                     </div>
                 </div>
             </div>
 
             <!-- Messages Area -->
-            <div class="flex-1 overflow-y-auto p-6 space-y-6 bg-slate-50/50 chat-scroll custom-scrollbar"
+            <div class="flex-1 overflow-y-auto p-3 sm:p-4 lg:p-6 space-y-3 sm:space-y-4 lg:space-y-6 bg-slate-50/50 chat-scroll custom-scrollbar"
                 id="messagesArea">
-                <div class="h-full flex flex-col items-center justify-center text-center p-8 opacity-60">
-                    <div class="w-24 h-24 bg-slate-100 rounded-full flex items-center justify-center mb-4">
-                        <svg class="w-12 h-12 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div class="h-full flex flex-col items-center justify-center text-center p-4 sm:p-8 opacity-60">
+                    <div class="w-16 sm:w-20 lg:w-24 h-16 sm:h-20 lg:h-24 bg-slate-100 rounded-full flex items-center justify-center mb-3 sm:mb-4">
+                        <svg class="w-8 sm:w-10 lg:w-12 h-8 sm:h-10 lg:h-12 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
                                 d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z">
                             </path>
                         </svg>
                     </div>
-                    <h3 class="text-lg font-semibold text-slate-700">Your Messages</h3>
-                    <p class="text-slate-500 max-w-xs mx-auto mt-1">Select a conversation from the sidebar to start
+                    <h3 class="text-base sm:text-lg font-semibold text-slate-700">Your Messages</h3>
+                    <p class="text-slate-500 text-xs sm:text-sm max-w-xs mx-auto mt-1">Select a conversation from the sidebar to start
                         chatting with your mentors or mentees.</p>
                 </div>
             </div>
 
             <!-- Message Input Area -->
-            <div class="p-4 border-t border-slate-100 bg-white">
-                <div class="flex gap-3 items-end">
+            <div class="p-2 sm:p-3 lg:p-4 border-t border-slate-100 bg-white">
+                <div class="flex gap-2 sm:gap-3 items-end">
                     <!-- Message Input -->
                     <div class="flex-1 relative">
                         <textarea id="messageInput" placeholder="Type a message..."
-                            class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all resize-none custom-scrollbar text-slate-700 placeholder-slate-400"
+                            class="w-full px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base bg-slate-50 border border-slate-200 rounded-lg sm:rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all resize-none custom-scrollbar text-slate-700 placeholder-slate-400"
                             rows="1" disabled></textarea>
                     </div>
 
                     <!-- Send Button -->
                     <button id="sendBtn"
-                        class="p-3 bg-slate-100 text-slate-400 rounded-xl hover:bg-primary hover:text-white transition-all duration-200 flex-shrink-0 disabled:opacity-50 disabled:cursor-not-allowed"
+                        class="p-2 sm:p-3 bg-slate-100 text-slate-400 rounded-lg sm:rounded-xl hover:bg-primary hover:text-white transition-all duration-200 flex-shrink-0 disabled:opacity-50 disabled:cursor-not-allowed"
                         title="Send" disabled>
-                        <svg class="w-6 h-6 transform rotate-90" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg class="w-5 sm:w-6 h-5 sm:h-6 transform rotate-90" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
                         </svg>
@@ -192,10 +216,45 @@
 
     document.addEventListener('DOMContentLoaded', function () {
         setupEventListeners();
+        setupMobileHandlers();
         getCurrentUserId().then(() => {
             loadConversations();
         });
     });
+
+    function setupMobileHandlers() {
+        const mobileSidebarToggle = document.getElementById('mobileSidebarToggle');
+        const chatSidebar = document.getElementById('chatSidebar');
+        const closeSidebar = document.getElementById('closeSidebar');
+        const mobileBackBtn = document.getElementById('mobileBackBtn');
+
+        if (mobileSidebarToggle) {
+            mobileSidebarToggle.addEventListener('click', () => {
+                chatSidebar.classList.remove('-translate-x-full');
+            });
+        }
+
+        if (closeSidebar) {
+            closeSidebar.addEventListener('click', () => {
+                chatSidebar.classList.add('-translate-x-full');
+            });
+        }
+
+        if (mobileBackBtn) {
+            mobileBackBtn.addEventListener('click', () => {
+                chatSidebar.classList.remove('-translate-x-full');
+            });
+        }
+
+        // Close sidebar when clicking outside on mobile
+        if (chatSidebar) {
+            chatSidebar.addEventListener('click', (e) => {
+                if (e.target === chatSidebar) {
+                    chatSidebar.classList.add('-translate-x-full');
+                }
+            });
+        }
+    }
 
     function setupEventListeners() {
         const newChatBtn = document.getElementById('newChatBtn');
@@ -306,6 +365,12 @@
     function selectConversation(conversationId) {
         currentConversationId = conversationId;
 
+        // Close mobile sidebar when conversation is selected
+        const chatSidebar = document.getElementById('chatSidebar');
+        if (chatSidebar && window.innerWidth < 1024) {
+            chatSidebar.classList.add('-translate-x-full');
+        }
+
         document.querySelectorAll('.conversation-item').forEach(item => {
             item.classList.remove('bg-blue-50', 'border-l-primary');
             item.classList.add('border-l-transparent');
@@ -359,7 +424,7 @@
         if (messages.length === 0) {
             container.innerHTML = `
                 <div class="h-full flex flex-col items-center justify-center opacity-50">
-                    <p class="text-sm font-medium text-slate-500 bg-white/50 px-4 py-2 rounded-full">No messages yet. Say hello!</p>
+                    <p class="text-xs sm:text-sm font-medium text-slate-500 bg-white/50 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full">No messages yet. Say hello!</p>
                 </div>`;
             return;
         }
@@ -367,19 +432,19 @@
         container.innerHTML = messages.map(msg => {
             const isMe = msg.sender_id === currentUserId;
             return `
-            <div class="flex gap-3 mb-2 animate-scale-in ${isMe ? 'justify-end' : 'justify-start'}">
+            <div class="flex gap-2 sm:gap-3 mb-2 animate-scale-in ${isMe ? 'justify-end' : 'justify-start'}">
                 ${!isMe ? `
-                    <div class="w-8 h-8 bg-slate-200 rounded-full flex items-center justify-center text-slate-600 text-xs font-bold flex-shrink-0 self-end mb-1">
+                    <div class="w-6 h-6 sm:w-8 sm:h-8 bg-slate-200 rounded-full flex items-center justify-center text-slate-600 text-[10px] sm:text-xs font-bold flex-shrink-0 self-end mb-1">
                         ${msg.sender_name.substring(0, 2).toUpperCase()}
                     </div>
                 ` : ''}
-                <div class="max-w-[75%] flex flex-col ${isMe ? 'items-end' : 'items-start'}">
-                    <div class="px-5 py-3 shadow-sm text-sm leading-relaxed whitespace-pre-wrap break-words ${isMe
+                <div class="max-w-[85%] sm:max-w-[75%] flex flex-col ${isMe ? 'items-end' : 'items-start'}">
+                    <div class="px-3 sm:px-5 py-2 sm:py-3 shadow-sm text-xs sm:text-sm leading-relaxed whitespace-pre-wrap break-words ${isMe
                     ? 'bg-primary text-white rounded-2xl rounded-br-xs'
                     : 'bg-white text-slate-700 rounded-2xl rounded-bl-xs border border-slate-100'}">
                         ${escapeHtml(msg.content)}
                     </div>
-                    <span class="text-[10px] text-slate-400 mt-1 px-1">${formatTime(msg.created_at)}</span>
+                    <span class="text-[9px] sm:text-[10px] text-slate-400 mt-1 px-1">${formatTime(msg.created_at)}</span>
                 </div>
             </div>
             `;
