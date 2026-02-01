@@ -170,7 +170,8 @@
               '{{ mentor.research_work }}',
               '{{ mentor.mentorship_philosophy }}',
               '{{ mentor.mentorship_motto }}',
-              '{{ mentor.other_social_link }}'
+              '{{ mentor.other_social_link }}',
+              '{{ mentor.criminal_certificate }}'
           )"
             class="flex-1 px-4 py-2 bg-gray-100 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-200 transition">
             View Profile
@@ -631,6 +632,22 @@
                   <p id="modalCity" class="text-gray-600"></p>
                 </div>
               </div>
+              
+              <!-- Criminal Certificate -->
+              <div id="modalCriminalCertificateContainer" class="flex items-start" style="display: none;">
+                <svg class="w-4 h-4 text-red-600 mr-2 mt-1 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4z" clip-rule="evenodd"></path>
+                </svg>
+                <div>
+                  <p class="font-medium text-gray-700">Criminal Certificate</p>
+                  <a id="modalCriminalCertificate" href="#" target="_blank" class="inline-flex items-center text-red-600 hover:text-red-800 transition">
+                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                    </svg>
+                    View PDF
+                  </a>
+                </div>
+              </div>
             </div>
           </div>
 
@@ -783,7 +800,8 @@
     linkedin, github, portfolio, preferredDuration,
     mentorshipTypePreference, connectFrequency, whatsapp, country, city, whatsappCode,
     highestQualification, degreeName, fieldOfStudy, universityName, graduationYear,
-    academicStatus, certifications, researchWork, mentorshipPhilosophy, mentorshipMotto, otherSocialLink
+    academicStatus, certifications, researchWork, mentorshipPhilosophy, mentorshipMotto, otherSocialLink,
+    criminalCertificate
   ) {
     // ===== BASIC INFORMATION =====
     document.getElementById('modalName').innerText = name || "Not specified";
@@ -837,6 +855,16 @@
     document.getElementById('modalWhatsApp').innerText = whatsappDisplay.trim() || "Not specified";
     document.getElementById('modalCountry').innerText = country || "Not specified";
     document.getElementById('modalCity').innerText = city || "Not specified";
+    
+    // Criminal Certificate
+    const criminalCertContainer = document.getElementById('modalCriminalCertificateContainer');
+    const criminalCertLink = document.getElementById('modalCriminalCertificate');
+    if (criminalCertificate && criminalCertificate.trim()) {
+      criminalCertLink.href = "/static/uploads/" + criminalCertificate;
+      criminalCertContainer.style.display = 'flex';
+    } else {
+      criminalCertContainer.style.display = 'none';
+    }
 
     // ===== SOCIAL LINKS =====
     const linkedinLink = document.getElementById('modalLinkedin');
