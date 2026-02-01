@@ -352,6 +352,33 @@
                             </div>
                         </div>
                     </div>
+                    
+                    <!-- Criminal Certificate (if available) -->
+                    {% if criminal_certificate %}
+                    <div class="flex items-start pt-2 border-t border-gray-100">
+                        <svg class="w-5 h-5 text-red-600 mt-0.5 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                        </svg>
+                        <div class="flex-1">
+                            <p class="text-sm font-medium text-gray-500 mb-2">Criminal Certificate</p>
+                            <a href="{{ url_for('static', filename='uploads/' + criminal_certificate) }}" target="_blank" class="inline-flex items-center px-4 py-2 bg-red-50 border border-red-200 rounded-lg hover:bg-red-100 transition-colors duration-200 group">
+                                <svg class="w-5 h-5 text-red-600 mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                                    <path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4z" clip-rule="evenodd"></path>
+                                </svg>
+                                <span class="text-sm font-medium text-red-700 group-hover:text-red-800">View Certificate (PDF)</span>
+                                <svg class="w-4 h-4 text-red-600 ml-2 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
+                                </svg>
+                            </a>
+                            <p class="text-xs text-gray-500 mt-2">
+                                <svg class="w-3 h-3 inline mr-1" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+                                </svg>
+                                Verified document
+                            </p>
+                        </div>
+                    </div>
+                    {% endif %}
                 </div>
             </div>
 

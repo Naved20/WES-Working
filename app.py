@@ -41,7 +41,7 @@ app.permanent_session_lifetime = timedelta(days=10)
 
 # Image upload configuration
 UPLOAD_FOLDER = "static/uploads"
-ALLOWED_EXTENSIONS = {"png", "jpg", "jpeg", "gif"}
+ALLOWED_EXTENSIONS = {"png", "jpg", "jpeg", "gif", "pdf"}  # Added PDF for criminal certificate
 
 app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
 
@@ -377,7 +377,8 @@ class MentorProfile(db.Model):
     
     # Additional Information
     additional_info = db.Column(db.Text)
-    profile_picture = db.Column(db.String(100)) 
+    profile_picture = db.Column(db.String(100))
+    criminal_certificate = db.Column(db.String(100))  # PDF file for criminal certificate (mandatory for Luxembourg)
     status = db.Column(db.String(20), default="pending")
 
 #------------ table mentee details-------------------
@@ -881,12 +882,13 @@ def check_profile_complete(user_id, user_type):
         print(f"📊 Mentor profile found: {profile is not None}")
         if profile:
             # Check if ALL mandatory fields are filled (including profile picture)
+            # Use 'or' with empty string to handle None values gracefully
             has_all_required = all([
                 profile.profession, 
                 profile.organisation, 
                 profile.whatsapp,
                 profile.location,
-                profile.education,
+                (profile.education or "Not specified"),  # Handle None gracefully
                 profile.years_of_experience,
                 profile.skills,
                 profile.role,
@@ -4712,10 +4714,10 @@ def editmentorprofile():
             "industry_sector": request.form.get("industry_sector"),
             "organisation": request.form.get("organisation"),
             "years_of_experience": request.form.get("years_of_experience"),
+            "institution": request.form.get("institution"),
             "whatsapp": request.form.get("whatsapp"),
             "city": request.form.get("city"),
             "country": request.form.get("country"),
-            "education": request.form.get("education"),
             "language": request.form.getlist("language"),
             "linkedin_link": request.form.get("linkedin_link"),
             "mentorship_topics": request.form.getlist("mentorship_topics"),
@@ -4738,6 +4740,25 @@ def editmentorprofile():
         if missing_fields:
             flash(f"Please fill all mandatory fields: {', '.join(missing_fields)}", "error")
             return redirect(url_for("editmentorprofile"))
+
+        # Special validation for Luxembourg: Criminal Certificate is mandatory
+        country = request.form.get("country")
+        if country == "Other":
+            country = request.form.get("other_country")
+        
+        # Check if criminal certificate is required (Luxembourg only)
+        if country == "Luxembourg":
+            criminal_cert_file = request.files.get("criminal_certificate")
+            # If no new file uploaded, check if one already exists
+            if not criminal_cert_file or criminal_cert_file.filename == "":
+                if not profile or not profile.criminal_certificate:
+                    flash("Criminal Certificate (PDF) is mandatory for mentors in Luxembourg", "error")
+                    return redirect(url_for("editmentorprofile"))
+            else:
+                # Validate file type (must be PDF)
+                if not criminal_cert_file.filename.lower().endswith('.pdf'):
+                    flash("Criminal Certificate must be a PDF file", "error")
+                    return redirect(url_for("editmentorprofile"))
 
         # Update institution if changed
         new_institution = request.form.get("institution")
@@ -4794,14 +4815,6 @@ def editmentorprofile():
         city = request.form.get("city")
         profile.location = f"{city}, {country}" if city and country else city or country
         
-        # Handle "Other" option for education
-        education = request.form.get("education")
-        if education == "Other":
-            other_education = request.form.get("other_education")
-            profile.education = other_education if other_education else education
-        else:
-            profile.education = education
-        
         # Handle multiple language selection with "Other" option
         languages = request.form.getlist("language")
         other_language = request.form.get("other_language")
@@ -4844,6 +4857,20 @@ def editmentorprofile():
         profile.academic_status = request.form.get("academic_status")
         profile.certifications = request.form.get("certifications")
         profile.research_work = request.form.get("research_work")
+        
+        # Set education field (legacy field) based on new educational fields
+        # This ensures backward compatibility with the old field
+        if profile.highest_qualification or profile.degree_name:
+            education_parts = []
+            if profile.degree_name:
+                education_parts.append(profile.degree_name)
+            if profile.field_of_study:
+                education_parts.append(f"in {profile.field_of_study}")
+            if profile.highest_qualification:
+                education_parts.append(f"({profile.highest_qualification})")
+            profile.education = " ".join(education_parts) if education_parts else "Not specified"
+        else:
+            profile.education = "Not specified"
 
         # Handle profile picture upload
         file = request.files.get("profile_picture")
@@ -4851,6 +4878,21 @@ def editmentorprofile():
             filename = secure_filename(file.filename)
             file.save(os.path.join(app.config["UPLOAD_FOLDER"], filename))
             profile.profile_picture = filename
+
+        # Handle criminal certificate upload (PDF only)
+        criminal_cert_file = request.files.get("criminal_certificate")
+        if criminal_cert_file and criminal_cert_file.filename:
+            if criminal_cert_file.filename.lower().endswith('.pdf'):
+                cert_filename = secure_filename(criminal_cert_file.filename)
+                # Add timestamp to avoid filename conflicts
+                timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+                cert_filename = f"criminal_cert_{user.id}_{timestamp}_{cert_filename}"
+                criminal_cert_file.save(os.path.join(app.config["UPLOAD_FOLDER"], cert_filename))
+                profile.criminal_certificate = cert_filename
+                print(f"✅ Criminal certificate uploaded: {cert_filename}")
+            else:
+                flash("Criminal Certificate must be a PDF file", "error")
+                return redirect(url_for("editmentorprofile"))
 
         try:
             db.session.commit()
@@ -4923,6 +4965,7 @@ def editmentorprofile():
         mentorship_motto=profile.mentorship_motto if profile else "",
         additional_info=profile.additional_info if profile else "",
         profile_picture=profile.profile_picture if profile else None,
+        criminal_certificate=profile.criminal_certificate if profile else None,
         # Educational Information
         highest_qualification=profile.highest_qualification if profile else "",
         degree_name=profile.degree_name if profile else "",
@@ -5361,6 +5404,7 @@ def mentorprofile():
             mentorship_motto=profile.mentorship_motto if profile else "",
             preferred_duration=profile.preferred_duration if profile else "",
             profile_picture=profile.profile_picture if profile else None,
+            criminal_certificate=profile.criminal_certificate if profile else None,
             institution_profile_picture=institution_profile_picture,
             # Educational Information
             highest_qualification=profile.highest_qualification if profile else "",
