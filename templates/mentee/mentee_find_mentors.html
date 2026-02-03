@@ -218,33 +218,31 @@
 
           <!-- Footer Actions -->
           <div class="px-6 pb-6 mt-auto flex flex-col gap-3">
-            <button type="button" onclick="openRequestModal('{{ mentor.user_id }}')"
-              class="w-full py-2.5 px-4 bg-blue-600 text-white text-sm font-semibold rounded-xl shadow-lg shadow-blue-500/20 hover:bg-blue-700 hover:shadow-blue-600/30 transition-all duration-200 flex items-center justify-center gap-2">
+            <button type="button" class="request-mentorship-btn w-full py-2.5 px-4 bg-blue-600 text-white text-sm font-semibold rounded-xl shadow-lg shadow-blue-500/20 hover:bg-blue-700 hover:shadow-blue-600/30 transition-all duration-200 flex items-center justify-center gap-2" data-mentor-id="{{ mentor.user_id }}">
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z">
                 </path>
               </svg>
               Request Mentorship
             </button>
-            <button onclick="openProfileModal(
-                    '{{ mentor.user.name }}',
-                    '{{ mentor.profession }}',
-                    '{{ mentor.organisation }}',
-                    '{{ mentor.location }}',
-                    '{{ mentor.years_of_experience }}',
-                    '{{ mentor.profile_picture }}',
-                    '{{ mentor.user.email }}',
-                    '{{ mentor.education }}',
-                    '{{ mentor.language }}',
-                    '{{ mentor.preferred_communication }}',
-                    '{{ mentor.why_mentor }}',
-                    '{{ mentor.role }}',
-                    '{{ mentor.industry_sector }}',
-                    '{{ mentor.skills }}',
-                    '{{ mentor.availability }}',
-                    '{{ mentor.mentorship_topics }}'
-                )"
-              class="w-full py-2.5 px-4 bg-white border border-slate-200 text-slate-700 text-sm font-semibold rounded-xl hover:bg-slate-50 hover:border-slate-300 hover:text-blue-600 transition-all duration-200">
+            <button class="view-profile-btn w-full py-2.5 px-4 bg-white border border-slate-200 text-slate-700 text-sm font-semibold rounded-xl hover:bg-slate-50 hover:border-slate-300 hover:text-blue-600 transition-all duration-200"
+              data-mentor-id="{{ mentor.id }}"
+              data-name="{{ mentor.user.name }}"
+              data-email="{{ mentor.user.email }}"
+              data-profession="{{ mentor.profession }}"
+              data-organisation="{{ mentor.organisation }}"
+              data-location="{{ mentor.location }}"
+              data-experience="{{ mentor.years_of_experience }}"
+              data-profile-picture="{{ mentor.profile_picture }}"
+              data-education="{{ mentor.education }}"
+              data-language="{{ mentor.language }}"
+              data-communication="{{ mentor.preferred_communication }}"
+              data-why-mentor="{{ mentor.why_mentor }}"
+              data-role="{{ mentor.role }}"
+              data-industry="{{ mentor.industry_sector }}"
+              data-skills="{{ mentor.skills }}"
+              data-availability="{{ mentor.availability }}"
+              data-mentorship-topics="{{ mentor.mentorship_topics }}">
               View Profile
             </button>
           </div>
@@ -683,41 +681,78 @@
     });
   }
 
-  // Simplified openProfileModal function - No social links handling
-  function openProfileModal(
-    name, profession, organisation, location, experience, profilePic,
-    email, education, language, communication, whyMentor,
-    role, industry, skills, availability, mentorshipTopics
-    // Social links parameters remove karen
-  ) {
+  // Initialize View Profile buttons with event listeners
+  document.addEventListener('DOMContentLoaded', function() {
+    const viewProfileButtons = document.querySelectorAll('.view-profile-btn');
+    
+    viewProfileButtons.forEach(button => {
+      button.addEventListener('click', function() {
+        const mentor = {
+          user: {
+            name: this.getAttribute('data-name'),
+            email: this.getAttribute('data-email')
+          },
+          profession: this.getAttribute('data-profession'),
+          organisation: this.getAttribute('data-organisation'),
+          location: this.getAttribute('data-location'),
+          years_of_experience: this.getAttribute('data-experience'),
+          profile_picture: this.getAttribute('data-profile-picture'),
+          education: this.getAttribute('data-education'),
+          language: this.getAttribute('data-language'),
+          preferred_communication: this.getAttribute('data-communication'),
+          why_mentor: this.getAttribute('data-why-mentor'),
+          role: this.getAttribute('data-role'),
+          industry_sector: this.getAttribute('data-industry'),
+          skills: this.getAttribute('data-skills'),
+          availability: this.getAttribute('data-availability'),
+          mentorship_topics: this.getAttribute('data-mentorship-topics')
+        };
+        openProfileModal(mentor);
+      });
+    });
+
+    const requestButtons = document.querySelectorAll('.request-mentorship-btn');
+    requestButtons.forEach(button => {
+      button.addEventListener('click', function() {
+        openRequestModal(this.getAttribute('data-mentor-id'));
+      });
+    });
+  });
+
+  // Updated openProfileModal function to accept mentor object
+  function openProfileModal(mentor) {
     // Basic Info
-    document.getElementById('modalName').innerText = name;
+    document.getElementById('modalName').innerText = mentor.user?.name || "Not specified";
 
     // Professional Details
-    document.getElementById('modalProfession').innerText = profession || "Not specified";
-    document.getElementById('modalRole').innerText = role || "Not specified";
-    document.getElementById('modalOrganisation').innerText = organisation || "Not specified";
-    document.getElementById('modalIndustry').innerText = industry || "Not specified";
-    document.getElementById('modalEducation').innerText = education || "Not specified";
+    document.getElementById('modalProfession').innerText = mentor.profession || "Not specified";
+    document.getElementById('modalRole').innerText = mentor.role || "Not specified";
+    document.getElementById('modalOrganisation').innerText = mentor.organisation || "Not specified";
+    document.getElementById('modalIndustry').innerText = mentor.industry_sector || "Not specified";
+    document.getElementById('modalEducation').innerText = mentor.education || "Not specified";
 
     // Experience & Skills
-    document.getElementById('modalExperience').innerText = experience ? experience + " years" : "Not specified";
-    document.getElementById('modalSkills').innerText = skills || "Not specified";
-    document.getElementById('modalLanguage').innerText = language || "Not specified";
+    document.getElementById('modalExperience').innerText = mentor.years_of_experience ? mentor.years_of_experience + " years" : "Not specified";
+    document.getElementById('modalSkills').innerText = mentor.skills || "Not specified";
+    document.getElementById('modalLanguage').innerText = mentor.language || "Not specified";
 
     // Contact & Preferences
-    document.getElementById('modalLocation').innerText = location || "Not specified";
-    document.getElementById('modalCommunication').innerText = communication || "Not specified";
-    document.getElementById('modalAvailability').innerText = availability || "Not specified";
+    document.getElementById('modalLocation').innerText = mentor.location || "Not specified";
+    document.getElementById('modalCommunication').innerText = mentor.preferred_communication || "Not specified";
+    document.getElementById('modalAvailability').innerText = mentor.availability || "Not specified";
 
     // Mentorship Details
-    document.getElementById('modalMentorshipTopics').innerText = mentorshipTopics || "Not specified";
-    document.getElementById('modalWhyMentor').innerText = whyMentor || "Not specified";
+    document.getElementById('modalMentorshipTopics').innerText = mentor.mentorship_topics || "Not specified";
+    document.getElementById('modalWhyMentor').innerText = mentor.why_mentor || "Not specified";
 
     // Profile Picture
-    document.getElementById('modalProfilePic').src = profilePic
-      ? "/static/uploads/" + profilePic
-      : "https://via.placeholder.com/100";
+    const profilePicElement = document.getElementById('modalProfilePic');
+    if (mentor.profile_picture && mentor.profile_picture.trim()) {
+      profilePicElement.src = "/static/uploads/" + mentor.profile_picture;
+    } else {
+      const mentorName = mentor.user?.name || '?';
+      profilePicElement.src = "https://via.placeholder.com/100?text=" + encodeURIComponent(mentorName.charAt(0));
+    }
 
     document.getElementById('profileModal').classList.remove('hidden');
   }
