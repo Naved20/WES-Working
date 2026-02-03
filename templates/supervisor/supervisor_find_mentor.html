@@ -93,7 +93,7 @@
     {% if mentors and mentors|length > 0 %}
     <div class="grid p-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="mentorsGrid">
       {% for mentor in mentors %}
-      <div class="mentor-card bg-white rounded-xl border border-gray-200 p-5 transition-all hover:shadow-md">
+      <div class="mentor-card bg-white rounded-xl border border-gray-200 p-5 transition-all hover:shadow-md" data-mentor-id="{{ mentor.id }}">
         <div class="flex items-center gap-4 mb-4">
           {% if mentor.profile_picture %}
           <img src="{{ url_for('static', filename='uploads/' ~ mentor.profile_picture) }}" alt="{{ mentor.user.name }}"
@@ -133,47 +133,46 @@
         </div>
 
         <div class="flex space-x-2">
-          <button onclick="openProfileModal(
-              '{{ mentor.user.name }}',
-              '{{ mentor.profession }}',
-              '{{ mentor.organisation }}',
-              '{{ mentor.location }}',
-              '{{ mentor.years_of_experience }}',
-              '{{ mentor.profile_picture }}',
-              '{{ mentor.user.email }}',
-              '{{ mentor.education }}',
-              '{{ mentor.language }}',
-              '{{ mentor.preferred_communication }}',
-              '{{ mentor.why_mentor }}',
-              '{{ mentor.role }}',
-              '{{ mentor.industry_sector }}',
-              '{{ mentor.skills }}',
-              '{{ mentor.availability }}',
-              '{{ mentor.mentorship_topics }}',
-              '{{ mentor.linkedin_link }}',
-              '{{ mentor.github_link }}',
-              '{{ mentor.portfolio_link }}',
-              '{{ mentor.preferred_duration }}',
-              '{{ mentor.mentorship_type_preference }}',
-              '{{ mentor.connect_frequency }}',
-              '{{ mentor.whatsapp }}',
-              '{{ mentor.country }}',
-              '{{ mentor.city }}',
-              '{{ mentor.whatsapp_country_code }}',
-              '{{ mentor.highest_qualification }}',
-              '{{ mentor.degree_name }}',
-              '{{ mentor.field_of_study }}',
-              '{{ mentor.university_name }}',
-              '{{ mentor.graduation_year }}',
-              '{{ mentor.academic_status }}',
-              '{{ mentor.certifications }}',
-              '{{ mentor.research_work }}',
-              '{{ mentor.mentorship_philosophy }}',
-              '{{ mentor.mentorship_motto }}',
-              '{{ mentor.other_social_link }}',
-              '{{ mentor.criminal_certificate }}'
-          )"
-            class="flex-1 px-4 py-2 bg-gray-100 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-200 transition">
+          <button class="flex-1 px-4 py-2 bg-gray-100 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-200 transition view-profile-btn" 
+            data-mentor-id="{{ mentor.id }}"
+            data-name="{{ mentor.user.name }}"
+            data-email="{{ mentor.user.email }}"
+            data-profession="{{ mentor.profession }}"
+            data-organisation="{{ mentor.organisation }}"
+            data-location="{{ mentor.location }}"
+            data-experience="{{ mentor.years_of_experience }}"
+            data-profile-picture="{{ mentor.profile_picture }}"
+            data-education="{{ mentor.education }}"
+            data-language="{{ mentor.language }}"
+            data-communication="{{ mentor.preferred_communication }}"
+            data-why-mentor="{{ mentor.why_mentor }}"
+            data-role="{{ mentor.role }}"
+            data-industry="{{ mentor.industry_sector }}"
+            data-skills="{{ mentor.skills }}"
+            data-availability="{{ mentor.availability }}"
+            data-mentorship-topics="{{ mentor.mentorship_topics }}"
+            data-linkedin="{{ mentor.linkedin_link }}"
+            data-github="{{ mentor.github_link }}"
+            data-portfolio="{{ mentor.portfolio_link }}"
+            data-preferred-duration="{{ mentor.preferred_duration }}"
+            data-mentorship-type="{{ mentor.mentorship_type_preference }}"
+            data-connect-frequency="{{ mentor.connect_frequency }}"
+            data-whatsapp="{{ mentor.whatsapp }}"
+            data-country="{{ mentor.country }}"
+            data-city="{{ mentor.city }}"
+            data-whatsapp-code="{{ mentor.whatsapp_country_code }}"
+            data-highest-qualification="{{ mentor.highest_qualification }}"
+            data-degree-name="{{ mentor.degree_name }}"
+            data-field-of-study="{{ mentor.field_of_study }}"
+            data-university-name="{{ mentor.university_name }}"
+            data-graduation-year="{{ mentor.graduation_year }}"
+            data-academic-status="{{ mentor.academic_status }}"
+            data-certifications="{{ mentor.certifications }}"
+            data-research-work="{{ mentor.research_work }}"
+            data-mentorship-philosophy="{{ mentor.mentorship_philosophy }}"
+            data-mentorship-motto="{{ mentor.mentorship_motto }}"
+            data-other-social="{{ mentor.other_social_link }}"
+            data-criminal-certificate="{{ mentor.criminal_certificate }}">
             View Profile
           </button>
         </div>
@@ -766,6 +765,62 @@
     });
   }
 
+  // Initialize View Profile buttons with event listeners
+  document.addEventListener('DOMContentLoaded', function() {
+    const viewProfileButtons = document.querySelectorAll('.view-profile-btn');
+    
+    viewProfileButtons.forEach(button => {
+      button.addEventListener('click', function() {
+        // Extract mentor data from data attributes
+        const mentor = {
+          id: this.getAttribute('data-mentor-id'),
+          user: {
+            name: this.getAttribute('data-name'),
+            email: this.getAttribute('data-email')
+          },
+          profession: this.getAttribute('data-profession'),
+          organisation: this.getAttribute('data-organisation'),
+          location: this.getAttribute('data-location'),
+          years_of_experience: this.getAttribute('data-experience'),
+          profile_picture: this.getAttribute('data-profile-picture'),
+          education: this.getAttribute('data-education'),
+          language: this.getAttribute('data-language'),
+          preferred_communication: this.getAttribute('data-communication'),
+          why_mentor: this.getAttribute('data-why-mentor'),
+          role: this.getAttribute('data-role'),
+          industry_sector: this.getAttribute('data-industry'),
+          skills: this.getAttribute('data-skills'),
+          availability: this.getAttribute('data-availability'),
+          mentorship_topics: this.getAttribute('data-mentorship-topics'),
+          linkedin_link: this.getAttribute('data-linkedin'),
+          github_link: this.getAttribute('data-github'),
+          portfolio_link: this.getAttribute('data-portfolio'),
+          preferred_duration: this.getAttribute('data-preferred-duration'),
+          mentorship_type_preference: this.getAttribute('data-mentorship-type'),
+          connect_frequency: this.getAttribute('data-connect-frequency'),
+          whatsapp: this.getAttribute('data-whatsapp'),
+          country: this.getAttribute('data-country'),
+          city: this.getAttribute('data-city'),
+          whatsapp_country_code: this.getAttribute('data-whatsapp-code'),
+          highest_qualification: this.getAttribute('data-highest-qualification'),
+          degree_name: this.getAttribute('data-degree-name'),
+          field_of_study: this.getAttribute('data-field-of-study'),
+          university_name: this.getAttribute('data-university-name'),
+          graduation_year: this.getAttribute('data-graduation-year'),
+          academic_status: this.getAttribute('data-academic-status'),
+          certifications: this.getAttribute('data-certifications'),
+          research_work: this.getAttribute('data-research-work'),
+          mentorship_philosophy: this.getAttribute('data-mentorship-philosophy'),
+          mentorship_motto: this.getAttribute('data-mentorship-motto'),
+          other_social_link: this.getAttribute('data-other-social'),
+          criminal_certificate: this.getAttribute('data-criminal-certificate')
+        };
+        
+        openProfileModal(mentor);
+      });
+    });
+  });
+
   // Client-side filtering for Mentees
   function filterMentees() {
     const input = document.getElementById('menteeSearch').value.toLowerCase();
@@ -792,75 +847,66 @@
 
 
 
-  // Comprehensive openProfileModal function with all mentor information
-  function openProfileModal(
-    name, profession, organisation, location, experience, profilePic,
-    email, education, language, communication, whyMentor,
-    role, industry, skills, availability, mentorshipTopics,
-    linkedin, github, portfolio, preferredDuration,
-    mentorshipTypePreference, connectFrequency, whatsapp, country, city, whatsappCode,
-    highestQualification, degreeName, fieldOfStudy, universityName, graduationYear,
-    academicStatus, certifications, researchWork, mentorshipPhilosophy, mentorshipMotto, otherSocialLink,
-    criminalCertificate
-  ) {
+  // Comprehensive openProfileModal function with mentor object
+  function openProfileModal(mentor) {
     // ===== BASIC INFORMATION =====
-    document.getElementById('modalName').innerText = name || "Not specified";
-    document.getElementById('modalEmail').innerText = email || "Not specified";
+    document.getElementById('modalName').innerText = mentor.user?.name || "Not specified";
+    document.getElementById('modalEmail').innerText = mentor.user?.email || "Not specified";
 
     // ===== PROFESSIONAL INFORMATION =====
-    document.getElementById('modalProfession').innerText = profession || "Not specified";
-    document.getElementById('modalRoleBadge').innerText = role || "Not specified";
-    document.getElementById('modalRole').innerText = role || "Not specified";
-    document.getElementById('modalOrganisation').innerText = organisation || "Not specified";
-    document.getElementById('modalIndustry').innerText = industry || "Not specified";
-    document.getElementById('modalEducation').innerText = education || "Not specified";
+    document.getElementById('modalProfession').innerText = mentor.profession || "Not specified";
+    document.getElementById('modalRoleBadge').innerText = mentor.role || "Not specified";
+    document.getElementById('modalRole').innerText = mentor.role || "Not specified";
+    document.getElementById('modalOrganisation').innerText = mentor.organisation || "Not specified";
+    document.getElementById('modalIndustry').innerText = mentor.industry_sector || "Not specified";
+    document.getElementById('modalEducation').innerText = mentor.education || "Not specified";
 
     // ===== EXPERIENCE & SKILLS =====
-    document.getElementById('modalExperience').innerText = experience ? experience + " years" : "Not specified";
-    document.getElementById('modalSkills').innerText = skills || "Not specified";
-    document.getElementById('modalLanguage').innerText = language || "Not specified";
+    document.getElementById('modalExperience').innerText = mentor.years_of_experience ? mentor.years_of_experience + " years" : "Not specified";
+    document.getElementById('modalSkills').innerText = mentor.skills || "Not specified";
+    document.getElementById('modalLanguage').innerText = mentor.language || "Not specified";
 
     // ===== CONTACT & PREFERENCES =====
-    document.getElementById('modalLocation').innerText = location || "Not specified";
-    document.getElementById('modalCommunication').innerText = communication || "Not specified";
-    document.getElementById('modalAvailability').innerText = availability || "Not specified";
-    document.getElementById('modalPreferredDuration').innerText = preferredDuration || "Not specified";
+    document.getElementById('modalLocation').innerText = mentor.location || "Not specified";
+    document.getElementById('modalCommunication').innerText = mentor.preferred_communication || "Not specified";
+    document.getElementById('modalAvailability').innerText = mentor.availability || "Not specified";
+    document.getElementById('modalPreferredDuration').innerText = mentor.preferred_duration || "Not specified";
 
     // ===== MENTORSHIP TOPICS =====
-    document.getElementById('modalMentorshipTopics').innerText = mentorshipTopics || "Not specified";
+    document.getElementById('modalMentorshipTopics').innerText = mentor.mentorship_topics || "Not specified";
 
     // ===== WHY MENTOR =====
-    document.getElementById('modalWhyMentor').innerText = whyMentor || "Not specified";
+    document.getElementById('modalWhyMentor').innerText = mentor.why_mentor || "Not specified";
 
     // ===== EDUCATIONAL INFORMATION =====
-    document.getElementById('modalHighestQualification').innerText = highestQualification || "Not specified";
-    document.getElementById('modalDegreeName').innerText = degreeName || "Not specified";
-    document.getElementById('modalFieldOfStudy').innerText = fieldOfStudy || "Not specified";
-    document.getElementById('modalUniversityName').innerText = universityName || "Not specified";
-    document.getElementById('modalGraduationYear').innerText = graduationYear || "Not specified";
-    document.getElementById('modalAcademicStatus').innerText = academicStatus || "Not specified";
-    document.getElementById('modalCertifications').innerText = certifications || "Not specified";
-    document.getElementById('modalResearchWork').innerText = researchWork || "Not specified";
+    document.getElementById('modalHighestQualification').innerText = mentor.highest_qualification || "Not specified";
+    document.getElementById('modalDegreeName').innerText = mentor.degree_name || "Not specified";
+    document.getElementById('modalFieldOfStudy').innerText = mentor.field_of_study || "Not specified";
+    document.getElementById('modalUniversityName').innerText = mentor.university_name || "Not specified";
+    document.getElementById('modalGraduationYear').innerText = mentor.graduation_year || "Not specified";
+    document.getElementById('modalAcademicStatus').innerText = mentor.academic_status || "Not specified";
+    document.getElementById('modalCertifications').innerText = mentor.certifications || "Not specified";
+    document.getElementById('modalResearchWork').innerText = mentor.research_work || "Not specified";
 
     // ===== MENTORSHIP PREFERENCES =====
-    document.getElementById('modalMentorshipTypePreference').innerText = mentorshipTypePreference || "Not specified";
-    document.getElementById('modalConnectFrequency').innerText = connectFrequency || "Not specified";
+    document.getElementById('modalMentorshipTypePreference').innerText = mentor.mentorship_type_preference || "Not specified";
+    document.getElementById('modalConnectFrequency').innerText = mentor.connect_frequency || "Not specified";
 
     // ===== MENTOR PHILOSOPHY =====
-    document.getElementById('modalMentorshipPhilosophy').innerText = mentorshipPhilosophy || "Not specified";
-    document.getElementById('modalMentorshipMotto').innerText = mentorshipMotto || "Not specified";
+    document.getElementById('modalMentorshipPhilosophy').innerText = mentor.mentorship_philosophy || "Not specified";
+    document.getElementById('modalMentorshipMotto').innerText = mentor.mentorship_motto || "Not specified";
 
     // ===== CONTACT & LOCATION =====
-    const whatsappDisplay = whatsappCode ? (whatsappCode + ' ' + (whatsapp || '')) : (whatsapp || 'Not specified');
+    const whatsappDisplay = mentor.whatsapp_country_code ? (mentor.whatsapp_country_code + ' ' + (mentor.whatsapp || '')) : (mentor.whatsapp || 'Not specified');
     document.getElementById('modalWhatsApp').innerText = whatsappDisplay.trim() || "Not specified";
-    document.getElementById('modalCountry').innerText = country || "Not specified";
-    document.getElementById('modalCity').innerText = city || "Not specified";
+    document.getElementById('modalCountry').innerText = mentor.country || "Not specified";
+    document.getElementById('modalCity').innerText = mentor.city || "Not specified";
     
     // Criminal Certificate
     const criminalCertContainer = document.getElementById('modalCriminalCertificateContainer');
     const criminalCertLink = document.getElementById('modalCriminalCertificate');
-    if (criminalCertificate && criminalCertificate.trim()) {
-      criminalCertLink.href = "/static/uploads/" + criminalCertificate;
+    if (mentor.criminal_certificate && mentor.criminal_certificate.trim()) {
+      criminalCertLink.href = "/static/uploads/" + mentor.criminal_certificate;
       criminalCertContainer.style.display = 'flex';
     } else {
       criminalCertContainer.style.display = 'none';
@@ -873,32 +919,32 @@
     const otherLink = document.getElementById('modalOtherSocial');
 
     // LinkedIn
-    if (linkedin && linkedin.trim()) {
-      linkedinLink.href = linkedin;
+    if (mentor.linkedin_link && mentor.linkedin_link.trim()) {
+      linkedinLink.href = mentor.linkedin_link;
       linkedinLink.style.display = 'flex';
     } else {
       linkedinLink.style.display = 'none';
     }
 
     // GitHub
-    if (github && github.trim()) {
-      githubLink.href = github;
+    if (mentor.github_link && mentor.github_link.trim()) {
+      githubLink.href = mentor.github_link;
       githubLink.style.display = 'flex';
     } else {
       githubLink.style.display = 'none';
     }
 
     // Portfolio
-    if (portfolio && portfolio.trim()) {
-      portfolioLink.href = portfolio;
+    if (mentor.portfolio_link && mentor.portfolio_link.trim()) {
+      portfolioLink.href = mentor.portfolio_link;
       portfolioLink.style.display = 'flex';
     } else {
       portfolioLink.style.display = 'none';
     }
 
     // Other Social Link
-    if (otherSocialLink && otherSocialLink.trim()) {
-      otherLink.href = otherSocialLink;
+    if (mentor.other_social_link && mentor.other_social_link.trim()) {
+      otherLink.href = mentor.other_social_link;
       otherLink.style.display = 'flex';
     } else {
       otherLink.style.display = 'none';
@@ -906,10 +952,11 @@
 
     // ===== PROFILE PICTURE =====
     const profilePicElement = document.getElementById('modalProfilePic');
-    if (profilePic && profilePic.trim()) {
-      profilePicElement.src = "/static/uploads/" + profilePic;
+    if (mentor.profile_picture && mentor.profile_picture.trim()) {
+      profilePicElement.src = "/static/uploads/" + mentor.profile_picture;
     } else {
-      profilePicElement.src = "https://via.placeholder.com/112?text=" + encodeURIComponent(name ? name.charAt(0) : '?');
+      const mentorName = mentor.user?.name || '?';
+      profilePicElement.src = "https://via.placeholder.com/112?text=" + encodeURIComponent(mentorName.charAt(0));
     }
 
     // Show the modal
