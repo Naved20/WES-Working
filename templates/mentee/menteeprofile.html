@@ -325,6 +325,52 @@
                             </span>
                         </div>
                         {% endif %}
+                        {% if parent_name %}
+                        <div class="flex flex-col">
+                            <span class="text-xs font-semibold text-slate-400 uppercase tracking-wide">Parent Name</span>
+                            <span class="text-slate-700 font-medium">{{ parent_name }}</span>
+                        </div>
+                        {% endif %}
+                        {% if parent_mobile %}
+                        <div class="flex flex-col">
+                            <span class="text-xs font-semibold text-slate-400 uppercase tracking-wide">Parent Mobile</span>
+                            <span class="text-slate-700 font-medium flex items-center gap-2">
+                                <span class="bg-slate-200 px-1.5 py-0.5 rounded text-xs text-slate-600">{{
+                                    parent_mobile_country_code or '+91' }}</span>
+                                {{ parent_mobile }}
+                            </span>
+                        </div>
+                        {% endif %}
+                        {% if comments %}
+                        <div class="flex flex-col md:col-span-2">
+                            <span class="text-xs font-semibold text-slate-400 uppercase tracking-wide">Additional Comments</span>
+                            <span class="text-slate-700 font-medium bg-white p-3 rounded-lg border border-slate-200">{{ comments }}</span>
+                        </div>
+                        {% endif %}
+                        {% if school_college_name %}
+                        <div class="flex flex-col">
+                            <span class="text-xs font-semibold text-slate-400 uppercase tracking-wide">School/College Name</span>
+                            <span class="text-slate-700 font-medium">{{ school_college_name }}</span>
+                        </div>
+                        {% endif %}
+                        {% if stream %}
+                        <div class="flex flex-col">
+                            <span class="text-xs font-semibold text-slate-400 uppercase tracking-wide">Stream/Field</span>
+                            <span class="text-slate-700 font-medium">{{ stream }}</span>
+                        </div>
+                        {% endif %}
+                        {% if goal %}
+                        <div class="flex flex-col">
+                            <span class="text-xs font-semibold text-slate-400 uppercase tracking-wide">Career Goal</span>
+                            <span class="text-slate-700 font-medium">{{ goal }}</span>
+                        </div>
+                        {% endif %}
+                        {% if govt_private %}
+                        <div class="flex flex-col">
+                            <span class="text-xs font-semibold text-slate-400 uppercase tracking-wide">Institution Type</span>
+                            <span class="text-slate-700 font-medium">{{ govt_private }}</span>
+                        </div>
+                        {% endif %}
                     </div>
                 </div>
 
