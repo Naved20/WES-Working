@@ -304,6 +304,7 @@ class User(db.Model):
 
     #connect form another table
     mentor_profile = db.relationship("MentorProfile", backref="user", uselist=False)
+    mentee_profile = db.relationship("MenteeProfile", backref="user_ref", uselist=False, foreign_keys="MenteeProfile.user_id")
     institution_ref = db.relationship("Institution", backref="users", foreign_keys="User.institution_id")
 
     def __repr__(self):
@@ -462,7 +463,7 @@ class MenteeProfile(db.Model):
     terms_agreement = db.Column(db.String(10))  # Yes / No
     profile_picture = db.Column(db.String(100))  # store image filename
     status = db.Column(db.String(20), default="pending")
-    user = db.relationship("User", backref="mentee_profile", uselist=False)
+    user = db.relationship("User", backref="mentee_profile_ref", uselist=False)
 
 #------------ table supervisor details-------------------
 class SupervisorProfile(db.Model):
@@ -3245,8 +3246,13 @@ def view_requests():
     if "email" not in session or session.get("user_type") != "0":
         return redirect(url_for("signin"))
 
-    # Fetch mentorship requests that are still pending approval from supervisor
-    pending_mentorship_requests = MentorshipRequest.query.filter(
+    # Fetch mentorship requests with proper eager loading of profile relationships
+    from sqlalchemy.orm import joinedload
+    
+    pending_mentorship_requests = MentorshipRequest.query.options(
+        joinedload(MentorshipRequest.mentee).joinedload(User.mentee_profile),
+        joinedload(MentorshipRequest.mentor).joinedload(User.mentor_profile)
+    ).filter(
         (MentorshipRequest.supervisor_status == "pending") | 
         (MentorshipRequest.mentor_status == "pending")
     ).all()
@@ -5073,6 +5079,10 @@ def editmenteeprofile():
         profile.dob = request.form.get("dob")
         profile.mobile_number = request.form.get("mobile_number")
         profile.whatsapp_number = request.form.get("whatsapp_number")
+        profile.parent_mobile = request.form.get("parent_mobile")
+        profile.school_college_name = request.form.get("school_college_name")
+        profile.stream = request.form.get("stream")
+        profile.goal = request.form.get("goal")
         profile.mentorship_expectations = request.form.get("mentorship_expectations")
         # Save "Yes" only if both terms and GDPR are agreed
         terms_agreed = request.form.get("terms_agreement")
@@ -5081,6 +5091,8 @@ def editmenteeprofile():
         
         # Save general details
         profile.father_name = request.form.get("father_name")
+        profile.parent_name = request.form.get("parent_name")
+        profile.comments = request.form.get("comments")
         profile.address_line1 = request.form.get("address_line1")
         profile.address_line2 = request.form.get("address_line2")
         profile.city = request.form.get("city")
@@ -5104,6 +5116,7 @@ def editmenteeprofile():
             profile.course_stream = request.form.get("course_stream")
             profile.favourite_subject = request.form.get("favourite_subject")
             profile.career_interest = request.form.get("career_interest")
+            profile.govt_private = request.form.get("govt_private")
 
         # UNIVERSITY STUDENT fields
         elif who_am_i == "university_student":
@@ -5184,6 +5197,13 @@ def editmenteeprofile():
         country=profile.country if profile else "",
         institution=profile.institution if profile else "",
         institution_other=profile.institution_other if profile else "",
+        # New common fields
+        parent_mobile=profile.parent_mobile if profile else "",
+        parent_mobile_country_code="+91",
+        school_college_name=profile.school_college_name if profile else "",
+        stream=profile.stream if profile else "",
+        goal=profile.goal if profile else "",
+        govt_private=profile.govt_private if profile else "",
         # Other fields
         education_level=profile.education_level if profile else "",
         institution_name=profile.institution_name if profile else "",
@@ -5453,6 +5473,14 @@ def menteeprofile():
             mobile_country_code="+91",
             whatsapp_number=profile.whatsapp_number if profile else "",
             whatsapp_country_code="+91",
+            parent_name=profile.parent_name if profile else "",
+            parent_mobile=profile.parent_mobile if profile else "",
+            parent_mobile_country_code="+91",
+            # Common fields for all categories
+            school_college_name=profile.school_college_name if profile else "",
+            stream=profile.stream if profile else "",
+            goal=profile.goal if profile else "",
+            govt_private=profile.govt_private if profile else "",
             # School Student fields
             school_name=profile.school_name if profile else "",
             class_year=profile.class_year if profile else "",
@@ -5477,6 +5505,7 @@ def menteeprofile():
             support_expected=profile.support_expected if profile else "",
             # Common fields
             mentorship_expectations=profile.mentorship_expectations if profile else "",
+            comments=profile.comments if profile else "",
             terms_agreement=profile.terms_agreement if profile else ""
         )
     return redirect(url_for("signin"))

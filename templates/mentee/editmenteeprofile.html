@@ -145,6 +145,13 @@
                             class="w-full p-2 border rounded-lg" placeholder="Father's full name">
                     </div>
 
+                    <!-- Parent Name -->
+                    <div class="md:col-span-2">
+                        <label class="block text-gray-700 font-semibold">Parent Name</label>
+                        <input type="text" name="parent_name" value="{{ parent_name or '' }}"
+                            class="w-full p-2 border rounded-lg" placeholder="Parent/Guardian's full name">
+                    </div>
+
                     <!-- Address Line 1 -->
                     <div class="md:col-span-2">
                         <label class="block text-gray-700 font-semibold">Address Line 1 *</label>
@@ -252,6 +259,15 @@
                             <label class="block text-gray-700 font-semibold">Board *</label>
                             <input type="text" name="school_board" value="{{ school_board or '' }}"
                                 class="w-full p-2 border rounded-lg" placeholder="e.g., CBSE, ICSE, State Board">
+                        </div>
+                        <div>
+                            <label class="block text-gray-700 font-semibold">School Type *</label>
+                            <select name="govt_private" class="w-full p-2 border rounded-lg">
+                                <option value="">Select Type</option>
+                                <option value="Government" {% if govt_private=='Government' %}selected{% endif %}>Government</option>
+                                <option value="Private" {% if govt_private=='Private' %}selected{% endif %}>Private</option>
+                                <option value="Semi-Government" {% if govt_private=='Semi-Government' %}selected{% endif %}>Semi-Government</option>
+                            </select>
                         </div>
                         <div>
                             <label class="block text-gray-700 font-semibold">Stream (if applicable)</label>
@@ -532,6 +548,31 @@
                                 class="flex-1 p-2 border rounded-lg" placeholder="Enter WhatsApp number">
                         </div>
                     </div>
+                    <div>
+                        <label class="block text-gray-700 font-semibold">Parent Mobile Number</label>
+                        <div class="flex gap-2">
+                            <input type="text" name="parent_mobile_country_code" list="country_codes"
+                                value="{{ parent_mobile_country_code or '+91' }}" class="w-24 p-2 border rounded-lg"
+                                placeholder="+91">
+                            <input type="tel" name="parent_mobile" value="{{ parent_mobile or '' }}"
+                                class="flex-1 p-2 border rounded-lg" placeholder="Enter parent's mobile number">
+                        </div>
+                    </div>
+                    <div class="md:col-span-2">
+                        <label class="block text-gray-700 font-semibold">School/College Name *</label>
+                        <input type="text" name="school_college_name" value="{{ school_college_name or '' }}"
+                            class="w-full p-2 border rounded-lg" placeholder="Enter your school or college name">
+                    </div>
+                    <div>
+                        <label class="block text-gray-700 font-semibold">Stream/Field of Study</label>
+                        <input type="text" name="stream" value="{{ stream or '' }}"
+                            class="w-full p-2 border rounded-lg" placeholder="e.g., Science, Commerce, Arts, Engineering, etc.">
+                    </div>
+                    <div>
+                        <label class="block text-gray-700 font-semibold">Career Goal</label>
+                        <input type="text" name="goal" value="{{ goal or '' }}"
+                            class="w-full p-2 border rounded-lg" placeholder="What is your career goal or aspiration?">
+                    </div>
                 </div>
             </div>
 
@@ -546,6 +587,18 @@
                     (guidance, clarity, skills, career direction, networking, etc.)</p>
                 <textarea name="mentorship_expectations" class="w-full p-2 border rounded-lg" rows="4"
                     placeholder="Share your expectations...">{{ mentorship_expectations or '' }}</textarea>
+            </div>
+
+            <!-- ADDITIONAL COMMENTS -->
+            <div class="bg-slate-50 p-8 rounded-2xl border border-slate-100 mb-8">
+                <h3 class="text-xl font-bold text-slate-800 mb-6 flex items-center gap-2">
+                    <span
+                        class="w-8 h-8 rounded-lg bg-gray-100 flex items-center justify-center text-gray-600 text-sm">💬</span>
+                    Additional Comments
+                </h3>
+                <p class="text-gray-600 text-sm mb-3">Any additional information you'd like to share about yourself, your background, interests, or anything else that might be helpful for your mentor to know.</p>
+                <textarea name="comments" class="w-full p-2 border rounded-lg" rows="4"
+                    placeholder="Share any additional information (optional)...">{{ comments or '' }}</textarea>
             </div>
 
             <!-- Terms Agreement -->
@@ -777,7 +830,7 @@
 
             // Define mandatory fields for each category
             const mandatoryFieldsByCategory = {
-                school_student: ['school_name', 'school_board'],
+                school_student: ['school_name', 'school_board', 'govt_private'],
                 university_student: ['institution_name'],
                 seeking_internship: ['institution_name'],
                 young_professional: ['current_role', 'industry', 'years_experience', 'current_organization'],
@@ -785,7 +838,7 @@
             };
 
             // Common mandatory fields for all categories
-            const commonMandatory = ['mobile_number', 'whatsapp_number', 'mentorship_expectations', 'institution'];
+            const commonMandatory = ['mobile_number', 'whatsapp_number', 'mentorship_expectations', 'institution', 'school_college_name'];
 
             // General details mandatory fields
             const generalDetailsMandatory = ['father_name', 'address_line1', 'city', 'state', 'postal_code', 'country'];
