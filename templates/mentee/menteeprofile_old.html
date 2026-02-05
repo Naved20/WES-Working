@@ -13,6 +13,9 @@
 
 
 {% block content %}
+<!-- Back Button -->
+{% include 'components/back_button.html' with context %}
+
 <div class="max-w-4xl mx-auto mt-8 p-6 bg-gray-50 rounded-lg shadow-lg">
     <!-- Back Button for Institution Admin -->
     {% if session.get('user_type') == '3' %}

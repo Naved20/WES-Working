@@ -261,7 +261,9 @@
           data-institution-other="{{ request.mentee.mentee_profile.institution_other or '' }}"
           data-school="{{ request.mentee.mentee_profile.school_college_name or '' }}"
           data-mobile="{{ request.mentee.mentee_profile.mobile_number or '' }}"
+          data-mobile-country-code="{{ request.mentee.mentee_profile.mobile_country_code or '+91' }}"
           data-whatsapp="{{ request.mentee.mentee_profile.whatsapp_number or '' }}"
+          data-whatsapp-country-code="{{ request.mentee.mentee_profile.whatsapp_country_code or '+91' }}"
           data-govt-private="{{ request.mentee.mentee_profile.govt_private or '' }}"
           data-stream="{{ request.mentee.mentee_profile.stream or '' }}"
           data-class="{{ request.mentee.mentee_profile.class_year or '' }}"
@@ -269,6 +271,7 @@
           data-goal="{{ request.mentee.mentee_profile.goal or '' }}"
           data-parent-name="{{ request.mentee.mentee_profile.parent_name or '' }}"
           data-parent-mobile="{{ request.mentee.mentee_profile.parent_mobile or '' }}"
+          data-parent-mobile-country-code="{{ request.mentee.mentee_profile.parent_mobile_country_code or '+91' }}"
           data-comments="{{ request.mentee.mentee_profile.comments or '' }}"
           data-mentorship-expectations="{{ request.mentee.mentee_profile.mentorship_expectations or '' }}"
           data-picture="{{ request.mentee.mentee_profile.profile_picture or '' }}"
@@ -916,10 +919,16 @@ function openMenteeProfileModal(menteeData) {
   // Personal Information
   document.getElementById('menteeDOB').textContent = menteeData.dob || 'Not specified';
   document.getElementById('menteeFatherName').textContent = menteeData.father_name || 'Not specified';
-  document.getElementById('menteeMobile').textContent = menteeData.mobile_number || 'Not specified';
-  document.getElementById('menteeWhatsapp').textContent = menteeData.whatsapp_number || 'Not specified';
+  document.getElementById('menteeMobile').innerHTML = menteeData.mobile_number ? 
+    `<span class="bg-slate-200 px-1.5 py-0.5 rounded text-xs text-slate-600 mr-2">${menteeData.mobile_country_code || '+91'}</span>${menteeData.mobile_number}` : 
+    'Not specified';
+  document.getElementById('menteeWhatsapp').innerHTML = menteeData.whatsapp_number ? 
+    `<span class="bg-slate-200 px-1.5 py-0.5 rounded text-xs text-slate-600 mr-2">${menteeData.whatsapp_country_code || '+91'}</span>${menteeData.whatsapp_number}` : 
+    'Not specified';
   document.getElementById('menteeParentName').textContent = menteeData.parent_name || 'Not specified';
-  document.getElementById('menteeParentMobile').textContent = menteeData.parent_mobile || 'Not specified';
+  document.getElementById('menteeParentMobile').innerHTML = menteeData.parent_mobile ? 
+    `<span class="bg-slate-200 px-1.5 py-0.5 rounded text-xs text-slate-600 mr-2">${menteeData.parent_mobile_country_code || '+91'}</span>${menteeData.parent_mobile}` : 
+    'Not specified';
   
   // Address Information
   document.getElementById('menteeAddress1').textContent = menteeData.address_line1 || 'Not specified';
@@ -1150,7 +1159,9 @@ document.addEventListener('DOMContentLoaded', function() {
         institution_other: this.getAttribute('data-institution-other'),
         school_college_name: this.getAttribute('data-school'),
         mobile_number: this.getAttribute('data-mobile'),
+        mobile_country_code: this.getAttribute('data-mobile-country-code'),
         whatsapp_number: this.getAttribute('data-whatsapp'),
+        whatsapp_country_code: this.getAttribute('data-whatsapp-country-code'),
         govt_private: this.getAttribute('data-govt-private'),
         stream: this.getAttribute('data-stream'),
         class_year: this.getAttribute('data-class'),
@@ -1158,6 +1169,7 @@ document.addEventListener('DOMContentLoaded', function() {
         goal: this.getAttribute('data-goal'),
         parent_name: this.getAttribute('data-parent-name'),
         parent_mobile: this.getAttribute('data-parent-mobile'),
+        parent_mobile_country_code: this.getAttribute('data-parent-mobile-country-code'),
         comments: this.getAttribute('data-comments'),
         mentorship_expectations: this.getAttribute('data-mentorship-expectations'),
         profile_picture: this.getAttribute('data-picture')

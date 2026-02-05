@@ -11,6 +11,11 @@
 {% endblock %}
 
 {% block content %}
+
+<!-- Back Button -->
+ 
+{% include 'components/back_button.html' with context %}
+
 <div class="max-w-2xl mx-auto mt-8 p-6 bg-white rounded-lg shadow-lg">
     <div class="mb-6">
         <h1 class="text-3xl font-bold text-gray-800 mb-2">➕ Create New Account</h1>
@@ -39,8 +44,9 @@
         </div>
 
         <div>
-            <label class="block text-gray-700 font-semibold mb-2">Full Name *</label>
-            <input type="text" name="name" class="w-full p-3 border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-200" placeholder="Enter full name" required>
+            <label class="block text-gray-700 font-semibold mb-2" id="name_label">Full Name *</label>
+            <input type="text" name="name" id="name_input" class="w-full p-3 border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-200" placeholder="Enter full name" required>
+            <p class="text-sm text-gray-500 mt-1" id="name_hint" style="display: none;">For institutions, this will be automatically filled with the institution name</p>
         </div>
 
         <div>
@@ -50,14 +56,18 @@
 
         <div id="institution_field" style="display: none;">
             <label class="block text-gray-700 font-semibold mb-2">Institution *</label>
-            <select name="institution" class="w-full p-3 border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-200">
-                <option value="">Select or Create Institution</option>
+            <select name="institution" id="institution_select" class="w-full p-3 border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-200">
+                <option value="">Select Institution</option>
                 {% for inst in institutions %}
                 <option value="{{ inst.name }}">{{ inst.name }}</option>
                 {% endfor %}
-                <option value="new">➕ Create New Institution</option>
             </select>
-            <input type="text" id="new_institution_name" name="new_institution_name" class="w-full p-3 border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-200 mt-2" placeholder="Enter new institution name" style="display: none;">
+        </div>
+
+        <div id="institution_admin_field" style="display: none;">
+            <label class="block text-gray-700 font-semibold mb-2">Institution Name *</label>
+            <input type="text" name="new_institution_name" id="new_institution_name" class="w-full p-3 border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-200" placeholder="Enter institution name" required>
+            <p class="text-sm text-gray-500 mt-1">This will be used as both the institution name and the user's name</p>
         </div>
 
         <div>
@@ -72,7 +82,7 @@
         </div>
 
         <div class="flex gap-4">
-            <button type="submit" class="flex-1 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-semibold transition">
+            <button type="submit" class="flex-1 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-semibold transition" onclick="return validateForm()">
                 <i class="fas fa-plus mr-2"></i>Create Account
             </button>
             <a href="{{ url_for('supervisordashboard') }}" class="flex-1 px-6 py-3 bg-gray-400 text-white rounded-lg hover:bg-gray-500 font-semibold transition text-center">
@@ -90,30 +100,113 @@
 function toggleInstitutionField() {
     const userType = document.getElementById('user_type').value;
     const institutionField = document.getElementById('institution_field');
+    const institutionAdminField = document.getElementById('institution_admin_field');
+    const nameInput = document.getElementById('name_input');
+    const nameLabel = document.getElementById('name_label');
+    const nameHint = document.getElementById('name_hint');
+    const institutionSelect = document.getElementById('institution_select');
+    const newInstitutionInput = document.getElementById('new_institution_name');
     
-    if (userType === '3') {
+    // Hide all fields first
+    institutionField.style.display = 'none';
+    institutionAdminField.style.display = 'none';
+    nameHint.style.display = 'none';
+    
+    // Reset required attributes
+    if (institutionSelect) institutionSelect.required = false;
+    if (newInstitutionInput) newInstitutionInput.required = false;
+    
+    // Reset name field
+    nameInput.disabled = false;
+    nameInput.placeholder = "Enter full name";
+    nameLabel.textContent = "Full Name *";
+    
+    if (userType === '1' || userType === '2') {
+        // Mentor or Mentee - show institution selection
         institutionField.style.display = 'block';
-    } else {
-        institutionField.style.display = 'none';
+        if (institutionSelect) institutionSelect.required = true;
+    } else if (userType === '3') {
+        // Institution Admin - show institution name field and disable name input
+        institutionAdminField.style.display = 'block';
+        if (newInstitutionInput) newInstitutionInput.required = true;
+        nameInput.disabled = true;
+        nameInput.placeholder = "Will be filled automatically";
+        nameLabel.textContent = "Institution Name (Auto-filled) *";
+        nameHint.style.display = 'block';
     }
 }
 
-// Handle institution selection
+// Handle institution name auto-fill for institution admin
 document.addEventListener('DOMContentLoaded', function() {
-    const institutionSelect = document.querySelector('select[name="institution"]');
-    const newInstitutionInput = document.getElementById('new_institution_name');
+    const institutionNameInput = document.getElementById('new_institution_name');
+    const nameInput = document.getElementById('name_input');
     
-    if (institutionSelect) {
-        institutionSelect.addEventListener('change', function() {
-            if (this.value === 'new') {
-                newInstitutionInput.style.display = 'block';
-                newInstitutionInput.required = true;
-            } else {
-                newInstitutionInput.style.display = 'none';
-                newInstitutionInput.required = false;
+    if (institutionNameInput) {
+        institutionNameInput.addEventListener('input', function() {
+            if (document.getElementById('user_type').value === '3') {
+                nameInput.value = this.value;
             }
         });
     }
 });
+
+// Form validation function
+function validateForm() {
+    const userType = document.getElementById('user_type').value;
+    const email = document.querySelector('input[name="email"]').value;
+    const password = document.querySelector('input[name="password"]').value;
+    const confirmPassword = document.querySelector('input[name="confirm_password"]').value;
+    
+    // Check if user type is selected
+    if (!userType) {
+        alert('Please select an account type!');
+        return false;
+    }
+    
+    // Check institution name for institution admin
+    if (userType === '3') {
+        const institutionName = document.getElementById('new_institution_name').value;
+        if (!institutionName.trim()) {
+            alert('Please provide an institution name!');
+            document.getElementById('new_institution_name').focus();
+            return false;
+        }
+    }
+    
+    // Check institution selection for mentors/mentees
+    if (userType === '1' || userType === '2') {
+        const institutionSelect = document.getElementById('institution_select').value;
+        if (!institutionSelect) {
+            alert('Please select an institution!');
+            document.getElementById('institution_select').focus();
+            return false;
+        }
+    }
+    
+    // Check email
+    if (!email.trim()) {
+        alert('Please provide an email address!');
+        return false;
+    }
+    
+    // Check password
+    if (!password.trim()) {
+        alert('Please provide a password!');
+        return false;
+    }
+    
+    if (password.length < 6) {
+        alert('Password must be at least 6 characters long!');
+        return false;
+    }
+    
+    // Check password confirmation
+    if (password !== confirmPassword) {
+        alert('Passwords do not match!');
+        return false;
+    }
+    
+    return true;
+}
 </script>
 {% endblock %}
