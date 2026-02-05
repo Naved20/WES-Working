@@ -3,6 +3,10 @@
 {% block content %}
 
 <section class="min-h-[calc(100vh-80px)] gradient-hero flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+    <!-- Back Button -->
+    <div class="absolute top-4 left-4">
+        {% include 'components/back_button.html' with context %}
+    </div>
     <div class="w-full max-w-lg space-y-8 animate-slide-up">
 
         <div class="glass-card p-8 sm:p-10 rounded-2xl shadow-2xl relative overflow-hidden">

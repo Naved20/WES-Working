@@ -10,6 +10,9 @@
 {% endblock %}
 
 {% block content %}
+<!-- Back Button -->
+{% include 'components/back_button.html' with context %}
+
 <div class="max-w-4xl mx-auto mt-8 p-6 bg-gray-50 rounded-lg shadow-lg">
     <form id="menteeProfileForm" action="{{ url_for('editmenteeprofile') }}" method="POST" enctype="multipart/form-data" class="space-y-6" onsubmit="return validateMenteeForm()">
         

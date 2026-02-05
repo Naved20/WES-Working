@@ -26,6 +26,9 @@
 {% endblock %}
 
 {% block content %}
+<!-- Back Button -->
+{% include 'components/back_button.html' with context %}
+
 <div class="max-w-6xl mx-auto mt-8 p-6">
     <!-- Back Button for Institution Admin -->
     {% if session.get('user_type') == '3' %}

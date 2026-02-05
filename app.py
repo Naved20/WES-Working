@@ -304,7 +304,7 @@ class User(db.Model):
 
     #connect form another table
     mentor_profile = db.relationship("MentorProfile", backref="user", uselist=False)
-    mentee_profile = db.relationship("MenteeProfile", backref="user_ref", uselist=False, foreign_keys="MenteeProfile.user_id")
+    mentee_profile = db.relationship("MenteeProfile", backref="user_ref", uselist=False, foreign_keys="MenteeProfile.user_id", overlaps="mentee_profile_ref,user")
     institution_ref = db.relationship("Institution", backref="users", foreign_keys="User.institution_id")
 
     def __repr__(self):
@@ -446,7 +446,9 @@ class MenteeProfile(db.Model):
     
     school_college_name = db.Column(db.String(150))
     mobile_number = db.Column(db.String(20))
+    mobile_country_code = db.Column(db.String(10), default="+91")
     whatsapp_number = db.Column(db.String(20))
+    whatsapp_country_code = db.Column(db.String(10), default="+91")
     govt_private = db.Column(db.String(50))
     stream = db.Column(db.String(100))
     class_year = db.Column(db.String(50))
@@ -456,6 +458,7 @@ class MenteeProfile(db.Model):
     # parent info
     parent_name = db.Column(db.String(150))
     parent_mobile = db.Column(db.String(20))
+    parent_mobile_country_code = db.Column(db.String(10), default="+91")
 
     # other
     comments = db.Column(db.Text)
@@ -463,7 +466,7 @@ class MenteeProfile(db.Model):
     terms_agreement = db.Column(db.String(10))  # Yes / No
     profile_picture = db.Column(db.String(100))  # store image filename
     status = db.Column(db.String(20), default="pending")
-    user = db.relationship("User", backref="mentee_profile_ref", uselist=False)
+    user = db.relationship("User", backref=db.backref("mentee_profile_ref", uselist=False, overlaps="user_ref"), uselist=False, overlaps="mentee_profile,user_ref")
 
 #------------ table supervisor details-------------------
 class SupervisorProfile(db.Model):
@@ -486,11 +489,14 @@ class Institution(db.Model):
     __tablename__ = "institutions"
     
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey("signup_details.id"), nullable=True, unique=True)
-    name = db.Column(db.String(150), nullable=False, unique=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("signup_details.id"), nullable=False, unique=True)  # Required - institution must be linked to user
+    
+    # Core institution information (linked to User signup data)
+    # name and contact_email are derived from User.name and User.email and should not be editable
+    
+    # Profile-specific fields (editable)
     email_domain = db.Column(db.String(100), nullable=True)  # For auto-detection
-    contact_person = db.Column(db.String(100))
-    contact_email = db.Column(db.String(100))
+    contact_person = db.Column(db.String(100))  # Can be different from institution name
     contact_phone = db.Column(db.String(20))
     address = db.Column(db.Text)
     city = db.Column(db.String(100))
@@ -504,6 +510,16 @@ class Institution(db.Model):
     
     # Relationship with User (institution admin) - via user_id
     user = db.relationship("User", backref="institution_profile", uselist=False, foreign_keys="Institution.user_id")
+    
+    @property
+    def name(self):
+        """Institution name comes from linked User.name"""
+        return self.user.name if self.user else None
+    
+    @property
+    def contact_email(self):
+        """Institution email comes from linked User.email"""
+        return self.user.email if self.user else None
     
     def __repr__(self):
         return f"<Institution {self.name}>"
@@ -2140,6 +2156,17 @@ def create_account():
         confirm_password = request.form.get("confirm_password")
         user_type = request.form.get("user_type")
         institution_name = request.form.get("institution", "")
+        new_institution_name = request.form.get("new_institution_name", "")
+        
+        # For institution admin, the name is the institution name
+        if user_type == "3":
+            if new_institution_name:
+                # Use the institution name provided in the new_institution_name field
+                institution_name = new_institution_name
+                name = institution_name
+            else:
+                flash("Please provide an institution name!", "error")
+                return redirect(url_for("create_account"))
         
         # Validation
         if not all([name, email, password, confirm_password, user_type]):
@@ -2160,6 +2187,13 @@ def create_account():
             flash("Email already exists! Please use a different email.", "error")
             return redirect(url_for("create_account"))
         
+        # For institutions, check if institution name already exists
+        if user_type == "3":
+            existing_institution = User.query.filter_by(name=name, user_type="3").first()
+            if existing_institution:
+                flash("Institution name already exists! Please use a different name.", "error")
+                return redirect(url_for("create_account"))
+        
         try:
             # Hash password
             hashed_password = generate_password_hash(password, method='pbkdf2:sha256', salt_length=8)
@@ -2170,24 +2204,19 @@ def create_account():
                 email=email,
                 password=hashed_password,
                 user_type=user_type,
-                institution=institution_name
+                institution=institution_name if user_type != "3" else None  # Don't store institution for institution admins
             )
             db.session.add(new_user)
             db.session.flush()  # Get user ID
             
             # For institution admin (user_type = "3"), create institution profile
             if user_type == "3":
-                institution = Institution.query.filter_by(name=institution_name).first()
-                if not institution:
-                    institution = Institution(
-                        user_id=new_user.id,
-                        name=institution_name,
-                        contact_person=name,
-                        contact_email=email,
-                        status="active"
-                    )
-                    db.session.add(institution)
-                    db.session.flush()
+                institution = Institution(
+                    user_id=new_user.id,
+                    status="active"
+                )
+                db.session.add(institution)
+                db.session.flush()
                 
                 new_user.institution_id = institution.id
             
@@ -2200,8 +2229,9 @@ def create_account():
             flash(f"Error creating account: {str(e)}", "error")
             return redirect(url_for("create_account"))
     
-    # Get institutions for dropdown
-    institutions = Institution.query.filter_by(status="active").all()
+    # Get existing institutions for dropdown (only show institutions that can be selected by mentors/mentees)
+    # These would be institutions created by supervisors, not institution admins
+    institutions = Institution.query.all()  # For now, show all institutions
     
     return render_template(
         "supervisor/create_account.html",
@@ -2785,11 +2815,10 @@ def editinstitutionprofile_old():
 
     if request.method == "POST":
         try:
-            # Validate all mandatory fields
+            # Validate only editable mandatory fields
+            # Note: name and contact_email are read-only from signup_details, so they're not validated
             mandatory_fields = {
-                "name": request.form.get("name"),
                 "contact_person": request.form.get("contact_person"),
-                "contact_email": request.form.get("contact_email"),
                 "contact_phone": request.form.get("contact_phone"),
                 "address": request.form.get("address"),
                 "city": request.form.get("city"),
@@ -2818,19 +2847,15 @@ def editinstitutionprofile_old():
                 db.session.flush()
             
             # Update institution details from form
-            institution_details.name = request.form.get("name", user.institution)
+            # Note: name and contact_email are read-only from signup_details, so they're not updated
             institution_details.email_domain = request.form.get("email_domain", "")
             institution_details.contact_person = request.form.get("contact_person", "")
-            institution_details.contact_email = request.form.get("contact_email", "")
             institution_details.contact_phone = request.form.get("contact_phone", "")
             institution_details.address = request.form.get("address", "")
             institution_details.city = request.form.get("city", "")
             institution_details.state = request.form.get("state", "")
             institution_details.country = request.form.get("country", "")
             institution_details.website = request.form.get("website", "")
-            
-            # Sync institution name to user's institution field
-            user.institution = request.form.get("name", user.institution)
             
             # Safely set institution_type
             try:
@@ -2879,10 +2904,8 @@ def editinstitutionprofile_old():
     return render_template(
         "institution/editinstitutionprofile.html",
         show_sidebar=False,
-        user=user,
-        full_name=user.name,
-        email=user.email,
-        institution=user.institution,
+        name=user.name,  # Institution name from signup_details.name
+        email=user.email,  # Institution email from signup_details.email
         institution_details=institution_details
     )
 
@@ -5078,8 +5101,11 @@ def editmenteeprofile():
         profile.who_am_i = who_am_i
         profile.dob = request.form.get("dob")
         profile.mobile_number = request.form.get("mobile_number")
+        profile.mobile_country_code = request.form.get("mobile_country_code", "+91")
         profile.whatsapp_number = request.form.get("whatsapp_number")
+        profile.whatsapp_country_code = request.form.get("whatsapp_country_code", "+91")
         profile.parent_mobile = request.form.get("parent_mobile")
+        profile.parent_mobile_country_code = request.form.get("parent_mobile_country_code", "+91")
         profile.school_college_name = request.form.get("school_college_name")
         profile.stream = request.form.get("stream")
         profile.goal = request.form.get("goal")
@@ -5183,9 +5209,9 @@ def editmenteeprofile():
         institutions=institutions,
         dob=profile.dob if profile else "",
         mobile_number=profile.mobile_number if profile else "",
-        mobile_country_code="+91",
+        mobile_country_code=profile.mobile_country_code if profile and profile.mobile_country_code else "+91",
         whatsapp_number=profile.whatsapp_number if profile else "",
-        whatsapp_country_code="+91",
+        whatsapp_country_code=profile.whatsapp_country_code if profile and profile.whatsapp_country_code else "+91",
         who_am_i=profile.who_am_i if profile and profile.who_am_i else None,
         # General details
         father_name=profile.father_name if profile else "",
@@ -5199,7 +5225,7 @@ def editmenteeprofile():
         institution_other=profile.institution_other if profile else "",
         # New common fields
         parent_mobile=profile.parent_mobile if profile else "",
-        parent_mobile_country_code="+91",
+        parent_mobile_country_code=profile.parent_mobile_country_code if profile and profile.parent_mobile_country_code else "+91",
         school_college_name=profile.school_college_name if profile else "",
         stream=profile.stream if profile else "",
         goal=profile.goal if profile else "",
@@ -5470,12 +5496,12 @@ def menteeprofile():
             who_am_i=profile.who_am_i if profile else None,
             # Contact Info
             mobile_number=profile.mobile_number if profile else "",
-            mobile_country_code="+91",
+            mobile_country_code=profile.mobile_country_code if profile and profile.mobile_country_code else "+91",
             whatsapp_number=profile.whatsapp_number if profile else "",
-            whatsapp_country_code="+91",
+            whatsapp_country_code=profile.whatsapp_country_code if profile and profile.whatsapp_country_code else "+91",
             parent_name=profile.parent_name if profile else "",
             parent_mobile=profile.parent_mobile if profile else "",
-            parent_mobile_country_code="+91",
+            parent_mobile_country_code=profile.parent_mobile_country_code if profile and profile.parent_mobile_country_code else "+91",
             # Common fields for all categories
             school_college_name=profile.school_college_name if profile else "",
             stream=profile.stream if profile else "",
@@ -6108,8 +6134,8 @@ def institutionprofile():
     return render_template(
         "institution/institutionprofile.html",
         show_sidebar=False,
-        institution_name=institution.name or "",
-        email=institution.contact_email or user.email,
+        institution_name=user.name,  # Always from user.name (signup_details table)
+        email=user.email,    # Always from user.email (signup_details table)
         institution_type=institution.institution_type or "",
         email_domain=institution.email_domain or "",
         website=institution.website or "",
@@ -6118,113 +6144,11 @@ def institutionprofile():
         state=institution.state or "",
         country=institution.country or "",
         contact_person=institution.contact_person or "",
-        contact_email=institution.contact_email or "",
         contact_phone=institution.contact_phone or "",
         status=institution.status or "active",
-        profile_picture=institution.profile_picture or None
-    )
-
-@app.route("/editinstitutionprofile", methods=["GET", "POST"])
-def editinstitutionprofile():
-    """Edit institution profile"""
-    if "email" not in session or session.get("user_type") != "3":
-        return redirect(url_for("signin"))
-    
-    user = User.query.filter_by(email=session["email"]).first()
-    if not user:
-        return redirect(url_for("signin"))
-    
-    # Get or create institution profile
-    institution = Institution.query.filter_by(user_id=user.id).first()
-    
-    if request.method == "POST":
-        # Check if AJAX request
-        is_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest'
-        
-        # Create institution if not exists
-        if not institution:
-            institution = Institution(user_id=user.id)
-            db.session.add(institution)
-        
-        # Validate mandatory fields
-        mandatory_fields = {
-            "institution_type": request.form.get("institution_type"),
-            "city": request.form.get("city"),
-            "country": request.form.get("country"),
-            "contact_person": request.form.get("contact_person"),
-            "contact_email": request.form.get("contact_email"),
-            "contact_phone": request.form.get("contact_phone"),
-        }
-        
-        missing_fields = []
-        for field_name, field_value in mandatory_fields.items():
-            if not field_value or (isinstance(field_value, str) and not field_value.strip()):
-                missing_fields.append(field_name.replace("_", " ").title())
-        
-        if missing_fields:
-            error_msg = f"Please fill all mandatory fields: {', '.join(missing_fields)}"
-            if is_ajax:
-                return jsonify({"success": False, "message": error_msg}), 400
-            flash(error_msg, "error")
-            return redirect(url_for("editinstitutionprofile"))
-        
-        # Update institution fields
-        institution.institution_type = request.form.get("institution_type")
-        institution.email_domain = request.form.get("email_domain") or ""
-        institution.website = request.form.get("website") or ""
-        institution.address = request.form.get("address") or ""
-        institution.city = request.form.get("city")
-        institution.state = request.form.get("state") or ""
-        institution.country = request.form.get("country")
-        institution.contact_person = request.form.get("contact_person")
-        institution.contact_email = request.form.get("contact_email")
-        institution.contact_phone = request.form.get("contact_phone")
-        institution.status = request.form.get("status", "active")
-        
-        # Handle profile picture upload
-        file = request.files.get("profile_picture")
-        if file and allowed_file(file.filename):
-            filename = secure_filename(file.filename)
-            file.save(os.path.join(app.config["UPLOAD_FOLDER"], filename))
-            institution.profile_picture = filename
-        
-        try:
-            db.session.commit()
-            success_msg = "Institution profile updated successfully!"
-            if is_ajax:
-                return jsonify({
-                    "success": True,
-                    "message": success_msg,
-                    "redirect_url": url_for("institutionprofile")
-                })
-            flash(success_msg, "success")
-            return redirect(url_for("institutionprofile"))
-        except Exception as e:
-            db.session.rollback()
-            error_msg = f"Error updating profile: {str(e)}"
-            if is_ajax:
-                return jsonify({"success": False, "message": error_msg}), 500
-            flash(error_msg, "error")
-            return redirect(url_for("editinstitutionprofile"))
-    
-    # GET request - pre-fill form with existing data
-    return render_template(
-        "institution/editinstitutionprofile.html",
-        show_sidebar=False,
-        institution_name=institution.name if institution else user.name,
-        email=institution.contact_email if institution else user.email,
-        institution_type=institution.institution_type if institution else "",
-        email_domain=institution.email_domain if institution else "",
-        website=institution.website if institution else "",
-        address=institution.address if institution else "",
-        city=institution.city if institution else "",
-        state=institution.state if institution else "",
-        country=institution.country if institution else "",
-        contact_person=institution.contact_person if institution else "",
-        contact_email=institution.contact_email if institution else "",
-        contact_phone=institution.contact_phone if institution else "",
-        status=institution.status if institution else "active",
-        profile_picture=institution.profile_picture if institution else None
+        profile_picture=institution.profile_picture or None,
+        institution_details=institution,
+        full_name=user.name  # Institution name from signup
     )
 
 

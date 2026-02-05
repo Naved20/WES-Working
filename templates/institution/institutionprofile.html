@@ -4,6 +4,9 @@
 {% block user %}Institution{% endblock %}
 
 {% block content %}
+<!-- Back Button -->
+{% include 'components/back_button.html' with context %}
+
 <div class="container mx-auto px-4 py-8 max-w-7xl">
     <!-- Profile Header -->
     <div class="bg-white rounded-2xl shadow-lg p-6 mb-8 border border-gray-200">
@@ -22,7 +25,7 @@
                     <div class="absolute -bottom-2 -right-2 w-6 h-6 rounded-full bg-green-400 border-2 border-white"></div>
                 </div>
                 <div class="flex-1">
-                    <h1 class="text-3xl font-bold text-gray-900 mb-1">{{ institution_details.name if institution_details else institution }}</h1>
+                    <h1 class="text-3xl font-bold text-gray-900 mb-1">{{ institution_name }}</h1>
                     <div class="flex flex-wrap items-center space-x-4 mb-2">
                         <span class="flex items-center text-gray-600 text-sm bg-gray-100 px-3 py-1 rounded-full">
                             <i class="fas fa-user-shield mr-2"></i>
@@ -152,7 +155,7 @@
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-500">Institution</label>
-                            <span class="mt-1 block text-lg font-semibold text-gray-900">{{ institution }}</span>
+                            <span class="mt-1 block text-lg font-semibold text-gray-900">{{ institution_name }}</span>
                         </div>
                     </div>
                 </div>
@@ -173,9 +176,19 @@
                 {% if institution_details %}
                 <div class="space-y-5">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-                        <div class="p-4 rounded-xl bg-blue-50 border border-blue-100">
-                            <label class="block text-sm font-medium text-gray-500 mb-2">Institution Name</label>
-                            <span class="block text-lg font-semibold text-gray-900">{{ institution_details.name }}</span>
+                        <div class="p-4 rounded-xl bg-blue-50 border border-blue-100 relative">
+                            <label class="block text-sm font-medium text-gray-500 mb-2">
+                                Official Institution Name
+                                <span class="inline-flex items-center ml-2 px-2 py-1 text-xs bg-gray-100 text-gray-600 rounded-full">
+                                    <i class="fas fa-lock mr-1"></i>
+                                    Official
+                                </span>
+                            </label>
+                            <span class="block text-lg font-semibold text-gray-900 mb-2">{{ institution_name }}</span>
+                            <div class="text-xs text-gray-600 bg-white p-2 rounded border-l-2 border-blue-400">
+                                <i class="fas fa-info-circle text-blue-500 mr-1"></i>
+                                This is your official institution name as registered during account creation.
+                            </div>
                         </div>
                         
                         {% if institution_details.email_domain %}
@@ -195,12 +208,20 @@
                         </div>
                         {% endif %}
                         
-                        {% if institution_details.contact_email %}
-                        <div class="p-4 rounded-xl bg-blue-50 border border-blue-100">
-                            <label class="block text-sm font-medium text-gray-500 mb-2">Contact Email</label>
-                            <span class="block text-lg font-semibold text-gray-900">{{ institution_details.contact_email }}</span>
+                        <div class="p-4 rounded-xl bg-blue-50 border border-blue-100 relative">
+                            <label class="block text-sm font-medium text-gray-500 mb-2">
+                                Official Institution Email
+                                <span class="inline-flex items-center ml-2 px-2 py-1 text-xs bg-gray-100 text-gray-600 rounded-full">
+                                    <i class="fas fa-lock mr-1"></i>
+                                    Official
+                                </span>
+                            </label>
+                            <span class="block text-lg font-semibold text-gray-900 mb-2">{{ email }}</span>
+                            <div class="text-xs text-gray-600 bg-white p-2 rounded border-l-2 border-blue-400">
+                                <i class="fas fa-info-circle text-blue-500 mr-1"></i>
+                                This is your official institution email as registered during account creation.
+                            </div>
                         </div>
-                        {% endif %}
                     </div>
                     {% endif %}
                     
@@ -251,7 +272,7 @@
                         <i class="fas fa-info-circle text-gray-400 text-4xl"></i>
                     </div>
                     <h3 class="text-lg font-semibold text-gray-900 mb-2">No institution details available</h3>
-                    <p class="text-gray-500 max-w-sm mx-auto">Institution "{{ institution }}" not found in database. Please contact support for assistance.</p>
+                    <p class="text-gray-500 max-w-sm mx-auto">Institution "{{ institution_name }}" profile is incomplete. Please complete your profile.</p>
                 </div>
                 {% endif %}
             </div>

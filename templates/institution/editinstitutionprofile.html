@@ -4,6 +4,9 @@
 {% block user %}Institution{% endblock %}
 
 {% block content %}
+<!-- Back Button -->
+{% include 'components/back_button.html' with context %}
+
 <div class="edit-profile-container">
     <!-- Header Section -->
     <div class="edit-profile-header">
@@ -47,6 +50,26 @@
         {% endif %}
     {% endwith %}
 
+    <!-- Information Banner -->
+    <div class="info-banner">
+        <div class="info-banner-content">
+            <div class="info-banner-icon">
+                <i class="fas fa-info-circle"></i>
+            </div>
+            <div class="info-banner-text">
+                <h3>About Your Institution Profile</h3>
+                <p>
+                    Your <strong>Institution Name</strong> and <strong>Institution Email</strong> are official identifiers set during account creation and cannot be modified to maintain data integrity and security. 
+                    All other profile information can be updated as needed.
+                </p>
+                <p class="info-banner-note">
+                    <i class="fas fa-shield-alt"></i>
+                    If you need to change your official name or email, please contact your system administrator.
+                </p>
+            </div>
+        </div>
+    </div>
+
     <!-- Main Form -->
     <form id="institutionProfileForm" method="POST" enctype="multipart/form-data" class="edit-profile-form" onsubmit="return validateInstitutionForm()">
 
@@ -64,15 +87,28 @@
                 </div>
 
                 <div class="form-grid">
-                    <!-- Institution Name -->
+                    <!-- Institution Name (Display Only) -->
                     <div class="form-group full-width">
-                        <label for="name" class="form-label">
-                            Institution Name
-                            <span class="required">*</span>
+                        <label class="form-label">
+                            Official Institution Name
+                            <span class="readonly-indicator">🔒 Read-only</span>
                         </label>
-                        <input type="text" name="name" id="name" 
-                               value="{{ institution_details.name if institution_details and institution_details.name else institution }}" required
-                               class="form-input" placeholder="Enter your institution name">
+                        <div class="readonly-display-field">
+                            <div class="readonly-display-value">{{ name or 'Not Available' }}</div>
+                            <div class="readonly-display-icon">
+                                <i class="fas fa-lock"></i>
+                            </div>
+                        </div>
+                        <div class="form-hint readonly-hint">
+                            <i class="fas fa-info-circle"></i>
+                            <strong>Official Name:</strong> This is your institution's official name as registered during account signup. 
+                            This name appears on all official documents and cannot be changed to maintain data integrity.
+                            <br><small>If you need to change this name, please contact your system administrator.</small>
+                        </div>
+                        <!-- Debug info -->
+                        <div style="display: none;" id="debug-name">
+                            Debug info hidden
+                        </div>
                     </div>
 
                     <!-- Profile Picture -->
@@ -175,12 +211,24 @@
                                class="form-input" placeholder="Full name">
                     </div>
 
-                    <!-- Contact Email -->
+                    <!-- Contact Email (Display Only) -->
                     <div class="form-group">
-                        <label for="contact_email" class="form-label">Contact Email</label>
-                        <input type="email" name="contact_email" id="contact_email" 
-                               value="{{ institution_details.contact_email if institution_details and institution_details.contact_email else '' }}"
-                               class="form-input" placeholder="contact@institution.edu">
+                        <label class="form-label">
+                            Official Institution Email
+                            <span class="readonly-indicator">🔒 Read-only</span>
+                        </label>
+                        <div class="readonly-display-field">
+                            <div class="readonly-display-value">{{ email or 'Not Available' }}</div>
+                            <div class="readonly-display-icon">
+                                <i class="fas fa-lock"></i>
+                            </div>
+                        </div>
+                        <div class="form-hint readonly-hint">
+                            <i class="fas fa-info-circle"></i>
+                            <strong>Official Email:</strong> This is your institution's official email address as registered during account signup. 
+                            This email is used for all official communications and cannot be changed to maintain account security.
+                            <br><small>If you need to change this email, please contact your system administrator.</small>
+                        </div>
                     </div>
 
                     <!-- Contact Phone -->
@@ -247,22 +295,20 @@
 function validateInstitutionForm() {
     const form = document.getElementById('institutionProfileForm');
     const requiredFields = [
-        { name: 'name', label: 'Institution Name' },
         { name: 'contact_person', label: 'Contact Person' },
-        { name: 'contact_email', label: 'Contact Email' },
         { name: 'contact_phone', label: 'Contact Phone' },
-        { name: 'address', label: 'Address' },
         { name: 'city', label: 'City' },
-        { name: 'state', label: 'State' },
-        { name: 'country', label: 'Country' },
-        { name: 'website', label: 'Website' }
+        { name: 'country', label: 'Country' }
     ];
 
     let emptyFields = [];
 
     requiredFields.forEach(field => {
         const element = form.elements[field.name];
-        if (!element) return;
+        if (!element) {
+            console.log('Debug: Field not found:', field.name);
+            return;
+        }
 
         let isEmpty = false;
 
@@ -270,7 +316,11 @@ function validateInstitutionForm() {
             isEmpty = !element.value.trim();
         } else if (element.type === 'select-one') {
             isEmpty = !element.value || element.value === '';
+        } else if (element.tagName === 'TEXTAREA') {
+            isEmpty = !element.value.trim();
         }
+
+        console.log('Debug: Field', field.name, 'value:', element.value, 'isEmpty:', isEmpty);
 
         if (isEmpty) {
             emptyFields.push(field.label);
@@ -281,6 +331,18 @@ function validateInstitutionForm() {
             element.style.borderWidth = '';
         }
     });
+
+    // Check institution type (radio buttons)
+    const institutionTypeRadios = form.querySelectorAll('input[name="institution_type"]');
+    const institutionTypeSelected = Array.from(institutionTypeRadios).some(radio => radio.checked);
+    
+    console.log('Debug: Institution type selected:', institutionTypeSelected);
+    
+    if (!institutionTypeSelected) {
+        emptyFields.push('Institution Type');
+    }
+
+    console.log('Debug: Empty fields:', emptyFields);
 
     if (emptyFields.length > 0) {
         alert('❌ Please fill all mandatory fields:\n\n' + emptyFields.join('\n'));
@@ -626,6 +688,148 @@ function showNotification(message, type) {
 /* Utility Classes */
 .hidden {
     display: none;
+}
+
+/* Read-only field styles */
+.readonly-input {
+    background-color: #f8fafc !important;
+    color: #64748b !important;
+    cursor: not-allowed !important;
+    border-color: #e2e8f0 !important;
+}
+
+.readonly-input:focus {
+    box-shadow: none !important;
+    border-color: #e2e8f0 !important;
+}
+
+.readonly-indicator {
+    font-size: 0.8em;
+    color: #64748b;
+    font-weight: normal;
+    margin-left: 8px;
+}
+
+.readonly-hint {
+    background-color: #f1f5f9;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    padding: 12px;
+    margin-top: 8px;
+    color: #475569;
+    font-size: 0.9em;
+    line-height: 1.5;
+}
+
+.readonly-hint i {
+    color: #3b82f6;
+    margin-right: 6px;
+}
+
+.readonly-hint strong {
+    color: #1e293b;
+}
+
+.readonly-hint small {
+    color: #64748b;
+    font-style: italic;
+}
+
+/* Information Banner */
+.info-banner {
+    background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+    border: 1px solid #bfdbfe;
+    border-radius: var(--radius);
+    margin-bottom: 30px;
+    box-shadow: 0 2px 4px rgba(59, 130, 246, 0.1);
+}
+
+.info-banner-content {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    padding: 20px;
+}
+
+.info-banner-icon {
+    width: 40px;
+    height: 40px;
+    background: #3b82f6;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.2em;
+    flex-shrink: 0;
+}
+
+.info-banner-text {
+    flex: 1;
+}
+
+.info-banner-text h3 {
+    margin: 0 0 8px 0;
+    font-size: 1.1em;
+    color: #1e40af;
+    font-weight: 600;
+}
+
+.info-banner-text p {
+    margin: 0 0 8px 0;
+    color: #1e40af;
+    line-height: 1.5;
+    font-size: 0.95em;
+}
+
+.info-banner-text p:last-child {
+    margin-bottom: 0;
+}
+
+.info-banner-note {
+    background: rgba(255, 255, 255, 0.7);
+    padding: 8px 12px;
+    border-radius: 6px;
+    border-left: 3px solid #3b82f6;
+    font-size: 0.85em !important;
+    margin-top: 12px !important;
+}
+
+.info-banner-note i {
+    color: #3b82f6;
+    margin-right: 6px;
+}
+
+/* Readonly Display Fields */
+.readonly-display-field {
+    display: flex;
+    align-items: center;
+    background-color: #f8fafc;
+    border: 2px solid #e2e8f0;
+    border-radius: var(--radius-sm);
+    padding: 12px 16px;
+    min-height: 48px;
+}
+
+.readonly-display-value {
+    flex: 1;
+    font-size: 1em;
+    color: #1e293b;
+    font-weight: 500;
+}
+
+.readonly-display-icon {
+    flex-shrink: 0;
+    width: 24px;
+    height: 24px;
+    background: #e2e8f0;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #64748b;
+    font-size: 0.8em;
+    margin-left: 12px;
 }
 
 /* Responsive Design */
