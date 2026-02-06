@@ -97,9 +97,12 @@
         "goal": profile.goal or "",
         "dob": profile.dob or "",
         "mobileNumber": profile.mobile_number or "",
+        "mobileCountryCode": profile.mobile_country_code or "",
         "whatsappNumber": profile.whatsapp_number or "",
+        "whatsappCountryCode": profile.whatsapp_country_code or "",
         "parentName": profile.parent_name or "",
         "parentMobile": profile.parent_mobile or "",
+        "parentMobileCountryCode": profile.parent_mobile_country_code or "",
         "comments": profile.comments or "",
         "profilePic": profile.profile_picture or "",
         "classYear": profile.class_year or "",
@@ -901,10 +904,27 @@ function openMenteeProfileModal(mentee) {
 
     // Show Contact Information if any field has data (excluding DOB which moved to General Details)
     let hasContactInfo = false;
-    hasContactInfo |= showField('mobileSection', 'menteeModalMobile', mentee.mobileNumber);
-    hasContactInfo |= showField('whatsappSection', 'menteeModalWhatsapp', mentee.whatsappNumber);
+    
+    // Format mobile with country code
+    if (mentee.mobileNumber && mentee.mobileNumber !== "None") {
+      const mobileDisplay = mentee.mobileCountryCode ? mentee.mobileCountryCode + ' ' + mentee.mobileNumber : mentee.mobileNumber;
+      hasContactInfo |= showField('mobileSection', 'menteeModalMobile', mobileDisplay);
+    }
+    
+    // Format WhatsApp with country code
+    if (mentee.whatsappNumber && mentee.whatsappNumber !== "None") {
+      const whatsappDisplay = mentee.whatsappCountryCode ? mentee.whatsappCountryCode + ' ' + mentee.whatsappNumber : mentee.whatsappNumber;
+      hasContactInfo |= showField('whatsappSection', 'menteeModalWhatsapp', whatsappDisplay);
+    }
+    
     hasContactInfo |= showField('parentNameSection', 'menteeModalParentName', mentee.parentName);
-    hasContactInfo |= showField('parentMobileSection', 'menteeModalParentMobile', mentee.parentMobile);
+    
+    // Format parent mobile with country code
+    if (mentee.parentMobile && mentee.parentMobile !== "None") {
+      const parentMobileDisplay = mentee.parentMobileCountryCode ? mentee.parentMobileCountryCode + ' ' + mentee.parentMobile : mentee.parentMobile;
+      hasContactInfo |= showField('parentMobileSection', 'menteeModalParentMobile', parentMobileDisplay);
+    }
+    
     if (hasContactInfo) {
         document.getElementById('contactInfoSection').style.display = 'block';
     }

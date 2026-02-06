@@ -123,9 +123,12 @@
                 "goal": mentee.goal or "",
                 "dob": mentee.dob or "",
                 "mobileNumber": mentee.mobile_number or "",
+                "mobileCountryCode": mentee.mobile_country_code or "",
                 "whatsappNumber": mentee.whatsapp_number or "",
+                "whatsappCountryCode": mentee.whatsapp_country_code or "",
                 "parentName": mentee.parent_name or "",
                 "parentMobile": mentee.parent_mobile or "",
+                "parentMobileCountryCode": mentee.parent_mobile_country_code or "",
                 "comments": mentee.comments or "",
                 "profilePic": mentee.profile_picture or "",
                 "classYear": mentee.class_year or "",
@@ -685,11 +688,30 @@
     }
 
     let hasContactInfo = false;
-    hasContactInfo |= setField('mobileField', 'menteeModalMobile', mentee.mobileNumber);
-    hasContactInfo |= setField('whatsappField', 'menteeModalWhatsapp', mentee.whatsappNumber);
+    
+    // Format mobile with country code
+    if (mentee.mobileNumber && mentee.mobileNumber !== "None") {
+      const mobileDisplay = mentee.mobileCountryCode ? mentee.mobileCountryCode + ' ' + mentee.mobileNumber : mentee.mobileNumber;
+      setField('mobileField', 'menteeModalMobile', mobileDisplay);
+      hasContactInfo = true;
+    }
+    
+    // Format WhatsApp with country code
+    if (mentee.whatsappNumber && mentee.whatsappNumber !== "None") {
+      const whatsappDisplay = mentee.whatsappCountryCode ? mentee.whatsappCountryCode + ' ' + mentee.whatsappNumber : mentee.whatsappNumber;
+      setField('whatsappField', 'menteeModalWhatsapp', whatsappDisplay);
+      hasContactInfo = true;
+    }
+    
     hasContactInfo |= setField('fatherNameField', 'menteeModalFatherName', mentee.fatherName);
     hasContactInfo |= setField('parentNameField', 'menteeModalParentName', mentee.parentName);
-    hasContactInfo |= setField('parentMobileField', 'menteeModalParentMobile', mentee.parentMobile);
+    
+    // Format parent mobile with country code
+    if (mentee.parentMobile && mentee.parentMobile !== "None") {
+      const parentMobileDisplay = mentee.parentMobileCountryCode ? mentee.parentMobileCountryCode + ' ' + mentee.parentMobile : mentee.parentMobile;
+      setField('parentMobileField', 'menteeModalParentMobile', parentMobileDisplay);
+      hasContactInfo = true;
+    }
     
     // Build address
     let addressParts = [];

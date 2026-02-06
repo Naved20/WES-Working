@@ -67,6 +67,7 @@
               "whatsappCountryCode": mentee.mentee_profile.whatsapp_country_code if mentee.mentee_profile else "",
               "parentName": mentee.mentee_profile.parent_name if mentee.mentee_profile else "",
               "parentMobile": mentee.mentee_profile.parent_mobile if mentee.mentee_profile else "",
+              "parentMobileCountryCode": mentee.mentee_profile.parent_mobile_country_code if mentee.mentee_profile else "",
               "comments": mentee.mentee_profile.comments if mentee.mentee_profile else "",
               "profilePic": mentee.mentee_profile.profile_picture if mentee.mentee_profile else "",
               "classYear": mentee.mentee_profile.class_year if mentee.mentee_profile else "",
@@ -547,7 +548,13 @@
     }
     hasContactInfo |= setField('fatherNameField', 'menteeModalFatherName', mentee.fatherName);
     hasContactInfo |= setField('parentNameField', 'menteeModalParentName', mentee.parentName);
-    hasContactInfo |= setField('parentMobileField', 'menteeModalParentMobile', mentee.parentMobile);
+    
+    // Format parent mobile with country code
+    if (mentee.parentMobile && mentee.parentMobile !== "None") {
+      const parentMobileDisplay = mentee.parentMobileCountryCode ? mentee.parentMobileCountryCode + ' ' + mentee.parentMobile : mentee.parentMobile;
+      setField('parentMobileField', 'menteeModalParentMobile', parentMobileDisplay);
+      hasContactInfo = true;
+    }
     let addressParts = [];
     if (mentee.addressLine1 && mentee.addressLine1 !== "None") addressParts.push(mentee.addressLine1);
     if (mentee.addressLine2 && mentee.addressLine2 !== "None") addressParts.push(mentee.addressLine2);
