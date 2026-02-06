@@ -2798,7 +2798,7 @@ def institutionprofile_old():
 
 
 @app.route("/editinstitutionprofile", methods=["GET", "POST"])
-def editinstitutionprofile_old():
+def editinstitutionprofile():
     if "email" not in session or session.get("user_type") != "3":
         return redirect(url_for("signin"))
 
