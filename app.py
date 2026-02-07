@@ -935,11 +935,8 @@ def check_profile_complete(user_id, user_type):
             # Check if ALL mandatory fields are filled (including profile picture)
             # General Details mandatory fields
             has_all_required = all([
-                profile.father_name,
-                profile.address_line1,
                 profile.city,
                 profile.state,
-                profile.postal_code,
                 profile.country,
                 # Common mandatory fields
                 profile.mobile_number,
@@ -5049,7 +5046,7 @@ def editmenteeprofile():
         common_mandatory = ['mobile_number', 'whatsapp_number', 'mentorship_expectations', 'institution']
         
         # General details mandatory fields
-        general_details_mandatory = ['father_name', 'address_line1', 'city', 'state', 'postal_code', 'country']
+        general_details_mandatory = ['city', 'state', 'country', 'institution']
         
         # Validate common mandatory fields
         missing_fields = []
