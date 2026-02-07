@@ -323,7 +323,7 @@
           <div class="flex items-start">
             <svg class="w-4 h-4 text-blue-600 mr-2 mt-1 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
             <div>
-              <p class="font-medium text-gray-700">Parent Name</p>
+              <p class="font-medium text-gray-700">Emergency Mobile Number</p>
               <p id="menteeParentName" class="text-gray-600"></p>
             </div>
           </div>
@@ -649,6 +649,26 @@
 </div>
 
 <script>
+// Helper function to check if value exists and is not empty
+function hasValue(val) {
+  return val && val !== '' && val !== 'None' && val !== 'null' && val !== null && val !== undefined;
+}
+
+// Helper function to show/hide field container based on value
+function showFieldIfExists(fieldContainerId, value) {
+  const container = document.getElementById(fieldContainerId);
+  if (container) {
+    if (hasValue(value)) {
+      container.style.display = 'flex';
+      return true;
+    } else {
+      container.style.display = 'none';
+      return false;
+    }
+  }
+  return false;
+}
+
 // Mentee Profile Functions
 function openMenteeProfileModal(menteeData) {
   // Basic Information
@@ -656,98 +676,230 @@ function openMenteeProfileModal(menteeData) {
   document.getElementById('menteeEmail').textContent = menteeData.email || 'Not specified';
   document.getElementById('menteeWhoAmI').textContent = (menteeData.who_am_i || 'Not specified').charAt(0).toUpperCase() + (menteeData.who_am_i || 'Not specified').slice(1);
   
-  // Personal Information
-  document.getElementById('menteeDOB').textContent = menteeData.dob || 'Not specified';
-  document.getElementById('menteeFatherName').textContent = menteeData.father_name || 'Not specified';
-  document.getElementById('menteeMobile').innerHTML = menteeData.mobile_number ? 
-    `<span class="bg-slate-200 px-1.5 py-0.5 rounded text-xs text-slate-600 mr-2">${menteeData.mobile_country_code || '+91'}</span>${menteeData.mobile_number}` : 
-    'Not specified';
-  document.getElementById('menteeWhatsapp').innerHTML = menteeData.whatsapp_number ? 
-    `<span class="bg-slate-200 px-1.5 py-0.5 rounded text-xs text-slate-600 mr-2">${menteeData.whatsapp_country_code || '+91'}</span>${menteeData.whatsapp_number}` : 
-    'Not specified';
-  document.getElementById('menteeParentName').textContent = menteeData.parent_name || 'Not specified';
-  document.getElementById('menteeParentMobile').innerHTML = menteeData.parent_mobile ? 
-    `<span class="bg-slate-200 px-1.5 py-0.5 rounded text-xs text-slate-600 mr-2">${menteeData.parent_mobile_country_code || '+91'}</span>${menteeData.parent_mobile}` : 
-    'Not specified';
+  // Personal Information - hide fields that don't have data
+  if (hasValue(menteeData.dob)) {
+    document.getElementById('menteeDOB').textContent = menteeData.dob;
+    document.getElementById('menteeDOB').parentElement.parentElement.style.display = 'flex';
+  } else {
+    document.getElementById('menteeDOB').parentElement.parentElement.style.display = 'none';
+  }
   
-  // Address Information
-  document.getElementById('menteeAddress1').textContent = menteeData.address_line1 || 'Not specified';
-  document.getElementById('menteeAddress2').textContent = menteeData.address_line2 || 'Not specified';
-  document.getElementById('menteeCity').textContent = menteeData.city || 'Not specified';
-  document.getElementById('menteeState').textContent = menteeData.state || 'Not specified';
-  document.getElementById('menteePostalCode').textContent = menteeData.postal_code || 'Not specified';
-  document.getElementById('menteeCountry').textContent = menteeData.country || 'Not specified';
+  if (hasValue(menteeData.father_name)) {
+    document.getElementById('menteeFatherName').textContent = menteeData.father_name;
+    document.getElementById('menteeFatherName').parentElement.parentElement.style.display = 'flex';
+  } else {
+    document.getElementById('menteeFatherName').parentElement.parentElement.style.display = 'none';
+  }
   
-  // Academic Information
-  document.getElementById('menteeEducationLevel').textContent = menteeData.education_level || 'Not specified';
-  document.getElementById('menteeSchool').textContent = menteeData.school_college_name || 'Not specified';
-  document.getElementById('menteeStream').textContent = menteeData.stream || 'Not specified';
-  document.getElementById('menteeClass').textContent = menteeData.class_year || 'Not specified';
-  document.getElementById('menteeFavouriteSubject').textContent = menteeData.favourite_subject || 'Not specified';
+  if (hasValue(menteeData.mobile_number)) {
+    document.getElementById('menteeMobile').innerHTML = `<span class="bg-slate-200 px-1.5 py-0.5 rounded text-xs text-slate-600 mr-2">${menteeData.mobile_country_code || '+91'}</span>${menteeData.mobile_number}`;
+    document.getElementById('menteeMobile').parentElement.parentElement.style.display = 'flex';
+  } else {
+    document.getElementById('menteeMobile').parentElement.parentElement.style.display = 'none';
+  }
   
-  // Professional Information (show/hide section based on who_am_i)
+  if (hasValue(menteeData.whatsapp_number)) {
+    document.getElementById('menteeWhatsapp').innerHTML = `<span class="bg-slate-200 px-1.5 py-0.5 rounded text-xs text-slate-600 mr-2">${menteeData.whatsapp_country_code || '+91'}</span>${menteeData.whatsapp_number}`;
+    document.getElementById('menteeWhatsapp').parentElement.parentElement.style.display = 'flex';
+  } else {
+    document.getElementById('menteeWhatsapp').parentElement.parentElement.style.display = 'none';
+  }
+  
+  if (hasValue(menteeData.parent_name)) {
+    document.getElementById('menteeParentName').textContent = menteeData.parent_name;
+    document.getElementById('menteeParentName').parentElement.parentElement.style.display = 'flex';
+  } else {
+    document.getElementById('menteeParentName').parentElement.parentElement.style.display = 'none';
+  }
+  
+  if (hasValue(menteeData.parent_mobile)) {
+    document.getElementById('menteeParentMobile').innerHTML = `<span class="bg-slate-200 px-1.5 py-0.5 rounded text-xs text-slate-600 mr-2">${menteeData.parent_mobile_country_code || '+91'}</span>${menteeData.parent_mobile}`;
+    document.getElementById('menteeParentMobile').parentElement.parentElement.style.display = 'flex';
+  } else {
+    document.getElementById('menteeParentMobile').parentElement.parentElement.style.display = 'none';
+  }
+  
+  // Address Information - hide fields that don't have data
+  showFieldIfExists('menteeAddress1', menteeData.address_line1) ? document.getElementById('menteeAddress1').parentElement.parentElement.style.display = 'flex' : document.getElementById('menteeAddress1').parentElement.parentElement.style.display = 'none';
+  showFieldIfExists('menteeAddress2', menteeData.address_line2) ? document.getElementById('menteeAddress2').parentElement.parentElement.style.display = 'flex' : document.getElementById('menteeAddress2').parentElement.parentElement.style.display = 'none';
+  showFieldIfExists('menteeCity', menteeData.city) ? document.getElementById('menteeCity').parentElement.parentElement.style.display = 'flex' : document.getElementById('menteeCity').parentElement.parentElement.style.display = 'none';
+  showFieldIfExists('menteeState', menteeData.state) ? document.getElementById('menteeState').parentElement.parentElement.style.display = 'flex' : document.getElementById('menteeState').parentElement.parentElement.style.display = 'none';
+  showFieldIfExists('menteePostalCode', menteeData.postal_code) ? document.getElementById('menteePostalCode').parentElement.parentElement.style.display = 'flex' : document.getElementById('menteePostalCode').parentElement.parentElement.style.display = 'none';
+  showFieldIfExists('menteeCountry', menteeData.country) ? document.getElementById('menteeCountry').parentElement.parentElement.style.display = 'flex' : document.getElementById('menteeCountry').parentElement.parentElement.style.display = 'none';
+  
+  if (hasValue(menteeData.address_line1)) document.getElementById('menteeAddress1').textContent = menteeData.address_line1;
+  if (hasValue(menteeData.address_line2)) document.getElementById('menteeAddress2').textContent = menteeData.address_line2;
+  if (hasValue(menteeData.city)) document.getElementById('menteeCity').textContent = menteeData.city;
+  if (hasValue(menteeData.state)) document.getElementById('menteeState').textContent = menteeData.state;
+  if (hasValue(menteeData.postal_code)) document.getElementById('menteePostalCode').textContent = menteeData.postal_code;
+  if (hasValue(menteeData.country)) document.getElementById('menteeCountry').textContent = menteeData.country;
+  
+  // Academic Information - hide fields that don't have data
+  if (hasValue(menteeData.education_level)) {
+    document.getElementById('menteeEducationLevel').textContent = menteeData.education_level;
+    document.getElementById('menteeEducationLevel').parentElement.parentElement.style.display = 'flex';
+  } else {
+    document.getElementById('menteeEducationLevel').parentElement.parentElement.style.display = 'none';
+  }
+  
+  if (hasValue(menteeData.school_college_name)) {
+    document.getElementById('menteeSchool').textContent = menteeData.school_college_name;
+    document.getElementById('menteeSchool').parentElement.parentElement.style.display = 'flex';
+  } else {
+    document.getElementById('menteeSchool').parentElement.parentElement.style.display = 'none';
+  }
+  
+  if (hasValue(menteeData.stream)) {
+    document.getElementById('menteeStream').textContent = menteeData.stream;
+    document.getElementById('menteeStream').parentElement.parentElement.style.display = 'flex';
+  } else {
+    document.getElementById('menteeStream').parentElement.parentElement.style.display = 'none';
+  }
+  
+  if (hasValue(menteeData.class_year)) {
+    document.getElementById('menteeClass').textContent = menteeData.class_year;
+    document.getElementById('menteeClass').parentElement.parentElement.style.display = 'flex';
+  } else {
+    document.getElementById('menteeClass').parentElement.parentElement.style.display = 'none';
+  }
+  
+  if (hasValue(menteeData.favourite_subject)) {
+    document.getElementById('menteeFavouriteSubject').textContent = menteeData.favourite_subject;
+    document.getElementById('menteeFavouriteSubject').parentElement.parentElement.style.display = 'flex';
+  } else {
+    document.getElementById('menteeFavouriteSubject').parentElement.parentElement.style.display = 'none';
+  }
+  
+  // Professional Information (show/hide section based on data)
   const professionalSection = document.getElementById('professionalSection');
-  if (menteeData.who_am_i === 'young_professional' || menteeData.current_role) {
-    professionalSection.style.display = 'block';
-    document.getElementById('menteeCurrentRole').textContent = menteeData.current_role || 'Not specified';
-    document.getElementById('menteeIndustry').textContent = menteeData.industry || 'Not specified';
-    document.getElementById('menteeYearsExperience').textContent = menteeData.years_experience || 'Not specified';
-    document.getElementById('menteeCurrentOrganization').textContent = menteeData.current_organization || 'Not specified';
-    document.getElementById('menteeKeySkills').textContent = menteeData.key_skills || 'Not specified';
-  } else {
-    professionalSection.style.display = 'none';
+  let hasProfessionalData = false;
+  
+  if (hasValue(menteeData.current_role)) {
+    document.getElementById('menteeCurrentRole').textContent = menteeData.current_role;
+    hasProfessionalData = true;
+  }
+  if (hasValue(menteeData.industry)) {
+    document.getElementById('menteeIndustry').textContent = menteeData.industry;
+    hasProfessionalData = true;
+  }
+  if (hasValue(menteeData.years_experience)) {
+    document.getElementById('menteeYearsExperience').textContent = menteeData.years_experience;
+    hasProfessionalData = true;
+  }
+  if (hasValue(menteeData.current_organization)) {
+    document.getElementById('menteeCurrentOrganization').textContent = menteeData.current_organization;
+    hasProfessionalData = true;
+  }
+  if (hasValue(menteeData.key_skills)) {
+    document.getElementById('menteeKeySkills').textContent = menteeData.key_skills;
+    hasProfessionalData = true;
   }
   
-  // Startup Information (conditional)
+  professionalSection.style.display = hasProfessionalData ? 'block' : 'none';
+  
+  // Startup Information (conditional - only show if has data)
   const startupSection = document.getElementById('startupSection');
-  if (menteeData.startup_stage || menteeData.startup_name || menteeData.startup_industry) {
-    startupSection.style.display = 'block';
-    document.getElementById('menteeStartupStage').textContent = menteeData.startup_stage || 'Not specified';
-    document.getElementById('menteeStartupName').textContent = menteeData.startup_name || 'Not specified';
-    document.getElementById('menteeStartupIndustry').textContent = menteeData.startup_industry || 'Not specified';
-    document.getElementById('menteeTeamSize').textContent = menteeData.team_size || 'Not specified';
-    document.getElementById('menteeMainChallenge').textContent = menteeData.main_challenge || 'Not specified';
-  } else {
-    startupSection.style.display = 'none';
+  let hasStartupData = false;
+  
+  if (hasValue(menteeData.startup_stage)) {
+    document.getElementById('menteeStartupStage').textContent = menteeData.startup_stage;
+    hasStartupData = true;
+  }
+  if (hasValue(menteeData.startup_name)) {
+    document.getElementById('menteeStartupName').textContent = menteeData.startup_name;
+    hasStartupData = true;
+  }
+  if (hasValue(menteeData.startup_industry)) {
+    document.getElementById('menteeStartupIndustry').textContent = menteeData.startup_industry;
+    hasStartupData = true;
+  }
+  if (hasValue(menteeData.team_size)) {
+    document.getElementById('menteeTeamSize').textContent = menteeData.team_size;
+    hasStartupData = true;
+  }
+  if (hasValue(menteeData.main_challenge)) {
+    document.getElementById('menteeMainChallenge').textContent = menteeData.main_challenge;
+    hasStartupData = true;
   }
   
-  // Freelance Information (conditional)
+  startupSection.style.display = hasStartupData ? 'block' : 'none';
+  
+  // Freelance Information (conditional - only show if has data)
   const freelanceSection = document.getElementById('freelanceSection');
-  if (menteeData.freelance_skill || menteeData.freelance_experience || menteeData.freelance_platforms) {
-    freelanceSection.style.display = 'block';
-    document.getElementById('menteeFreelanceSkill').textContent = menteeData.freelance_skill || 'Not specified';
-    document.getElementById('menteeFreelanceExperience').textContent = menteeData.freelance_experience || 'Not specified';
-    document.getElementById('menteeFreelancePlatforms').textContent = menteeData.freelance_platforms || 'Not specified';
-    document.getElementById('menteeFreelanceChallenge').textContent = menteeData.freelance_challenge || 'Not specified';
-  } else {
-    freelanceSection.style.display = 'none';
+  let hasFreelanceData = false;
+  
+  if (hasValue(menteeData.freelance_skill)) {
+    document.getElementById('menteeFreelanceSkill').textContent = menteeData.freelance_skill;
+    hasFreelanceData = true;
+  }
+  if (hasValue(menteeData.freelance_experience)) {
+    document.getElementById('menteeFreelanceExperience').textContent = menteeData.freelance_experience;
+    hasFreelanceData = true;
+  }
+  if (hasValue(menteeData.freelance_platforms)) {
+    document.getElementById('menteeFreelancePlatforms').textContent = menteeData.freelance_platforms;
+    hasFreelanceData = true;
+  }
+  if (hasValue(menteeData.freelance_challenge)) {
+    document.getElementById('menteeFreelanceChallenge').textContent = menteeData.freelance_challenge;
+    hasFreelanceData = true;
   }
   
-  // Career Break Information (conditional)
+  freelanceSection.style.display = hasFreelanceData ? 'block' : 'none';
+  
+  // Career Break Information (conditional - only show if has data)
   const careerBreakSection = document.getElementById('careerBreakSection');
-  if (menteeData.last_role || menteeData.career_break_reason || menteeData.restart_field) {
-    careerBreakSection.style.display = 'block';
-    document.getElementById('menteeLastRole').textContent = menteeData.last_role || 'Not specified';
-    document.getElementById('menteeCareerBreakReason').textContent = menteeData.career_break_reason || 'Not specified';
-    document.getElementById('menteeRestartField').textContent = menteeData.restart_field || 'Not specified';
-    document.getElementById('menteeSupportExpected').textContent = menteeData.support_expected || 'Not specified';
-  } else {
-    careerBreakSection.style.display = 'none';
+  let hasCareerBreakData = false;
+  
+  if (hasValue(menteeData.last_role)) {
+    document.getElementById('menteeLastRole').textContent = menteeData.last_role;
+    hasCareerBreakData = true;
   }
+  if (hasValue(menteeData.career_break_reason)) {
+    document.getElementById('menteeCareerBreakReason').textContent = menteeData.career_break_reason;
+    hasCareerBreakData = true;
+  }
+  if (hasValue(menteeData.restart_field)) {
+    document.getElementById('menteeRestartField').textContent = menteeData.restart_field;
+    hasCareerBreakData = true;
+  }
+  if (hasValue(menteeData.support_expected)) {
+    document.getElementById('menteeSupportExpected').textContent = menteeData.support_expected;
+    hasCareerBreakData = true;
+  }
+  
+  careerBreakSection.style.display = hasCareerBreakData ? 'block' : 'none';
   
   // Goals & Aspirations
-  document.getElementById('menteeGoal').textContent = menteeData.goal || 'Not specified';
-  document.getElementById('menteeCareerInterest').textContent = menteeData.career_interest || 'Not specified';
+  if (hasValue(menteeData.goal)) {
+    document.getElementById('menteeGoal').textContent = menteeData.goal;
+  } else {
+    document.getElementById('menteeGoal').textContent = 'Not specified';
+  }
+  
+  if (hasValue(menteeData.career_interest)) {
+    document.getElementById('menteeCareerInterest').textContent = menteeData.career_interest;
+  } else {
+    document.getElementById('menteeCareerInterest').textContent = 'Not specified';
+  }
   
   // Mentorship Expectations
-  document.getElementById('menteeMentorshipExpectations').textContent = menteeData.mentorship_expectations || 'Not specified';
+  if (hasValue(menteeData.mentorship_expectations)) {
+    document.getElementById('menteeMentorshipExpectations').textContent = menteeData.mentorship_expectations;
+  } else {
+    document.getElementById('menteeMentorshipExpectations').textContent = 'Not specified';
+  }
   
   // Additional Comments
-  document.getElementById('menteeComments').textContent = menteeData.comments || 'Not specified';
+  if (hasValue(menteeData.comments)) {
+    document.getElementById('menteeComments').textContent = menteeData.comments;
+  } else {
+    document.getElementById('menteeComments').textContent = 'Not specified';
+  }
   
   // Profile Picture
   const profilePic = document.getElementById('menteeProfilePic');
-  if (menteeData.profile_picture) {
+  if (hasValue(menteeData.profile_picture)) {
     profilePic.src = '/static/uploads/' + menteeData.profile_picture;
   } else {
     profilePic.src = 'https://via.placeholder.com/128?text=' + encodeURIComponent((menteeData.name || '?').charAt(0));

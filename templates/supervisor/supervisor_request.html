@@ -373,282 +373,260 @@
 
 </main>
 
-<!-- Mentee Profile Modal -->
+<!-- Updated Mentee Profile Modal -->
 <div id="menteeProfileModal" class="fixed inset-0 hidden bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-  <div class="bg-white rounded-2xl shadow-xl w-full max-w-6xl max-h-[90vh] overflow-y-auto relative">
-    <!-- Close Button -->
-    <button onclick="closeMenteeProfileModal()" class="absolute top-5 right-5 text-gray-400 hover:text-gray-600 transition-colors duration-200 text-xl bg-white rounded-full p-1 shadow-sm z-10">✕</button>
+  <div class="bg-white rounded-xl shadow-xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
     
     <!-- Header -->
-    <div class="sticky top-0 bg-white z-10 px-8 pt-8 pb-4 border-b border-gray-100">
-      <h2 class="text-2xl font-bold text-gray-800 flex items-center">
-        <svg class="w-6 h-6 text-blue-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
-        Complete Mentee Profile
-      </h2>
+    <div class="sticky top-0 bg-white z-10 px-6 pt-6 pb-4 border-b border-gray-200">
+      <div class="flex justify-between items-center">
+        <h2 class="text-xl font-bold text-gray-800">Mentee Profile</h2>
+        <button onclick="closeMenteeProfileModal()" class="text-gray-400 hover:text-gray-600 transition">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
     </div>
-    
+
     <!-- Content -->
-    <div class="p-8">
-      <!-- Profile Picture + Basic Info -->
+    <div class="p-6">
+      <!-- Profile Header -->
       <div class="flex flex-col md:flex-row items-center gap-6 mb-8">
-        <img id="menteeProfilePic" src="" alt="Profile" class="w-32 h-32 rounded-full object-cover border-4 border-blue-50 shadow-sm">
+        <div class="relative">
+          <img id="menteeModalProfilePic" src="" alt="Profile Picture"
+            class="w-24 h-24 rounded-full object-cover border-4 border-blue-50">
+        </div>
         <div class="text-center md:text-left">
-          <h3 id="menteeName" class="text-3xl font-bold text-gray-800 mb-2"></h3>
-          <p id="menteeEmail" class="text-lg text-gray-600 mb-2"></p>
-          <div class="flex items-center justify-center md:justify-start gap-3 mt-3">
-            <span id="menteeWhoAmI" class="bg-blue-100 text-blue-800 text-sm px-4 py-2 rounded-full font-medium"></span>
-          </div>
-        </div>
-      </div>
-      
-      <!-- Personal Information -->
-      <div class="mb-8 p-6 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border border-blue-100">
-        <h4 class="font-semibold text-gray-800 flex items-center mb-4">
-          <svg class="w-5 h-5 text-blue-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
-          Personal Information
-        </h4>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div class="flex items-start">
-            <svg class="w-4 h-4 text-blue-600 mr-2 mt-1 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zM4 9h12v8H4V9z"></path></svg>
-            <div>
-              <p class="font-medium text-gray-700">Date of Birth</p>
-              <p id="menteeDOB" class="text-gray-600"></p>
-            </div>
-          </div>
-          <div class="flex items-start">
-            <svg class="w-4 h-4 text-blue-600 mr-2 mt-1 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-            <div>
-              <p class="font-medium text-gray-700">Father's Name</p>
-              <p id="menteeFatherName" class="text-gray-600"></p>
-            </div>
-          </div>
-          <div class="flex items-start">
-            <svg class="w-4 h-4 text-blue-600 mr-2 mt-1 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773c.346.766.868 1.611 1.498 2.24.63.63 1.474 1.152 2.24 1.498l.773-1.548a1 1 0 011.06-.54l4.435.74a1 1 0 01.836.986V17a2 2 0 01-2 2h-2.5A8.5 8.5 0 013.5 5.5H2z"></path></svg>
-            <div>
-              <p class="font-medium text-gray-700">Mobile</p>
-              <p id="menteeMobile" class="text-gray-600"></p>
-            </div>
-          </div>
-          <div class="flex items-start">
-            <svg class="w-4 h-4 text-blue-600 mr-2 mt-1 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773c.346.766.868 1.611 1.498 2.24.63.63 1.474 1.152 2.24 1.498l.773-1.548a1 1 0 011.06-.54l4.435.74a1 1 0 01.836.986V17a2 2 0 01-2 2h-2.5A8.5 8.5 0 013.5 5.5H2z"></path></svg>
-            <div>
-              <p class="font-medium text-gray-700">WhatsApp</p>
-              <p id="menteeWhatsapp" class="text-gray-600"></p>
-            </div>
-          </div>
-          <div class="flex items-start">
-            <svg class="w-4 h-4 text-blue-600 mr-2 mt-1 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-            <div>
-              <p class="font-medium text-gray-700">Parent Name</p>
-              <p id="menteeParentName" class="text-gray-600"></p>
-            </div>
-          </div>
-          <div class="flex items-start">
-            <svg class="w-4 h-4 text-blue-600 mr-2 mt-1 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773c.346.766.868 1.611 1.498 2.24.63.63 1.474 1.152 2.24 1.498l.773-1.548a1 1 0 011.06-.54l4.435.74a1 1 0 01.836.986V17a2 2 0 01-2 2h-2.5A8.5 8.5 0 013.5 5.5H2z"></path></svg>
-            <div>
-              <p class="font-medium text-gray-700">Parent Mobile</p>
-              <p id="menteeParentMobile" class="text-gray-600"></p>
-            </div>
+          <h3 id="menteeModalName" class="text-2xl font-bold text-gray-800 mb-1"></h3>
+          <p id="menteeModalEmail" class="text-sm text-gray-600 mb-3"></p>
+          <div class="flex flex-wrap gap-2 justify-center md:justify-start">
+            <span id="menteeModalStream" class="bg-blue-100 text-blue-800 text-sm px-3 py-1 rounded-full"></span>
+            <span id="menteeModalGoal" class="bg-green-100 text-green-800 text-sm px-3 py-1 rounded-full"></span>
+            <span id="menteeModalWhoAmI" class="bg-purple-100 text-purple-800 text-sm px-3 py-1 rounded-full capitalize"></span>
           </div>
         </div>
       </div>
 
-      <!-- Address Information -->
-      <div class="mb-8 p-6 bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg border border-green-100">
-        <h4 class="font-semibold text-gray-800 flex items-center mb-4">
-          <svg class="w-5 h-5 text-green-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
-          Address Information
-        </h4>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div class="flex items-start">
-            <svg class="w-4 h-4 text-green-600 mr-2 mt-1 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"></path></svg>
-            <div>
-              <p class="font-medium text-gray-700">Address Line 1</p>
-              <p id="menteeAddress1" class="text-gray-600"></p>
+      <!-- Dynamic Sections (Show only if data exists) -->
+      <div class="space-y-6">
+        <!-- Section 1: Personal Information -->
+        <div id="personalInfoSection" class="bg-gray-50 p-4 rounded-lg" style="display: none;">
+          <h4 class="font-semibold text-gray-800 mb-4 flex items-center">
+            <svg class="w-5 h-5 text-blue-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+            </svg>
+            Personal Information
+          </h4>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div id="dobField" style="display: none;">
+              <p class="text-sm font-medium text-gray-600">Date of Birth</p>
+              <p id="menteeModalDOB" class="text-gray-800"></p>
+            </div>
+            <div id="fatherNameField" style="display: none;">
+              <p class="text-sm font-medium text-gray-600">Father's Name</p>
+              <p id="menteeModalFatherName" class="text-gray-800"></p>
+            </div>
+            <div id="mobileField" style="display: none;">
+              <p class="text-sm font-medium text-gray-600">Mobile Number</p>
+              <p id="menteeModalMobile" class="text-gray-800"></p>
+            </div>
+            <div id="whatsappField" style="display: none;">
+              <p class="text-sm font-medium text-gray-600">WhatsApp Number</p>
+              <p id="menteeModalWhatsapp" class="text-gray-800"></p>
+            </div>
+            <div id="parentNameField" style="display: none;">
+              <p class="text-sm font-medium text-gray-600">Emergency Mobile Number</p>
+              <p id="menteeModalParentName" class="text-gray-800"></p>
+            </div>
+            <div id="parentMobileField" style="display: none;">
+              <p class="text-sm font-medium text-gray-600">Emergency Mobile Number</p>
+              <p id="menteeModalParentMobile" class="text-gray-800"></p>
             </div>
           </div>
-          <div class="flex items-start">
-            <svg class="w-4 h-4 text-green-600 mr-2 mt-1 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"></path></svg>
-            <div>
-              <p class="font-medium text-gray-700">Address Line 2</p>
-              <p id="menteeAddress2" class="text-gray-600"></p>
+        </div>
+
+        <!-- Section 2: Address Information -->
+        <div id="addressSection" class="bg-gray-50 p-4 rounded-lg" style="display: none;">
+          <h4 class="font-semibold text-gray-800 mb-4 flex items-center">
+            <svg class="w-5 h-5 text-green-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+            </svg>
+            Address Information
+          </h4>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div id="addressLine1Field" style="display: none;">
+              <p class="text-sm font-medium text-gray-600">Address Line 1</p>
+              <p id="menteeModalAddressLine1" class="text-gray-800"></p>
+            </div>
+            <div id="addressLine2Field" style="display: none;">
+              <p class="text-sm font-medium text-gray-600">Address Line 2</p>
+              <p id="menteeModalAddressLine2" class="text-gray-800"></p>
+            </div>
+            <div id="cityField" style="display: none;">
+              <p class="text-sm font-medium text-gray-600">City</p>
+              <p id="menteeModalCity" class="text-gray-800"></p>
+            </div>
+            <div id="stateField" style="display: none;">
+              <p class="text-sm font-medium text-gray-600">State</p>
+              <p id="menteeModalState" class="text-gray-800"></p>
+            </div>
+            <div id="postalCodeField" style="display: none;">
+              <p class="text-sm font-medium text-gray-600">Postal Code</p>
+              <p id="menteeModalPostalCode" class="text-gray-800"></p>
+            </div>
+            <div id="countryField" style="display: none;">
+              <p class="text-sm font-medium text-gray-600">Country</p>
+              <p id="menteeModalCountry" class="text-gray-800"></p>
             </div>
           </div>
-          <div class="flex items-start">
-            <svg class="w-4 h-4 text-green-600 mr-2 mt-1 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"></path></svg>
-            <div>
-              <p class="font-medium text-gray-700">City</p>
-              <p id="menteeCity" class="text-gray-600"></p>
+        </div>
+
+        <!-- Section 3: Educational Information -->
+        <div id="educationSection" class="bg-gray-50 p-4 rounded-lg" style="display: none;">
+          <h4 class="font-semibold text-gray-800 mb-4 flex items-center">
+            <svg class="w-5 h-5 text-purple-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5z" />
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5zm0 0v6" />
+            </svg>
+            Educational Information
+          </h4>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div id="educationLevelField" style="display: none;">
+              <p class="text-sm font-medium text-gray-600">Education Level</p>
+              <p id="menteeModalEducationLevel" class="text-gray-800"></p>
+            </div>
+            <div id="schoolCollegeField" style="display: none;">
+              <p class="text-sm font-medium text-gray-600">School/College</p>
+              <p id="menteeModalSchoolCollege" class="text-gray-800"></p>
+            </div>
+            <div id="classYearField" style="display: none;">
+              <p class="text-sm font-medium text-gray-600">Class/Year</p>
+              <p id="menteeModalClassYear" class="text-gray-800"></p>
+            </div>
+            <div id="govtPrivateField" style="display: none;">
+              <p class="text-sm font-medium text-gray-600">Institution Type</p>
+              <p id="menteeModalGovtPrivate" class="text-gray-800"></p>
+            </div>
+            <div id="favouriteSubjectField" style="display: none;">
+              <p class="text-sm font-medium text-gray-600">Favourite Subject</p>
+              <p id="menteeModalFavouriteSubject" class="text-gray-800"></p>
             </div>
           </div>
-          <div class="flex items-start">
-            <svg class="w-4 h-4 text-green-600 mr-2 mt-1 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"></path></svg>
-            <div>
-              <p class="font-medium text-gray-700">State</p>
-              <p id="menteeState" class="text-gray-600"></p>
+        </div>
+
+        <!-- Section 4: University Details (if applicable) -->
+        <div id="universitySection" class="bg-gray-50 p-4 rounded-lg" style="display: none;">
+          <h4 class="font-semibold text-gray-800 mb-4 flex items-center">
+            <svg class="w-5 h-5 text-indigo-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4" />
+            </svg>
+            University Details
+          </h4>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div id="institutionNameField" style="display: none;">
+              <p class="text-sm font-medium text-gray-600">Institution Name</p>
+              <p id="menteeModalInstitutionName" class="text-gray-800"></p>
+            </div>
+            <div id="boardUniversityField" style="display: none;">
+              <p class="text-sm font-medium text-gray-600">University/Board</p>
+              <p id="menteeModalBoardUniversity" class="text-gray-800"></p>
+            </div>
+            <div id="courseStreamField" style="display: none;">
+              <p class="text-sm font-medium text-gray-600">Course/Stream</p>
+              <p id="menteeModalCourseStream" class="text-gray-800"></p>
             </div>
           </div>
-          <div class="flex items-start">
-            <svg class="w-4 h-4 text-green-600 mr-2 mt-1 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"></path></svg>
-            <div>
-              <p class="font-medium text-gray-700">Postal Code</p>
-              <p id="menteePostalCode" class="text-gray-600"></p>
+        </div>
+
+        <!-- Section 5: Professional Information (for professionals) -->
+        <div id="professionalSection" class="bg-gray-50 p-4 rounded-lg" style="display: none;">
+          <h4 class="font-semibold text-gray-800 mb-4 flex items-center">
+            <svg class="w-5 h-5 text-orange-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2-2v2m8 0V6a2 2 0 012 2v6a2 2 0 01-2 2H8a2 2 0 01-2-2V8a2 2 0 012-2V6" />
+            </svg>
+            Professional Information
+          </h4>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div id="currentRoleField" style="display: none;">
+              <p class="text-sm font-medium text-gray-600">Current Role</p>
+              <p id="menteeModalCurrentRole" class="text-gray-800"></p>
+            </div>
+            <div id="industryField" style="display: none;">
+              <p class="text-sm font-medium text-gray-600">Industry</p>
+              <p id="menteeModalIndustry" class="text-gray-800"></p>
+            </div>
+            <div id="yearsExperienceField" style="display: none;">
+              <p class="text-sm font-medium text-gray-600">Years of Experience</p>
+              <p id="menteeModalYearsExperience" class="text-gray-800"></p>
+            </div>
+            <div id="currentOrganizationField" style="display: none;">
+              <p class="text-sm font-medium text-gray-600">Current Organization</p>
+              <p id="menteeModalCurrentOrganization" class="text-gray-800"></p>
+            </div>
+            <div id="keySkillsField" style="display: none;">
+              <p class="text-sm font-medium text-gray-600">Key Skills</p>
+              <p id="menteeModalKeySkills" class="text-gray-800"></p>
             </div>
           </div>
-          <div class="flex items-start">
-            <svg class="w-4 h-4 text-green-600 mr-2 mt-1 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"></path></svg>
-            <div>
-              <p class="font-medium text-gray-700">Country</p>
-              <p id="menteeCountry" class="text-gray-600"></p>
+        </div>
+
+        <!-- Section 6: Career Information -->
+        <div id="careerSection" class="bg-gray-50 p-4 rounded-lg" style="display: none;">
+          <h4 class="font-semibold text-gray-800 mb-4 flex items-center">
+            <svg class="w-5 h-5 text-amber-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+            </svg>
+            Career Information
+          </h4>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div id="careerGoalField" style="display: none;">
+              <p class="text-sm font-medium text-gray-600">Career Goal</p>
+              <p id="menteeModalCareerGoal" class="text-gray-800"></p>
             </div>
+            <div id="careerInterestField" style="display: none;">
+              <p class="text-sm font-medium text-gray-600">Career Interest</p>
+              <p id="menteeModalCareerInterest" class="text-gray-800"></p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section 7: Mentorship Expectations -->
+        <div id="expectationsSection" class="bg-gray-50 p-4 rounded-lg" style="display: none;">
+          <h4 class="font-semibold text-gray-800 mb-4 flex items-center">
+            <svg class="w-5 h-5 text-pink-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            Mentorship Expectations
+          </h4>
+          <div class="bg-white p-4 rounded border border-gray-200">
+            <p id="menteeModalExpectations" class="text-gray-800"></p>
+          </div>
+        </div>
+
+        <!-- Section 8: Comments -->
+        <div id="commentsSection" class="bg-gray-50 p-4 rounded-lg" style="display: none;">
+          <h4 class="font-semibold text-gray-800 mb-4 flex items-center">
+            <svg class="w-5 h-5 text-gray-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
+            </svg>
+            Additional Comments
+          </h4>
+          <div class="bg-white p-4 rounded border border-gray-200">
+            <p id="menteeModalComments" class="text-gray-800"></p>
           </div>
         </div>
       </div>
 
-      <!-- Academic Information -->
-      <div id="academicSection" class="mb-8 p-6 bg-gradient-to-r from-purple-50 to-pink-50 rounded-lg border border-purple-100">
-        <h4 class="font-semibold text-gray-800 flex items-center mb-4">
-          <svg class="w-5 h-5 text-purple-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
-          Academic Information
-        </h4>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div class="flex items-start">
-            <svg class="w-4 h-4 text-purple-600 mr-2 mt-1 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path d="M10.394 2.08a1 1 0 00-.788 0l-7 3a1 1 0 000 1.84L5.25 8.051a.999.999 0 01.356-.257l4-1.714a1 1 0 11.788 1.838L7.667 9.088l1.94.831a1 1 0 00.787 0l7-3a1 1 0 000-1.838l-7-3zM3.31 9.397L5 10.12v4.102a8.969 8.969 0 00-1.05-.174 1 1 0 01-.89-.89 11.115 11.115 0 01.25-3.762zM9.3 16.573A9.026 9.026 0 007 14.935v-3.957l1.818.78a3 3 0 002.364 0l5.508-2.361a11.026 11.026 0 01.25 3.762 1 1 0 01-.89.89 8.968 8.968 0 00-5.35 2.524 1 1 0 01-1.4 0zM6 18a1 1 0 001-1v-2.065a8.935 8.935 0 00-2-.712V17a1 1 0 001 1z"></path></svg>
-            <div>
-              <p class="font-medium text-gray-700">Education Level</p>
-              <p id="menteeEducationLevel" class="text-gray-600"></p>
-            </div>
-          </div>
-          <div class="flex items-start">
-            <svg class="w-4 h-4 text-purple-600 mr-2 mt-1 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path d="M10.394 2.08a1 1 0 00-.788 0l-7 3a1 1 0 000 1.84L5.25 8.051a.999.999 0 01.356-.257l4-1.714a1 1 0 11.788 1.838L7.667 9.088l1.94.831a1 1 0 00.787 0l7-3a1 1 0 000-1.838l-7-3zM3.31 9.397L5 10.12v4.102a8.969 8.969 0 00-1.05-.174 1 1 0 01-.89-.89 11.115 11.115 0 01.25-3.762zM9.3 16.573A9.026 9.026 0 007 14.935v-3.957l1.818.78a3 3 0 002.364 0l5.508-2.361a11.026 11.026 0 01.25 3.762 1 1 0 01-.89.89 8.968 8.968 0 00-5.35 2.524 1 1 0 01-1.4 0zM6 18a1 1 0 001-1v-2.065a8.935 8.935 0 00-2-.712V17a1 1 0 001 1z"></path></svg>
-            <div>
-              <p class="font-medium text-gray-700">School/College</p>
-              <p id="menteeSchool" class="text-gray-600"></p>
-            </div>
-          </div>
-          <div class="flex items-start">
-            <svg class="w-4 h-4 text-purple-600 mr-2 mt-1 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path d="M10.394 2.08a1 1 0 00-.788 0l-7 3a1 1 0 000 1.84L5.25 8.051a.999.999 0 01.356-.257l4-1.714a1 1 0 11.788 1.838L7.667 9.088l1.94.831a1 1 0 00.787 0l7-3a1 1 0 000-1.838l-7-3zM3.31 9.397L5 10.12v4.102a8.969 8.969 0 00-1.05-.174 1 1 0 01-.89-.89 11.115 11.115 0 01.25-3.762zM9.3 16.573A9.026 9.026 0 007 14.935v-3.957l1.818.78a3 3 0 002.364 0l5.508-2.361a11.026 11.026 0 01.25 3.762 1 1 0 01-.89.89 8.968 8.968 0 00-5.35 2.524 1 1 0 01-1.4 0zM6 18a1 1 0 001-1v-2.065a8.935 8.935 0 00-2-.712V17a1 1 0 001 1z"></path></svg>
-            <div>
-              <p class="font-medium text-gray-700">Stream</p>
-              <p id="menteeStream" class="text-gray-600"></p>
-            </div>
-          </div>
-          <div class="flex items-start">
-            <svg class="w-4 h-4 text-purple-600 mr-2 mt-1 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zM4 9h12v8H4V9z"></path></svg>
-            <div>
-              <p class="font-medium text-gray-700">Class/Year</p>
-              <p id="menteeClass" class="text-gray-600"></p>
-            </div>
-          </div>
-          <div class="flex items-start">
-            <svg class="w-4 h-4 text-purple-600 mr-2 mt-1 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-            <div>
-              <p class="font-medium text-gray-700">Favourite Subject</p>
-              <p id="menteeFavouriteSubject" class="text-gray-600"></p>
-            </div>
-          </div>
-          <div class="flex items-start">
-            <svg class="w-4 h-4 text-purple-600 mr-2 mt-1 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path d="M4 4a2 2 0 00-2 2v4a2 2 0 002 2V6h10a2 2 0 00-2-2H4zm2 6a2 2 0 012-2h8a2 2 0 012 2v4a2 2 0 01-2 2H8a2 2 0 01-2-2v-4zm6 4a2 2 0 100-4 2 2 0 000 4z"></path></svg>
-            <div>
-              <p class="font-medium text-gray-700">Govt/Private</p>
-              <p id="menteeGovtPrivate" class="text-gray-600"></p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Professional Information (for professionals) -->
-      <div id="professionalSection" class="mb-8 p-6 bg-gradient-to-r from-orange-50 to-red-50 rounded-lg border border-orange-100" style="display: none;">
-        <h4 class="font-semibold text-gray-800 flex items-center mb-4">
-          <svg class="w-5 h-5 text-orange-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2-2v2m8 0V6a2 2 0 012 2v6a2 2 0 01-2 2H8a2 2 0 01-2-2V8a2 2 0 012-2V6"></path></svg>
-          Professional Information
-        </h4>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div class="flex items-start">
-            <svg class="w-4 h-4 text-orange-600 mr-2 mt-1 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3z"></path></svg>
-            <div>
-              <p class="font-medium text-gray-700">Current Role</p>
-              <p id="menteeCurrentRole" class="text-gray-600"></p>
-            </div>
-          </div>
-          <div class="flex items-start">
-            <svg class="w-4 h-4 text-orange-600 mr-2 mt-1 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path d="M4 4a2 2 0 00-2 2v4a2 2 0 002 2V6h10a2 2 0 00-2-2H4zm2 6a2 2 0 012-2h8a2 2 0 012 2v4a2 2 0 01-2 2H8a2 2 0 01-2-2v-4zm6 4a2 2 0 100-4 2 2 0 000 4z"></path></svg>
-            <div>
-              <p class="font-medium text-gray-700">Industry</p>
-              <p id="menteeIndustry" class="text-gray-600"></p>
-            </div>
-          </div>
-          <div class="flex items-start">
-            <svg class="w-4 h-4 text-orange-600 mr-2 mt-1 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zM4 9h12v8H4V9z"></path></svg>
-            <div>
-              <p class="font-medium text-gray-700">Years Experience</p>
-              <p id="menteeYearsExperience" class="text-gray-600"></p>
-            </div>
-          </div>
-          <div class="flex items-start">
-            <svg class="w-4 h-4 text-orange-600 mr-2 mt-1 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path d="M4 4a2 2 0 00-2 2v4a2 2 0 002 2V6h10a2 2 0 00-2-2H4zm2 6a2 2 0 012-2h8a2 2 0 012 2v4a2 2 0 01-2 2H8a2 2 0 01-2-2v-4zm6 4a2 2 0 100-4 2 2 0 000 4z"></path></svg>
-            <div>
-              <p class="font-medium text-gray-700">Current Organization</p>
-              <p id="menteeCurrentOrganization" class="text-gray-600"></p>
-            </div>
-          </div>
-          <div class="flex items-start col-span-2">
-            <svg class="w-4 h-4 text-orange-600 mr-2 mt-1 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3z"></path></svg>
-            <div>
-              <p class="font-medium text-gray-700">Key Skills</p>
-              <p id="menteeKeySkills" class="text-gray-600"></p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Goals & Aspirations -->
-      <div class="mb-8">
-        <h4 class="font-semibold text-gray-800 flex items-center mb-4">
-          <svg class="w-5 h-5 text-indigo-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-          Goals & Aspirations
-        </h4>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div class="bg-gray-50 p-5 rounded-lg border border-gray-100">
-            <p class="font-medium text-gray-700 mb-2">Career Goal</p>
-            <p id="menteeGoal" class="text-gray-600"></p>
-          </div>
-          <div class="bg-gray-50 p-5 rounded-lg border border-gray-100">
-            <p class="font-medium text-gray-700 mb-2">Career Interest</p>
-            <p id="menteeCareerInterest" class="text-gray-600"></p>
-          </div>
-        </div>
-      </div>
-
-      <!-- Mentorship Expectations -->
-      <div class="mb-8">
-        <h4 class="font-semibold text-gray-800 flex items-center mb-4">
-          <svg class="w-5 h-5 text-teal-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path></svg>
-          Mentorship Expectations
-        </h4>
-        <div class="bg-gray-50 p-5 rounded-lg border border-gray-100">
-          <p id="menteeMentorshipExpectations" class="text-gray-600"></p>
-        </div>
-      </div>
-
-      <!-- Additional Comments -->
-      <div class="mb-8">
-        <h4 class="font-semibold text-gray-800 flex items-center mb-4">
-          <svg class="w-5 h-5 text-gray-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"></path></svg>
-          Additional Comments
-        </h4>
-        <div class="bg-gray-50 p-5 rounded-lg border border-gray-100">
-          <p id="menteeComments" class="text-gray-600"></p>
-        </div>
-      </div>
-      
-      <!-- Footer Buttons -->
-      <div class="flex flex-col sm:flex-row justify-end gap-3 pt-4 border-t border-gray-100">
+      <!-- Footer -->
+      <div class="mt-8 pt-6 border-t border-gray-200 flex justify-end">
         <button onclick="closeMenteeProfileModal()" class="px-5 py-2.5 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors duration-200 font-medium">Close</button>
       </div>
     </div>
   </div>
 </div>
+
 
 <!-- Mentor Profile Modal -->
 <div id="mentorProfileModal" class="fixed inset-0 hidden bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
@@ -910,75 +888,196 @@
 
 <script>
 // Mentee Profile Functions
-function openMenteeProfileModal(menteeData) {
-  // Basic Information
-  document.getElementById('menteeName').textContent = menteeData.name || 'Not specified';
-  document.getElementById('menteeEmail').textContent = menteeData.email || 'Not specified';
-  document.getElementById('menteeWhoAmI').textContent = (menteeData.who_am_i || 'Not specified').charAt(0).toUpperCase() + (menteeData.who_am_i || 'Not specified').slice(1);
-  
-  // Personal Information
-  document.getElementById('menteeDOB').textContent = menteeData.dob || 'Not specified';
-  document.getElementById('menteeFatherName').textContent = menteeData.father_name || 'Not specified';
-  document.getElementById('menteeMobile').innerHTML = menteeData.mobile_number ? 
-    `<span class="bg-slate-200 px-1.5 py-0.5 rounded text-xs text-slate-600 mr-2">${menteeData.mobile_country_code || '+91'}</span>${menteeData.mobile_number}` : 
-    'Not specified';
-  document.getElementById('menteeWhatsapp').innerHTML = menteeData.whatsapp_number ? 
-    `<span class="bg-slate-200 px-1.5 py-0.5 rounded text-xs text-slate-600 mr-2">${menteeData.whatsapp_country_code || '+91'}</span>${menteeData.whatsapp_number}` : 
-    'Not specified';
-  document.getElementById('menteeParentName').textContent = menteeData.parent_name || 'Not specified';
-  document.getElementById('menteeParentMobile').innerHTML = menteeData.parent_mobile ? 
-    `<span class="bg-slate-200 px-1.5 py-0.5 rounded text-xs text-slate-600 mr-2">${menteeData.parent_mobile_country_code || '+91'}</span>${menteeData.parent_mobile}` : 
-    'Not specified';
-  
-  // Address Information
-  document.getElementById('menteeAddress1').textContent = menteeData.address_line1 || 'Not specified';
-  document.getElementById('menteeAddress2').textContent = menteeData.address_line2 || 'Not specified';
-  document.getElementById('menteeCity').textContent = menteeData.city || 'Not specified';
-  document.getElementById('menteeState').textContent = menteeData.state || 'Not specified';
-  document.getElementById('menteePostalCode').textContent = menteeData.postal_code || 'Not specified';
-  document.getElementById('menteeCountry').textContent = menteeData.country || 'Not specified';
-  
-  // Academic Information
-  document.getElementById('menteeEducationLevel').textContent = menteeData.education_level || 'Not specified';
-  document.getElementById('menteeSchool').textContent = menteeData.school_college_name || 'Not specified';
-  document.getElementById('menteeStream').textContent = menteeData.stream || 'Not specified';
-  document.getElementById('menteeClass').textContent = menteeData.class_year || 'Not specified';
-  document.getElementById('menteeFavouriteSubject').textContent = menteeData.favourite_subject || 'Not specified';
-  document.getElementById('menteeGovtPrivate').textContent = menteeData.govt_private || 'Not specified';
-  
-  // Professional Information (show/hide section based on who_am_i)
-  const professionalSection = document.getElementById('professionalSection');
-  if (menteeData.who_am_i === 'professional') {
-    professionalSection.style.display = 'block';
-    document.getElementById('menteeCurrentRole').textContent = menteeData.current_role || 'Not specified';
-    document.getElementById('menteeIndustry').textContent = menteeData.industry || 'Not specified';
-    document.getElementById('menteeYearsExperience').textContent = menteeData.years_experience || 'Not specified';
-    document.getElementById('menteeCurrentOrganization').textContent = menteeData.current_organization || 'Not specified';
-    document.getElementById('menteeKeySkills').textContent = menteeData.key_skills || 'Not specified';
-  } else {
-    professionalSection.style.display = 'none';
-  }
-  
-  // Goals & Aspirations
-  document.getElementById('menteeGoal').textContent = menteeData.goal || 'Not specified';
-  document.getElementById('menteeCareerInterest').textContent = menteeData.career_interest || 'Not specified';
-  
-  // Mentorship Expectations
-  document.getElementById('menteeMentorshipExpectations').textContent = menteeData.mentorship_expectations || 'Not specified';
-  
-  // Additional Comments
-  document.getElementById('menteeComments').textContent = menteeData.comments || 'Not specified';
-  
-  // Profile Picture
-  const profilePic = document.getElementById('menteeProfilePic');
-  if (menteeData.profile_picture) {
-    profilePic.src = '/static/uploads/' + menteeData.profile_picture;
-  } else {
-    profilePic.src = 'https://via.placeholder.com/128?text=' + encodeURIComponent((menteeData.name || '?').charAt(0));
-  }
-  
-  document.getElementById('menteeProfileModal').classList.remove('hidden');
+function openMenteeProfileModal(mentee) {
+    console.log("Opening modal with mentee data:", mentee);
+    
+    function showField(fieldId, elementId, value) {
+        const field = document.getElementById(fieldId);
+        const valueElement = document.getElementById(elementId);
+        
+        if (!field || !valueElement) {
+            console.warn(`Missing element: ${fieldId} or ${elementId}`);
+            return false;
+        }
+        
+        if (value && value !== "" && value !== "None" && value !== "null" && value !== "Not specified") {
+            valueElement.innerText = value;
+            field.style.display = 'block';
+            return true;
+        } else {
+            field.style.display = 'none';
+            return false;
+        }
+    }
+
+    function showSection(sectionId, show) {
+        const section = document.getElementById(sectionId);
+        if (section) {
+            section.style.display = show ? 'block' : 'none';
+        }
+    }
+
+    // Basic info (always show)
+    document.getElementById('menteeModalName').innerText = mentee.name || "Not specified";
+    document.getElementById('menteeModalStream').innerText = mentee.stream || "Not specified";
+    document.getElementById('menteeModalGoal').innerText = mentee.goal || "Not specified";
+    document.getElementById('menteeModalEmail').innerText = mentee.email || "Not specified";
+    document.getElementById('menteeModalWhoAmI').innerText = (mentee.who_am_i || "").charAt(0).toUpperCase() + (mentee.who_am_i || "").slice(1);
+    
+    // Profile picture
+    const profilePic = document.getElementById('menteeModalProfilePic');
+    if (mentee.profile_picture) {
+        profilePic.src = "/static/uploads/" + mentee.profile_picture;
+    } else {
+        profilePic.src = "https://via.placeholder.com/96?text=" + (mentee.name ? mentee.name.charAt(0) : "?");
+    }
+
+    // Hide all sections initially
+    showSection('personalInfoSection', false);
+    showSection('addressSection', false);
+    showSection('educationSection', false);
+    showSection('universitySection', false);
+    showSection('professionalSection', false);
+    showSection('careerSection', false);
+    showSection('expectationsSection', false);
+    showSection('commentsSection', false);
+
+    // Personal Information Section
+    let hasPersonalInfo = false;
+    hasPersonalInfo |= showField('dobField', 'menteeModalDOB', mentee.dob);
+    hasPersonalInfo |= showField('fatherNameField', 'menteeModalFatherName', mentee.father_name);
+    
+    // Format mobile numbers with country code
+    if (mentee.mobile_number && mentee.mobile_number !== "None") {
+        const mobileDisplay = mentee.mobile_country_code ? `${mentee.mobile_country_code} ${mentee.mobile_number}` : mentee.mobile_number;
+        hasPersonalInfo |= showField('mobileField', 'menteeModalMobile', mobileDisplay);
+    }
+    
+    if (mentee.whatsapp_number && mentee.whatsapp_number !== "None") {
+        const whatsappDisplay = mentee.whatsapp_country_code ? `${mentee.whatsapp_country_code} ${mentee.whatsapp_number}` : mentee.whatsapp_number;
+        hasPersonalInfo |= showField('whatsappField', 'menteeModalWhatsapp', whatsappDisplay);
+    }
+    
+    hasPersonalInfo |= showField('parentNameField', 'menteeModalParentName', mentee.parent_name);
+    
+    if (mentee.parent_mobile && mentee.parent_mobile !== "None") {
+        const parentMobileDisplay = mentee.parent_mobile_country_code ? `${mentee.parent_mobile_country_code} ${mentee.parent_mobile}` : mentee.parent_mobile;
+        hasPersonalInfo |= showField('parentMobileField', 'menteeModalParentMobile', parentMobileDisplay);
+    }
+    
+    showSection('personalInfoSection', hasPersonalInfo);
+
+    // Address Information Section
+    let hasAddressInfo = false;
+    hasAddressInfo |= showField('addressLine1Field', 'menteeModalAddressLine1', mentee.address_line1);
+    hasAddressInfo |= showField('addressLine2Field', 'menteeModalAddressLine2', mentee.address_line2);
+    hasAddressInfo |= showField('cityField', 'menteeModalCity', mentee.city);
+    hasAddressInfo |= showField('stateField', 'menteeModalState', mentee.state);
+    hasAddressInfo |= showField('postalCodeField', 'menteeModalPostalCode', mentee.postal_code);
+    hasAddressInfo |= showField('countryField', 'menteeModalCountry', mentee.country);
+    showSection('addressSection', hasAddressInfo);
+
+    // Educational Information Section
+    let hasEducationInfo = false;
+    hasEducationInfo |= showField('educationLevelField', 'menteeModalEducationLevel', mentee.education_level);
+    hasEducationInfo |= showField('schoolCollegeField', 'menteeModalSchoolCollege', mentee.school_college_name);
+    hasEducationInfo |= showField('classYearField', 'menteeModalClassYear', mentee.class_year);
+    hasEducationInfo |= showField('govtPrivateField', 'menteeModalGovtPrivate', mentee.govt_private);
+    hasEducationInfo |= showField('favouriteSubjectField', 'menteeModalFavouriteSubject', mentee.favourite_subject);
+    showSection('educationSection', hasEducationInfo);
+
+    // University Details Section (show only if data exists)
+    let hasUniversityInfo = false;
+    hasUniversityInfo |= showField('institutionNameField', 'menteeModalInstitutionName', mentee.institution_name);
+    hasUniversityInfo |= showField('boardUniversityField', 'menteeModalBoardUniversity', mentee.board_university);
+    hasUniversityInfo |= showField('courseStreamField', 'menteeModalCourseStream', mentee.course_stream);
+    showSection('universitySection', hasUniversityInfo);
+
+    // Professional Information Section (show only if who_am_i is 'professional')
+    let hasProfessionalInfo = false;
+    if (mentee.who_am_i === 'professional') {
+        hasProfessionalInfo |= showField('currentRoleField', 'menteeModalCurrentRole', mentee.current_role);
+        hasProfessionalInfo |= showField('industryField', 'menteeModalIndustry', mentee.industry);
+        hasProfessionalInfo |= showField('yearsExperienceField', 'menteeModalYearsExperience', mentee.years_experience);
+        hasProfessionalInfo |= showField('currentOrganizationField', 'menteeModalCurrentOrganization', mentee.current_organization);
+        hasProfessionalInfo |= showField('keySkillsField', 'menteeModalKeySkills', mentee.key_skills);
+        showSection('professionalSection', hasProfessionalInfo);
+    }
+
+    // Career Information Section
+    let hasCareerInfo = false;
+    hasCareerInfo |= showField('careerGoalField', 'menteeModalCareerGoal', mentee.career_goal || mentee.goal);
+    hasCareerInfo |= showField('careerInterestField', 'menteeModalCareerInterest', mentee.career_interest);
+    showSection('careerSection', hasCareerInfo);
+
+    // Mentorship Expectations Section
+    if (mentee.mentorship_expectations && mentee.mentorship_expectations !== "" && mentee.mentorship_expectations !== "None") {
+        document.getElementById('menteeModalExpectations').innerText = mentee.mentorship_expectations;
+        showSection('expectationsSection', true);
+    }
+
+    // Comments Section
+    if (mentee.comments && mentee.comments !== "" && mentee.comments !== "None") {
+        document.getElementById('menteeModalComments').innerText = mentee.comments;
+        showSection('commentsSection', true);
+    }
+
+    // Show modal
+    document.getElementById('menteeProfileModal').classList.remove('hidden');
 }
+
+function closeMenteeProfileModal() {
+    document.getElementById('menteeProfileModal').classList.add('hidden');
+}
+
+// Update the event listener in your button
+document.addEventListener("DOMContentLoaded", function() {
+    document.querySelectorAll(".view-mentee-profile-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+            const mentee = {
+                name: btn.dataset.menteeName,
+                email: btn.dataset.menteeEmail,
+                stream: btn.dataset.menteeStream,
+                school_college_name: btn.dataset.menteeSchool,
+                goal: btn.dataset.menteeGoal,
+                dob: btn.dataset.menteeDob,
+                mobile_number: btn.dataset.menteeMobileNumber,
+                mobile_country_code: btn.dataset.menteeMobileCountryCode,
+                whatsapp_number: btn.dataset.menteeWhatsappNumber,
+                whatsapp_country_code: btn.dataset.menteeWhatsappCountryCode,
+                parent_name: btn.dataset.menteeParentName,
+                parent_mobile: btn.dataset.menteeParentMobile,
+                parent_mobile_country_code: btn.dataset.menteeParentMobileCountryCode,
+                comments: btn.dataset.menteeComments,
+                profile_picture: btn.dataset.menteeProfilePic,
+                class_year: btn.dataset.menteeClassYear,
+                favourite_subject: btn.dataset.menteeFavouriteSubject,
+                who_am_i: btn.dataset.menteeWhoAmI,
+                father_name: btn.dataset.menteeFatherName,
+                address_line1: btn.dataset.menteeAddressLine1,
+                address_line2: btn.dataset.menteeAddressLine2,
+                city: btn.dataset.menteeCity,
+                state: btn.dataset.menteeState,
+                postal_code: btn.dataset.menteePostalCode,
+                country: btn.dataset.menteeCountry,
+                govt_private: btn.dataset.menteeGovtPrivate,
+                education_level: btn.dataset.menteeEducationLevel,
+                institution_name: btn.dataset.menteeInstitutionName,
+                board_university: btn.dataset.menteeBoardUniversity,
+                course_stream: btn.dataset.menteeCourseStream,
+                career_interest: btn.dataset.menteeCareerInterest,
+                current_role: btn.dataset.menteeCurrentRole,
+                industry: btn.dataset.menteeIndustry,
+                years_experience: btn.dataset.menteeYearsExperience,
+                current_organization: btn.dataset.menteeCurrentOrganization,
+                key_skills: btn.dataset.menteeKeySkills,
+                career_goal: btn.dataset.menteeCareerGoal,
+                mentorship_expectations: btn.dataset.menteeMentorshipExpectations
+            };
+            openMenteeProfileModal(mentee);
+        });
+    });
+});
 
 function closeMenteeProfileModal() {
   document.getElementById('menteeProfileModal').classList.add('hidden');
