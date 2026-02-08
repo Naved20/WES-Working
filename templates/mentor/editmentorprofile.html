@@ -103,41 +103,71 @@
                 <div class="space-y-4">
                     {% set profession_options = ['Software Engineer', 'Data Scientist', 'AI/ML Engineer', 'Web Developer', 'DevOps Engineer', 'Cybersecurity Analyst', 'Doctor', 'Surgeon', 'Dentist', 'Pharmacist', 'Medical Researcher', 'Business Consultant', 'Product Manager', 'Marketing Manager', 'Financial Analyst', 'Entrepreneur', 'Professor', 'Teacher', 'Education Consultant', 'Researcher'] %}
                     {% set is_other_profession = profession and profession not in profession_options %}
-                    <div>
-                        <label class="block text-gray-700 font-semibold mb-2">Profession *</label>
-                        <select name="profession" id="profession_select" class="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition duration-300">
-                            <option value="">Select Your Profession</option>
-                            <optgroup label="Technology">
-                                <option value="Software Engineer" {% if profession == 'Software Engineer' %}selected{% endif %}>Software Engineer</option>
-                                <option value="Data Scientist" {% if profession == 'Data Scientist' %}selected{% endif %}>Data Scientist</option>
-                                <option value="AI/ML Engineer" {% if profession == 'AI/ML Engineer' %}selected{% endif %}>AI/ML Engineer</option>
-                                <option value="Web Developer" {% if profession == 'Web Developer' %}selected{% endif %}>Web Developer</option>
-                                <option value="DevOps Engineer" {% if profession == 'DevOps Engineer' %}selected{% endif %}>DevOps Engineer</option>
-                                <option value="Cybersecurity Analyst" {% if profession == 'Cybersecurity Analyst' %}selected{% endif %}>Cybersecurity Analyst</option>
-                            </optgroup>
-                            <optgroup label="Healthcare">
-                                <option value="Doctor" {% if profession == 'Doctor' %}selected{% endif %}>Doctor</option>
-                                <option value="Surgeon" {% if profession == 'Surgeon' %}selected{% endif %}>Surgeon</option>
-                                <option value="Dentist" {% if profession == 'Dentist' %}selected{% endif %}>Dentist</option>
-                                <option value="Pharmacist" {% if profession == 'Pharmacist' %}selected{% endif %}>Pharmacist</option>
-                                <option value="Medical Researcher" {% if profession == 'Medical Researcher' %}selected{% endif %}>Medical Researcher</option>
-                            </optgroup>
-                            <optgroup label="Business">
-                                <option value="Business Consultant" {% if profession == 'Business Consultant' %}selected{% endif %}>Business Consultant</option>
-                                <option value="Product Manager" {% if profession == 'Product Manager' %}selected{% endif %}>Product Manager</option>
-                                <option value="Marketing Manager" {% if profession == 'Marketing Manager' %}selected{% endif %}>Marketing Manager</option>
-                                <option value="Financial Analyst" {% if profession == 'Financial Analyst' %}selected{% endif %}>Financial Analyst</option>
-                                <option value="Entrepreneur" {% if profession == 'Entrepreneur' %}selected{% endif %}>Entrepreneur</option>
-                            </optgroup>
-                            <optgroup label="Education">
-                                <option value="Professor" {% if profession == 'Professor' %}selected{% endif %}>Professor</option>
-                                <option value="Teacher" {% if profession == 'Teacher' %}selected{% endif %}>Teacher</option>
-                                <option value="Education Consultant" {% if profession == 'Education Consultant' %}selected{% endif %}>Education Consultant</option>
-                                <option value="Researcher" {% if profession == 'Researcher' %}selected{% endif %}>Researcher</option>
-                            </optgroup>
-                            <option value="Other" {% if is_other_profession %}selected{% endif %}>Other (Please specify)</option>
-                        </select>
-                    </div>
+                        <div>
+                            <label class="block text-gray-700 font-semibold mb-2">Profession *</label>
+                            <select name="profession" id="profession_select" class="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition duration-300">
+                                <option value="">Select Your Profession</option>
+                                <optgroup label="Technology">
+                                    <option value="Software Engineer" {% if profession == 'Software Engineer' %}selected{% endif %}>Software Engineer/Developer</option>
+                                    <option value="Data Scientist" {% if profession == 'Data Scientist' %}selected{% endif %}>Data Scientist/Analyst</option>
+                                    <option value="AI/ML Engineer" {% if profession == 'AI/ML Engineer' %}selected{% endif %}>AI/ML Engineer</option>
+                                    <option value="Web Developer" {% if profession == 'Web Developer' %}selected{% endif %}>Web Developer</option>
+                                    <option value="DevOps Engineer" {% if profession == 'DevOps Engineer' %}selected{% endif %}>DevOps Engineer</option>
+                                    <option value="Cybersecurity Analyst" {% if profession == 'Cybersecurity Analyst' %}selected{% endif %}>Cybersecurity Analyst</option>
+                                    <option value="IT Manager" {% if profession == 'IT Manager' %}selected{% endif %}>IT Manager/Team Lead</option>
+                                    <option value="System Administrator" {% if profession == 'System Administrator' %}selected{% endif %}>System Administrator</option>
+                                </optgroup>
+                                <optgroup label="Healthcare">
+                                    <option value="Doctor" {% if profession == 'Doctor' %}selected{% endif %}>Doctor/Physician</option>
+                                    <option value="Surgeon" {% if profession == 'Surgeon' %}selected{% endif %}>Surgeon</option>
+                                    <option value="Dentist" {% if profession == 'Dentist' %}selected{% endif %}>Dentist</option>
+                                    <option value="Pharmacist" {% if profession == 'Pharmacist' %}selected{% endif %}>Pharmacist</option>
+                                    <option value="Medical Researcher" {% if profession == 'Medical Researcher' %}selected{% endif %}>Medical Researcher</option>
+                                    <option value="Nurse" {% if profession == 'Nurse' %}selected{% endif %}>Nurse/Nursing Staff</option>
+                                    <option value="Medical Technician" {% if profession == 'Medical Technician' %}selected{% endif %}>Medical Technician</option>
+                                    <option value="Hospital Administrator" {% if profession == 'Hospital Administrator' %}selected{% endif %}>Hospital Administrator/Manager</option>
+                                </optgroup>
+                                <optgroup label="Business">
+                                    <option value="Business Consultant" {% if profession == 'Business Consultant' %}selected{% endif %}>Business Consultant/Advisor</option>
+                                    <option value="Product Manager" {% if profession == 'Product Manager' %}selected{% endif %}>Product Manager</option>
+                                    <option value="Marketing Manager" {% if profession == 'Marketing Manager' %}selected{% endif %}>Marketing Manager/Team</option>
+                                    <option value="Financial Analyst" {% if profession == 'Financial Analyst' %}selected{% endif %}>Financial Analyst/Advisor</option>
+                                    <option value="Entrepreneur" {% if profession == 'Entrepreneur' %}selected{% endif %}>Entrepreneur/Business Owner</option>
+                                    <option value="Sales Manager" {% if profession == 'Sales Manager' %}selected{% endif %}>Sales Manager/Team</option>
+                                    <option value="HR Manager" {% if profession == 'HR Manager' %}selected{% endif %}>HR Manager/Team</option>
+                                    <option value="Operations Manager" {% if profession == 'Operations Manager' %}selected{% endif %}>Operations Manager</option>
+                                </optgroup>
+                                <optgroup label="Education">
+                                    <option value="Professor" {% if profession == 'Professor' %}selected{% endif %}>Professor/Lecturer</option>
+                                    <option value="Teacher" {% if profession == 'Teacher' %}selected{% endif %}>Teacher/Educator</option>
+                                    <option value="Education Consultant" {% if profession == 'Education Consultant' %}selected{% endif %}>Education Consultant/Advisor</option>
+                                    <option value="University Student" {% if profession == 'University Student' %}selected{% endif %}>University Student</option>
+                                    <option value="Researcher" {% if profession == 'Researcher' %}selected{% endif %}>Researcher/Scholar</option>
+                                    <option value="School Administrator" {% if profession == 'School Administrator' %}selected{% endif %}>School Administrator/Principal</option>
+                                    <option value="Counselor" {% if profession == 'Counselor' %}selected{% endif %}>Counselor/Advisor</option>
+                                </optgroup>
+                                <optgroup label="Creative & Media">
+                                    <option value="Graphic Designer" {% if profession == 'Graphic Designer' %}selected{% endif %}>Graphic Designer</option>
+                                    <option value="Content Writer" {% if profession == 'Content Writer' %}selected{% endif %}>Content Writer/Editor</option>
+                                    <option value="Journalist" {% if profession == 'Journalist' %}selected{% endif %}>Journalist/Reporter</option>
+                                    <option value="Photographer" {% if profession == 'Photographer' %}selected{% endif %}>Photographer</option>
+                                    <option value="Video Editor" {% if profession == 'Video Editor' %}selected{% endif %}>Video Editor/Producer</option>
+                                </optgroup>
+                                <optgroup label="Legal">
+                                    <option value="Lawyer" {% if profession == 'Lawyer' %}selected{% endif %}>Lawyer/Attorney</option>
+                                    <option value="Legal Advisor" {% if profession == 'Legal Advisor' %}selected{% endif %}>Legal Advisor/Consultant</option>
+                                    <option value="Judge" {% if profession == 'Judge' %}selected{% endif %}>Judge</option>
+                                    <option value="Paralegal" {% if profession == 'Paralegal' %}selected{% endif %}>Paralegal/Legal Assistant</option>
+                                </optgroup>
+                                <optgroup label="Government & Public Service">
+                                    <option value="Government Officer" {% if profession == 'Government Officer' %}selected{% endif %}>Government Officer</option>
+                                    <option value="Police Officer" {% if profession == 'Police Officer' %}selected{% endif %}>Police Officer</option>
+                                    <option value="Social Worker" {% if profession == 'Social Worker' %}selected{% endif %}>Social Worker</option>
+                                    <option value="Public Administrator" {% if profession == 'Public Administrator' %}selected{% endif %}>Public Administrator</option>
+                                </optgroup>
+                                <option value="Other" {% if is_other_profession %}selected{% endif %}>Other (Please specify)</option>
+                            </select>
+                        </div>
 
                     <!-- Other Profession Field -->
                     <div id="other_profession_field" style="display: {% if is_other_profession %}block{% else %}none{% endif %};">
@@ -204,7 +234,7 @@
                         </select>
                     </div>
                     <div>
-                        <label class="block text-gray-700 font-semibold mb-2">Institution *</label>
+                        <label class="block text-gray-700 font-semibold mb-2">affiliated Institution *</label>
                         <select name="institution" id="institution" class="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition duration-300" required>
                             <option value="">Select Your Institution</option>
                             <option value="Self" {% if institution == 'Self' %}selected{% endif %}>Self (Not affiliated with any institution)</option>
@@ -485,7 +515,7 @@
                     </div>
 
                     <div>
-                        <label class="block text-gray-700 font-semibold mb-2">University / Institution Name</label>
+                        <label class="block text-gray-700 font-semibold mb-2">University / Collage Name</label>
                         <input type="text" name="university_name" value="{{ university_name or '' }}" class="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition duration-300" placeholder="e.g., IIT Delhi, Stanford University, Oxford University">
                     </div>
                 </div>

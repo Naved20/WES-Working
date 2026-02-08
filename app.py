@@ -463,6 +463,7 @@ class MenteeProfile(db.Model):
     # other
     comments = db.Column(db.Text)
     mentorship_expectations = db.Column(db.Text)
+    linkedin_link = db.Column(db.String(200))  # LinkedIn profile URL
     terms_agreement = db.Column(db.String(10))  # Yes / No
     profile_picture = db.Column(db.String(100))  # store image filename
     status = db.Column(db.String(20), default="pending")
@@ -5107,6 +5108,7 @@ def editmenteeprofile():
         profile.stream = request.form.get("stream")
         profile.goal = request.form.get("goal")
         profile.mentorship_expectations = request.form.get("mentorship_expectations")
+        profile.linkedin_link = request.form.get("linkedin_link")
         # Save "Yes" only if both terms and GDPR are agreed
         terms_agreed = request.form.get("terms_agreement")
         gdpr_agreed = request.form.get("gdpr_agreement")
@@ -5259,6 +5261,7 @@ def editmenteeprofile():
         restart_field=profile.restart_field if profile else "",
         support_expected=profile.support_expected if profile else "",
         mentorship_expectations=profile.mentorship_expectations if profile else "",
+        linkedin_link=profile.linkedin_link if profile else "",
         terms_agreement=profile.terms_agreement if profile else "",
         profile_picture=profile.profile_picture if profile else None
     )
