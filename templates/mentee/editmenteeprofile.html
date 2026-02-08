@@ -376,31 +376,39 @@
                         </div>
                         <div>
                             <label class="block text-gray-700 font-semibold">Class / Grade *</label>
-                            <select name="class_year" class="w-full p-2 border rounded-lg">
-                                <option value="">Select Class</option>
-                                <option value="9th" {% if class_year=='9th' %}selected{% endif %}>9th</option>
-                                <option value="10th" {% if class_year=='10th' %}selected{% endif %}>10th</option>
-                                <option value="11th" {% if class_year=='11th' %}selected{% endif %}>11th</option>
-                                <option value="12th" {% if class_year=='12th' %}selected{% endif %}>12th</option>
-                            </select>
+                                <select name="class_year" class="w-full p-2 border rounded-lg">
+                                    <option value="">Select Class</option>
+                                    <option value="1st" {% if class_year=='1st' %}selected{% endif %}>1st</option>
+                                    <option value="2nd" {% if class_year=='2nd' %}selected{% endif %}>2nd</option>
+                                    <option value="3rd" {% if class_year=='3rd' %}selected{% endif %}>3rd</option>
+                                    <option value="4th" {% if class_year=='4th' %}selected{% endif %}>4th</option>
+                                    <option value="5th" {% if class_year=='5th' %}selected{% endif %}>5th</option>
+                                    <option value="6th" {% if class_year=='6th' %}selected{% endif %}>6th</option>
+                                    <option value="7th" {% if class_year=='7th' %}selected{% endif %}>7th</option>
+                                    <option value="8th" {% if class_year=='8th' %}selected{% endif %}>8th</option>
+                                    <option value="9th" {% if class_year=='9th' %}selected{% endif %}>9th</option>
+                                    <option value="10th" {% if class_year=='10th' %}selected{% endif %}>10th</option>
+                                    <option value="11th" {% if class_year=='11th (Pre Final Year)' %}selected{% endif %}>11th (Pre Final Year)</option>
+                                    <option value="12th" {% if class_year=='12th (Final Year)' %}selected{% endif %}>12th (Final Year)</option>
+                                </select>
                         </div>
                         <div>
-                            <label class="block text-gray-700 font-semibold">Board *</label>
+                            <label class="block text-gray-700 font-semibold">Examination Board *</label>
                             <input type="text" name="school_board" value="{{ school_board or '' }}"
                                 class="w-full p-2 border rounded-lg" placeholder="e.g., CBSE, ICSE, State Board">
                         </div>
-                        <div>
+                        <div id="school_type_field" class="hidden">
                             <label class="block text-gray-700 font-semibold">School Type *</label>
-                            <select name="govt_private" class="w-full p-2 border rounded-lg">
+                            <select name="govt_private" id="govt_private_select" class="w-full p-2 border rounded-lg">
                                 <option value="">Select Type</option>
                                 <option value="Government" {% if govt_private=='Government' %}selected{% endif %}>Government</option>
                                 <option value="Private" {% if govt_private=='Private' %}selected{% endif %}>Private</option>
                                 <option value="Semi-Government" {% if govt_private=='Semi-Government' %}selected{% endif %}>Semi-Government</option>
                             </select>
                         </div>
-                        <div>
+                        <div id="stream_field" class="hidden">
                             <label class="block text-gray-700 font-semibold">Stream (if applicable)</label>
-                            <select name="course_stream" class="w-full p-2 border rounded-lg">
+                            <select name="course_stream" id="course_stream_select" class="w-full p-2 border rounded-lg">
                                 <option value="">Select Stream</option>
                                 <option value="Science" {% if course_stream=='Science' %}selected{% endif %}>Science
                                 </option>
@@ -415,11 +423,7 @@
                             <input type="text" name="favourite_subject" value="{{ favourite_subject or '' }}"
                                 class="w-full p-2 border rounded-lg" placeholder="e.g., Mathematics, Physics">
                         </div>
-                        <div>
-                            <label class="block text-gray-700 font-semibold">Career Interest *</label>
-                            <input type="text" name="career_interest" value="{{ career_interest or '' }}"
-                                class="w-full p-2 border rounded-lg" placeholder="What career are you interested in?">
-                        </div>
+
                     </div>
                 </div>
             </div>
@@ -466,11 +470,7 @@
                             <input type="text" name="favourite_subject" value="{{ favourite_subject or '' }}"
                                 class="w-full p-2 border rounded-lg" placeholder="Specialization or interest area">
                         </div>
-                        <div>
-                            <label class="block text-gray-700 font-semibold">Career Goal *</label>
-                            <input type="text" name="career_interest" value="{{ career_interest or '' }}"
-                                class="w-full p-2 border rounded-lg" placeholder="What's your career goal?">
-                        </div>
+
                     </div>
                 </div>
             </div>
@@ -614,7 +614,7 @@
                                 placeholder="Tell us what you're trying to figure out or explore...">{{ restart_field or '' }}</textarea>
                         </div>
                         <div>
-                            <label class="block text-gray-700 font-semibold">Type of Support Needed *</label>
+                            <label class="block text-gray-700 font-semibold">Guidance Needed *</label>
                             <select name="support_expected" class="w-full p-2 border rounded-lg">
                                 <option value="">Select Support</option>
                                 <option value="Career Clarity" {% if support_expected=='Career Clarity' %}selected{%
@@ -633,7 +633,68 @@
                 </div>
             </div>
 
-            <!-- COMMON FIELDS FOR ALL -->
+
+
+            <!-- MENTORSHIP EXPECTATIONS -->
+            <div class="bg-slate-50 p-8 rounded-2xl border border-slate-100 mb-8">
+                <h3 class="text-xl font-bold text-slate-800 mb-6 flex items-center gap-2">
+                    <span
+                        class="w-8 h-8 rounded-lg bg-pink-100 flex items-center justify-center text-pink-600 text-sm">🎯</span>
+                    My Expectation from Mentorship Programme <span class="text-red-500">*</span>
+                </h3>
+                <p class="text-gray-600 text-sm mb-3">Briefly describe what you expect to gain from this mentorship
+                    (guidance, clarity, skills, career direction, networking, etc.)</p>
+                <textarea name="mentorship_expectations" class="w-full p-2 border rounded-lg" rows="4"
+                    placeholder="Share your expectations...">{{ mentorship_expectations or '' }}</textarea>
+            </div>
+
+            <!-- CAREER GOAL SECTION -->
+            <div class="bg-slate-50 p-8 rounded-2xl border border-slate-100 mb-8">
+                <h3 class="text-xl font-bold text-slate-800 mb-6 flex items-center gap-2">
+                    <span
+                        class="w-8 h-8 rounded-lg bg-amber-100 flex items-center justify-center text-amber-600 text-sm">🎯</span>
+                    Career Goal
+                </h3>
+                <div class="grid grid-cols-1 gap-4">
+                    <div>
+                        <label class="block text-gray-700 font-semibold">What is your career goal or aspiration?</label>
+                        <input type="text" name="goal" value="{{ goal or '' }}"
+                            class="w-full p-2 border rounded-lg" placeholder="Describe your career aspirations and goals">
+                    </div>
+                </div>
+            </div>
+
+
+
+
+
+            <!-- LINKEDIN PROFILE -->
+            <div class="bg-slate-50 p-8 rounded-2xl border border-slate-100 mb-8">
+                <h3 class="text-xl font-bold text-slate-800 mb-6 flex items-center gap-2">
+                    <span
+                        class="w-8 h-8 rounded-lg bg-blue-100 flex items-center justify-center text-blue-600 text-sm">�</span>
+                    LinkedIn Profile
+                </h3>
+                <p class="text-gray-600 text-sm mb-3">Share your LinkedIn profile URL (optional)</p>
+                <input type="url" name="linkedin_link" value="{{ linkedin_link or '' }}"
+                    class="w-full p-2 border rounded-lg" 
+                    placeholder="https://linkedin.com/in/yourprofile">
+            </div>
+
+            <!-- ADDITIONAL COMMENTS -->
+            <div class="bg-slate-50 p-8 rounded-2xl border border-slate-100 mb-8">
+                <h3 class="text-xl font-bold text-slate-800 mb-6 flex items-center gap-2">
+                    <span
+                        class="w-8 h-8 rounded-lg bg-gray-100 flex items-center justify-center text-gray-600 text-sm">💬</span>
+                    Additional Comments
+                </h3>
+                <p class="text-gray-600 text-sm mb-3">Any additional information you'd like to share about yourself, your background, interests, or anything else that might be helpful for your mentor to know.</p>
+                <textarea name="comments" class="w-full p-2 border rounded-lg" rows="4"
+                    placeholder="Share any additional information (optional)...">{{ comments or '' }}</textarea>
+            </div>
+
+
+            <!-- Contact Information -->
             <div class="bg-slate-50 p-8 rounded-2xl border border-slate-100 mb-8">
                 <h3 class="text-xl font-bold text-slate-800 mb-6 flex items-center gap-2">
                     <span
@@ -662,7 +723,7 @@
                         </div>
                     </div>
                     <div>
-                        <label class="block text-gray-700 font-semibold">Emergency Mobile Number</label>
+                        <label class="block text-gray-700 font-semibold">Emergency Contact Number</label>
                         <div class="flex gap-2">
                             <input type="text" name="parent_mobile_country_code" list="country_codes"
                                 value="{{ parent_mobile_country_code or '+91' }}" class="w-24 p-2 border rounded-lg"
@@ -674,46 +735,6 @@
                 </div>
             </div>
 
-            <!-- MENTORSHIP EXPECTATIONS -->
-            <div class="bg-slate-50 p-8 rounded-2xl border border-slate-100 mb-8">
-                <h3 class="text-xl font-bold text-slate-800 mb-6 flex items-center gap-2">
-                    <span
-                        class="w-8 h-8 rounded-lg bg-pink-100 flex items-center justify-center text-pink-600 text-sm">🎯</span>
-                    My Expectation from Mentorship Programme <span class="text-red-500">*</span>
-                </h3>
-                <p class="text-gray-600 text-sm mb-3">Briefly describe what you expect to gain from this mentorship
-                    (guidance, clarity, skills, career direction, networking, etc.)</p>
-                <textarea name="mentorship_expectations" class="w-full p-2 border rounded-lg" rows="4"
-                    placeholder="Share your expectations...">{{ mentorship_expectations or '' }}</textarea>
-            </div>
-
-            <!-- ADDITIONAL COMMENTS -->
-            <div class="bg-slate-50 p-8 rounded-2xl border border-slate-100 mb-8">
-                <h3 class="text-xl font-bold text-slate-800 mb-6 flex items-center gap-2">
-                    <span
-                        class="w-8 h-8 rounded-lg bg-gray-100 flex items-center justify-center text-gray-600 text-sm">💬</span>
-                    Additional Comments
-                </h3>
-                <p class="text-gray-600 text-sm mb-3">Any additional information you'd like to share about yourself, your background, interests, or anything else that might be helpful for your mentor to know.</p>
-                <textarea name="comments" class="w-full p-2 border rounded-lg" rows="4"
-                    placeholder="Share any additional information (optional)...">{{ comments or '' }}</textarea>
-            </div>
-
-            <!-- CAREER GOAL SECTION -->
-            <div class="bg-slate-50 p-8 rounded-2xl border border-slate-100 mb-8">
-                <h3 class="text-xl font-bold text-slate-800 mb-6 flex items-center gap-2">
-                    <span
-                        class="w-8 h-8 rounded-lg bg-amber-100 flex items-center justify-center text-amber-600 text-sm">🎯</span>
-                    Career Goal
-                </h3>
-                <div class="grid grid-cols-1 gap-4">
-                    <div>
-                        <label class="block text-gray-700 font-semibold">What is your career goal or aspiration?</label>
-                        <input type="text" name="goal" value="{{ goal or '' }}"
-                            class="w-full p-2 border rounded-lg" placeholder="Describe your career aspirations and goals">
-                    </div>
-                </div>
-            </div>
 
             <!-- Terms Agreement -->
             <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
@@ -945,7 +966,7 @@
 
             // Define mandatory fields for each category
             const mandatoryFieldsByCategory = {
-                school_student: ['school_name', 'school_board', 'govt_private'],
+                school_student: ['school_name', 'school_board'],
                 university_student: ['institution_name'],
                 seeking_internship: ['institution_name'],
                 young_professional: ['current_role', 'industry', 'years_experience', 'current_organization'],
@@ -1048,6 +1069,15 @@
                 }
             });
 
+            // Check India-specific fields (School Type and Stream) ONLY if India is selected
+            const countrySelect = document.querySelector('select[name="country"]');
+            if (countrySelect && countrySelect.value === 'India') {
+                console.log('🇮🇳 India selected - checking India-specific fields');
+                // Note: School Type (govt_private) and Stream (course_stream) are optional fields
+            } else {
+                console.log('⊘ Non-India country selected - skipping India-specific fields');
+            }
+
             console.log('Empty fields found:', emptyFields);
 
             if (emptyFields.length > 0) {
@@ -1124,8 +1154,57 @@
                 updateRequiredAttributes();
             }
 
+            // Add event listener for country selection to show/hide Stream and School Type fields
+            const countrySelect = document.querySelector('select[name="country"]');
+            if (countrySelect) {
+                console.log('✓ Country select found, adding event listener');
+                
+                // Check on page load
+                updateIndiaSpecificFields();
+                
+                // Check on change
+                countrySelect.addEventListener('change', function() {
+                    console.log('Country changed to:', this.value);
+                    updateIndiaSpecificFields();
+                });
+            }
+
             console.log('✅ Form initialized');
         });
+
+        // Function to show/hide India-specific fields
+        function updateIndiaSpecificFields() {
+            const countrySelect = document.querySelector('select[name="country"]');
+            const schoolTypeField = document.getElementById('school_type_field');
+            const streamField = document.getElementById('stream_field');
+            
+            if (!countrySelect || !schoolTypeField || !streamField) {
+                console.warn('⚠️ Country select or India-specific fields not found');
+                return;
+            }
+
+            const isIndia = countrySelect.value === 'India';
+            console.log(`🌍 Country is India: ${isIndia}`);
+
+            if (isIndia) {
+                // Show fields for India
+                schoolTypeField.classList.remove('hidden');
+                streamField.classList.remove('hidden');
+                console.log('✓ Showing School Type and Stream fields (India selected)');
+            } else {
+                // Hide fields for other countries
+                schoolTypeField.classList.add('hidden');
+                streamField.classList.add('hidden');
+                
+                // Clear values when hiding
+                const govtPrivateSelect = document.getElementById('govt_private_select');
+                const courseStreamSelect = document.getElementById('course_stream_select');
+                if (govtPrivateSelect) govtPrivateSelect.value = '';
+                if (courseStreamSelect) courseStreamSelect.value = '';
+                
+                console.log('✓ Hiding School Type and Stream fields (non-India country selected)');
+            }
+        }
     </script>
 
     {% endblock %}
