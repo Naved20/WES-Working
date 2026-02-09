@@ -42,6 +42,51 @@
         font-weight: normal;
         padding-left: 1rem;
     }
+
+
+    /* Language dropdown styling */
+#language_dropdown_menu {
+    scrollbar-width: thin;
+    scrollbar-color: #cbd5e0 #f7fafc;
+}
+
+#language_dropdown_menu::-webkit-scrollbar {
+    width: 8px;
+}
+
+#language_dropdown_menu::-webkit-scrollbar-track {
+    background: #f7fafc;
+    border-radius: 10px;
+}
+
+#language_dropdown_menu::-webkit-scrollbar-thumb {
+    background: #cbd5e0;
+    border-radius: 10px;
+}
+
+#language_dropdown_menu::-webkit-scrollbar-thumb:hover {
+    background: #a0aec0;
+}
+
+.remove-language-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1.2rem;
+    line-height: 1;
+    padding: 0;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+}
+
+.remove-language-btn:hover {
+    background-color: rgba(59, 130, 246, 0.1);
+}
+
 </style>
 
 <div class="max-w-6xl mx-auto mt-8 p-6 bg-gradient-to-br from-gray-50 to-blue-50 rounded-2xl shadow-2xl">
@@ -364,59 +409,283 @@
                         <input type="text" name="other_country" id="other_country" class="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition duration-300" placeholder="Enter your country name" value="{% if is_other_country %}{{ country }}{% endif %}">
                     </div>
 
-                    <div>
-                        <label class="block text-gray-700 font-semibold mb-2">Language(s) *</label>
-                        <select name="language" id="language_select" class="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition duration-300" multiple>
-                            <optgroup label="Indian Languages">
-                                <option value="Hindi" {% if language and 'Hindi' in language %}selected{% endif %}>🇮🇳 Hindi</option>
-                                <option value="English" {% if language and 'English' in language %}selected{% endif %}>🇬🇧 English</option>
-                                <option value="Tamil" {% if language and 'Tamil' in language %}selected{% endif %}>🇮🇳 Tamil</option>
-                                <option value="Telugu" {% if language and 'Telugu' in language %}selected{% endif %}>🇮🇳 Telugu</option>
-                                <option value="Marathi" {% if language and 'Marathi' in language %}selected{% endif %}>🇮🇳 Marathi</option>
-                                <option value="Bengali" {% if language and 'Bengali' in language %}selected{% endif %}>🇮🇳 Bengali</option>
-                                <option value="Gujarati" {% if language and 'Gujarati' in language %}selected{% endif %}>🇮🇳 Gujarati</option>
-                                <option value="Kannada" {% if language and 'Kannada' in language %}selected{% endif %}>🇮🇳 Kannada</option>
-                                <option value="Malayalam" {% if language and 'Malayalam' in language %}selected{% endif %}>🇮🇳 Malayalam</option>
-                                <option value="Punjabi" {% if language and 'Punjabi' in language %}selected{% endif %}>🇮🇳 Punjabi</option>
-                                <option value="Odia" {% if language and 'Odia' in language %}selected{% endif %}>🇮🇳 Odia</option>
-                                <option value="Urdu" {% if language and 'Urdu' in language %}selected{% endif %}>🇮🇳 Urdu</option>
-                                <option value="Assamese" {% if language and 'Assamese' in language %}selected{% endif %}>🇮🇳 Assamese</option>
-                            </optgroup>
-                            <optgroup label="European Languages">
-                                <option value="Spanish" {% if language and 'Spanish' in language %}selected{% endif %}>🇪🇸 Spanish</option>
-                                <option value="French" {% if language and 'French' in language %}selected{% endif %}>🇫🇷 French</option>
-                                <option value="German" {% if language and 'German' in language %}selected{% endif %}>🇩🇪 German</option>
-                                <option value="Italian" {% if language and 'Italian' in language %}selected{% endif %}>🇮🇹 Italian</option>
-                                <option value="Portuguese" {% if language and 'Portuguese' in language %}selected{% endif %}>🇵🇹 Portuguese</option>
-                                <option value="Russian" {% if language and 'Russian' in language %}selected{% endif %}>🇷🇺 Russian</option>
-                                <option value="Dutch" {% if language and 'Dutch' in language %}selected{% endif %}>🇳🇱 Dutch</option>
-                                <option value="Polish" {% if language and 'Polish' in language %}selected{% endif %}>🇵🇱 Polish</option>
-                                <option value="Swedish" {% if language and 'Swedish' in language %}selected{% endif %}>🇸🇪 Swedish</option>
-                                <option value="Greek" {% if language and 'Greek' in language %}selected{% endif %}>🇬🇷 Greek</option>
-                            </optgroup>
-                            <optgroup label="Asian Languages">
-                                <option value="Chinese (Mandarin)" {% if language and 'Chinese (Mandarin)' in language %}selected{% endif %}>🇨🇳 Chinese (Mandarin)</option>
-                                <option value="Japanese" {% if language and 'Japanese' in language %}selected{% endif %}>🇯🇵 Japanese</option>
-                                <option value="Korean" {% if language and 'Korean' in language %}selected{% endif %}>🇰🇷 Korean</option>
-                                <option value="Thai" {% if language and 'Thai' in language %}selected{% endif %}>🇹🇭 Thai</option>
-                                <option value="Vietnamese" {% if language and 'Vietnamese' in language %}selected{% endif %}>🇻🇳 Vietnamese</option>
-                                <option value="Indonesian" {% if language and 'Indonesian' in language %}selected{% endif %}>🇮🇩 Indonesian</option>
-                                <option value="Malay" {% if language and 'Malay' in language %}selected{% endif %}>🇲🇾 Malay</option>
-                            </optgroup>
-                            <optgroup label="Middle Eastern Languages">
-                                <option value="Arabic" {% if language and 'Arabic' in language %}selected{% endif %}>🇸🇦 Arabic</option>
-                                <option value="Persian" {% if language and 'Persian' in language %}selected{% endif %}>🇮🇷 Persian (Farsi)</option>
-                                <option value="Turkish" {% if language and 'Turkish' in language %}selected{% endif %}>🇹🇷 Turkish</option>
-                                <option value="Hebrew" {% if language and 'Hebrew' in language %}selected{% endif %}>🇮🇱 Hebrew</option>
-                            </optgroup>
-                            <optgroup label="African Languages">
-                                <option value="Swahili" {% if language and 'Swahili' in language %}selected{% endif %}>🇰🇪 Swahili</option>
-                                <option value="Afrikaans" {% if language and 'Afrikaans' in language %}selected{% endif %}>🇿🇦 Afrikaans</option>
-                            </optgroup>
-                            <option value="Other">🌍 Other</option>
-                        </select>
-                        <p class="text-sm text-gray-500 mt-1"><i class="fas fa-mouse-pointer mr-1"></i>Hold Ctrl/Cmd to select multiple languages</p>
-                    </div>
+<div>
+    <label class="block text-gray-700 font-semibold mb-2">Language(s) *</label>
+    
+    <!-- Selected languages will appear here as tags -->
+    <div id="selected_languages_container" class="flex flex-wrap gap-2 mb-2 p-2 border border-gray-300 rounded-lg min-h-[3rem] bg-gray-50">
+        {% if language %}
+            {% set language_list = language.split(',') if language is string else language %}
+            {% for lang in language_list %}
+                <div class="inline-flex items-center bg-blue-100 text-blue-800 text-sm font-medium px-3 py-1 rounded-full">
+                    <span>{{ lang.strip() }}</span>
+                    <button type="button" class="ml-2 text-blue-600 hover:text-blue-800 remove-language-btn" data-value="{{ lang.strip() }}">
+                        &times;
+                    </button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    </div>
+
+    <!-- Dropdown toggle button -->
+    <div class="relative">
+        <button type="button" id="language_dropdown_toggle" class="w-full p-3 border-2 border-gray-200 rounded-xl text-left focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition duration-300 bg-white">
+            <span class="text-gray-500">Select Languages...</span>
+            <span class="float-right">▼</span>
+        </button>
+<!-- Dropdown menu with checkboxes -->
+<div id="language_dropdown_menu" class="hidden absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-xl shadow-lg max-h-80 overflow-y-auto">
+    <!-- World's Top 10 Most Spoken Languages -->
+    <div class="p-2 border-b bg-blue-50">
+        <p class="font-bold text-gray-800 mb-1">🌍 World's Top 10 Most Spoken Languages</p>
+        
+        <label class="flex items-center p-2 hover:bg-blue-100 cursor-pointer rounded">
+            <input type="checkbox" value="English" class="mr-3 h-5 w-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500 language-checkbox">
+            <span class="font-medium">🇬🇧 English</span>
+            <span class="ml-auto text-sm text-gray-500">1.5B+ speakers</span>
+        </label>
+        
+        <label class="flex items-center p-2 hover:bg-blue-100 cursor-pointer rounded">
+            <input type="checkbox" value="Chinese (Mandarin)" class="mr-3 h-5 w-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500 language-checkbox">
+            <span class="font-medium">🇨🇳 Chinese (Mandarin)</span>
+            <span class="ml-auto text-sm text-gray-500">1.1B+ speakers</span>
+        </label>
+        
+        <label class="flex items-center p-2 hover:bg-blue-100 cursor-pointer rounded">
+            <input type="checkbox" value="Hindi" class="mr-3 h-5 w-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500 language-checkbox">
+            <span class="font-medium">🇮🇳 Hindi</span>
+            <span class="ml-auto text-sm text-gray-500">602M+ speakers</span>
+        </label>
+        
+        <label class="flex items-center p-2 hover:bg-blue-100 cursor-pointer rounded">
+            <input type="checkbox" value="Spanish" class="mr-3 h-5 w-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500 language-checkbox">
+            <span class="font-medium">🇪🇸 Spanish</span>
+            <span class="ml-auto text-sm text-gray-500">548M+ speakers</span>
+        </label>
+        
+        <label class="flex items-center p-2 hover:bg-blue-100 cursor-pointer rounded">
+            <input type="checkbox" value="French" class="mr-3 h-5 w-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500 language-checkbox">
+            <span class="font-medium">🇫🇷 French</span>
+            <span class="ml-auto text-sm text-gray-500">280M+ speakers</span>
+        </label>
+        
+        <label class="flex items-center p-2 hover:bg-blue-100 cursor-pointer rounded">
+            <input type="checkbox" value="Arabic" class="mr-3 h-5 w-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500 language-checkbox">
+            <span class="font-medium">🇸🇦 Arabic</span>
+            <span class="ml-auto text-sm text-gray-500">274M+ speakers</span>
+        </label>
+        
+        <label class="flex items-center p-2 hover:bg-blue-100 cursor-pointer rounded">
+            <input type="checkbox" value="Bengali" class="mr-3 h-5 w-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500 language-checkbox">
+            <span class="font-medium">🇧🇩 Bengali</span>
+            <span class="ml-auto text-sm text-gray-500">272M+ speakers</span>
+        </label>
+        
+        <label class="flex items-center p-2 hover:bg-blue-100 cursor-pointer rounded">
+            <input type="checkbox" value="Russian" class="mr-3 h-5 w-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500 language-checkbox">
+            <span class="font-medium">🇷🇺 Russian</span>
+            <span class="ml-auto text-sm text-gray-500">258M+ speakers</span>
+        </label>
+        
+        <label class="flex items-center p-2 hover:bg-blue-100 cursor-pointer rounded">
+            <input type="checkbox" value="Portuguese" class="mr-3 h-5 w-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500 language-checkbox">
+            <span class="font-medium">🇵🇹 Portuguese</span>
+            <span class="ml-auto text-sm text-gray-500">257M+ speakers</span>
+        </label>
+        
+        <label class="flex items-center p-2 hover:bg-blue-100 cursor-pointer rounded">
+            <input type="checkbox" value="Urdu" class="mr-3 h-5 w-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500 language-checkbox">
+            <span class="font-medium">🇵🇰 Urdu</span>
+            <span class="ml-auto text-sm text-gray-500">231M+ speakers</span>
+        </label>
+    </div>
+
+    <!-- Indian Languages (Additional) -->
+    <div class="p-2 border-b">
+        <p class="font-semibold text-gray-700 mb-1">🇮🇳 Indian Languages</p>
+        <label class="flex items-center p-2 hover:bg-gray-100 cursor-pointer rounded">
+            <input type="checkbox" value="Tamil" class="mr-3 h-5 w-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500 language-checkbox">
+            <span>தமிழ் Tamil</span>
+            <span class="ml-auto text-sm text-gray-500">83M+</span>
+        </label>
+        <label class="flex items-center p-2 hover:bg-gray-100 cursor-pointer rounded">
+            <input type="checkbox" value="Telugu" class="mr-3 h-5 w-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500 language-checkbox">
+            <span>తెలుగు Telugu</span>
+            <span class="ml-auto text-sm text-gray-500">82M+</span>
+        </label>
+        <label class="flex items-center p-2 hover:bg-gray-100 cursor-pointer rounded">
+            <input type="checkbox" value="Marathi" class="mr-3 h-5 w-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500 language-checkbox">
+            <span>मराठी Marathi</span>
+            <span class="ml-auto text-sm text-gray-500">83M+</span>
+        </label>
+        <label class="flex items-center p-2 hover:bg-gray-100 cursor-pointer rounded">
+            <input type="checkbox" value="Gujarati" class="mr-3 h-5 w-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500 language-checkbox">
+            <span>ગુજરાતી Gujarati</span>
+            <span class="ml-auto text-sm text-gray-500">57M+</span>
+        </label>
+        <label class="flex items-center p-2 hover:bg-gray-100 cursor-pointer rounded">
+            <input type="checkbox" value="Kannada" class="mr-3 h-5 w-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500 language-checkbox">
+            <span>ಕನ್ನಡ Kannada</span>
+            <span class="ml-auto text-sm text-gray-500">44M+</span>
+        </label>
+        <label class="flex items-center p-2 hover:bg-gray-100 cursor-pointer rounded">
+            <input type="checkbox" value="Malayalam" class="mr-3 h-5 w-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500 language-checkbox">
+            <span>മലയാളം Malayalam</span>
+            <span class="ml-auto text-sm text-gray-500">38M+</span>
+        </label>
+        <label class="flex items-center p-2 hover:bg-gray-100 cursor-pointer rounded">
+            <input type="checkbox" value="Punjabi" class="mr-3 h-5 w-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500 language-checkbox">
+            <span>ਪੰਜਾਬੀ Punjabi</span>
+            <span class="ml-auto text-sm text-gray-500">113M+</span>
+        </label>
+        <label class="flex items-center p-2 hover:bg-gray-100 cursor-pointer rounded">
+            <input type="checkbox" value="Odia" class="mr-3 h-5 w-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500 language-checkbox">
+            <span>ଓଡ଼ିଆ Odia</span>
+            <span class="ml-auto text-sm text-gray-500">38M+</span>
+        </label>
+        <label class="flex items-center p-2 hover:bg-gray-100 cursor-pointer rounded">
+            <input type="checkbox" value="Assamese" class="mr-3 h-5 w-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500 language-checkbox">
+            <span>অসমীয়া Assamese</span>
+            <span class="ml-auto text-sm text-gray-500">15M+</span>
+        </label>
+    </div>
+
+    <!-- European Languages (Additional) -->
+    <div class="p-2 border-b">
+        <p class="font-semibold text-gray-700 mb-1">🇪🇺 European Languages</p>
+        <label class="flex items-center p-2 hover:bg-gray-100 cursor-pointer rounded">
+            <input type="checkbox" value="German" class="mr-3 h-5 w-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500 language-checkbox">
+            <span>🇩🇪 German</span>
+            <span class="ml-auto text-sm text-gray-500">134M+</span>
+        </label>
+        <label class="flex items-center p-2 hover:bg-gray-100 cursor-pointer rounded">
+            <input type="checkbox" value="Italian" class="mr-3 h-5 w-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500 language-checkbox">
+            <span>🇮🇹 Italian</span>
+            <span class="ml-auto text-sm text-gray-500">67M+</span>
+        </label>
+        <label class="flex items-center p-2 hover:bg-gray-100 cursor-pointer rounded">
+            <input type="checkbox" value="Dutch" class="mr-3 h-5 w-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500 language-checkbox">
+            <span>🇳🇱 Dutch</span>
+            <span class="ml-auto text-sm text-gray-500">24M+</span>
+        </label>
+        <label class="flex items-center p-2 hover:bg-gray-100 cursor-pointer rounded">
+            <input type="checkbox" value="Polish" class="mr-3 h-5 w-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500 language-checkbox">
+            <span>🇵🇱 Polish</span>
+            <span class="ml-auto text-sm text-gray-500">45M+</span>
+        </label>
+        <label class="flex items-center p-2 hover:bg-gray-100 cursor-pointer rounded">
+            <input type="checkbox" value="Swedish" class="mr-3 h-5 w-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500 language-checkbox">
+            <span>🇸🇪 Swedish</span>
+            <span class="ml-auto text-sm text-gray-500">10M+</span>
+        </label>
+        <label class="flex items-center p-2 hover:bg-gray-100 cursor-pointer rounded">
+            <input type="checkbox" value="Greek" class="mr-3 h-5 w-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500 language-checkbox">
+            <span>🇬🇷 Greek</span>
+            <span class="ml-auto text-sm text-gray-500">13M+</span>
+        </label>
+    </div>
+
+    <!-- Asian Languages (Additional) -->
+    <div class="p-2 border-b">
+        <p class="font-semibold text-gray-700 mb-1">🌏 Asian Languages</p>
+        <label class="flex items-center p-2 hover:bg-gray-100 cursor-pointer rounded">
+            <input type="checkbox" value="Japanese" class="mr-3 h-5 w-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500 language-checkbox">
+            <span>🇯🇵 Japanese</span>
+            <span class="ml-auto text-sm text-gray-500">126M+</span>
+        </label>
+        <label class="flex items-center p-2 hover:bg-gray-100 cursor-pointer rounded">
+            <input type="checkbox" value="Korean" class="mr-3 h-5 w-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500 language-checkbox">
+            <span>🇰🇷 Korean</span>
+            <span class="ml-auto text-sm text-gray-500">81M+</span>
+        </label>
+        <label class="flex items-center p-2 hover:bg-gray-100 cursor-pointer rounded">
+            <input type="checkbox" value="Thai" class="mr-3 h-5 w-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500 language-checkbox">
+            <span>🇹🇭 Thai</span>
+            <span class="ml-auto text-sm text-gray-500">61M+</span>
+        </label>
+        <label class="flex items-center p-2 hover:bg-gray-100 cursor-pointer rounded">
+            <input type="checkbox" value="Vietnamese" class="mr-3 h-5 w-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500 language-checkbox">
+            <span>🇻🇳 Vietnamese</span>
+            <span class="ml-auto text-sm text-gray-500">85M+</span>
+        </label>
+        <label class="flex items-center p-2 hover:bg-gray-100 cursor-pointer rounded">
+            <input type="checkbox" value="Indonesian" class="mr-3 h-5 w-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500 language-checkbox">
+            <span>🇮🇩 Indonesian</span>
+            <span class="ml-auto text-sm text-gray-500">199M+</span>
+        </label>
+        <label class="flex items-center p-2 hover:bg-gray-100 cursor-pointer rounded">
+            <input type="checkbox" value="Malay" class="mr-3 h-5 w-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500 language-checkbox">
+            <span>🇲🇾 Malay</span>
+            <span class="ml-auto text-sm text-gray-500">77M+</span>
+        </label>
+    </div>
+
+    <!-- Middle Eastern Languages (Additional) -->
+    <div class="p-2 border-b">
+        <p class="font-semibold text-gray-700 mb-1">🕌 Middle Eastern Languages</p>
+        <label class="flex items-center p-2 hover:bg-gray-100 cursor-pointer rounded">
+            <input type="checkbox" value="Persian" class="mr-3 h-5 w-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500 language-checkbox">
+            <span>🇮🇷 Persian (Farsi)</span>
+            <span class="ml-auto text-sm text-gray-500">77M+</span>
+        </label>
+        <label class="flex items-center p-2 hover:bg-gray-100 cursor-pointer rounded">
+            <input type="checkbox" value="Turkish" class="mr-3 h-5 w-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500 language-checkbox">
+            <span>🇹🇷 Turkish</span>
+            <span class="ml-auto text-sm text-gray-500">88M+</span>
+        </label>
+        <label class="flex items-center p-2 hover:bg-gray-100 cursor-pointer rounded">
+            <input type="checkbox" value="Hebrew" class="mr-3 h-5 w-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500 language-checkbox">
+            <span>🇮🇱 Hebrew</span>
+            <span class="ml-auto text-sm text-gray-500">9M+</span>
+        </label>
+    </div>
+
+    <!-- African Languages -->
+    <div class="p-2 border-b">
+        <p class="font-semibold text-gray-700 mb-1">🌍 African Languages</p>
+        <label class="flex items-center p-2 hover:bg-gray-100 cursor-pointer rounded">
+            <input type="checkbox" value="Swahili" class="mr-3 h-5 w-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500 language-checkbox">
+            <span>🇰🇪 Swahili</span>
+            <span class="ml-auto text-sm text-gray-500">98M+</span>
+        </label>
+        <label class="flex items-center p-2 hover:bg-gray-100 cursor-pointer rounded">
+            <input type="checkbox" value="Afrikaans" class="mr-3 h-5 w-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500 language-checkbox">
+            <span>🇿🇦 Afrikaans</span>
+            <span class="ml-auto text-sm text-gray-500">17M+</span>
+        </label>
+        <label class="flex items-center p-2 hover:bg-gray-100 cursor-pointer rounded">
+            <input type="checkbox" value="Hausa" class="mr-3 h-5 w-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500 language-checkbox">
+            <span>🇳🇬 Hausa</span>
+            <span class="ml-auto text-sm text-gray-500">63M+</span>
+        </label>
+        <label class="flex items-center p-2 hover:bg-gray-100 cursor-pointer rounded">
+            <input type="checkbox" value="Yoruba" class="mr-3 h-5 w-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500 language-checkbox">
+            <span>🇳🇬 Yoruba</span>
+            <span class="ml-auto text-sm text-gray-500">43M+</span>
+        </label>
+    </div>
+
+    <!-- Other Option -->
+    <div class="p-2">
+        <label class="flex items-center p-2 hover:bg-gray-100 cursor-pointer rounded">
+            <input type="checkbox" value="Other" class="mr-3 h-5 w-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500 language-checkbox">
+            <span class="font-medium">🌐 Other Language</span>
+        </label>
+    </div>
+</div>
+    </div>
+
+    <!-- Other Language Input Field -->
+    <div id="other_language_field" style="display: none;" class="mt-3">
+        <label class="block text-gray-700 font-semibold mb-2">Specify Other Language(s)</label>
+        <input type="text" name="other_language" id="other_language_input" class="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition duration-300" placeholder="Enter language(s), separated by commas">
+    </div>
+
+    <!-- Hidden input to store selected languages -->
+    <input type="hidden" name="language" id="language_hidden_input" value="{{ language or '' }}">
+
+    <p class="text-sm text-gray-500 mt-1"><i class="fas fa-mouse-pointer mr-1"></i>Click to select multiple languages</p>
+</div>
 
                     <!-- Other Language Field -->
                     <div id="other_language_field" style="display: none;">
@@ -596,85 +865,318 @@
             </h3>
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <div class="space-y-4">
-                    <div>
-                        <label class="block text-gray-700 font-semibold mb-2">Mentorship Topics *</label>
-                        <select name="mentorship_topics" class="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition duration-300" multiple>
-                            <optgroup label="Career Development">
-                                <option value="Career Guidance" {% if mentorship_topics and 'Career Guidance' in mentorship_topics %}selected{% endif %}>🎯 Career Guidance</option>
-                                <option value="Career Transition" {% if mentorship_topics and 'Career Transition' in mentorship_topics %}selected{% endif %}>🔄 Career Transition</option>
-                                <option value="Interview Preparation" {% if mentorship_topics and 'Interview Preparation' in mentorship_topics %}selected{% endif %}>📝 Interview Preparation</option>
-                                <option value="Resume Building" {% if mentorship_topics and 'Resume Building' in mentorship_topics %}selected{% endif %}>📄 Resume Building</option>
-                                <option value="Job Search Strategy" {% if mentorship_topics and 'Job Search Strategy' in mentorship_topics %}selected{% endif %}>🔍 Job Search Strategy</option>
-                                <option value="Salary Negotiation" {% if mentorship_topics and 'Salary Negotiation' in mentorship_topics %}selected{% endif %}>💰 Salary Negotiation</option>
-                            </optgroup>
-                            <optgroup label="Technical Skills">
-                                <option value="Programming" {% if mentorship_topics and 'Programming' in mentorship_topics %}selected{% endif %}>💻 Programming</option>
-                                <option value="Data Science" {% if mentorship_topics and 'Data Science' in mentorship_topics %}selected{% endif %}>📊 Data Science</option>
-                                <option value="Machine Learning" {% if mentorship_topics and 'Machine Learning' in mentorship_topics %}selected{% endif %}>🤖 Machine Learning</option>
-                                <option value="Web Development" {% if mentorship_topics and 'Web Development' in mentorship_topics %}selected{% endif %}>🌐 Web Development</option>
-                                <option value="Mobile Development" {% if mentorship_topics and 'Mobile Development' in mentorship_topics %}selected{% endif %}>📱 Mobile Development</option>
-                                <option value="Cloud Computing" {% if 'Cloud Computing' in mentorship_topics %}selected{% endif %}>☁️ Cloud Computing</option>
-                                <option value="Cybersecurity" {% if 'Cybersecurity' in mentorship_topics %}selected{% endif %}>🔒 Cybersecurity</option>
-                            </optgroup>
-                            <optgroup label="Professional Skills">
-                                <option value="Leadership" {% if 'Leadership' in mentorship_topics %}selected{% endif %}>🌟 Leadership</option>
-                                <option value="Project Management" {% if 'Project Management' in mentorship_topics %}selected{% endif %}>📊 Project Management</option>
-                                <option value="Public Speaking" {% if 'Public Speaking' in mentorship_topics %}selected{% endif %}>🎤 Public Speaking</option>
-                                <option value="Communication Skills" {% if 'Communication Skills' in mentorship_topics %}selected{% endif %}>💬 Communication Skills</option>
-                                <option value="Time Management" {% if 'Time Management' in mentorship_topics %}selected{% endif %}>⏰ Time Management</option>
-                                <option value="Team Collaboration" {% if 'Team Collaboration' in mentorship_topics %}selected{% endif %}>👥 Team Collaboration</option>
-                            </optgroup>
-                            <optgroup label="Academic & Research">
-                                <option value="Research Methodology" {% if 'Research Methodology' in mentorship_topics %}selected{% endif %}>🔬 Research Methodology</option>
-                                <option value="Academic Writing" {% if 'Academic Writing' in mentorship_topics %}selected{% endif %}>✍️ Academic Writing</option>
-                                <option value="Thesis Guidance" {% if 'Thesis Guidance' in mentorship_topics %}selected{% endif %}>📚 Thesis Guidance</option>
-                                <option value="Study Abroad" {% if 'Study Abroad' in mentorship_topics %}selected{% endif %}>✈️ Study Abroad</option>
-                                <option value="Competitive Exams" {% if 'Competitive Exams' in mentorship_topics %}selected{% endif %}>📝 Competitive Exams</option>
-                            </optgroup>
-                            <optgroup label="Entrepreneurship">
-                                <option value="Startup Guidance" {% if 'Startup Guidance' in mentorship_topics %}selected{% endif %}>🚀 Startup Guidance</option>
-                                <option value="Business Planning" {% if 'Business Planning' in mentorship_topics %}selected{% endif %}>📈 Business Planning</option>
-                                <option value="Funding & Investment" {% if 'Funding & Investment' in mentorship_topics %}selected{% endif %}>💸 Funding & Investment</option>
-                                <option value="Marketing Strategy" {% if 'Marketing Strategy' in mentorship_topics %}selected{% endif %}>📢 Marketing Strategy</option>
-                                <option value="Product Management" {% if 'Product Management' in mentorship_topics %}selected{% endif %}>📦 Product Management</option>
-                            </optgroup>
-                            <optgroup label="Personal Development">
-                                <option value="Personal Growth" {% if 'Personal Growth' in mentorship_topics %}selected{% endif %}>🌱 Personal Growth</option>
-                                <option value="Mindset & Motivation" {% if 'Mindset & Motivation' in mentorship_topics %}selected{% endif %}>💪 Mindset & Motivation</option>
-                                <option value="Work-Life Balance" {% if 'Work-Life Balance' in mentorship_topics %}selected{% endif %}>⚖️ Work-Life Balance</option>
-                                <option value="Networking Skills" {% if 'Networking Skills' in mentorship_topics %}selected{% endif %}>🤝 Networking Skills</option>
-                                <option value="Personal Branding" {% if 'Personal Branding' in mentorship_topics %}selected{% endif %}>🌟 Personal Branding</option>
-                            </optgroup>
-                        </select>
-                        <p class="text-sm text-gray-500 mt-1"><i class="fas fa-mouse-pointer mr-1"></i>Hold Ctrl/Cmd to select multiple topics</p>
-                    </div>
+                    
+                    
+<div>
+    <label class="block text-gray-700 font-semibold mb-2">Mentorship Topics *</label>
+    
+    <!-- Selected topics will appear here as tags -->
+    <div id="selected_topics_container" class="flex flex-wrap gap-2 mb-2 p-2 border border-gray-300 rounded-lg min-h-[3rem] bg-gray-50">
+        {% if mentorship_topics %}
+            {% set topics_list = mentorship_topics.split(',') if mentorship_topics is string else mentorship_topics %}
+            {% for topic in topics_list %}
+                <div class="inline-flex items-center bg-green-100 text-green-800 text-sm font-medium px-3 py-1 rounded-full">
+                    <span>{{ topic.strip() }}</span>
+                    <button type="button" class="ml-2 text-green-600 hover:text-green-800 remove-topic-btn" data-value="{{ topic.strip() }}">
+                        &times;
+                    </button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    </div>
 
-                    <div>
-                        <label class="block text-gray-700 font-semibold mb-2">Mentorship Type Preference *</label>
-                        <select name="mentorship_type_preference" class="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition duration-300" multiple>
-                            <optgroup label="Student Groups">
-                                <option value="School Students" {% if mentorship_type_preference and 'School Students' in mentorship_type_preference %}selected{% endif %}>🎒 School Students (6th-12th)</option>
-                                <option value="College Students" {% if mentorship_type_preference and 'College Students' in mentorship_type_preference %}selected{% endif %}>🎓 College Students (Undergraduate)</option>
-                                <option value="Graduate Students" {% if mentorship_type_preference and 'Graduate Students' in mentorship_type_preference %}selected{% endif %}>🎓 Graduate Students (Postgraduate)</option>
-                                <option value="PhD Scholars" {% if mentorship_type_preference and 'PhD Scholars' in mentorship_type_preference %}selected{% endif %}>🔬 PhD Scholars</option>
-                            </optgroup>
-                            <optgroup label="Professional Groups">
-                                <option value="Early Professionals" {% if mentorship_type_preference and 'Early Professionals' in mentorship_type_preference %}selected{% endif %}>👨‍💼 Early Professionals (0-3 years)</option>
-                                <option value="Mid-Level Professionals" {% if mentorship_type_preference and 'Mid-Level Professionals' in mentorship_type_preference %}selected{% endif %}>💼 Mid-Level Professionals (4-8 years)</option>
-                                <option value="Senior Professionals" {% if mentorship_type_preference and 'Senior Professionals' in mentorship_type_preference %}selected{% endif %}>👔 Senior Professionals (8+ years)</option>
-                                <option value="Career Changers" {% if mentorship_type_preference and 'Career Changers' in mentorship_type_preference %}selected{% endif %}>🔄 Career Changers</option>
-                            </optgroup>
-                            <optgroup label="Special Groups">
-                                <option value="Women" {% if mentorship_type_preference and 'Women' in mentorship_type_preference %}selected{% endif %}>👩‍💼 Women Professionals</option>
-                                <option value="Underrepresented Groups" {% if mentorship_type_preference and 'Underrepresented Groups' in mentorship_type_preference %}selected{% endif %}>🌈 Underrepresented Groups</option>
-                                <option value="Entrepreneurs" {% if mentorship_type_preference and 'Entrepreneurs' in mentorship_type_preference %}selected{% endif %}>💡 Entrepreneurs</option>
-                                <option value="Returning Professionals" {% if mentorship_type_preference and 'Returning Professionals' in mentorship_type_preference %}selected{% endif %}>↩️ Returning Professionals</option>
-                                <option value="First Generation Students" {% if mentorship_type_preference and 'First Generation Students' in mentorship_type_preference %}selected{% endif %}>🌟 First Generation Students</option>
-                            </optgroup>
-                            <option value="All" {% if mentorship_type_preference and 'All' in mentorship_type_preference %}selected{% endif %}>🌍 All Groups</option>
-                        </select>
-                        <p class="text-sm text-gray-500 mt-1"><i class="fas fa-mouse-pointer mr-1"></i>Hold Ctrl/Cmd to select multiple preferences</p>
-                    </div>
+    <!-- Dropdown toggle button -->
+    <div class="relative">
+        <button type="button" id="topics_dropdown_toggle" class="w-full p-3 border-2 border-gray-200 rounded-xl text-left focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition duration-300 bg-white">
+            <span class="text-gray-500">Select Mentorship Topics...</span>
+            <span class="float-right">▼</span>
+        </button>
+
+        <!-- Dropdown menu with checkboxes -->
+        <div id="topics_dropdown_menu" class="hidden absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-xl shadow-lg max-h-80 overflow-y-auto">
+            <!-- Career Development -->
+            <div class="p-2 border-b">
+                <p class="font-semibold text-gray-700 mb-1">Career Development</p>
+                <label class="flex items-center p-2 hover:bg-gray-100 cursor-pointer rounded">
+                    <input type="checkbox" value="Career Guidance" class="mr-3 h-5 w-5 rounded border-gray-300 text-green-600 focus:ring-green-500 topic-checkbox">
+                    <span>🎯 Career Guidance</span>
+                </label>
+                <label class="flex items-center p-2 hover:bg-gray-100 cursor-pointer rounded">
+                    <input type="checkbox" value="Career Transition" class="mr-3 h-5 w-5 rounded border-gray-300 text-green-600 focus:ring-green-500 topic-checkbox">
+                    <span>🔄 Career Transition</span>
+                </label>
+                <label class="flex items-center p-2 hover:bg-gray-100 cursor-pointer rounded">
+                    <input type="checkbox" value="Interview Preparation" class="mr-3 h-5 w-5 rounded border-gray-300 text-green-600 focus:ring-green-500 topic-checkbox">
+                    <span>📝 Interview Preparation</span>
+                </label>
+                <label class="flex items-center p-2 hover:bg-gray-100 cursor-pointer rounded">
+                    <input type="checkbox" value="Resume Building" class="mr-3 h-5 w-5 rounded border-gray-300 text-green-600 focus:ring-green-500 topic-checkbox">
+                    <span>📄 Resume Building</span>
+                </label>
+                <label class="flex items-center p-2 hover:bg-gray-100 cursor-pointer rounded">
+                    <input type="checkbox" value="Job Search Strategy" class="mr-3 h-5 w-5 rounded border-gray-300 text-green-600 focus:ring-green-500 topic-checkbox">
+                    <span>🔍 Job Search Strategy</span>
+                </label>
+                <label class="flex items-center p-2 hover:bg-gray-100 cursor-pointer rounded">
+                    <input type="checkbox" value="Salary Negotiation" class="mr-3 h-5 w-5 rounded border-gray-300 text-green-600 focus:ring-green-500 topic-checkbox">
+                    <span>💰 Salary Negotiation</span>
+                </label>
+            </div>
+
+            <!-- Technical Skills -->
+            <div class="p-2 border-b">
+                <p class="font-semibold text-gray-700 mb-1">Technical Skills</p>
+                <label class="flex items-center p-2 hover:bg-gray-100 cursor-pointer rounded">
+                    <input type="checkbox" value="Programming" class="mr-3 h-5 w-5 rounded border-gray-300 text-green-600 focus:ring-green-500 topic-checkbox">
+                    <span>💻 Programming</span>
+                </label>
+                <label class="flex items-center p-2 hover:bg-gray-100 cursor-pointer rounded">
+                    <input type="checkbox" value="Data Science" class="mr-3 h-5 w-5 rounded border-gray-300 text-green-600 focus:ring-green-500 topic-checkbox">
+                    <span>📊 Data Science</span>
+                </label>
+                <label class="flex items-center p-2 hover:bg-gray-100 cursor-pointer rounded">
+                    <input type="checkbox" value="Machine Learning" class="mr-3 h-5 w-5 rounded border-gray-300 text-green-600 focus:ring-green-500 topic-checkbox">
+                    <span>🤖 Machine Learning</span>
+                </label>
+                <label class="flex items-center p-2 hover:bg-gray-100 cursor-pointer rounded">
+                    <input type="checkbox" value="Web Development" class="mr-3 h-5 w-5 rounded border-gray-300 text-green-600 focus:ring-green-500 topic-checkbox">
+                    <span>🌐 Web Development</span>
+                </label>
+                <label class="flex items-center p-2 hover:bg-gray-100 cursor-pointer rounded">
+                    <input type="checkbox" value="Mobile Development" class="mr-3 h-5 w-5 rounded border-gray-300 text-green-600 focus:ring-green-500 topic-checkbox">
+                    <span>📱 Mobile Development</span>
+                </label>
+                <label class="flex items-center p-2 hover:bg-gray-100 cursor-pointer rounded">
+                    <input type="checkbox" value="Cloud Computing" class="mr-3 h-5 w-5 rounded border-gray-300 text-green-600 focus:ring-green-500 topic-checkbox">
+                    <span>☁️ Cloud Computing</span>
+                </label>
+                <label class="flex items-center p-2 hover:bg-gray-100 cursor-pointer rounded">
+                    <input type="checkbox" value="Cybersecurity" class="mr-3 h-5 w-5 rounded border-gray-300 text-green-600 focus:ring-green-500 topic-checkbox">
+                    <span>🔒 Cybersecurity</span>
+                </label>
+            </div>
+
+            <!-- Professional Skills -->
+            <div class="p-2 border-b">
+                <p class="font-semibold text-gray-700 mb-1">Professional Skills</p>
+                <label class="flex items-center p-2 hover:bg-gray-100 cursor-pointer rounded">
+                    <input type="checkbox" value="Leadership" class="mr-3 h-5 w-5 rounded border-gray-300 text-green-600 focus:ring-green-500 topic-checkbox">
+                    <span>🌟 Leadership</span>
+                </label>
+                <label class="flex items-center p-2 hover:bg-gray-100 cursor-pointer rounded">
+                    <input type="checkbox" value="Project Management" class="mr-3 h-5 w-5 rounded border-gray-300 text-green-600 focus:ring-green-500 topic-checkbox">
+                    <span>📊 Project Management</span>
+                </label>
+                <label class="flex items-center p-2 hover:bg-gray-100 cursor-pointer rounded">
+                    <input type="checkbox" value="Public Speaking" class="mr-3 h-5 w-5 rounded border-gray-300 text-green-600 focus:ring-green-500 topic-checkbox">
+                    <span>🎤 Public Speaking</span>
+                </label>
+                <label class="flex items-center p-2 hover:bg-gray-100 cursor-pointer rounded">
+                    <input type="checkbox" value="Communication Skills" class="mr-3 h-5 w-5 rounded border-gray-300 text-green-600 focus:ring-green-500 topic-checkbox">
+                    <span>💬 Communication Skills</span>
+                </label>
+                <label class="flex items-center p-2 hover:bg-gray-100 cursor-pointer rounded">
+                    <input type="checkbox" value="Time Management" class="mr-3 h-5 w-5 rounded border-gray-300 text-green-600 focus:ring-green-500 topic-checkbox">
+                    <span>⏰ Time Management</span>
+                </label>
+                <label class="flex items-center p-2 hover:bg-gray-100 cursor-pointer rounded">
+                    <input type="checkbox" value="Team Collaboration" class="mr-3 h-5 w-5 rounded border-gray-300 text-green-600 focus:ring-green-500 topic-checkbox">
+                    <span>👥 Team Collaboration</span>
+                </label>
+            </div>
+
+            <!-- Academic & Research -->
+            <div class="p-2 border-b">
+                <p class="font-semibold text-gray-700 mb-1">Academic & Research</p>
+                <label class="flex items-center p-2 hover:bg-gray-100 cursor-pointer rounded">
+                    <input type="checkbox" value="Research Methodology" class="mr-3 h-5 w-5 rounded border-gray-300 text-green-600 focus:ring-green-500 topic-checkbox">
+                    <span>🔬 Research Methodology</span>
+                </label>
+                <label class="flex items-center p-2 hover:bg-gray-100 cursor-pointer rounded">
+                    <input type="checkbox" value="Academic Writing" class="mr-3 h-5 w-5 rounded border-gray-300 text-green-600 focus:ring-green-500 topic-checkbox">
+                    <span>✍️ Academic Writing</span>
+                </label>
+                <label class="flex items-center p-2 hover:bg-gray-100 cursor-pointer rounded">
+                    <input type="checkbox" value="Thesis Guidance" class="mr-3 h-5 w-5 rounded border-gray-300 text-green-600 focus:ring-green-500 topic-checkbox">
+                    <span>📚 Thesis Guidance</span>
+                </label>
+                <label class="flex items-center p-2 hover:bg-gray-100 cursor-pointer rounded">
+                    <input type="checkbox" value="Study Abroad" class="mr-3 h-5 w-5 rounded border-gray-300 text-green-600 focus:ring-green-500 topic-checkbox">
+                    <span>✈️ Study Abroad</span>
+                </label>
+                <label class="flex items-center p-2 hover:bg-gray-100 cursor-pointer rounded">
+                    <input type="checkbox" value="Competitive Exams" class="mr-3 h-5 w-5 rounded border-gray-300 text-green-600 focus:ring-green-500 topic-checkbox">
+                    <span>📝 Competitive Exams</span>
+                </label>
+            </div>
+
+            <!-- Entrepreneurship -->
+            <div class="p-2 border-b">
+                <p class="font-semibold text-gray-700 mb-1">Entrepreneurship</p>
+                <label class="flex items-center p-2 hover:bg-gray-100 cursor-pointer rounded">
+                    <input type="checkbox" value="Startup Guidance" class="mr-3 h-5 w-5 rounded border-gray-300 text-green-600 focus:ring-green-500 topic-checkbox">
+                    <span>🚀 Startup Guidance</span>
+                </label>
+                <label class="flex items-center p-2 hover:bg-gray-100 cursor-pointer rounded">
+                    <input type="checkbox" value="Business Planning" class="mr-3 h-5 w-5 rounded border-gray-300 text-green-600 focus:ring-green-500 topic-checkbox">
+                    <span>📈 Business Planning</span>
+                </label>
+                <label class="flex items-center p-2 hover:bg-gray-100 cursor-pointer rounded">
+                    <input type="checkbox" value="Funding & Investment" class="mr-3 h-5 w-5 rounded border-gray-300 text-green-600 focus:ring-green-500 topic-checkbox">
+                    <span>💸 Funding & Investment</span>
+                </label>
+                <label class="flex items-center p-2 hover:bg-gray-100 cursor-pointer rounded">
+                    <input type="checkbox" value="Marketing Strategy" class="mr-3 h-5 w-5 rounded border-gray-300 text-green-600 focus:ring-green-500 topic-checkbox">
+                    <span>📢 Marketing Strategy</span>
+                </label>
+                <label class="flex items-center p-2 hover:bg-gray-100 cursor-pointer rounded">
+                    <input type="checkbox" value="Product Management" class="mr-3 h-5 w-5 rounded border-gray-300 text-green-600 focus:ring-green-500 topic-checkbox">
+                    <span>📦 Product Management</span>
+                </label>
+            </div>
+
+            <!-- Personal Development -->
+            <div class="p-2">
+                <p class="font-semibold text-gray-700 mb-1">Personal Development</p>
+                <label class="flex items-center p-2 hover:bg-gray-100 cursor-pointer rounded">
+                    <input type="checkbox" value="Personal Growth" class="mr-3 h-5 w-5 rounded border-gray-300 text-green-600 focus:ring-green-500 topic-checkbox">
+                    <span>🌱 Personal Growth</span>
+                </label>
+                <label class="flex items-center p-2 hover:bg-gray-100 cursor-pointer rounded">
+                    <input type="checkbox" value="Mindset & Motivation" class="mr-3 h-5 w-5 rounded border-gray-300 text-green-600 focus:ring-green-500 topic-checkbox">
+                    <span>💪 Mindset & Motivation</span>
+                </label>
+                <label class="flex items-center p-2 hover:bg-gray-100 cursor-pointer rounded">
+                    <input type="checkbox" value="Work-Life Balance" class="mr-3 h-5 w-5 rounded border-gray-300 text-green-600 focus:ring-green-500 topic-checkbox">
+                    <span>⚖️ Work-Life Balance</span>
+                </label>
+                <label class="flex items-center p-2 hover:bg-gray-100 cursor-pointer rounded">
+                    <input type="checkbox" value="Networking Skills" class="mr-3 h-5 w-5 rounded border-gray-300 text-green-600 focus:ring-green-500 topic-checkbox">
+                    <span>🤝 Networking Skills</span>
+                </label>
+                <label class="flex items-center p-2 hover:bg-gray-100 cursor-pointer rounded">
+                    <input type="checkbox" value="Personal Branding" class="mr-3 h-5 w-5 rounded border-gray-300 text-green-600 focus:ring-green-500 topic-checkbox">
+                    <span>🌟 Personal Branding</span>
+                </label>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hidden input to store selected topics -->
+    <input type="hidden" name="mentorship_topics" id="topics_hidden_input" value="{{ mentorship_topics or '' }}">
+
+    <p class="text-sm text-gray-500 mt-1"><i class="fas fa-mouse-pointer mr-1"></i>Click to select multiple topics</p>
+</div>
+
+    <div>
+    <label class="block text-gray-700 font-semibold mb-2">Mentorship Type Preference *</label>
+    
+    <!-- Selected preferences will appear here as tags -->
+    <div id="selected_mentorship_prefs_container" class="flex flex-wrap gap-2 mb-2 p-2 border border-gray-300 rounded-lg min-h-[3rem] bg-gray-50">
+        {% if mentorship_type_preference %}
+            {% set prefs_list = mentorship_type_preference.split(',') if mentorship_type_preference is string else mentorship_type_preference %}
+            {% for pref in prefs_list %}
+                <div class="inline-flex items-center bg-purple-100 text-purple-800 text-sm font-medium px-3 py-1 rounded-full">
+                    <span>{{ pref.strip() }}</span>
+                    <button type="button" class="ml-2 text-purple-600 hover:text-purple-800 remove-mentorship-pref-btn" data-value="{{ pref.strip() }}">
+                        &times;
+                    </button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    </div>
+
+    <!-- Dropdown toggle button -->
+    <div class="relative">
+        <button type="button" id="mentorship_pref_dropdown_toggle" class="w-full p-3 border-2 border-gray-200 rounded-xl text-left focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition duration-300 bg-white">
+            <span class="text-gray-500">Select Mentorship Preferences...</span>
+            <span class="float-right">▼</span>
+        </button>
+
+        <!-- Dropdown menu with checkboxes -->
+        <div id="mentorship_pref_dropdown_menu" class="hidden absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-xl shadow-lg max-h-80 overflow-y-auto">
+            <!-- Student Groups -->
+            <div class="p-2 border-b">
+                <p class="font-semibold text-gray-700 mb-1">Student Groups</p>
+                <label class="flex items-center p-2 hover:bg-gray-100 cursor-pointer rounded">
+                    <input type="checkbox" value="School Students" class="mr-3 h-5 w-5 rounded border-gray-300 text-purple-600 focus:ring-purple-500 mentorship-pref-checkbox">
+                    <span>🎒 School Students (6th-12th)</span>
+                </label>
+                <label class="flex items-center p-2 hover:bg-gray-100 cursor-pointer rounded">
+                    <input type="checkbox" value="College Students" class="mr-3 h-5 w-5 rounded border-gray-300 text-purple-600 focus:ring-purple-500 mentorship-pref-checkbox">
+                    <span>🎓 College Students (Undergraduate)</span>
+                </label>
+                <label class="flex items-center p-2 hover:bg-gray-100 cursor-pointer rounded">
+                    <input type="checkbox" value="Graduate Students" class="mr-3 h-5 w-5 rounded border-gray-300 text-purple-600 focus:ring-purple-500 mentorship-pref-checkbox">
+                    <span>🎓 Graduate Students (Postgraduate)</span>
+                </label>
+                <label class="flex items-center p-2 hover:bg-gray-100 cursor-pointer rounded">
+                    <input type="checkbox" value="PhD Scholars" class="mr-3 h-5 w-5 rounded border-gray-300 text-purple-600 focus:ring-purple-500 mentorship-pref-checkbox">
+                    <span>🔬 PhD Scholars</span>
+                </label>
+            </div>
+
+            <!-- Professional Groups -->
+            <div class="p-2 border-b">
+                <p class="font-semibold text-gray-700 mb-1">Professional Groups</p>
+                <label class="flex items-center p-2 hover:bg-gray-100 cursor-pointer rounded">
+                    <input type="checkbox" value="Early Professionals" class="mr-3 h-5 w-5 rounded border-gray-300 text-purple-600 focus:ring-purple-500 mentorship-pref-checkbox">
+                    <span>👨‍💼 Early Professionals (0-3 years)</span>
+                </label>
+                <label class="flex items-center p-2 hover:bg-gray-100 cursor-pointer rounded">
+                    <input type="checkbox" value="Mid-Level Professionals" class="mr-3 h-5 w-5 rounded border-gray-300 text-purple-600 focus:ring-purple-500 mentorship-pref-checkbox">
+                    <span>💼 Mid-Level Professionals (4-8 years)</span>
+                </label>
+                <label class="flex items-center p-2 hover:bg-gray-100 cursor-pointer rounded">
+                    <input type="checkbox" value="Senior Professionals" class="mr-3 h-5 w-5 rounded border-gray-300 text-purple-600 focus:ring-purple-500 mentorship-pref-checkbox">
+                    <span>👔 Senior Professionals (8+ years)</span>
+                </label>
+                <label class="flex items-center p-2 hover:bg-gray-100 cursor-pointer rounded">
+                    <input type="checkbox" value="Career Changers" class="mr-3 h-5 w-5 rounded border-gray-300 text-purple-600 focus:ring-purple-500 mentorship-pref-checkbox">
+                    <span>🔄 Career Changers</span>
+                </label>
+            </div>
+
+            <!-- Special Groups -->
+            <div class="p-2 border-b">
+                <p class="font-semibold text-gray-700 mb-1">Special Groups</p>
+                <label class="flex items-center p-2 hover:bg-gray-100 cursor-pointer rounded">
+                    <input type="checkbox" value="Women" class="mr-3 h-5 w-5 rounded border-gray-300 text-purple-600 focus:ring-purple-500 mentorship-pref-checkbox">
+                    <span>👩‍💼 Women Professionals</span>
+                </label>
+                <label class="flex items-center p-2 hover:bg-gray-100 cursor-pointer rounded">
+                    <input type="checkbox" value="Underrepresented Groups" class="mr-3 h-5 w-5 rounded border-gray-300 text-purple-600 focus:ring-purple-500 mentorship-pref-checkbox">
+                    <span>🌈 Underrepresented Groups</span>
+                </label>
+                <label class="flex items-center p-2 hover:bg-gray-100 cursor-pointer rounded">
+                    <input type="checkbox" value="Entrepreneurs" class="mr-3 h-5 w-5 rounded border-gray-300 text-purple-600 focus:ring-purple-500 mentorship-pref-checkbox">
+                    <span>💡 Entrepreneurs</span>
+                </label>
+                <label class="flex items-center p-2 hover:bg-gray-100 cursor-pointer rounded">
+                    <input type="checkbox" value="Returning Professionals" class="mr-3 h-5 w-5 rounded border-gray-300 text-purple-600 focus:ring-purple-500 mentorship-pref-checkbox">
+                    <span>↩️ Returning Professionals</span>
+                </label>
+                <label class="flex items-center p-2 hover:bg-gray-100 cursor-pointer rounded">
+                    <input type="checkbox" value="First Generation Students" class="mr-3 h-5 w-5 rounded border-gray-300 text-purple-600 focus:ring-purple-500 mentorship-pref-checkbox">
+                    <span>🌟 First Generation Students</span>
+                </label>
+            </div>
+
+            <!-- All Option -->
+            <div class="p-2">
+                <label class="flex items-center p-2 hover:bg-gray-100 cursor-pointer rounded">
+                    <input type="checkbox" value="All" class="mr-3 h-5 w-5 rounded border-gray-300 text-purple-600 focus:ring-purple-500 mentorship-pref-checkbox">
+                    <span>🌍 All Groups</span>
+                </label>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hidden input to store selected preferences -->
+    <input type="hidden" name="mentorship_type_preference" id="mentorship_pref_hidden_input" value="{{ mentorship_type_preference or '' }}">
+
+    <p class="text-sm text-gray-500 mt-1"><i class="fas fa-mouse-pointer mr-1"></i>Click to select multiple preferences</p>
+</div>
                 </div>
                 <div class="space-y-4">
                     <div>
@@ -1114,6 +1616,478 @@ function updateCriminalCertificateRequirement() {
         otherCountryInput.addEventListener('input', checkLuxembourg);
     }
 }
+
+// Language multi-select dropdown functionality
+document.addEventListener('DOMContentLoaded', function() {
+    const languageDropdownToggle = document.getElementById('language_dropdown_toggle');
+    const languageDropdownMenu = document.getElementById('language_dropdown_menu');
+    const selectedLanguagesContainer = document.getElementById('selected_languages_container');
+    const languageHiddenInput = document.getElementById('language_hidden_input');
+    const languageCheckboxes = document.querySelectorAll('.language-checkbox');
+    const otherLanguageField = document.getElementById('other_language_field');
+    const otherLanguageInput = document.getElementById('other_language_input');
+
+    // Store selected languages
+    let selectedLanguages = [];
+
+    // Initialize with existing languages from hidden input
+    if (languageHiddenInput.value) {
+        const existingLanguages = languageHiddenInput.value.split(',');
+        selectedLanguages = existingLanguages.filter(lang => lang.trim() !== '');
+        
+        // Check corresponding checkboxes
+        languageCheckboxes.forEach(checkbox => {
+            if (selectedLanguages.includes(checkbox.value)) {
+                checkbox.checked = true;
+            }
+        });
+        
+        // Show other language field if "Other" is selected
+        if (selectedLanguages.includes('Other')) {
+            otherLanguageField.style.display = 'block';
+        }
+        
+        updateSelectedLanguagesDisplay();
+    }
+
+    // Toggle dropdown
+    if (languageDropdownToggle) {
+        languageDropdownToggle.addEventListener('click', function(e) {
+            e.stopPropagation();
+            languageDropdownMenu.classList.toggle('hidden');
+        });
+    }
+
+    // Close dropdown when clicking outside
+    document.addEventListener('click', function(e) {
+        if (!languageDropdownToggle.contains(e.target) && !languageDropdownMenu.contains(e.target)) {
+            languageDropdownMenu.classList.add('hidden');
+        }
+    });
+
+    // Handle checkbox changes
+    languageCheckboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', function() {
+            const value = this.value;
+            const isChecked = this.checked;
+
+            if (value === 'Other') {
+                if (isChecked) {
+                    otherLanguageField.style.display = 'block';
+                    otherLanguageInput.focus();
+                } else {
+                    otherLanguageField.style.display = 'none';
+                    otherLanguageInput.value = '';
+                }
+            }
+
+            if (isChecked) {
+                if (!selectedLanguages.includes(value)) {
+                    selectedLanguages.push(value);
+                }
+            } else {
+                const index = selectedLanguages.indexOf(value);
+                if (index > -1) {
+                    selectedLanguages.splice(index, 1);
+                }
+            }
+
+            updateSelectedLanguagesDisplay();
+            updateHiddenInput();
+        });
+    });
+
+    // Handle other language input
+    if (otherLanguageInput) {
+        otherLanguageInput.addEventListener('input', function() {
+            updateHiddenInput();
+        });
+    }
+
+    // Update selected languages display
+    function updateSelectedLanguagesDisplay() {
+        selectedLanguagesContainer.innerHTML = '';
+        
+        selectedLanguages.forEach(language => {
+            const tag = document.createElement('div');
+            tag.className = 'inline-flex items-center bg-blue-100 text-blue-800 text-sm font-medium px-3 py-1 rounded-full';
+            tag.innerHTML = `
+                <span>${language}</span>
+                <button type="button" class="ml-2 text-blue-600 hover:text-blue-800 remove-language-btn" data-value="${language}">
+                    &times;
+                </button>
+            `;
+            selectedLanguagesContainer.appendChild(tag);
+        });
+
+        // Add remove functionality
+        document.querySelectorAll('.remove-language-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                const valueToRemove = this.getAttribute('data-value');
+                removeLanguage(valueToRemove);
+            });
+        });
+    }
+
+    // Remove language
+    function removeLanguage(value) {
+        selectedLanguages = selectedLanguages.filter(lang => lang !== value);
+        
+        // Uncheck corresponding checkbox
+        languageCheckboxes.forEach(checkbox => {
+            if (checkbox.value === value) {
+                checkbox.checked = false;
+            }
+        });
+
+        // Hide other language field if "Other" is removed
+        if (value === 'Other') {
+            otherLanguageField.style.display = 'none';
+            otherLanguageInput.value = '';
+        }
+
+        updateSelectedLanguagesDisplay();
+        updateHiddenInput();
+    }
+
+    // Update hidden input value
+    function updateHiddenInput() {
+        let languages = [...selectedLanguages];
+        
+        // Add other languages if specified
+        if (selectedLanguages.includes('Other') && otherLanguageInput.value.trim()) {
+            const otherLanguages = otherLanguageInput.value.split(',').map(lang => lang.trim()).filter(lang => lang);
+            languages = [...selectedLanguages.filter(lang => lang !== 'Other'), ...otherLanguages];
+        }
+        
+        languageHiddenInput.value = languages.join(',');
+    }
+
+    // Form validation for languages
+    function validateLanguages() {
+        if (selectedLanguages.length === 0) {
+            selectedLanguagesContainer.style.borderColor = '#ef4444';
+            selectedLanguagesContainer.style.borderWidth = '2px';
+            return false;
+        } else {
+            selectedLanguagesContainer.style.borderColor = '';
+            selectedLanguagesContainer.style.borderWidth = '';
+            return true;
+        }
+    }
+
+    // Update form validation to include languages
+    const originalValidateForm = window.validateForm;
+    window.validateForm = function() {
+        if (!validateLanguages()) {
+            alert('❌ Please select at least one language');
+            return false;
+        }
+        return originalValidateForm();
+    };
+});
+
+
+
+
+// Mentorship Type Preference multi-select dropdown functionality
+document.addEventListener('DOMContentLoaded', function() {
+    const mentorshipPrefDropdownToggle = document.getElementById('mentorship_pref_dropdown_toggle');
+    const mentorshipPrefDropdownMenu = document.getElementById('mentorship_pref_dropdown_menu');
+    const selectedMentorshipPrefsContainer = document.getElementById('selected_mentorship_prefs_container');
+    const mentorshipPrefHiddenInput = document.getElementById('mentorship_pref_hidden_input');
+    const mentorshipPrefCheckboxes = document.querySelectorAll('.mentorship-pref-checkbox');
+
+    // Store selected preferences
+    let selectedMentorshipPrefs = [];
+
+    // Initialize with existing preferences from hidden input
+    if (mentorshipPrefHiddenInput.value) {
+        const existingPrefs = mentorshipPrefHiddenInput.value.split(',');
+        selectedMentorshipPrefs = existingPrefs.filter(pref => pref.trim() !== '');
+        
+        // Check corresponding checkboxes
+        mentorshipPrefCheckboxes.forEach(checkbox => {
+            if (selectedMentorshipPrefs.includes(checkbox.value)) {
+                checkbox.checked = true;
+            }
+        });
+        
+        updateSelectedMentorshipPrefsDisplay();
+    }
+
+    // Toggle dropdown
+    if (mentorshipPrefDropdownToggle) {
+        mentorshipPrefDropdownToggle.addEventListener('click', function(e) {
+            e.stopPropagation();
+            mentorshipPrefDropdownMenu.classList.toggle('hidden');
+        });
+    }
+
+    // Close dropdown when clicking outside
+    document.addEventListener('click', function(e) {
+        if (!mentorshipPrefDropdownToggle.contains(e.target) && !mentorshipPrefDropdownMenu.contains(e.target)) {
+            mentorshipPrefDropdownMenu.classList.add('hidden');
+        }
+    });
+
+    // Handle checkbox changes
+    mentorshipPrefCheckboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', function() {
+            const value = this.value;
+            const isChecked = this.checked;
+
+            // Handle "All" option
+            if (value === 'All' && isChecked) {
+                // Uncheck all other options
+                mentorshipPrefCheckboxes.forEach(cb => {
+                    if (cb.value !== 'All') {
+                        cb.checked = false;
+                    }
+                });
+                selectedMentorshipPrefs = ['All'];
+            } else if (value !== 'All' && isChecked) {
+                // If any specific option is selected, uncheck "All"
+                const allCheckbox = document.querySelector('.mentorship-pref-checkbox[value="All"]');
+                if (allCheckbox) {
+                    allCheckbox.checked = false;
+                }
+                const allIndex = selectedMentorshipPrefs.indexOf('All');
+                if (allIndex > -1) {
+                    selectedMentorshipPrefs.splice(allIndex, 1);
+                }
+                
+                if (!selectedMentorshipPrefs.includes(value)) {
+                    selectedMentorshipPrefs.push(value);
+                }
+            } else if (!isChecked) {
+                // Remove from selected list
+                const index = selectedMentorshipPrefs.indexOf(value);
+                if (index > -1) {
+                    selectedMentorshipPrefs.splice(index, 1);
+                }
+            }
+
+            updateSelectedMentorshipPrefsDisplay();
+            updateMentorshipPrefHiddenInput();
+        });
+    });
+
+    // Update selected preferences display
+    function updateSelectedMentorshipPrefsDisplay() {
+        selectedMentorshipPrefsContainer.innerHTML = '';
+        
+        selectedMentorshipPrefs.forEach(pref => {
+            const tag = document.createElement('div');
+            tag.className = 'inline-flex items-center bg-purple-100 text-purple-800 text-sm font-medium px-3 py-1 rounded-full';
+            tag.innerHTML = `
+                <span>${pref}</span>
+                <button type="button" class="ml-2 text-purple-600 hover:text-purple-800 remove-mentorship-pref-btn" data-value="${pref}">
+                    &times;
+                </button>
+            `;
+            selectedMentorshipPrefsContainer.appendChild(tag);
+        });
+
+        // Add remove functionality
+        document.querySelectorAll('.remove-mentorship-pref-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                const valueToRemove = this.getAttribute('data-value');
+                removeMentorshipPref(valueToRemove);
+            });
+        });
+    }
+
+    // Remove preference
+    function removeMentorshipPref(value) {
+        selectedMentorshipPrefs = selectedMentorshipPrefs.filter(pref => pref !== value);
+        
+        // Uncheck corresponding checkbox
+        mentorshipPrefCheckboxes.forEach(checkbox => {
+            if (checkbox.value === value) {
+                checkbox.checked = false;
+            }
+        });
+
+        updateSelectedMentorshipPrefsDisplay();
+        updateMentorshipPrefHiddenInput();
+    }
+
+    // Update hidden input value
+    function updateMentorshipPrefHiddenInput() {
+        mentorshipPrefHiddenInput.value = selectedMentorshipPrefs.join(',');
+    }
+
+    // Form validation for mentorship preferences
+    function validateMentorshipPrefs() {
+        if (selectedMentorshipPrefs.length === 0) {
+            selectedMentorshipPrefsContainer.style.borderColor = '#ef4444';
+            selectedMentorshipPrefsContainer.style.borderWidth = '2px';
+            return false;
+        } else {
+            selectedMentorshipPrefsContainer.style.borderColor = '';
+            selectedMentorshipPrefsContainer.style.borderWidth = '';
+            return true;
+        }
+    }
+
+    // Update form validation to include mentorship preferences
+    const originalValidateForm = window.validateForm;
+    window.validateForm = function() {
+        if (!validateLanguages()) {
+            alert('❌ Please select at least one language');
+            return false;
+        }
+        if (!validateMentorshipPrefs()) {
+            alert('❌ Please select at least one mentorship type preference');
+            return false;
+        }
+        return originalValidateForm();
+    };
+});
+
+
+
+
+// Mentorship Topics multi-select dropdown functionality
+document.addEventListener('DOMContentLoaded', function() {
+    const topicsDropdownToggle = document.getElementById('topics_dropdown_toggle');
+    const topicsDropdownMenu = document.getElementById('topics_dropdown_menu');
+    const selectedTopicsContainer = document.getElementById('selected_topics_container');
+    const topicsHiddenInput = document.getElementById('topics_hidden_input');
+    const topicCheckboxes = document.querySelectorAll('.topic-checkbox');
+
+    // Store selected topics
+    let selectedTopics = [];
+
+    // Initialize with existing topics from hidden input
+    if (topicsHiddenInput.value) {
+        const existingTopics = topicsHiddenInput.value.split(',');
+        selectedTopics = existingTopics.filter(topic => topic.trim() !== '');
+        
+        // Check corresponding checkboxes
+        topicCheckboxes.forEach(checkbox => {
+            if (selectedTopics.includes(checkbox.value)) {
+                checkbox.checked = true;
+            }
+        });
+        
+        updateSelectedTopicsDisplay();
+    }
+
+    // Toggle dropdown
+    if (topicsDropdownToggle) {
+        topicsDropdownToggle.addEventListener('click', function(e) {
+            e.stopPropagation();
+            topicsDropdownMenu.classList.toggle('hidden');
+        });
+    }
+
+    // Close dropdown when clicking outside
+    document.addEventListener('click', function(e) {
+        if (!topicsDropdownToggle.contains(e.target) && !topicsDropdownMenu.contains(e.target)) {
+            topicsDropdownMenu.classList.add('hidden');
+        }
+    });
+
+    // Handle checkbox changes
+    topicCheckboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', function() {
+            const value = this.value;
+            const isChecked = this.checked;
+
+            if (isChecked) {
+                if (!selectedTopics.includes(value)) {
+                    selectedTopics.push(value);
+                }
+            } else {
+                const index = selectedTopics.indexOf(value);
+                if (index > -1) {
+                    selectedTopics.splice(index, 1);
+                }
+            }
+
+            updateSelectedTopicsDisplay();
+            updateTopicsHiddenInput();
+        });
+    });
+
+    // Update selected topics display
+    function updateSelectedTopicsDisplay() {
+        selectedTopicsContainer.innerHTML = '';
+        
+        selectedTopics.forEach(topic => {
+            const tag = document.createElement('div');
+            tag.className = 'inline-flex items-center bg-green-100 text-green-800 text-sm font-medium px-3 py-1 rounded-full';
+            tag.innerHTML = `
+                <span>${topic}</span>
+                <button type="button" class="ml-2 text-green-600 hover:text-green-800 remove-topic-btn" data-value="${topic}">
+                    &times;
+                </button>
+            `;
+            selectedTopicsContainer.appendChild(tag);
+        });
+
+        // Add remove functionality
+        document.querySelectorAll('.remove-topic-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                const valueToRemove = this.getAttribute('data-value');
+                removeTopic(valueToRemove);
+            });
+        });
+    }
+
+    // Remove topic
+    function removeTopic(value) {
+        selectedTopics = selectedTopics.filter(topic => topic !== value);
+        
+        // Uncheck corresponding checkbox
+        topicCheckboxes.forEach(checkbox => {
+            if (checkbox.value === value) {
+                checkbox.checked = false;
+            }
+        });
+
+        updateSelectedTopicsDisplay();
+        updateTopicsHiddenInput();
+    }
+
+    // Update hidden input value
+    function updateTopicsHiddenInput() {
+        topicsHiddenInput.value = selectedTopics.join(',');
+    }
+
+    // Form validation for mentorship topics
+    function validateMentorshipTopics() {
+        if (selectedTopics.length === 0) {
+            selectedTopicsContainer.style.borderColor = '#ef4444';
+            selectedTopicsContainer.style.borderWidth = '2px';
+            return false;
+        } else {
+            selectedTopicsContainer.style.borderColor = '';
+            selectedTopicsContainer.style.borderWidth = '';
+            return true;
+        }
+    }
+
+    // Update form validation to include mentorship topics
+    const originalValidateForm = window.validateForm;
+    window.validateForm = function() {
+        if (!validateLanguages()) {
+            alert('❌ Please select at least one language');
+            return false;
+        }
+        if (!validateMentorshipPrefs()) {
+            alert('❌ Please select at least one mentorship type preference');
+            return false;
+        }
+        if (!validateMentorshipTopics()) {
+            alert('❌ Please select at least one mentorship topic');
+            return false;
+        }
+        return originalValidateForm();
+    };
+});
 
 </script>
 {% endblock %}
