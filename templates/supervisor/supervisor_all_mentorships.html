@@ -1,0 +1,508 @@
+{% extends "base2.html" %}
+{% block title %}All Mentorships{% endblock %}
+{% block user %}Supervisor{% endblock %}
+
+{% block profiledrop %}{% endblock %}
+
+{% block content %}
+
+<style>
+  .nav-btn {
+    background: transparent;
+    color: #6b7280;
+    transition: all 0.2s;
+  }
+
+  .nav-btn.active,
+  .nav-btn:hover {
+    background: white;
+    color: #1e3a8a;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  }
+  
+  .progress-bar {
+    height: 6px;
+    border-radius: 3px;
+    overflow: hidden;
+  }
+  
+  .progress-fill {
+    height: 100%;
+    transition: width 0.3s ease;
+  }
+</style>
+
+<main class="max-w-7xl mx-auto px-2 sm:px-3 lg:px-3 py-2">
+  <!-- Navigation Tabs -->
+  <div class="flex flex-wrap gap-2 mb-6">
+    <a href="{{ url_for('supervisordashboard') }}" 
+       class="nav-btn px-4 py-2 rounded-full text-sm font-medium">
+      Dashboard
+    </a>
+    <a href="{{ url_for('supervisor_find_mentor') }}" 
+       class="nav-btn px-4 py-2 rounded-full text-sm font-medium">
+      Find Mentor
+    </a>
+    <a href="{{ url_for('supervisor_find_mentee') }}" 
+       class="nav-btn px-4 py-2 rounded-full text-sm font-medium">
+      Find Mentee
+    </a>
+    <a href="{{ url_for('supervisor_all_mentorships') }}" 
+       class="nav-btn px-4 py-2 rounded-full text-sm font-medium active">
+      All Mentorships
+    </a>
+    <a href="{{ url_for('supervisor_tasks') }}" 
+       class="nav-btn px-4 py-2 rounded-full text-sm font-medium">
+      Tasks
+    </a>
+    <a href="{{ url_for('supervisor_calendar') }}" 
+       class="nav-btn px-4 py-2 rounded-full text-sm font-medium">
+      Calendar
+    </a>
+  </div>
+
+  <!-- Page Header -->
+  <div class="bg-white rounded-xl shadow-sm p-6 mb-6">
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div>
+        <h1 class="text-2xl font-bold text-gray-800 mb-2">All Connected Mentorships</h1>
+        <p class="text-gray-600">View and monitor all active mentorship connections in the system.</p>
+      </div>
+      <div class="flex items-center gap-3">
+        <div class="bg-blue-50 px-4 py-2 rounded-lg">
+          <span class="text-sm font-medium text-gray-600">Total Mentorships:</span>
+          <span class="ml-2 text-lg font-bold text-blue-600">{{ mentorships_data|length }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mentorships Grid -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    {% for mentorship in mentorships_data %}
+    <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-shadow">
+      <!-- Mentorship Header -->
+      <div class="bg-gradient-to-r from-blue-50 to-indigo-50 p-6 border-b border-gray-100">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <h3 class="text-lg font-bold text-gray-800 mb-1">
+              {{ mentorship.mentor.name if mentorship.mentor else 'Unknown Mentor' }} 
+              <span class="text-gray-500">→</span> 
+              {{ mentorship.mentee.name if mentorship.mentee else 'Unknown Mentee' }}
+            </h3>
+            <div class="flex flex-wrap items-center gap-3 text-sm text-gray-600">
+              <span class="bg-blue-100 text-blue-700 px-2 py-1 rounded-full text-xs font-medium">
+                {{ mentorship.request.mentor_type|title }} Term
+              </span>
+              <span class="bg-green-100 text-green-700 px-2 py-1 rounded-full text-xs font-medium">
+                {{ mentorship.request.duration_months }} months
+              </span>
+              <span class="text-gray-500">
+                Started: {{ mentorship.request.created_at.strftime('%d %b %Y') if mentorship.request.created_at else 'N/A' }}
+              </span>
+            </div>
+          </div>
+          <div class="text-right">
+            <span class="inline-block bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm font-medium">
+              Active
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mentorship Details -->
+      <div class="p-6">
+        <!-- Purpose -->
+        <div class="mb-4">
+          <h4 class="text-sm font-semibold text-gray-700 mb-2">Purpose</h4>
+          <p class="text-gray-600">{{ mentorship.request.purpose }}</p>
+        </div>
+
+        <!-- Why Need Mentor -->
+        <div class="mb-6">
+          <h4 class="text-sm font-semibold text-gray-700 mb-2">Why Need Mentor</h4>
+          <p class="text-gray-600">{{ mentorship.request.why_need_mentor|truncate(150) }}</p>
+        </div>
+
+        <!-- Progress Stats -->
+        <div class="grid grid-cols-2 gap-4 mb-6">
+          <!-- Tasks Progress -->
+          <div class="bg-gray-50 p-4 rounded-lg">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-sm font-medium text-gray-700">Tasks</span>
+              <span class="text-sm font-bold text-blue-600">
+                {{ mentorship.tasks_completed }}/{{ mentorship.tasks_total }}
+              </span>
+            </div>
+            <div class="progress-bar bg-gray-200">
+              <div class="progress-fill bg-blue-500" 
+                   style="width: {% if mentorship.tasks_total > 0 %}{{ (mentorship.tasks_completed / mentorship.tasks_total * 100)|round|int }}%{% else %}0%{% endif %}">
+              </div>
+            </div>
+            <p class="text-xs text-gray-500 mt-1">
+              {% if mentorship.tasks_total > 0 %}
+                {{ (mentorship.tasks_completed / mentorship.tasks_total * 100)|round|int }}% completed
+              {% else %}
+                No tasks assigned
+              {% endif %}
+            </p>
+          </div>
+
+          <!-- Meetings Progress -->
+          <div class="bg-gray-50 p-4 rounded-lg">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-sm font-medium text-gray-700">Meetings</span>
+              <span class="text-sm font-bold text-green-600">
+                {{ mentorship.meetings_completed }}/{{ mentorship.meetings_total }}
+              </span>
+            </div>
+            <div class="progress-bar bg-gray-200">
+              <div class="progress-fill bg-green-500" 
+                   style="width: {% if mentorship.meetings_total > 0 %}{{ (mentorship.meetings_completed / mentorship.meetings_total * 100)|round|int }}%{% else %}0%{% endif %}">
+              </div>
+            </div>
+            <p class="text-xs text-gray-500 mt-1">
+              {% if mentorship.meetings_total > 0 %}
+                {{ (mentorship.meetings_completed / mentorship.meetings_total * 100)|round|int }}% completed
+              {% else %}
+                No meetings scheduled
+              {% endif %}
+            </p>
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="flex flex-wrap gap-2">
+          <a href="{{ url_for('supervisor_meeting_details') }}?mentor_id={{ mentorship.mentor.id if mentorship.mentor else '' }}&mentee_id={{ mentorship.mentee.id if mentorship.mentee else '' }}"
+             class="px-4 py-2 bg-blue-50 text-blue-600 hover:bg-blue-100 rounded-lg text-sm font-medium transition-colors">
+            View Meetings
+          </a>
+          <a href="{{ url_for('supervisor_tasks') }}?mentor_id={{ mentorship.mentor.id if mentorship.mentor else '' }}&mentee_id={{ mentorship.mentee.id if mentorship.mentee else '' }}"
+             class="px-4 py-2 bg-green-50 text-green-600 hover:bg-green-100 rounded-lg text-sm font-medium transition-colors">
+            View Tasks
+          </a>
+          <button onclick="showMentorshipDetails({{ loop.index0 }})"
+                  class="px-4 py-2 bg-gray-50 text-gray-600 hover:bg-gray-100 rounded-lg text-sm font-medium transition-colors">
+            View Details
+          </button>
+        </div>
+      </div>
+
+      <!-- Footer with Profiles -->
+      <div class="bg-gray-50 p-4 border-t border-gray-100">
+        <div class="flex items-center justify-between">
+          <!-- Mentor Info -->
+          <div class="flex items-center gap-3">
+            {% if mentorship.mentor_profile and mentorship.mentor_profile.profile_picture %}
+            <img src="{{ url_for('static', filename='uploads/' + mentorship.mentor_profile.profile_picture) }}" 
+                 alt="{{ mentorship.mentor.name }}" 
+                 class="w-8 h-8 rounded-full object-cover">
+            {% else %}
+            <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 text-sm font-bold">
+              {{ mentorship.mentor.name[0] if mentorship.mentor and mentorship.mentor.name else 'M' }}
+            </div>
+            {% endif %}
+            <div>
+              <p class="text-sm font-medium text-gray-700">Mentor</p>
+              <p class="text-xs text-gray-500">{{ mentorship.mentor_profile.profession if mentorship.mentor_profile else 'N/A' }}</p>
+            </div>
+          </div>
+
+          <!-- Mentee Info -->
+          <div class="flex items-center gap-3">
+            {% if mentorship.mentee_profile and mentorship.mentee_profile.profile_picture %}
+            <img src="{{ url_for('static', filename='uploads/' + mentorship.mentee_profile.profile_picture) }}" 
+                 alt="{{ mentorship.mentee.name }}" 
+                 class="w-8 h-8 rounded-full object-cover">
+            {% else %}
+            <div class="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center text-green-600 text-sm font-bold">
+              {{ mentorship.mentee.name[0] if mentorship.mentee and mentorship.mentee.name else 'E' }}
+            </div>
+            {% endif %}
+            <div>
+              <p class="text-sm font-medium text-gray-700">Mentee</p>
+              <p class="text-xs text-gray-500">{{ mentorship.mentee_profile.who_am_i|replace('_', ' ')|title if mentorship.mentee_profile else 'N/A' }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% else %}
+    <!-- Empty State -->
+    <div class="col-span-2 bg-white rounded-xl shadow-sm p-12 text-center">
+      <div class="max-w-md mx-auto">
+        <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                  d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+          </svg>
+        </div>
+        <h3 class="text-lg font-medium text-gray-900 mb-2">No Active Mentorships</h3>
+        <p class="text-gray-500 mb-6">There are no active mentorship connections in the system yet.</p>
+        <a href="{{ url_for('supervisordashboard') }}" 
+           class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+          Go to Dashboard
+        </a>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</main>
+
+<script>
+  // Convert Python data to JavaScript
+  const mentorshipsData = [
+    {% for mentorship in mentorships_data %}
+    {
+      request: {
+        id: {{ mentorship.request.id }},
+        purpose: "{{ mentorship.request.purpose|default('')|replace('"', '\\"')|safe }}",
+        mentor_type: "{{ mentorship.request.mentor_type|default('') }}",
+        term: "{{ mentorship.request.term|default('') }}",
+        duration_months: {{ mentorship.request.duration_months|default(0) }},
+        why_need_mentor: `{{ mentorship.request.why_need_mentor|default('')|replace('`', '\\`')|safe }}`,
+        final_status: "{{ mentorship.request.final_status|default('') }}",
+        created_at: "{{ mentorship.request.created_at|default('') }}"
+      },
+      mentor: {
+        id: {{ mentorship.mentor.id if mentorship.mentor else 0 }},
+        name: "{{ mentorship.mentor.name|default('')|replace('"', '\\"')|safe }}",
+        email: "{{ mentorship.mentor.email|default('')|replace('"', '\\"')|safe }}"
+      },
+      mentor_profile: {
+        profession: "{{ mentorship.mentor_profile.profession|default('')|replace('"', '\\"')|safe }}",
+        organisation: "{{ mentorship.mentor_profile.organisation|default('')|replace('"', '\\"')|safe }}"
+      },
+      mentee: {
+        id: {{ mentorship.mentee.id if mentorship.mentee else 0 }},
+        name: "{{ mentorship.mentee.name|default('')|replace('"', '\\"')|safe }}",
+        email: "{{ mentorship.mentee.email|default('')|replace('"', '\\"')|safe }}"
+      },
+      mentee_profile: {
+        who_am_i: "{{ mentorship.mentee_profile.who_am_i|default('') }}",
+        institution: "{{ mentorship.mentee_profile.institution|default('')|replace('"', '\\"')|safe }}"
+      }
+    }{% if not loop.last %},{% endif %}
+    {% endfor %}
+  ];
+
+  // Make navigation buttons active on click
+  document.addEventListener('DOMContentLoaded', function() {
+    const navButtons = document.querySelectorAll('.nav-btn');
+    navButtons.forEach(btn => {
+      btn.addEventListener('click', function() {
+        navButtons.forEach(b => b.classList.remove('active'));
+        this.classList.add('active');
+      });
+    });
+  });
+
+  // Mentorship Details Modal
+  function showMentorshipDetails(index) {
+    const mentorship = mentorshipsData[index];
+    if (!mentorship) return;
+    
+    const modal = document.getElementById('mentorshipDetailsModal');
+    const modalContent = document.getElementById('mentorshipDetailsContent');
+    
+    // Format the details HTML
+    const detailsHTML = `
+      <div class="space-y-6">
+        <!-- Header -->
+        <div class="border-b pb-4">
+          <h3 class="text-xl font-bold text-gray-800 mb-2">Mentorship Request Details</h3>
+          <div class="flex flex-wrap items-center gap-3 text-sm text-gray-600">
+            <span class="bg-blue-100 text-blue-700 px-2 py-1 rounded-full">
+              ${mentorship.request.mentor_type ? mentorship.request.mentor_type.charAt(0).toUpperCase() + mentorship.request.mentor_type.slice(1) + ' Term' : 'N/A'}
+            </span>
+            <span class="bg-green-100 text-green-700 px-2 py-1 rounded-full">
+              ${mentorship.request.duration_months || 'N/A'} months
+            </span>
+            <span class="text-gray-500">
+              Requested: ${mentorship.request.created_at ? new Date(mentorship.request.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) : 'N/A'}
+            </span>
+          </div>
+        </div>
+
+        <!-- Connection Info -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <!-- Mentor Info -->
+          <div class="bg-blue-50 p-4 rounded-lg">
+            <h4 class="text-sm font-semibold text-blue-700 mb-3">Mentor Information</h4>
+            <div class="space-y-2">
+              <div>
+                <span class="text-xs text-gray-500">Name:</span>
+                <p class="font-medium">${mentorship.mentor ? mentorship.mentor.name : 'Unknown Mentor'}</p>
+              </div>
+              <div>
+                <span class="text-xs text-gray-500">Email:</span>
+                <p class="font-medium">${mentorship.mentor ? mentorship.mentor.email : 'N/A'}</p>
+              </div>
+              <div>
+                <span class="text-xs text-gray-500">Profession:</span>
+                <p class="font-medium">${mentorship.mentor_profile ? mentorship.mentor_profile.profession : 'N/A'}</p>
+              </div>
+              <div>
+                <span class="text-xs text-gray-500">Organization:</span>
+                <p class="font-medium">${mentorship.mentor_profile ? mentorship.mentor_profile.organisation : 'N/A'}</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Mentee Info -->
+          <div class="bg-green-50 p-4 rounded-lg">
+            <h4 class="text-sm font-semibold text-green-700 mb-3">Mentee Information</h4>
+            <div class="space-y-2">
+              <div>
+                <span class="text-xs text-gray-500">Name:</span>
+                <p class="font-medium">${mentorship.mentee ? mentorship.mentee.name : 'Unknown Mentee'}</p>
+              </div>
+              <div>
+                <span class="text-xs text-gray-500">Email:</span>
+                <p class="font-medium">${mentorship.mentee ? mentorship.mentee.email : 'N/A'}</p>
+              </div>
+              <div>
+                <span class="text-xs text-gray-500">Category:</span>
+                <p class="font-medium">${mentorship.mentee_profile ? mentorship.mentee_profile.who_am_i.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase()) : 'N/A'}</p>
+              </div>
+              <div>
+                <span class="text-xs text-gray-500">Institution:</span>
+                <p class="font-medium">${mentorship.mentee_profile ? mentorship.mentee_profile.institution : 'N/A'}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Mentorship Details -->
+        <div class="space-y-4">
+          <!-- Purpose -->
+          <div>
+            <h4 class="text-sm font-semibold text-gray-700 mb-2">Purpose of Mentorship</h4>
+            <div class="bg-gray-50 p-4 rounded-lg">
+              <p class="text-gray-700">${mentorship.request.purpose || 'Not specified'}</p>
+            </div>
+          </div>
+
+          <!-- Why Need Mentor -->
+          <div>
+            <h4 class="text-sm font-semibold text-gray-700 mb-2">Why Need a Mentor</h4>
+            <div class="bg-gray-50 p-4 rounded-lg">
+              <p class="text-gray-700 whitespace-pre-line">${mentorship.request.why_need_mentor || 'Not specified'}</p>
+            </div>
+          </div>
+
+          <!-- Additional Details -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <h4 class="text-sm font-semibold text-gray-700 mb-2">Mentor Type</h4>
+              <div class="bg-gray-50 p-3 rounded-lg">
+                <p class="text-gray-700">${mentorship.request.mentor_type ? mentorship.request.mentor_type.charAt(0).toUpperCase() + mentorship.request.mentor_type.slice(1) : 'N/A'}</p>
+              </div>
+            </div>
+            <div>
+              <h4 class="text-sm font-semibold text-gray-700 mb-2">Term</h4>
+              <div class="bg-gray-50 p-3 rounded-lg">
+                <p class="text-gray-700">${mentorship.request.term ? mentorship.request.term.charAt(0).toUpperCase() + mentorship.request.term.slice(1) : 'N/A'}</p>
+              </div>
+            </div>
+            <div>
+              <h4 class="text-sm font-semibold text-gray-700 mb-2">Duration</h4>
+              <div class="bg-gray-50 p-3 rounded-lg">
+                <p class="text-gray-700">${mentorship.request.duration_months || 'N/A'} months</p>
+              </div>
+            </div>
+            <div>
+              <h4 class="text-sm font-semibold text-gray-700 mb-2">Status</h4>
+              <div class="bg-gray-50 p-3 rounded-lg">
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                  mentorship.request.final_status === 'approved' ? 'bg-green-100 text-green-800' :
+                  mentorship.request.final_status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
+                  'bg-red-100 text-red-800'
+                }">
+                  ${mentorship.request.final_status ? mentorship.request.final_status.charAt(0).toUpperCase() + mentorship.request.final_status.slice(1) : 'N/A'}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Timeline -->
+          <div>
+            <h4 class="text-sm font-semibold text-gray-700 mb-2">Timeline</h4>
+            <div class="bg-gray-50 p-4 rounded-lg">
+              <div class="space-y-2">
+                <div class="flex justify-between">
+                  <span class="text-sm text-gray-600">Request Date:</span>
+                  <span class="text-sm font-medium">${mentorship.request.created_at ? new Date(mentorship.request.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) : 'N/A'}</span>
+                </div>
+                <div class="flex justify-between">
+                  <span class="text-sm text-gray-600">Duration:</span>
+                  <span class="text-sm font-medium">${mentorship.request.duration_months || 'N/A'} months</span>
+                </div>
+                <div class="flex justify-between">
+                  <span class="text-sm text-gray-600">Expected End Date:</span>
+                  <span class="text-sm font-medium">
+                    ${mentorship.request.created_at && mentorship.request.duration_months ? 
+                      new Date(new Date(mentorship.request.created_at).setMonth(new Date(mentorship.request.created_at).getMonth() + mentorship.request.duration_months)).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) : 
+                      'N/A'}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+    
+    modalContent.innerHTML = detailsHTML;
+    modal.classList.remove('hidden');
+  }
+
+  function closeMentorshipDetails() {
+    const modal = document.getElementById('mentorshipDetailsModal');
+    modal.classList.add('hidden');
+  }
+
+  // Close modal when clicking outside
+  document.getElementById('mentorshipDetailsModal').addEventListener('click', function(e) {
+    if (e.target.id === 'mentorshipDetailsModal') {
+      closeMentorshipDetails();
+    }
+  });
+
+  // Close modal with Escape key
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+      closeMentorshipDetails();
+    }
+  });
+</script>
+
+<!-- Mentorship Details Modal -->
+<div id="mentorshipDetailsModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+  <div class="bg-white rounded-xl shadow-xl max-w-4xl w-full max-h-[90vh] overflow-hidden">
+    <!-- Modal Header -->
+    <div class="flex items-center justify-between p-6 border-b">
+      <h3 class="text-xl font-bold text-gray-800">Mentorship Request Details</h3>
+      <button onclick="closeMentorshipDetails()" class="text-gray-400 hover:text-gray-600">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+    </div>
+    
+    <!-- Modal Content -->
+    <div class="p-6 overflow-y-auto max-h-[calc(90vh-120px)]" id="mentorshipDetailsContent">
+      <!-- Content will be dynamically inserted here -->
+    </div>
+    
+    <!-- Modal Footer -->
+    <div class="flex justify-end p-6 border-t bg-gray-50">
+      <button onclick="closeMentorshipDetails()" 
+              class="px-4 py-2 bg-gray-200 text-gray-700 hover:bg-gray-300 rounded-lg font-medium transition-colors">
+        Close
+      </button>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
