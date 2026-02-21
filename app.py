@@ -5709,6 +5709,64 @@ def supervisor_response():
     
     return redirect(url_for("supervisordashboard"))
 
+# ------------------ ALL MENTORSHIPS PAGE ------------------
+@app.route("/supervisor_all_mentorships")
+def supervisor_all_mentorships():
+    if "email" not in session or session.get("user_type") != "0":
+        return redirect(url_for("signin"))
+    
+    user = User.query.filter_by(email=session["email"]).first()
+    profile_complete = check_profile_complete(user.id, "0")
+    
+    # Get all approved mentorship requests
+    all_mentorships = MentorshipRequest.query.filter_by(final_status="approved").all()
+    
+    # Get additional data for each mentorship
+    mentorships_data = []
+    for mentorship in all_mentorships:
+        mentor = User.query.get(mentorship.mentor_id)
+        mentee = User.query.get(mentorship.mentee_id)
+        
+        # Get mentor profile
+        mentor_profile = MentorProfile.query.filter_by(user_id=mentor.id).first() if mentor else None
+        
+        # Get mentee profile
+        mentee_profile = MenteeProfile.query.filter_by(user_id=mentee.id).first() if mentee else None
+        
+        # Get tasks for this mentorship
+        tasks = MenteeTask.query.filter_by(
+            mentee_id=mentee.id if mentee else None,
+            mentor_id=mentor.id if mentor else None
+        ).all()
+        
+        # Get meetings for this mentorship
+        meetings = MeetingRequest.query.filter(
+            ((MeetingRequest.requester_id == mentee.id) & (MeetingRequest.requested_to_id == mentor.id)) |
+            ((MeetingRequest.requester_id == mentor.id) & (MeetingRequest.requested_to_id == mentee.id))
+        ).all()
+        
+        mentorships_data.append({
+            "request": mentorship,
+            "mentor": mentor,
+            "mentor_profile": mentor_profile,
+            "mentee": mentee,
+            "mentee_profile": mentee_profile,
+            "tasks": tasks,
+            "meetings": meetings,
+            "tasks_completed": len([t for t in tasks if t.status == "completed"]),
+            "tasks_total": len(tasks),
+            "meetings_completed": len([m for m in meetings if m.status == "approved"]),
+            "meetings_total": len(meetings)
+        })
+    
+    return render_template(
+        "supervisor/supervisor_all_mentorships.html",
+        show_sidebar=True,
+        user_email=session["email"],
+        mentorships_data=mentorships_data,
+        profile_complete=profile_complete
+    )
+
 # ---------- Google Calendar Service Account Config ----------
 CALENDAR_SERVICE_SCOPES = ["https://www.googleapis.com/auth/calendar"]
 SERVICE_ACCOUNT_FILE = "service_account.json"
