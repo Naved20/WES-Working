@@ -1884,7 +1884,7 @@ def institution():
         return redirect(url_for("signin"))
 
     # Get all institutions
-    institutions = Institution.query.order_by(Institution.name.asc()).all()
+    institutions = Institution.query.order_by(Institution.id.asc()).all()
     
     # Get institution statistics
     institution_stats = []
@@ -5044,7 +5044,7 @@ def editmenteeprofile():
         }
         
         # Common mandatory fields for all categories
-        common_mandatory = ['mobile_number', 'whatsapp_number', 'mentorship_expectations', 'institution']
+        common_mandatory = ['mobile_number', 'mentorship_expectations', 'institution']
         
         # General details mandatory fields
         general_details_mandatory = ['city', 'state', 'country', 'institution']

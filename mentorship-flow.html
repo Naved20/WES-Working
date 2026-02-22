@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WES Lux - How It Works</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --gold: #C9A84C;
+    --gold-light: #E8C97A;
+    --deep: #0D1B2A;
+    --navy: #132338;
+    --slate: #1E3450;
+    --cream: #F5F0E8;
+    --muted: #8A9BB0;
+    --white: #FFFFFF;
+  }
+
+  body {
+    background: var(--deep);
+    color: var(--white);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Background texture */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: 
+      radial-gradient(ellipse 80% 50% at 20% 0%, rgba(201,168,76,0.08) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 40% at 80% 100%, rgba(201,168,76,0.06) 0%, transparent 60%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .page {
+    position: relative;
+    z-index: 1;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 60px 24px 80px;
+  }
+
+  /* Header */
+  .header {
+    text-align: center;
+    margin-bottom: 70px;
+    animation: fadeDown 0.8s ease both;
+  }
+
+  .header .badge {
+    display: inline-block;
+    border: 1px solid var(--gold);
+    color: var(--gold);
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    padding: 6px 18px;
+    border-radius: 100px;
+    margin-bottom: 20px;
+  }
+
+  .header h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(36px, 6vw, 62px);
+    font-weight: 900;
+    line-height: 1.1;
+    color: var(--white);
+  }
+
+  .header h1 span {
+    color: var(--gold);
+  }
+
+  .header p {
+    margin-top: 16px;
+    color: var(--muted);
+    font-size: 16px;
+    font-weight: 300;
+    max-width: 480px;
+    margin-left: auto;
+    margin-right: auto;
+    line-height: 1.7;
+  }
+
+  /* Two-column type selector */
+  .types {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 60px;
+    animation: fadeUp 0.8s 0.2s ease both;
+  }
+
+  .type-card {
+    background: var(--navy);
+    border: 1px solid rgba(201,168,76,0.2);
+    border-radius: 20px;
+    padding: 28px 24px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .type-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 4px;
+    height: 100%;
+    background: var(--gold);
+    border-radius: 4px 0 0 4px;
+  }
+
+  .type-card .duration {
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--gold);
+    font-weight: 500;
+    margin-bottom: 8px;
+  }
+
+  .type-card h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px;
+    color: var(--white);
+    margin-bottom: 10px;
+  }
+
+  .type-card p {
+    font-size: 14px;
+    color: var(--muted);
+    line-height: 1.6;
+  }
+
+  .type-card .pill {
+    display: inline-block;
+    margin-top: 14px;
+    background: rgba(201,168,76,0.12);
+    color: var(--gold-light);
+    font-size: 12px;
+    padding: 4px 12px;
+    border-radius: 100px;
+  }
+
+  /* Flow Timeline */
+  .flow-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--white);
+    margin-bottom: 36px;
+    animation: fadeUp 0.8s 0.3s ease both;
+  }
+
+  .flow-title span { color: var(--gold); }
+
+  .timeline {
+    position: relative;
+    animation: fadeUp 0.8s 0.4s ease both;
+  }
+
+  /* Vertical line */
+  .timeline::before {
+    content: '';
+    position: absolute;
+    left: 36px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: linear-gradient(to bottom, var(--gold), rgba(201,168,76,0.1));
+    border-radius: 2px;
+  }
+
+  .step {
+    display: flex;
+    gap: 28px;
+    margin-bottom: 8px;
+    position: relative;
+  }
+
+  .step:last-child { margin-bottom: 0; }
+
+  .step-icon {
+    flex-shrink: 0;
+    width: 72px;
+    height: 72px;
+    background: var(--navy);
+    border: 2px solid rgba(201,168,76,0.3);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 26px;
+    position: relative;
+    z-index: 2;
+    transition: border-color 0.3s, transform 0.3s;
+  }
+
+  .step:hover .step-icon {
+    border-color: var(--gold);
+    transform: scale(1.05);
+  }
+
+  .connector {
+    flex-shrink: 0;
+    width: 72px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 6px 0;
+    color: rgba(201,168,76,0.4);
+    font-size: 20px;
+  }
+
+  .step-body {
+    flex: 1;
+    background: var(--navy);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 16px;
+    padding: 22px 24px;
+    margin-bottom: 0;
+    transition: border-color 0.3s, box-shadow 0.3s;
+    cursor: default;
+  }
+
+  .step:hover .step-body {
+    border-color: rgba(201,168,76,0.25);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+  }
+
+  .step-num {
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--gold);
+    font-weight: 500;
+    margin-bottom: 4px;
+  }
+
+  .step-body h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 19px;
+    color: var(--white);
+    margin-bottom: 8px;
+  }
+
+  .step-body p {
+    font-size: 14px;
+    color: var(--muted);
+    line-height: 1.7;
+  }
+
+  .step-body .tags {
+    margin-top: 12px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .tag {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    color: var(--muted);
+    font-size: 12px;
+    padding: 3px 10px;
+    border-radius: 100px;
+  }
+
+  /* Arrow between steps */
+  .arrow-row {
+    display: flex;
+    gap: 28px;
+    align-items: center;
+    margin-bottom: 8px;
+    opacity: 0.5;
+  }
+
+  .arrow-icon {
+    width: 74px;
+    display: flex;
+    justify-content: center;
+    font-size: 18px;
+    color: var(--gold);
+  }
+
+  .arrow-line {
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(to right, rgba(201,168,76,0.3), transparent);
+  }
+
+  /* Roles Section */
+  .roles {
+    margin-top: 70px;
+    animation: fadeUp 0.8s 0.5s ease both;
+  }
+
+  .roles-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+    margin-top: 28px;
+  }
+
+  .role-card {
+    background: var(--navy);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 16px;
+    padding: 22px 18px;
+    text-align: center;
+    transition: transform 0.3s, border-color 0.3s;
+  }
+
+  .role-card:hover {
+    transform: translateY(-4px);
+    border-color: rgba(201,168,76,0.3);
+  }
+
+  .role-card .emoji { font-size: 32px; margin-bottom: 10px; }
+
+  .role-card h4 {
+    font-family: 'Playfair Display', serif;
+    font-size: 16px;
+    color: var(--white);
+    margin-bottom: 6px;
+  }
+
+  .role-card p {
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.6;
+  }
+
+  /* Footer note */
+  .footer-note {
+    margin-top: 60px;
+    text-align: center;
+    animation: fadeUp 0.8s 0.6s ease both;
+  }
+
+  .footer-note p {
+    color: var(--muted);
+    font-size: 14px;
+    font-style: italic;
+  }
+
+  .footer-note strong {
+    color: var(--gold);
+    font-style: normal;
+  }
+
+  /* Animations */
+  @keyframes fadeDown {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @media (max-width: 600px) {
+    .types { grid-template-columns: 1fr; }
+    .roles-grid { grid-template-columns: 1fr; }
+    .timeline::before { left: 30px; }
+    .step-icon, .arrow-icon { width: 60px; min-width: 60px; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- Header -->
+  <div class="header">
+    <div class="badge">WES Luxembourg for Education</div>
+    <h1>How Our <span>Mentorship</span><br>Program Works</h1>
+    <p>A simple journey - from a young person with a dream, to a mentor who opens the door.</p>
+  </div>
+
+  <!-- Mentorship Types -->
+  <div class="types">
+    <div class="type-card">
+      <div class="duration">12 Months</div>
+      <h3>Anchor Mentorship</h3>
+      <p>A deep, long-term bond focused on specific support - helping a young person overcome challenges and build strengths over time.</p>
+    </div>
+    <div class="type-card">
+      <div class="duration">3-11 Months</div>
+      <h3>Special Mentorship</h3>
+      <p>A focused short journey around career growth - quick, practical guidance to help a young person move forward with clarity.</p>
+    </div>
+  </div>
+
+  <!-- Flow Timeline -->
+  <div class="flow-title">The <span>Journey</span>, Step by Step</div>
+
+  <div class="timeline">
+
+    <!-- Step 1 -->
+    <div class="step">
+      <div class="step-icon">📝</div>
+      <div class="step-body">
+        <div class="step-num">Step 01</div>
+        <h3>Sign Up & Share Your Story</h3>
+        <p>Both mentors and young learners(Mentee) join the platform and fill in a short profile - their background, what they love, what they're looking for, and where they want to go.</p>
+        <div class="tags">
+          <span class="tag">For Mentee</span>
+          <span class="tag">For Mentors</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="arrow-row">
+      <div class="arrow-icon">↓</div>
+      <div class="arrow-line"></div>
+    </div>
+
+    <!-- Step 2 -->
+    <div class="step">
+      <div class="step-icon">🔍</div>
+      <div class="step-body">
+        <div class="step-num">Step 02</div>
+        <h3>Explore & Choose a Mentor</h3>
+        <p>The mentee browses mentor profiles - filtering by field of work, experience, or topics of interest - until they find someone who feels like the right guide for them.</p>
+        <div class="tags">
+          <span class="tag">Search by Field</span>
+          <span class="tag">Search by Topic</span>
+          <span class="tag">View Mentor Profiles</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="arrow-row">
+      <div class="arrow-icon">↓</div>
+      <div class="arrow-line"></div>
+    </div>
+
+    <!-- Step 3 -->
+    <div class="step">
+      <div class="step-icon">📨</div>
+      <div class="step-body">
+        <div class="step-num">Step 03</div>
+        <h3>Send a Mentorship Request</h3>
+        <p>The learner sends a request explaining why they want this mentor - their goals, what kind of support they need, and which type of mentorship (Anchor or Special) they prefer.</p>
+      </div>
+    </div>
+
+    <div class="arrow-row">
+      <div class="arrow-icon">↓</div>
+      <div class="arrow-line"></div>
+    </div>
+
+    <!-- Step 4 -->
+    <div class="step">
+      <div class="step-icon">🤝</div>
+      <div class="step-body">
+        <div class="step-num">Step 04</div>
+        <h3>Mentor Says Yes</h3>
+        <p>The mentor reviews the request. If it's a good fit, they accept - welcoming the mentee into their mentorship circle.</p>
+      </div>
+    </div>
+
+    <div class="arrow-row">
+      <div class="arrow-icon">↓</div>
+      <div class="arrow-line"></div>
+    </div>
+
+    <!-- Step 5 -->
+    <div class="step">
+      <div class="step-icon">✅</div>
+      <div class="step-body">
+        <div class="step-num">Step 05</div>
+        <h3>Our Team Gives the Green Light</h3>
+        <p>A WES Lux Supervisor reviews the match to make sure it's safe, suitable, and set up for success. Once approved, both sides are notified and the journey officially begins.</p>
+      </div>
+    </div>
+
+    <div class="arrow-row">
+      <div class="arrow-icon">↓</div>
+      <div class="arrow-line"></div>
+    </div>
+
+    <!-- Step 6 -->
+    <div class="step">
+      <div class="step-icon">🗺️</div>
+      <div class="step-body">
+        <div class="step-num">Step 06</div>
+        <h3>Set Goals Together</h3>
+        <p>In the first meeting, mentor and learner sit down, get to know each other, and co-create a personal roadmap - clear goals, milestones, and a schedule for the months ahead.</p>
+      </div>
+    </div>
+
+    <div class="arrow-row">
+      <div class="arrow-icon">↓</div>
+      <div class="arrow-line"></div>
+    </div>
+
+    <!-- Step 7 -->
+    <div class="step">
+      <div class="step-icon">📅</div>
+      <div class="step-body">
+        <div class="step-num">Step 07</div>
+        <h3>Regular Meetings & Check-ins</h3>
+        <p>Mentor and mentee meet regularly. They talk, track progress, tackle challenges, and adjust goals when needed. The platform keeps everything organised - schedules, notes, and tasks all in one place.</p>
+        <div class="tags">
+          <span class="tag">Online Meetings</span>
+          <span class="tag">Progress Notes</span>
+          <span class="tag">Tasks & Goals</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="arrow-row">
+      <div class="arrow-icon">↓</div>
+      <div class="arrow-line"></div>
+    </div>
+
+    <!-- Step 8 -->
+    <div class="step">
+      <div class="step-icon">🌟</div>
+      <div class="step-body">
+        <div class="step-num">Step 08</div>
+        <h3>Reflect, Grow & Celebrate</h3>
+        <p>At the end of the journey, both mentor and mentee look back at how far they've come. Feedback is shared, lessons are captured, and the learner is ready for their next chapter - stronger and more confident.</p>
+      </div>
+    </div>
+
+  </div><!-- end timeline -->
+
+  <!-- Roles Section -->
+  <div class="roles">
+    <div class="flow-title">Who's <span>Involved</span></div>
+    <div class="roles-grid">
+      <div class="role-card">
+        <div class="emoji">👩‍🎓</div>
+        <h4>The Mentee</h4>
+        <p>Mentee looking for direction, clarity, and a trusted guide.</p>
+      </div>
+      <div class="role-card">
+        <div class="emoji">👨‍💼</div>
+        <h4>The Mentor</h4>
+        <p>Experienced professionals who share their knowledge, time, and real-world wisdom.</p>
+      </div>
+      <div class="role-card">
+        <div class="emoji">🛡️</div>
+        <h4>The Supervisor</h4>
+        <p>The WES Lux Supervisor that makes sure every match is safe, supported, and successful.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer Note -->
+  <div class="footer-note">
+    <p>Every great career begins with one conversation. <strong>Be the reason someone finds their path.</strong></p>
+  </div>
+
+</div>
+</body>
+</html>

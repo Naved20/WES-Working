@@ -4,12 +4,12 @@
 {% block profiledrop %}{% endblock %}
 
 {% block content %}
-<!-- Back Button -->
-{% include 'components/back_button.html' with context %}
-
 <main class="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+  <!-- Back Button -->
+  {% include 'components/back_button.html' with context %}
+
   <!-- Page Header -->
-  <div class="mb-6">
+  <div class="mb-6 mt-4">
     <h2 class="text-2xl font-bold text-gray-900 font-poppins">Schedule Meeting</h2>
     <p class="text-gray-600 mt-1">Create a Google Meet session with your mentor</p>
   </div>
