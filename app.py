@@ -941,7 +941,6 @@ def check_profile_complete(user_id, user_type):
                 profile.country,
                 # Common mandatory fields
                 profile.mobile_number,
-                profile.whatsapp_number,
                 profile.mentorship_expectations,
                 profile.terms_agreement,
                 profile.profile_picture,  # Profile picture is now mandatory
