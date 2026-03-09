@@ -1024,7 +1024,8 @@ def profile_required(f):
 #-------------HOME----------------
 @app.route("/")
 def home():
-    return render_template("index.html")
+    # Redirect to signin as the direct entry point
+    return redirect(url_for("signin"))
 
 #--------------SIGNUP----------------
 @app.route("/signup", methods=["GET", "POST"])
@@ -6137,7 +6138,7 @@ def customer_support():
     
     if not supervisor:
         flash("No supervisors available at the moment. Please try again later or email us at info@wazireducationsocity.com", "error")
-        return redirect(url_for("home"))
+        return redirect(url_for("signin"))
     
     try:
         # Check if conversation already exists
@@ -6167,7 +6168,7 @@ def customer_support():
     except Exception as e:
         print(f"Error creating support conversation: {e}")
         flash("Unable to start chat. Please try again or email us at info@wazireducationsocity.com", "error")
-        return redirect(url_for("home"))
+        return redirect(url_for("signin"))
 
 #--------------INSTITUTION PROFILE ROUTES------------------
 
