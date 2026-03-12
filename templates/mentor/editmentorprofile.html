@@ -282,7 +282,7 @@
                         </select>
                     </div>
                     <div>
-                        <label class="block text-gray-700 font-semibold mb-2">affiliated Institution *</label>
+                        <label class="block text-gray-700 font-semibold mb-2">Affiliated Institution *</label>
                         <select name="institution" id="institution" class="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition duration-300" required>
                             <option value="">Select Your Institution</option>
                             <option value="Self" {% if institution == 'Self' %}selected{% endif %}>Self (Not affiliated with any institution)</option>
@@ -321,7 +321,7 @@
                     <div>
                         <label class="block text-gray-700 font-semibold mb-2">WhatsApp Number *</label>
                         <div class="flex gap-2">
-                            <input type="text" name="whatsapp_country_code" list="country_codes" value="{{ whatsapp_country_code or '+91' }}" class="w-24 p-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition duration-300" placeholder="+91">
+                            <input type="text" name="whatsapp_country_code" list="country_codes" value="{{ whatsapp_country_code or '+01' }}" class="w-24 p-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition duration-300" placeholder="+91">
                             <input type="tel" name="whatsapp" value="{{ whatsapp }}" class="flex-1 p-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition duration-300" placeholder="Enter WhatsApp number">
                         </div>
                     </div>
@@ -988,6 +988,112 @@
                 </label>
             </div>
 
+
+<!-- Design & Creative -->
+<div class="p-2 border-b">
+    <p class="font-semibold text-gray-700 mb-1">Design & Creative</p>
+
+    <label class="flex items-center p-2 hover:bg-gray-100 cursor-pointer rounded">
+        <input type="checkbox" value="UI/UX Design" class="mr-3 h-5 w-5 rounded border-gray-300 text-green-600 focus:ring-green-500 topic-checkbox">
+        <span>🎨 UI/UX Design</span>
+    </label>
+
+    <label class="flex items-center p-2 hover:bg-gray-100 cursor-pointer rounded">
+        <input type="checkbox" value="Graphic Design" class="mr-3 h-5 w-5 rounded border-gray-300 text-green-600 focus:ring-green-500 topic-checkbox">
+        <span>🖌️ Graphic Design</span>
+    </label>
+
+    <label class="flex items-center p-2 hover:bg-gray-100 cursor-pointer rounded">
+        <input type="checkbox" value="Video Editing" class="mr-3 h-5 w-5 rounded border-gray-300 text-green-600 focus:ring-green-500 topic-checkbox">
+        <span>🎬 Video Editing</span>
+    </label>
+
+    <label class="flex items-center p-2 hover:bg-gray-100 cursor-pointer rounded">
+        <input type="checkbox" value="Animation" class="mr-3 h-5 w-5 rounded border-gray-300 text-green-600 focus:ring-green-500 topic-checkbox">
+        <span>✨ Animation</span>
+    </label>
+</div>
+
+
+
+<!-- Business & Management -->
+<div class="p-2 border-b">
+    <p class="font-semibold text-gray-700 mb-1">Business & Management</p>
+
+    <label class="flex items-center p-2 hover:bg-gray-100 cursor-pointer rounded">
+        <input type="checkbox" value="Business Strategy" class="mr-3 h-5 w-5 rounded border-gray-300 text-green-600 focus:ring-green-500 topic-checkbox">
+        <span>📊 Business Strategy</span>
+    </label>
+
+    <label class="flex items-center p-2 hover:bg-gray-100 cursor-pointer rounded">
+        <input type="checkbox" value="Operations Management" class="mr-3 h-5 w-5 rounded border-gray-300 text-green-600 focus:ring-green-500 topic-checkbox">
+        <span>⚙️ Operations Management</span>
+    </label>
+
+    <label class="flex items-center p-2 hover:bg-gray-100 cursor-pointer rounded">
+        <input type="checkbox" value="Human Resource Management" class="mr-3 h-5 w-5 rounded border-gray-300 text-green-600 focus:ring-green-500 topic-checkbox">
+        <span>👔 Human Resource Management</span>
+    </label>
+
+    <label class="flex items-center p-2 hover:bg-gray-100 cursor-pointer rounded">
+        <input type="checkbox" value="Financial Planning" class="mr-3 h-5 w-5 rounded border-gray-300 text-green-600 focus:ring-green-500 topic-checkbox">
+        <span>💰 Financial Planning</span>
+    </label>
+</div>
+
+<!-- AI & Emerging Technologies -->
+<div class="p-2 border-b">
+    <p class="font-semibold text-gray-700 mb-1">AI & Emerging Technologies</p>
+
+    <label class="flex items-center p-2 hover:bg-gray-100 cursor-pointer rounded">
+        <input type="checkbox" value="Artificial Intelligence" class="mr-3 h-5 w-5 rounded border-gray-300 text-green-600 focus:ring-green-500 topic-checkbox">
+        <span>🤖 Artificial Intelligence</span>
+    </label>
+
+    <label class="flex items-center p-2 hover:bg-gray-100 cursor-pointer rounded">
+        <input type="checkbox" value="Blockchain" class="mr-3 h-5 w-5 rounded border-gray-300 text-green-600 focus:ring-green-500 topic-checkbox">
+        <span>⛓️ Blockchain</span>
+    </label>
+
+    <label class="flex items-center p-2 hover:bg-gray-100 cursor-pointer rounded">
+        <input type="checkbox" value="Internet of Things" class="mr-3 h-5 w-5 rounded border-gray-300 text-green-600 focus:ring-green-500 topic-checkbox">
+        <span>🌐 Internet of Things</span>
+    </label>
+
+    <label class="flex items-center p-2 hover:bg-gray-100 cursor-pointer rounded">
+        <input type="checkbox" value="AR/VR" class="mr-3 h-5 w-5 rounded border-gray-300 text-green-600 focus:ring-green-500 topic-checkbox">
+        <span>🥽 AR / VR</span>
+    </label>
+</div>
+
+
+
+<!-- Student & College Life -->
+<div class="p-2 border-b">
+    <p class="font-semibold text-gray-700 mb-1">Student & College Life</p>
+
+    <label class="flex items-center p-2 hover:bg-gray-100 cursor-pointer rounded">
+        <input type="checkbox" value="Internships" class="mr-3 h-5 w-5 rounded border-gray-300 text-green-600 focus:ring-green-500 topic-checkbox">
+        <span>🏢 Internships</span>
+    </label>
+
+    <label class="flex items-center p-2 hover:bg-gray-100 cursor-pointer rounded">
+        <input type="checkbox" value="Hackathons" class="mr-3 h-5 w-5 rounded border-gray-300 text-green-600 focus:ring-green-500 topic-checkbox">
+        <span>💻 Hackathons</span>
+    </label>
+
+    <label class="flex items-center p-2 hover:bg-gray-100 cursor-pointer rounded">
+        <input type="checkbox" value="Final Year Projects" class="mr-3 h-5 w-5 rounded border-gray-300 text-green-600 focus:ring-green-500 topic-checkbox">
+        <span>📚 Final Year Projects</span>
+    </label>
+
+    <label class="flex items-center p-2 hover:bg-gray-100 cursor-pointer rounded">
+        <input type="checkbox" value="Scholarships" class="mr-3 h-5 w-5 rounded border-gray-300 text-green-600 focus:ring-green-500 topic-checkbox">
+        <span>🎓 Scholarships</span>
+    </label>
+</div>
+
+
             <!-- Academic & Research -->
             <div class="p-2 border-b">
                 <p class="font-semibold text-gray-700 mb-1">Academic & Research</p>
@@ -1068,7 +1174,6 @@
     <!-- Hidden input to store selected topics -->
     <input type="hidden" name="mentorship_topics" id="topics_hidden_input" value="{{ mentorship_topics or '' }}">
 
-    <p class="text-sm text-gray-500 mt-1"><i class="fas fa-mouse-pointer mr-1"></i>Click to select multiple topics</p>
 </div>
 
     <div>
@@ -1178,7 +1283,6 @@
     <!-- Hidden input to store selected preferences -->
     <input type="hidden" name="mentorship_type_preference" id="mentorship_pref_hidden_input" value="{{ mentorship_type_preference or '' }}">
 
-    <p class="text-sm text-gray-500 mt-1"><i class="fas fa-mouse-pointer mr-1"></i>Click to select multiple preferences</p>
 </div>
                 </div>
                 <div class="space-y-4">

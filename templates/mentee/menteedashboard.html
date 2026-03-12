@@ -33,6 +33,32 @@
       </div>
     </div>
 
+    <!-- Career Goal Section -->
+    {% if career_goal %}
+    <div class="mb-8 bg-blue-600 p-6 rounded-2xl shadow-lg border border-purple-400/30 text-white">
+      <div class="flex items-center justify-between gap-4">
+        <div class="flex items-center gap-4 flex-1">
+          <div class="flex-shrink-0">
+            <div class="flex items-center justify-center h-12 w-12 rounded-lg bg-white/20 backdrop-blur-sm">
+              <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+              </svg>
+            </div>
+          </div>
+          <div class="flex-1 min-w-0">
+            <p class="text-sm font-semibold opacity-90 uppercase tracking-wide">Your Career Goal</p>
+            <p class="text-lg font-bold mt-1 truncate">{{ career_goal }}</p>
+          </div>
+        </div>
+        <a href="{{ url_for('editmenteeprofile') }}" class="flex-shrink-0 inline-flex items-center justify-center h-10 w-10 rounded-lg bg-white/20 hover:bg-white/30 text-white transition-all duration-200">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+          </svg>
+        </a>
+      </div>
+    </div>
+    {% endif %}
+
     <!-- Stats Overview -->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
       <div
