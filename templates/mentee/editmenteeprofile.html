@@ -386,8 +386,8 @@
                                     <option value="12th" {% if class_year=='12th (Final Year)' %}selected{% endif %}>12th (Final Year)</option>
                                 </select>
                         </div>
-                        <div>
-                            <label class="block text-gray-700 font-semibold">Examination Board *</label>
+                        <div id="examination_board_field" class="hidden">
+                            <label class="block text-gray-700 font-semibold">Examination Board</label>
                             <input type="text" name="school_board" value="{{ school_board or '' }}"
                                 class="w-full p-2 border rounded-lg" placeholder="e.g., CBSE, ICSE, State Board">
                         </div>
@@ -954,7 +954,7 @@
 
             // Define mandatory fields for each category
             const mandatoryFieldsByCategory = {
-                school_student: ['school_name', 'school_board'],
+                school_student: ['school_name'],
                 university_student: ['institution_name'],
                 seeking_internship: ['institution_name'],
                 young_professional: ['current_role', 'industry', 'years_experience', 'current_organization'],
@@ -1061,7 +1061,7 @@
             const countrySelect = document.querySelector('select[name="country"]');
             if (countrySelect && countrySelect.value === 'India') {
                 console.log('🇮🇳 India selected - checking India-specific fields');
-                // Note: School Type (govt_private) and Stream (course_stream) are optional fields
+                // Note: School Type (govt_private), Stream (course_stream), and Examination Board are optional fields
             } else {
                 console.log('⊘ Non-India country selected - skipping India-specific fields');
             }
@@ -1165,8 +1165,9 @@
             const countrySelect = document.querySelector('select[name="country"]');
             const schoolTypeField = document.getElementById('school_type_field');
             const streamField = document.getElementById('stream_field');
+            const examinationBoardField = document.getElementById('examination_board_field');
             
-            if (!countrySelect || !schoolTypeField || !streamField) {
+            if (!countrySelect || !schoolTypeField || !streamField || !examinationBoardField) {
                 console.warn('⚠️ Country select or India-specific fields not found');
                 return;
             }
@@ -1176,21 +1177,25 @@
 
             if (isIndia) {
                 // Show fields for India
+                examinationBoardField.classList.remove('hidden');
                 schoolTypeField.classList.remove('hidden');
                 streamField.classList.remove('hidden');
-                console.log('✓ Showing School Type and Stream fields (India selected)');
+                console.log('✓ Showing Examination Board, School Type and Stream fields (India selected)');
             } else {
                 // Hide fields for other countries
+                examinationBoardField.classList.add('hidden');
                 schoolTypeField.classList.add('hidden');
                 streamField.classList.add('hidden');
                 
                 // Clear values when hiding
+                const schoolBoardInput = document.querySelector('input[name="school_board"]');
                 const govtPrivateSelect = document.getElementById('govt_private_select');
                 const courseStreamSelect = document.getElementById('course_stream_select');
+                if (schoolBoardInput) schoolBoardInput.value = '';
                 if (govtPrivateSelect) govtPrivateSelect.value = '';
                 if (courseStreamSelect) courseStreamSelect.value = '';
                 
-                console.log('✓ Hiding School Type and Stream fields (non-India country selected)');
+                console.log('✓ Hiding Examination Board, School Type and Stream fields (non-India country selected)');
             }
         }
     </script>

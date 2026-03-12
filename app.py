@@ -1748,8 +1748,6 @@ def menteedashboard():
 
         all_mentors = MentorProfile.query.filter_by().all()
 
-
-
         all_mentors = MentorProfile.query.filter_by().all()
 
         # unique filter value from db
@@ -1758,6 +1756,9 @@ def menteedashboard():
         educations = [row.education for row in MentorProfile.query.with_entities(MentorProfile.education).distinct() if row.education]
         experiences = [row.years_of_experience for row in MentorProfile.query.with_entities(MentorProfile.years_of_experience).distinct() if row.years_of_experience]
 
+        # Fetch mentee profile to get career goal
+        mentee_profile = MenteeProfile.query.filter_by(user_id=user.id).first()
+        career_goal = mentee_profile.goal if mentee_profile else None
 
         # Optionally, fetch mentors already assigned to this mentee
         # This depends if you have a "mentorship" table, for now we just show all mentors
@@ -1770,11 +1771,9 @@ def menteedashboard():
             educations=[row.education for row in MentorProfile.query.with_entities(MentorProfile.education).distinct() if row.education],
             experiences=[row.years_of_experience for row in MentorProfile.query.with_entities(MentorProfile.years_of_experience).distinct() if row.years_of_experience],
             show_sidebar=True,
-            profile_complete=profile_complete
+            profile_complete=profile_complete,
+            career_goal=career_goal
         )
-
-
-
 
     return redirect(url_for("signin"))
 
@@ -5036,7 +5035,7 @@ def editmenteeprofile():
         
         # Define mandatory fields for each category
         mandatory_fields_by_category = {
-            'school_student': ['school_name', 'school_board'],
+            'school_student': ['school_name'],
             'university_student': ['institution_name'],
             'seeking_internship': ['institution_name'],
             'young_professional': ['current_role', 'industry', 'years_experience', 'current_organization'],
