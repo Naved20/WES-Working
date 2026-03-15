@@ -446,9 +446,9 @@ class MenteeProfile(db.Model):
     
     school_college_name = db.Column(db.String(150))
     mobile_number = db.Column(db.String(20))
-    mobile_country_code = db.Column(db.String(10), default="+91")
+    mobile_country_code = db.Column(db.String(10), default="+1")
     whatsapp_number = db.Column(db.String(20))
-    whatsapp_country_code = db.Column(db.String(10), default="+91")
+    whatsapp_country_code = db.Column(db.String(10), default="+1")
     govt_private = db.Column(db.String(50))
     stream = db.Column(db.String(100))
     class_year = db.Column(db.String(50))
@@ -458,7 +458,7 @@ class MenteeProfile(db.Model):
     # parent info
     parent_name = db.Column(db.String(150))
     parent_mobile = db.Column(db.String(20))
-    parent_mobile_country_code = db.Column(db.String(10), default="+91")
+    parent_mobile_country_code = db.Column(db.String(10), default="+1")
 
     # other
     comments = db.Column(db.Text)
@@ -4824,7 +4824,7 @@ def editmentorprofile():
         profile.years_of_experience = request.form.get("years_of_experience")
         
         # Handle WhatsApp with country code - combine them
-        whatsapp_country_code = request.form.get("whatsapp_country_code", "+91")
+        whatsapp_country_code = request.form.get("whatsapp_country_code", "+1")
         whatsapp_number = request.form.get("whatsapp")
         if whatsapp_number:
             # Combine country code and number
@@ -4944,7 +4944,7 @@ def editmentorprofile():
     
     # Parse WhatsApp to get country code and number separately
     whatsapp_full = profile.whatsapp if profile else ""
-    whatsapp_country_code = "+91"  # Default
+    whatsapp_country_code = "+1"  # Default
     whatsapp_number = ""
     
     if whatsapp_full:
@@ -5098,11 +5098,11 @@ def editmenteeprofile():
         profile.who_am_i = who_am_i
         profile.dob = request.form.get("dob")
         profile.mobile_number = request.form.get("mobile_number")
-        profile.mobile_country_code = request.form.get("mobile_country_code", "+91")
+        profile.mobile_country_code = request.form.get("mobile_country_code", "+1")
         profile.whatsapp_number = request.form.get("whatsapp_number")
-        profile.whatsapp_country_code = request.form.get("whatsapp_country_code", "+91")
+        profile.whatsapp_country_code = request.form.get("whatsapp_country_code", "+1")
         profile.parent_mobile = request.form.get("parent_mobile")
-        profile.parent_mobile_country_code = request.form.get("parent_mobile_country_code", "+91")
+        profile.parent_mobile_country_code = request.form.get("parent_mobile_country_code", "+1")
         profile.school_college_name = request.form.get("school_college_name")
         profile.stream = request.form.get("stream")
         profile.goal = request.form.get("goal")
@@ -5207,9 +5207,9 @@ def editmenteeprofile():
         institutions=institutions,
         dob=profile.dob if profile else "",
         mobile_number=profile.mobile_number if profile else "",
-        mobile_country_code=profile.mobile_country_code if profile and profile.mobile_country_code else "+91",
+        mobile_country_code=profile.mobile_country_code if profile and profile.mobile_country_code else "+1",
         whatsapp_number=profile.whatsapp_number if profile else "",
-        whatsapp_country_code=profile.whatsapp_country_code if profile and profile.whatsapp_country_code else "+91",
+        whatsapp_country_code=profile.whatsapp_country_code if profile and profile.whatsapp_country_code else "+1",
         who_am_i=profile.who_am_i if profile and profile.who_am_i else None,
         # General details
         father_name=profile.father_name if profile else "",
@@ -5223,7 +5223,7 @@ def editmenteeprofile():
         institution_other=profile.institution_other if profile else "",
         # New common fields
         parent_mobile=profile.parent_mobile if profile else "",
-        parent_mobile_country_code=profile.parent_mobile_country_code if profile and profile.parent_mobile_country_code else "+91",
+        parent_mobile_country_code=profile.parent_mobile_country_code if profile and profile.parent_mobile_country_code else "+1",
         school_college_name=profile.school_college_name if profile else "",
         stream=profile.stream if profile else "",
         goal=profile.goal if profile else "",
@@ -5495,12 +5495,12 @@ def menteeprofile():
             who_am_i=profile.who_am_i if profile else None,
             # Contact Info
             mobile_number=profile.mobile_number if profile else "",
-            mobile_country_code=profile.mobile_country_code if profile and profile.mobile_country_code else "+91",
+            mobile_country_code=profile.mobile_country_code if profile and profile.mobile_country_code else "+1",
             whatsapp_number=profile.whatsapp_number if profile else "",
-            whatsapp_country_code=profile.whatsapp_country_code if profile and profile.whatsapp_country_code else "+91",
+            whatsapp_country_code=profile.whatsapp_country_code if profile and profile.whatsapp_country_code else "+1",
             parent_name=profile.parent_name if profile else "",
             parent_mobile=profile.parent_mobile if profile else "",
-            parent_mobile_country_code=profile.parent_mobile_country_code if profile and profile.parent_mobile_country_code else "+91",
+            parent_mobile_country_code=profile.parent_mobile_country_code if profile and profile.parent_mobile_country_code else "+1",
             # Common fields for all categories
             school_college_name=profile.school_college_name if profile else "",
             stream=profile.stream if profile else "",
