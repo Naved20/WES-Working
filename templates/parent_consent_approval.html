@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Parent Consent - Mentors Connect</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body class="bg-gray-50">
+    <div class="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-3xl w-full">
+            <!-- Header -->
+            <div class="text-center mb-8">
+                <h1 class="text-4xl font-bold text-gray-900 mb-2">Parent Consent Required</h1>
+                <p class="text-gray-600">Please review your child's profile and provide consent</p>
+            </div>
+
+            <!-- Main Card -->
+            <div class="bg-white rounded-2xl shadow-xl p-8 border border-gray-200">
+                <!-- Alert Box -->
+                <div class="bg-blue-50 border-l-4 border-blue-500 p-4 mb-6">
+                    <div class="flex">
+                        <div class="flex-shrink-0">
+                            <i class="fas fa-info-circle text-blue-500 text-xl"></i>
+                        </div>
+                        <div class="ml-3">
+                            <p class="text-sm text-blue-700">
+                                Your child <strong>{{ mentee.name }}</strong> ({{ age }} years old) has registered for our Mentorship Connect program. 
+                                Since they are under 18, we require your consent before they can participate.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Mentee Details -->
+                <div class="space-y-6 mb-8">
+                    <h2 class="text-2xl font-bold text-gray-900 border-b pb-2">Profile Details</h2>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="bg-gray-50 p-4 rounded-lg">
+                            <p class="text-sm text-gray-500 font-semibold">Full Name</p>
+                            <p class="text-lg text-gray-900">{{ mentee.name }}</p>
+                        </div>
+                        
+                        <div class="bg-gray-50 p-4 rounded-lg">
+                            <p class="text-sm text-gray-500 font-semibold">Email</p>
+                            <p class="text-lg text-gray-900">{{ mentee.email }}</p>
+                        </div>
+                        
+                        {% if age %}
+                        <div class="bg-gray-50 p-4 rounded-lg">
+                            <p class="text-sm text-gray-500 font-semibold">Age</p>
+                            <p class="text-lg text-gray-900">{{ age }} years old</p>
+                        </div>
+                        {% endif %}
+                        
+                        {% if profile.who_am_i %}
+                        <div class="bg-gray-50 p-4 rounded-lg">
+                            <p class="text-sm text-gray-500 font-semibold">Category</p>
+                            <p class="text-lg text-gray-900">
+                                {% if profile.who_am_i == 'school_student' %}School Student
+                                {% elif profile.who_am_i == 'university_student' %}University Student
+                                {% elif profile.who_am_i == 'seeking_internship' %}Seeking Internship
+                                {% elif profile.who_am_i == 'young_professional' %}Young Professional
+                                {% elif profile.who_am_i == 'exploring' %}Exploring
+                                {% endif %}
+                            </p>
+                        </div>
+                        {% endif %}
+                        
+                        {% if profile.school_name %}
+                        <div class="bg-gray-50 p-4 rounded-lg">
+                            <p class="text-sm text-gray-500 font-semibold">School</p>
+                            <p class="text-lg text-gray-900">{{ profile.school_name }}</p>
+                        </div>
+                        {% endif %}
+                        
+                        {% if profile.institution_name %}
+                        <div class="bg-gray-50 p-4 rounded-lg">
+                            <p class="text-sm text-gray-500 font-semibold">Institution</p>
+                            <p class="text-lg text-gray-900">{{ profile.institution_name }}</p>
+                        </div>
+                        {% endif %}
+                        
+                        {% if profile.goal %}
+                        <div class="bg-gray-50 p-4 rounded-lg md:col-span-2">
+                            <p class="text-sm text-gray-500 font-semibold">Career Goal</p>
+                            <p class="text-lg text-gray-900">{{ profile.goal }}</p>
+                        </div>
+                        {% endif %}
+                        
+                        {% if profile.mentorship_expectations %}
+                        <div class="bg-gray-50 p-4 rounded-lg md:col-span-2">
+                            <p class="text-sm text-gray-500 font-semibold">Mentorship Expectations</p>
+                            <p class="text-lg text-gray-900">{{ profile.mentorship_expectations }}</p>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- What Happens Next -->
+                <div class="bg-gradient-to-r from-purple-50 to-blue-50 p-6 rounded-lg mb-8">
+                    <h3 class="text-lg font-bold text-gray-900 mb-3">
+                        <i class="fas fa-lightbulb text-yellow-500 mr-2"></i>
+                        What happens after approval?
+                    </h3>
+                    <ul class="space-y-2 text-gray-700">
+                        <li class="flex items-start">
+                            <i class="fas fa-check-circle text-green-500 mr-2 mt-1"></i>
+                            <span>Your child will be able to browse and connect with verified mentors</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-check-circle text-green-500 mr-2 mt-1"></i>
+                            <span>They can send mentorship requests and schedule sessions</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-check-circle text-green-500 mr-2 mt-1"></i>
+                            <span>All mentor interactions are monitored for safety</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-check-circle text-green-500 mr-2 mt-1"></i>
+                            <span>You can revoke consent at any time by contacting us</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Action Buttons -->
+                <form method="POST" class="space-y-4">
+                    <div class="flex flex-col sm:flex-row gap-4">
+                        <button type="submit" name="action" value="approve"
+                                class="flex-1 bg-green-600 hover:bg-green-700 text-white font-bold py-4 px-6 rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl">
+                            <i class="fas fa-check-circle mr-2"></i>
+                            Approve Participation
+                        </button>
+                        
+                        <button type="submit" name="action" value="reject"
+                                onclick="return confirm('Are you sure you want to reject your child\'s participation?')"
+                                class="flex-1 bg-red-600 hover:bg-red-700 text-white font-bold py-4 px-6 rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl">
+                            <i class="fas fa-times-circle mr-2"></i>
+                            Reject Participation
+                        </button>
+                    </div>
+                </form>
+
+                <!-- Contact Info -->
+                <div class="mt-8 pt-6 border-t border-gray-200 text-center">
+                    <p class="text-sm text-gray-600">
+                        <i class="fas fa-envelope mr-2"></i>
+                        Questions? Contact us at 
+                        <a href="mailto:mentorship@wazireducation.com" class="text-blue-600 hover:text-blue-800 font-semibold">
+                            mentorship@wazireducationsocity.com
+                        </a>
+                    </p>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="text-center mt-8 text-gray-500 text-sm">
+                <p>© 2026 Mentors Connect. All rights reserved.</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

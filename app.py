@@ -75,6 +75,121 @@ def calculate_age(dob_string):
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
+def is_under_18(dob_string):
+    """
+    Check if person is under 18 years old based on date of birth.
+    Returns True if under 18, False otherwise.
+    """
+    if not dob_string:
+        return False
+    
+    try:
+        # Try multiple date formats
+        for fmt in ["%Y-%m-%d", "%d-%m-%Y", "%d/%m/%Y"]:
+            try:
+                dob = datetime.strptime(dob_string, fmt)
+                today = datetime.today()
+                age = today.year - dob.year - ((today.month, today.day) < (dob.month, dob.day))
+                return age < 18
+            except ValueError:
+                continue
+        return False
+    except Exception as e:
+        print(f"Error calculating age: {e}")
+        return False
+
+def generate_consent_token():
+    """Generate a unique token for parent consent link"""
+    import secrets
+    return secrets.token_urlsafe(32)
+
+def send_parent_consent_email(parent_email, parent_name, mentee_name, consent_token):
+    """Send parent consent email with approval link"""
+    try:
+        print(f"📧 Starting email send process...")
+        print(f"   SMTP Server: {SMTP_SERVER}:{SMTP_PORT}")
+        print(f"   From: {SMTP_EMAIL}")
+        print(f"   To: {parent_email}")
+        
+        # Build approval link manually based on environment
+        if PRODUCTION:
+            base_url = "https://mentorship.weslux.lu"
+        else:
+            base_url = "http://127.0.0.1:5000"
+        
+        approval_link = f"{base_url}/parent_consent/{consent_token}"
+        print(f"   Approval Link: {approval_link}")
+        
+        msg = MIMEMultipart()
+        msg['From'] = SMTP_EMAIL
+        msg['To'] = parent_email
+        msg['Subject'] = f"Parent Consent Required for {mentee_name}'s Mentorship Program"
+        
+        html_body = f"""
+        <html>
+        <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+            <div style="max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f9f9f9; border-radius: 10px;">
+                <h2 style="color: #2563eb; text-align: center;">Parent Consent Required</h2>
+                
+                <p>Dear {parent_name},</p>
+                
+                <p>Your child, <strong>{mentee_name}</strong>, has registered for our Mentorship Connect program.</p>
+                
+                <p>Since {mentee_name} is under 18 years old, we require your consent before they can participate in the mentorship program.</p>
+                
+                <div style="background-color: #fff; padding: 20px; border-radius: 8px; margin: 20px 0;">
+                    <h3 style="color: #2563eb;">What happens next?</h3>
+                    <ul>
+                        <li>Review your child's profile details</li>
+                        <li>Approve or reject their participation</li>
+                        <li>Once approved, they can connect with mentors</li>
+                    </ul>
+                </div>
+                
+                <div style="text-align: center; margin: 30px 0;">
+                    <a href="{approval_link}" 
+                       style="background-color: #2563eb; color: white; padding: 15px 30px; text-decoration: none; border-radius: 8px; display: inline-block; font-weight: bold;">
+                        Review & Approve
+                    </a>
+                </div>
+                
+                <p style="color: #666; font-size: 14px; margin-top: 30px;">
+                    If you did not expect this email, please ignore it or contact us at support@mentorsconnect.com
+                </p>
+                
+                <hr style="border: none; border-top: 1px solid #ddd; margin: 20px 0;">
+                
+                <p style="text-align: center; color: #999; font-size: 12px;">
+                    © 2026 Mentors Connect. All rights reserved.
+                </p>
+            </div>
+        </body>
+        </html>
+        """
+        
+        msg.attach(MIMEText(html_body, 'html'))
+        
+        print(f"📤 Connecting to SMTP server...")
+        server = smtplib.SMTP(SMTP_SERVER, SMTP_PORT)
+        print(f"🔐 Starting TLS...")
+        server.starttls()
+        print(f"🔑 Logging in...")
+        server.login(SMTP_EMAIL, SMTP_PASSWORD)
+        print(f"📨 Sending message...")
+        server.send_message(msg)
+        print(f"👋 Closing connection...")
+        server.quit()
+        
+        print(f"✅ Email sent successfully to {parent_email}")
+        return True
+    except Exception as e:
+        print(f"❌ Error sending parent consent email: {e}")
+        print(f"   Error type: {type(e).__name__}")
+        import traceback
+        traceback.print_exc()
+        return False
+
+
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = "signin" 
@@ -459,6 +574,10 @@ class MenteeProfile(db.Model):
     parent_name = db.Column(db.String(150))
     parent_mobile = db.Column(db.String(20))
     parent_mobile_country_code = db.Column(db.String(10), default="+1")
+    parent_email = db.Column(db.String(150))  # Parent's email for consent
+    parent_consent_status = db.Column(db.String(20), default="pending")  # pending, approved, rejected
+    parent_consent_token = db.Column(db.String(200))  # Unique token for approval link
+    parent_consent_date = db.Column(db.DateTime)  # Date when parent approved/rejected
 
     # other
     comments = db.Column(db.Text)
@@ -1285,6 +1404,66 @@ def reset_password():
     
     return render_template("auth/reset_password.html", email=email, token=token)
 
+# ------------------- PARENT CONSENT FOR UNDER 18 MENTEES -------------------
+@app.route("/parent_consent/<token>", methods=["GET", "POST"])
+def parent_consent_approval(token):
+    """Parent approval page for under-18 mentees"""
+    # Find mentee profile by consent token
+    profile = MenteeProfile.query.filter_by(parent_consent_token=token).first()
+    
+    if not profile:
+        flash("Invalid or expired consent link.", "error")
+        return redirect(url_for("index"))
+    
+    # Get mentee user details
+    mentee = User.query.get(profile.user_id)
+    if not mentee:
+        flash("Mentee not found.", "error")
+        return redirect(url_for("index"))
+    
+    # Check if already approved/rejected
+    if profile.parent_consent_status in ["approved", "rejected"]:
+        status_message = "approved" if profile.parent_consent_status == "approved" else "rejected"
+        return render_template("parent_consent_status.html", 
+                             status=profile.parent_consent_status,
+                             mentee_name=mentee.name,
+                             consent_date=profile.parent_consent_date)
+    
+    if request.method == "POST":
+        action = request.form.get("action")
+        
+        if action == "approve":
+            profile.parent_consent_status = "approved"
+            profile.parent_consent_date = datetime.now()
+            db.session.commit()
+            
+            flash(f"You have approved {mentee.name}'s participation in the mentorship program!", "success")
+            return render_template("parent_consent_status.html", 
+                                 status="approved",
+                                 mentee_name=mentee.name,
+                                 consent_date=profile.parent_consent_date)
+        
+        elif action == "reject":
+            profile.parent_consent_status = "rejected"
+            profile.parent_consent_date = datetime.now()
+            db.session.commit()
+            
+            flash(f"You have rejected {mentee.name}'s participation in the mentorship program.", "info")
+            return render_template("parent_consent_status.html", 
+                                 status="rejected",
+                                 mentee_name=mentee.name,
+                                 consent_date=profile.parent_consent_date)
+    
+    # Calculate age
+    age = calculate_age(profile.dob) if profile.dob else None
+    
+    # GET request - show approval form
+    return render_template("parent_consent_approval.html",
+                         mentee=mentee,
+                         profile=profile,
+                         age=age,
+                         parent_email=profile.parent_email)
+
 # ------------------- GOOGLE OAUTH LOGIN -------------------
 @app.route("/google_login")
 def google_login():
@@ -1759,6 +1938,10 @@ def menteedashboard():
         # Fetch mentee profile to get career goal
         mentee_profile = MenteeProfile.query.filter_by(user_id=user.id).first()
         career_goal = mentee_profile.goal if mentee_profile else None
+        
+        # Get parent consent status and email for under-18 mentees
+        parent_consent_status = mentee_profile.parent_consent_status if mentee_profile else None
+        parent_email = mentee_profile.parent_email if mentee_profile else None
 
         # Optionally, fetch mentors already assigned to this mentee
         # This depends if you have a "mentorship" table, for now we just show all mentors
@@ -1772,7 +1955,9 @@ def menteedashboard():
             experiences=[row.years_of_experience for row in MentorProfile.query.with_entities(MentorProfile.years_of_experience).distinct() if row.years_of_experience],
             show_sidebar=True,
             profile_complete=profile_complete,
-            career_goal=career_goal
+            career_goal=career_goal,
+            parent_consent_status=parent_consent_status,
+            parent_email=parent_email
         )
 
     return redirect(url_for("signin"))
@@ -4576,6 +4761,25 @@ def request_mentorship():
         return jsonify({"success": False, "message": "Unauthorized"}), 401
 
     try:
+        # Get mentee (current user)
+        mentee = User.query.filter_by(email=session["email"]).first()
+        if not mentee:
+            return jsonify({"success": False, "message": "User not found"}), 404
+        
+        # Check parent consent status for under-18 mentees
+        mentee_profile = MenteeProfile.query.filter_by(user_id=mentee.id).first()
+        if mentee_profile and mentee_profile.parent_consent_status == "pending":
+            return jsonify({
+                "success": False, 
+                "message": "You need parent/guardian approval before requesting mentorship. Please check your email or update your parent's email in your profile."
+            }), 403
+        
+        if mentee_profile and mentee_profile.parent_consent_status == "rejected":
+            return jsonify({
+                "success": False, 
+                "message": "Your parent/guardian has not approved your participation. Please contact support if you need assistance."
+            }), 403
+        
         data = request.json
         mentor_id = data.get("mentor_id")
         purpose = data.get("purpose")
@@ -4595,11 +4799,6 @@ def request_mentorship():
                 return jsonify({"success": False, "message": "Duration must be a positive number"}), 400
         except (ValueError, TypeError):
             return jsonify({"success": False, "message": "Invalid duration value"}), 400
-
-        # Get mentee (current user)
-        mentee = User.query.filter_by(email=session["email"]).first()
-        if not mentee:
-            return jsonify({"success": False, "message": "User not found"}), 404
 
         # Verify mentor exists
         mentor = User.query.get(mentor_id)
@@ -5097,6 +5296,41 @@ def editmenteeprofile():
         # Save common fields
         profile.who_am_i = who_am_i
         profile.dob = request.form.get("dob")
+        
+        # Check if mentee is under 18 and handle parent consent
+        parent_email = request.form.get("parent_email", "").strip()
+        if profile.dob and is_under_18(profile.dob):
+            # Mentee is under 18, parent consent required
+            if parent_email:
+                profile.parent_email = parent_email
+                
+                # Generate consent token if not already generated
+                if not profile.parent_consent_token:
+                    profile.parent_consent_token = generate_consent_token()
+                    profile.parent_consent_status = "pending"
+                    
+                    # Send consent email to parent
+                    parent_name = request.form.get("parent_name", "Parent/Guardian")
+                    print(f"🔔 Attempting to send parent consent email to: {parent_email}")
+                    print(f"   Parent Name: {parent_name}")
+                    print(f"   Mentee Name: {user.name}")
+                    print(f"   Token: {profile.parent_consent_token}")
+                    
+                    email_sent = send_parent_consent_email(
+                        parent_email=parent_email,
+                        parent_name=parent_name,
+                        mentee_name=user.name,
+                        consent_token=profile.parent_consent_token
+                    )
+                    
+                    if email_sent:
+                        print(f"✅ Parent consent email sent successfully to {parent_email}")
+                    else:
+                        print(f"❌ Failed to send parent consent email to {parent_email}")
+        else:
+            # Mentee is 18 or older, auto-approve
+            profile.parent_consent_status = "approved"
+        
         profile.mobile_number = request.form.get("mobile_number")
         profile.mobile_country_code = request.form.get("mobile_country_code", "+1")
         profile.whatsapp_number = request.form.get("whatsapp_number")
@@ -5187,16 +5421,27 @@ def editmenteeprofile():
 
         db.session.commit()
         
+        # Check if parent consent email was sent
+        parent_consent_sent = False
+        if profile.dob and is_under_18(profile.dob) and profile.parent_consent_status == "pending":
+            parent_consent_sent = True
+        
         # Return JSON response for AJAX requests
         if is_ajax:
+            message = "Mentee profile updated successfully!"
+            if parent_consent_sent:
+                message += " A consent email has been sent to your parent/guardian."
             return jsonify({
                 "success": True, 
-                "message": "Mentee profile updated successfully!",
-                "redirect_url": url_for("menteeprofile")
+                "message": message,
+                "redirect_url": url_for("menteeprofile"),
+                "parent_consent_sent": parent_consent_sent
             }), 200
         
         # Traditional response for non-AJAX requests
         flash("Mentee profile updated successfully!", "success")
+        if parent_consent_sent:
+            flash("A consent email has been sent to your parent/guardian. You need their approval before connecting with mentors.", "info")
         return redirect(url_for("menteeprofile"))
 
     # GET request – pre-fill form with existing data
@@ -5213,6 +5458,8 @@ def editmenteeprofile():
         who_am_i=profile.who_am_i if profile and profile.who_am_i else None,
         # General details
         father_name=profile.father_name if profile else "",
+        parent_name=profile.parent_name if profile else "",
+        parent_email=profile.parent_email if profile else "",
         address_line1=profile.address_line1 if profile else "",
         address_line2=profile.address_line2 if profile else "",
         city=profile.city if profile else "",

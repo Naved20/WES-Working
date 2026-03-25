@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Parent Consent Status - Mentors Connect</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body class="bg-gray-50">
+    <div class="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-2xl w-full">
+            <!-- Success/Rejection Card -->
+            <div class="bg-white rounded-2xl shadow-xl p-8 border border-gray-200 text-center">
+                {% if status == 'approved' %}
+                <!-- Approved Status -->
+                <div class="mb-6">
+                    <div class="mx-auto flex items-center justify-center h-20 w-20 rounded-full bg-green-100 mb-4">
+                        <i class="fas fa-check text-green-600 text-4xl"></i>
+                    </div>
+                    <h1 class="text-3xl font-bold text-gray-900 mb-2">Consent Approved!</h1>
+                    <p class="text-gray-600 text-lg">Thank you for approving {{ mentee_name }}'s participation</p>
+                </div>
+                
+                <div class="bg-green-50 border-l-4 border-green-500 p-4 mb-6">
+                    <div class="flex">
+                        <div class="flex-shrink-0">
+                            <i class="fas fa-info-circle text-green-500 text-xl"></i>
+                        </div>
+                        <div class="ml-3 text-left">
+                            <p class="text-sm text-green-700">
+                                <strong>{{ mentee_name }}</strong> can now:
+                            </p>
+                            <ul class="mt-2 text-sm text-green-700 list-disc list-inside">
+                                <li>Connect with mentors</li>
+                                <li>Send mentorship requests</li>
+                                <li>Schedule meetings</li>
+                                <li>Participate in the mentorship program</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+                {% elif status == 'rejected' %}
+                <!-- Rejected Status -->
+                <div class="mb-6">
+                    <div class="mx-auto flex items-center justify-center h-20 w-20 rounded-full bg-red-100 mb-4">
+                        <i class="fas fa-times text-red-600 text-4xl"></i>
+                    </div>
+                    <h1 class="text-3xl font-bold text-gray-900 mb-2">Consent Rejected</h1>
+                    <p class="text-gray-600 text-lg">You have rejected {{ mentee_name }}'s participation</p>
+                </div>
+                
+                <div class="bg-red-50 border-l-4 border-red-500 p-4 mb-6">
+                    <div class="flex">
+                        <div class="flex-shrink-0">
+                            <i class="fas fa-info-circle text-red-500 text-xl"></i>
+                        </div>
+                        <div class="ml-3 text-left">
+                            <p class="text-sm text-red-700">
+                                <strong>{{ mentee_name }}</strong> will not be able to:
+                            </p>
+                            <ul class="mt-2 text-sm text-red-700 list-disc list-inside">
+                                <li>Connect with mentors</li>
+                                <li>Send mentorship requests</li>
+                                <li>Participate in the mentorship program</li>
+                            </ul>
+                            <p class="mt-3 text-sm text-red-700">
+                                If you change your mind, please contact support at <a href="mailto:support@mentorsconnect.com" class="underline font-semibold">support@mentorsconnect.com</a>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+                
+                <!-- Consent Date -->
+                {% if consent_date %}
+                <div class="text-sm text-gray-500 mb-6">
+                    <i class="far fa-calendar-alt mr-2"></i>
+                    Consent {{ 'approved' if status == 'approved' else 'rejected' }} on {{ consent_date.strftime('%B %d, %Y at %I:%M %p') }}
+                </div>
+                {% endif %}
+                
+                <!-- Action Buttons -->
+                <div class="space-y-3">
+                    <p class="text-gray-600 text-sm">You can now close this page.</p>
+                    
+                    <div class="pt-4">
+                        <a href="mailto:support@mentorsconnect.com" 
+                           class="inline-flex items-center text-blue-600 hover:text-blue-700 font-medium text-sm">
+                            <i class="fas fa-envelope mr-2"></i>
+                            Contact Support
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Footer -->
+            <div class="mt-8 text-center">
+                <p class="text-gray-500 text-sm">
+                    © 2026 Mentors Connect. All rights reserved.
+                </p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
