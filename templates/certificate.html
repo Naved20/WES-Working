@@ -3,9 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
     <title>Certificate - {{ user_name }}</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('static', filename='img/logo.jpg') }}">
+
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Great+Vibes&family=Playfair+Display:wght@400;700&display=swap');
         
@@ -134,13 +137,13 @@
             <div class="text-center mb-8">
                 <span class="badge">
                     {% if user_type == '1' %}
-                        🎓 Registered Mentor
+                        Registered Mentor
                     {% elif user_type == '2' %}
-                        📚 Registered Mentee
+                        Registered Mentee
                     {% elif user_type == '0' %}
-                        👨‍💼 Supervisor
+                        Supervisor
                     {% elif user_type == '3' %}
-                        🏛️ Institution
+                        Institution
                     {% endif %}
                 </span>
             </div>
@@ -191,7 +194,7 @@
                 </p>
             </div>
         </div>
-        
+
         <!-- Action Buttons -->
         <div class="no-print text-center mt-8 space-x-4">
             <button onclick="downloadCertificate()" class="px-8 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-all shadow-lg">
