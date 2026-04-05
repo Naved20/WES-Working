@@ -5605,6 +5605,45 @@ def profile():
     elif user_type == "3":
         return redirect(url_for("institutionprofile"))
 
+# ------------------ CERTIFICATE ------------------
+@app.route("/my_certificate")
+def my_certificate():
+    """Generate and display user certificate"""
+    if "email" not in session:
+        flash("Please login first!", "error")
+        return redirect(url_for("signin"))
+    
+    # Get current user
+    user = User.query.filter_by(email=session["email"]).first()
+    if not user:
+        flash("User not found!", "error")
+        return redirect(url_for("signin"))
+    
+    # Format registration date
+    registration_date = user.created_at.strftime("%B %d, %Y") if user.created_at else "N/A"
+    
+    # Determine back URL based on user type
+    user_type = session.get("user_type")
+    if user_type == "1":
+        back_url = url_for("mentordashboard")
+    elif user_type == "2":
+        back_url = url_for("menteedashboard")
+    elif user_type == "0":
+        back_url = url_for("supervisordashboard")
+    elif user_type == "3":
+        back_url = url_for("institutiondashboard")
+    else:
+        back_url = url_for("index")
+    
+    return render_template(
+        "certificate.html",
+        user_name=user.name,
+        user_type=user.user_type,
+        user_id=user.id,
+        registration_date=registration_date,
+        back_url=back_url
+    )
+
 # --------- CHANGE PASSWORD ROUTE ---------
 @app.route("/change_password", methods=["GET", "POST"])
 def change_password():
