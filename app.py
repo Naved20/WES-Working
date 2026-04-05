@@ -416,6 +416,9 @@ class User(db.Model):
     oauth_provider = db.Column(db.String(50), nullable=True)  # 'google', 'facebook', etc.
     profile_picture_url = db.Column(db.String(500), nullable=True)  # OAuth profile picture
     oauth_created_at = db.Column(db.DateTime, nullable=True)
+    
+    # Registration timestamp
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     #connect form another table
     mentor_profile = db.relationship("MentorProfile", backref="user", uselist=False)
@@ -5620,12 +5623,13 @@ def my_certificate():
         return redirect(url_for("signin"))
     
     # Format registration date
-    # Use oauth_created_at if available, otherwise show generic message
-    if user.oauth_created_at:
+    # Use created_at if available, otherwise oauth_created_at
+    if user.created_at:
+        registration_date = user.created_at.strftime("%B %d, %Y")
+    elif user.oauth_created_at:
         registration_date = user.oauth_created_at.strftime("%B %d, %Y")
     else:
-        # For non-OAuth users, we don't have exact date, so show generic message
-        registration_date = "Member since account creation"
+        registration_date = "Registration date not available"
     
     # Determine back URL based on user type
     user_type = session.get("user_type")
