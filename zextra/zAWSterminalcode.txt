@@ -5,15 +5,16 @@ cd ~/WES-Working
 
 downoldeall things
 scp -i "C:\Users\WES\Documents\WES_MENTORSHIP_APP.pem" ubuntu@13.60.24.151:/home/ubuntu/WES-Working/instance/mentors_connect.db "C:\Users\WES\"
-<<<<<<< HEAD
 scp -r -i "C:\Users\WES\Documents\WES_MENTORSHIP_APP.pem" ubuntu@13.60.24.151:/home/ubuntu/WES-Working/static C:\MD_naved\WES-Working
 scp -r -i "C:\Users\WES\Documents\WES_MENTORSHIP_APP.pem" ubuntu@13.60.24.151:/home/ubuntu/WES-Working/client_secret.json C:\MD_naved\WES-Working
 scp -r -i "C:\Users\WES\Documents\WES_MENTORSHIP_APP.pem" ubuntu@13.60.24.151:/home/ubuntu/WES-Working/service_account.json C:\MD_naved\WES-Working
-=======
-scp -r -i "C:\Users\WES\Documents\WES_MENTORSHIP_APP.pem" ubuntu@13.60.24.151:/home/ubuntu/WES-Working/static C:\Users\WES\
->>>>>>> c6b5328bbb342c24ace12e813f9a9a4ea710875f
 
 
+
+scp -r -i "C:\Users\WES\Documents\WES_MENTORSHIP_APP.pem" ubuntu@13.60.24.151:/home/ubuntu/WES-Working C:\mentors-connect-backup
+scp -r -i "C:\Users\WES\Documents\WES_MENTORSHIP_APP.pem" ubuntu@13.60.24.151:/home/ubuntu/WES-Working/client_secret.json C:\MD_naved\WES-Working
+scp -r -i "C:\Users\WES\Documents\WES_MENTORSHIP_APP.pem" ubuntu@13.60.24.151:/home/ubuntu/WES-Working/service_account.json C:\MD_naved\WES-Working
+======
 git pull origin main
 source venv/bin/activate
 gunicorn -w 3 -b 127.0.0.1:8000 app:app

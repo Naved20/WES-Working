@@ -5620,7 +5620,12 @@ def my_certificate():
         return redirect(url_for("signin"))
     
     # Format registration date
-    registration_date = user.created_at.strftime("%B %d, %Y") if user.created_at else "N/A"
+    # Use oauth_created_at if available, otherwise show generic message
+    if user.oauth_created_at:
+        registration_date = user.oauth_created_at.strftime("%B %d, %Y")
+    else:
+        # For non-OAuth users, we don't have exact date, so show generic message
+        registration_date = "Member since account creation"
     
     # Determine back URL based on user type
     user_type = session.get("user_type")

@@ -1,0 +1,216 @@
+naved20@ip-172-31-17-49:/home/luxment/htdocs/mentorship.weslux.lu/WES-Working$ git pull
+remote: Enumerating objects: 5, done.
+remote: Counting objects: 100% (5/5), done.
+remote: Compressing objects: 100% (3/3), done.
+remote: Total 4 (delta 1), reused 4 (delta 1), pack-reused 0 (from 0)
+Unpacking objects: 100% (4/4), 1.86 KiB | 1.86 MiB/s, done.
+From https://github.com/Naved20/WES-Working
+   30bd7eef..9f42c92b  main       -> origin/main
+Updating 30bd7eef..9f42c92b
+Fast-forward
+ check_db_permissions.py | 92 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ fix_db_permissions.sh   | 62 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 154 insertions(+)
+ create mode 100644 check_db_permissions.py
+ create mode 100644 fix_db_permissions.sh
+naved20@ip-172-31-17-49:/home/luxment/htdocs/mentorship.weslux.lu/WES-Working$ python3 chec_db
+python3: can't open file '/home/luxment/htdocs/mentorship.weslux.lu/WES-Working/chec_db': [Errno 2] No such file or directory
+naved20@ip-172-31-17-49:/home/luxment/htdocs/mentorship.weslux.lu/WES-Working$ python3 check_db_permissions.py
+============================================================
+DATABASE PERMISSIONS CHECKER
+============================================================
+
+✅ Database file exists: instance/mentors_connect.db
+
+📋 File Information:
+   Owner UID: 1003
+   Group GID: 1004
+   Permissions: 660
+   Readable: True
+   Writable: True
+
+📁 Directory Information:
+   Directory: instance
+   Permissions: 770
+   Writable: True
+
+🔧 Testing write access...
+✅ Database is WRITABLE - write test successful!
+
+👤 Current user: naved20
+✅ Current user CAN write to database
+
+============================================================
+Check complete!
+============================================================
+naved20@ip-172-31-17-49:/home/luxment/htdocs/mentorship.weslux.lu/WES-Working$ python3 fix_db_permissions.py
+python3: can't open file '/home/luxment/htdocs/mentorship.weslux.lu/WES-Working/fix_db_permissions.py': [Errno 2] No such file or directory
+naved20@ip-172-31-17-49:/home/luxment/htdocs/mentorship.weslux.lu/WES-Working$ # Check error log
+tail -100 /home/luxment/logs/mentorship.weslux.lu/error.log
+tail: cannot open '/home/luxment/logs/mentorship.weslux.lu/error.log' for reading: No such file or directory
+naved20@ip-172-31-17-49:/home/luxment/htdocs/mentorship.weslux.lu/WES-Working$ tail -100 /home/luxment/logs/mentorship.weslux.lu/error.log
+tail: cannot open '/home/luxment/logs/mentorship.weslux.lu/error.log' for reading: No such file or directory
+naved20@ip-172-31-17-49:/home/luxment/htdocs/mentorship.weslux.lu/WES-Working$
+✅ Database is WRITABLE - write test successful!
+
+👤 Current user: naved20
+✅ Current user CAN write to database
+
+============================================================
+Check complete!
+============================================================
+naved20@ip-172-31-17-49:/home/luxment/htdocs/mentorship.weslux.lu/WES-Working$ python3 fix_db_permissions.py
+python3: can't open file '/home/luxment/htdocs/mentorship.weslux.lu/WES-Working/fix_db_permissions.py': [Errno 2] No such file or directory
+naved20@ip-172-31-17-49:/home/luxment/htdocs/mentorship.weslux.lu/WES-Working$ # Check error log
+tail -100 /home/luxment/logs/mentorship.weslux.lu/error.log
+tail: cannot open '/home/luxment/logs/mentorship.weslux.lu/error.log' for reading: No such file or directory
+naved20@ip-172-31-17-49:/home/luxment/htdocs/mentorship.weslux.lu/WES-Working$ tail -100 /home/luxment/logs/mentorship.weslux.lu/error.log
+tail: cannot open '/home/luxment/logs/mentorship.weslux.lu/error.log' for reading: No such file or directory
+naved20@ip-172-31-17-49:/home/luxment/htdocs/mentorship.weslux.lu/WES-Workin^C
+naved20@ip-172-31-17-49:/home/luxment/htdocs/mentorship.weslux.lu/WES-Working$ ^C
+naved20@ip-172-31-17-49:/home/luxment/htdocs/mentorship.weslux.lu/WES-Working$ ^C
+naved20@ip-172-31-17-49:/home/luxment/htdocs/mentorship.weslux.lu/WES-Working$ pip3 install -r requirements.txt
+Command 'pip3' not found, but can be installed with:
+apt install python3-pip
+Please ask your administrator.
+naved20@ip-172-31-17-49:/home/luxment/htdocs/mentorship.weslux.lu/WES-Working$ git pull
+Already up to date.
+naved20@ip-172-31-17-49:/home/luxment/htdocs/mentorship.weslux.lu/WES-Working$ git pull
+remote: Enumerating objects: 4, done.
+remote: Counting objects: 100% (4/4), done.
+remote: Compressing objects: 100% (2/2), done.
+remote: Total 3 (delta 1), reused 3 (delta 1), pack-reused 0 (from 0)
+Unpacking objects: 100% (3/3), 1.50 KiB | 1.50 MiB/s, done.
+From https://github.com/Naved20/WES-Working
+   9f42c92b..951e16c0  main       -> origin/main
+Updating 9f42c92b..951e16c0
+Fast-forward
+ find_error.py | 132 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 132 insertions(+)
+ create mode 100644 find_error.py
+naved20@ip-172-31-17-49:/home/luxment/htdocs/mentorship.weslux.lu/WES-Working$ python3 find_error.py
+============================================================
+FINDING PRODUCTION ERROR
+============================================================
+
+1. Testing app import...
+   ✅ App imported successfully
+
+2. Testing database connection...
+   ✅ Database working - 71 users
+
+3. Testing signup route...
+   Status: 200
+   ✅ Signup page loads
+
+4. Testing signup POST...
+   Status: 302
+   ✅ Signup POST works
+
+5. Checking SMTP configuration...
+   SMTP Server: smtp.gmail.com:587
+   SMTP Email: mentorship@wazireducationsociety.com
+   SMTP Password set: Yes
+
+   Testing SMTP connection...
+   ✅ SMTP connection successful
+
+6. Testing parent consent email function...
+   ✅ Function exists
+
+7. Testing request_mentorship route...
+   Status: 401
+   ❌ Route error: 401
+
+============================================================
+ERROR CHECK COMPLETE
+============================================================
+
+If you see errors above, those are causing 500 errors!
+Send the output to fix the issues.
+naved20@ip-172-31-17-49:/home/luxment/htdocs/mentorship.weslux.lu/WES-Working$ sudo systemctl restart mentorship
+[sudo] password for naved20:
+Sorry, user naved20 is not allowed to execute '/usr/bin/systemctl restart mentorship' as root on ip-172-31-17-49.eu-north-1.compute.internal.
+naved20@ip-172-31-17-49:/home/luxment/htdocs/mentorship.weslux.lu/WES-Working$ sudo systemctl restart mentorship
+[sudo] password for naved20:
+Sorry, user naved20 is not allowed to execute '/usr/bin/systemctl restart mentorship' as root on ip-172-31-17-49.eu-north-1.compute.internal.
+naved20@ip-172-31-17-49:/home/luxment/htdocs/mentorship.weslux.lu/WES-Working$ git pull
+remote: Enumerating objects: 4, done.
+remote: Counting objects: 100% (4/4), done.
+remote: Compressing objects: 100% (2/2), done.
+remote: Total 3 (delta 1), reused 3 (delta 1), pack-reused 0 (from 0)
+Unpacking objects: 100% (3/3), 791 bytes | 791.00 KiB/s, done.
+From https://github.com/Naved20/WES-Working
+   951e16c0..dd168ed8  main       -> origin/main
+Updating 951e16c0..dd168ed8
+Fast-forward
+ restart_app.sh | 44 ++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 44 insertions(+)
+ create mode 100644 restart_app.sh
+naved20@ip-172-31-17-49:/home/luxment/htdocs/mentorship.weslux.lu/WES-Working$ bash restart_app.sh
+============================================================
+RESTARTING APPLICATION
+============================================================
+
+1. Finding running processes...
+naved20    23321  0.0  0.4  34268  3884 ?        S    Mar14   2:00 /usr/bin/python3 /home/naved20/.local/bin/gunicorn --bind 127.0.0.1:8000 app:app
+clascp     74884  0.0  0.4 110664  3936 ?        Sl   Mar16   1:52 python3 -m gunicorn --bind 0.0.0.0:8001 --workers 1 CLAS.wsgi:application
+wesclas   289184  0.0  0.4 110660  4084 ?        Sl   Mar27   0:12 python3 -m gunicorn --bind 0.0.0.0:8090 --workers 1 CLAS.wsgi:application
+wesclas   290840  0.0  3.2 342264 30580 ?        Sl   Mar27   0:06 python3 -m gunicorn --bind 0.0.0.0:8090 --workers 1 CLAS.wsgi:application
+clascp    290909  0.0  3.0 341984 28904 ?        Sl   Mar27   0:06 python3 -m gunicorn --bind 0.0.0.0:8001 --workers 1 CLAS.wsgi:application
+naved20   290910  0.0  6.1 119392 57572 ?        S    Mar27   0:19 /usr/bin/python3 /home/naved20/.local/bin/gunicorn --bind 127.0.0.1:8000 app:app
+naved20    23321  0.0  0.4  34268  3884 ?        S    Mar14   2:00 /usr/bin/python3 /home/naved20/.local/bin/gunicorn --bind 127.0.0.1:8000 app:app
+clascp     74884  0.0  0.4 110664  3936 ?        Sl   Mar16   1:52 python3 -m gunicorn --bind 0.0.0.0:8001 --workers 1 CLAS.wsgi:application
+wesclas   289184  0.0  0.4 110660  4084 ?        Sl   Mar27   0:12 python3 -m gunicorn --bind 0.0.0.0:8090 --workers 1 CLAS.wsgi:application
+wesclas   290840  0.0  3.2 342264 30580 ?        Sl   Mar27   0:06 python3 -m gunicorn --bind 0.0.0.0:8090 --workers 1 CLAS.wsgi:application
+clascp    290909  0.0  3.0 341984 28904 ?        Sl   Mar27   0:06 python3 -m gunicorn --bind 0.0.0.0:8001 --workers 1 CLAS.wsgi:application
+naved20   290910  0.0  6.1 119392 57572 ?        S    Mar27   0:19 /usr/bin/python3 /home/naved20/.local/bin/gunicorn --bind 127.0.0.1:8000 app:app
+
+2. Stopping old processes...
+
+3. Checking if processes stopped...
+   ⚠️  Some processes still running
+clascp     74884  0.0  0.4 110664  3936 ?        Sl   Mar16   1:52 python3 -m gunicorn --bind 0.0.0.0:8001 --workers 1 CLAS.wsgi:application
+wesclas   289184  0.0  0.4 110660  4084 ?        Sl   Mar27   0:12 python3 -m gunicorn --bind 0.0.0.0:8090 --workers 1 CLAS.wsgi:application
+wesclas   290840  0.0  3.2 342264 30580 ?        Sl   Mar27   0:06 python3 -m gunicorn --bind 0.0.0.0:8090 --workers 1 CLAS.wsgi:application
+clascp    290909  0.0  3.0 341984 28904 ?        Sl   Mar27   0:06 python3 -m gunicorn --bind 0.0.0.0:8001 --workers 1 CLAS.wsgi:application
+
+============================================================
+APPLICATION STOPPED
+============================================================
+
+Now restart from CloudPanel:
+  1. Go to CloudPanel dashboard
+  2. Sites → mentorship.weslux.lu
+  3. Click 'Restart' button
+
+Or start manually:
+  cd /home/luxment/htdocs/mentorship.weslux.lu/WES-Working
+  gunicorn -w 4 -b 0.0.0.0:8000 app:app --daemon
+
+naved20@ip-172-31-17-49:/home/luxment/htdocs/mentorship.weslux.lu/WES-Working$ gunicorn -w 4 -b 127.0.0.1:8000 app:app --daemon
+Command 'gunicorn' not found, but can be installed with:
+apt install gunicorn
+Please ask your administrator.
+naved20@ip-172-31-17-49:/home/luxment/htdocs/mentorship.weslux.lu/WES-Working$ python3 app.py
+ * Serving Flask app 'app'
+ * Debug mode: on
+WARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://172.31.17.49:5000
+Press CTRL+C to quit
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 157-015-018
+^C^C^C^CException ignored in: <module 'threading' from '/usr/lib/python3.12/threading.py'>
+Traceback (most recent call last):
+  File "/usr/lib/python3.12/threading.py", line 1573, in _shutdown
+    def _shutdown():
+
+KeyboardInterrupt:
+^C
+naved20@ip-172-31-17-49:/home/luxment/htdocs/mentorship.weslux.lu/WES-Working$ ^C
+naved20@ip-172-31-17-49:/home/luxment/htdocs/mentorship.weslux.lu/WES-Working$ cd /home/luxment/htdocs/mentorship.weslux.lu/WES-Working
+python3 -m gunicorn -w 4 -b 127.0.0.1:8000 app:app --daemon
+naved20@ip-172-31-17-49:/home/luxment/htdocs/mentorship.weslux.lu/WES-Working$
