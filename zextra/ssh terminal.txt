@@ -1,0 +1,230 @@
+PS C:\MD_naved\WES-Working> SSH naved20@13.50.213.182
+naved20@13.50.213.182's password: 
+
+########################################################
+###            Welcome to CloudPanel                 ###
+########################################################
+
+* Website:         https://www.cloudpanel.io
+* Documentation:   https://www.cloudpanel.io/docs/v2/
+* Best Practices:  https://www.cloudpanel.io/docs/v2/best-practices/
+* CloudPanel:      https://13.50.213.182:8443 
+* CloudPanel CLI:  clpctl
+
+Last login: Sun Apr  5 20:58:06 2026 from 152.59.28.99
+naved20@ip-172-31-17-49:~$ systemlt restart
+systemlt: command not found
+naved20@ip-172-31-17-49:~$ ps aux | grep gunicorn
+clascp     74884  0.0  0.6 110664  6476 ?        Sl   Mar16   3:14 python3 -m gunicorn --bind 0.0.0.0:8001 --workers 1 CLAS.wsgi:application
+naved20   301443  0.0  0.7  34240  6800 ?        S    Mar28   1:24 python3 -m gunicorn -w 4 -b 127.0.0.1:8000 app:app --daemon
+naved20   301447  0.0  1.2 120540 11496 ?        S    Mar28   0:15 python3 -m gunicorn -w 4 -b 127.0.0.1:8000 app:app --daemon
+wesclas   423175  0.0  0.7 110660  6988 ?        Sl   Apr03   0:20 python3 -m gunicorn --bind 0.0.0.0:8090 --workers 1 CLAS.wsgi:application
+naved20   461469  1.4  6.1 105832 57304 ?        S    21:06   0:01 python3 -m gunicorn -w 4 -b 127.0.0.1:8000 app:app --daemon
+naved20   461470  1.4  6.1 105832 57228 ?        S    21:06   0:01 python3 -m gunicorn -w 4 -b 127.0.0.1:8000 app:app --daemon
+clascp    461566  0.5  5.0 159052 47092 ?        S    21:07   0:00 python3 -m gunicorn --bind 0.0.0.0:8001 --workers 1 CLAS.wsgi:application
+naved20   461567  1.3  7.1 105820 66660 ?        S    21:07   0:01 python3 -m gunicorn -w 4 -b 127.0.0.1:8000 app:app --daemon
+wesclas   461568  1.8 12.2 340320 114632 ?       Sl   21:07   0:01 python3 -m gunicorn --bind 0.0.0.0:8090 --workers 1 CLAS.wsgi:application
+naved20   461613  0.0  0.2   6868  2404 pts/0    S+   21:08   0:00 grep gunicorn
+naved20@ip-172-31-17-49:~$ python3 -m gunicorn -w 4 -b 127.0.0.1:8000 app:app --daemon
+naved20@ip-172-31-17-49:~$ cd /home/luxment/htdocs/mentorship.weslux.lu/WES-Working
+naved20@ip-172-31-17-49:/home/luxment/htdocs/mentorship.weslux.lu/WES-Working$ ps aux | grep gunicorn
+clascp     74884  0.0  0.6 110664  6284 ?        Sl   Mar16   3:14 python3 -m gunicorn --bind 0.0.0.0:8001 --workers 1 CLAS.wsgi:application
+naved20   301443  0.0  0.6  34240  6208 ?        S    Mar28   1:24 python3 -m gunicorn -w 4 -b 127.0.0.1:8000 app:app --daemon
+naved20   301447  0.0  1.2 120540 11356 ?        S    Mar28   0:15 python3 -m gunicorn -w 4 -b 127.0.0.1:8000 app:app --daemon
+wesclas   423175  0.0  0.7 110660  6876 ?        Sl   Apr03   0:20 python3 -m gunicorn --bind 0.0.0.0:8090 --workers 1 CLAS.wsgi:application
+naved20   461469  0.9  3.9 105832 37276 ?        S    21:06   0:01 python3 -m gunicorn -w 4 -b 127.0.0.1:8000 app:app --daemon
+naved20   461470  0.9  4.0 105832 37588 ?        S    21:06   0:01 python3 -m gunicorn -w 4 -b 127.0.0.1:8000 app:app --daemon
+clascp    461566  0.3  2.4 159052 23108 ?        S    21:07   0:00 python3 -m gunicorn --bind 0.0.0.0:8001 --workers 1 CLAS.wsgi:application
+naved20   461567  1.0  7.4 110712 69408 ?        S    21:07   0:01 python3 -m gunicorn -w 4 -b 127.0.0.1:8000 app:app --daemon
+wesclas   461568  1.1  9.8 340320 92384 ?        Sl   21:07   0:01 python3 -m gunicorn --bind 0.0.0.0:8090 --workers 1 CLAS.wsgi:application
+naved20   461910  0.0  0.2   6868  2400 pts/0    S+   21:09   0:00 grep gunicorn
+naved20@ip-172-31-17-49:/home/luxment/htdocs/mentorship.weslux.lu/WES-Working$ python3 -m gunicorn -w 4 -b 127.0.0.1:8000 app:app --daemon
+naved20@ip-172-31-17-49:/home/luxment/htdocs/mentorship.weslux.lu/WES-Working$ git pull
+Updating dd168ed8..92100050
+error: Your local changes to the following files would be overwritten by merge:
+        instance/mentors_connect.db
+Please commit your changes or stash them before you merge.
+Aborting
+naved20@ip-172-31-17-49:/home/luxment/htdocs/mentorship.weslux.lu/WES-Working$ git pull -hard
+usage: git pull [<options>] [<repository> [<refspec>...]]
+
+    -v, --[no-]verbose    be more verbose
+    -q, --[no-]quiet      be more quiet
+    --[no-]progress       force progress reporting
+    --[no-]recurse-submodules[=<on-demand>]
+                          control for recursive fetching of submodules
+
+Options related to merging
+    -r, --[no-]rebase[=(false|true|merges|interactive)]
+                          incorporate changes by rebasing rather than merging
+    -n                    do not show a diffstat at the end of the merge
+    --[no-]stat           show a diffstat at the end of the merge
+    --[no-]log[=<n>]      add (at most <n>) entries from shortlog to merge commit message
+    --[no-]signoff[=...]  add a Signed-off-by trailer
+    --[no-]squash         create a single commit instead of doing a merge
+    --[no-]commit         perform a commit if the merge succeeds (default)
+    --[no-]edit           edit message before committing
+    --[no-]cleanup <mode> how to strip spaces and #comments from message
+    --[no-]ff             allow fast-forward
+    --ff-only             abort if fast-forward is not possible
+    --[no-]verify         control use of pre-merge-commit and commit-msg hooks
+    --[no-]verify-signatures
+                          verify that the named commit has a valid GPG signature
+    --[no-]autostash      automatically stash/stash pop before and after
+    -s, --[no-]strategy <strategy>
+                          merge strategy to use
+    -X, --[no-]strategy-option <option=value>
+                          option for selected merge strategy
+    -S, --[no-]gpg-sign[=<key-id>]
+                          GPG sign commit
+    --[no-]allow-unrelated-histories
+                          allow merging unrelated histories
+
+Options related to fetching
+    --[no-]all            fetch from all remotes
+    -a, --[no-]append     append to .git/FETCH_HEAD instead of overwriting
+    --[no-]upload-pack <path>
+                          path to upload pack on remote end
+    -f, --[no-]force      force overwrite of local branch
+    -t, --[no-]tags       fetch all tags and associated objects
+    -p, --[no-]prune      prune remote-tracking branches no longer on remote
+    -j, --[no-]jobs[=<n>] number of submodules pulled in parallel
+    --[no-]dry-run        dry run
+    -k, --[no-]keep       keep downloaded pack
+    --[no-]depth <depth>  deepen history of shallow clone
+    --[no-]shallow-since <time>
+                          deepen history of shallow repository based on time
+    --[no-]shallow-exclude <revision>
+                          deepen history of shallow clone, excluding rev
+    --[no-]deepen <n>     deepen history of shallow clone
+    --unshallow           convert to a complete repository
+    --[no-]update-shallow accept refs that update .git/shallow
+    --refmap <refmap>     specify fetch refmap
+    -o, --[no-]server-option <server-specific>
+                          option to transmit
+    -4, --[no-]ipv4       use IPv4 addresses only
+    -6, --[no-]ipv6       use IPv6 addresses only
+    --[no-]negotiation-tip <revision>
+                          report that we have only objects reachable from this object
+    --[no-]show-forced-updates
+                          check for forced-updates on all updated branches
+    --[no-]set-upstream   set upstream for git pull/fetch
+
+naved20@ip-172-31-17-49:/home/luxment/htdocs/mentorship.weslux.lu/WES-Working$ git fetch origin
+git reset --hard origin/main
+git pull
+HEAD is now at 92100050 add certificate
+Already up to date.
+naved20@ip-172-31-17-49:/home/luxment/htdocs/mentorship.weslux.lu/WES-Working$ ps aux | grep gunicorn
+clascp     74884  0.0  0.6 110664  6284 ?        Sl   Mar16   3:14 python3 -m gunicorn --bind 0.0.0.0:8001 --workers 1 CLAS.wsgi:application
+naved20   301443  0.0  0.6  34240  6208 ?        S    Mar28   1:24 python3 -m gunicorn -w 4 -b 127.0.0.1:8000 app:app --daemon
+naved20   301447  0.0  1.2 120540 11356 ?        S    Mar28   0:15 python3 -m gunicorn -w 4 -b 127.0.0.1:8000 app:app --daemon
+wesclas   423175  0.0  0.7 110660  6876 ?        Sl   Apr03   0:20 python3 -m gunicorn --bind 0.0.0.0:8090 --workers 1 CLAS.wsgi:application
+naved20   461469  0.4  3.9 105832 37280 ?        S    21:06   0:01 python3 -m gunicorn -w 4 -b 127.0.0.1:8000 app:app --daemon
+naved20   461470  0.4  4.0 105832 37588 ?        S    21:06   0:01 python3 -m gunicorn -w 4 -b 127.0.0.1:8000 app:app --daemon
+clascp    461566  0.1  2.4 159052 23152 ?        S    21:07   0:00 python3 -m gunicorn --bind 0.0.0.0:8001 --workers 1 CLAS.wsgi:application
+naved20   461567  0.4  7.4 110712 69852 ?        S    21:07   0:01 python3 -m gunicorn -w 4 -b 127.0.0.1:8000 app:app --daemon
+wesclas   461568  0.4  9.8 340320 92532 ?        Sl   21:07   0:01 python3 -m gunicorn --bind 0.0.0.0:8090 --workers 1 CLAS.wsgi:application
+naved20   461963  0.0  0.2   6868  2404 pts/0    S+   21:12   0:00 grep gunicorn
+naved20@ip-172-31-17-49:/home/luxment/htdocs/mentorship.weslux.lu/WES-Working$ python3 -m gunicorn -w 4 -b 127.0.0.1:8000 app:app --daemon
+naved20@ip-172-31-17-49:/home/luxment/htdocs/mentorship.weslux.lu/WES-Working$ client_loop: send disconnect: Connection reset
+PS C:\MD_naved\WES-Working> 
+PS C:\MD_naved\WES-Working> git fetch origin
+PS C:\MD_naved\WES-Working> git reset --hard origin/main
+HEAD is now at 92100050 add certificate
+PS C:\MD_naved\WES-Working> SSH naved20@13.50.213.182
+naved20@13.50.213.182's password: 
+
+########################################################
+###            Welcome to CloudPanel                 ###
+########################################################
+
+* Website:         https://www.cloudpanel.io
+
+Last login: Sun Apr  5 21:08:04 2026 from 152.59.28.99
+naved20@ip-172-31-17-49:~$ cd /home/luxment/htdocs/mentorship.weslux.lu/WES-Working
+naved20@ip-172-31-17-49:/home/luxment/htdocs/mentorship.weslux.lu/WES-Working$ pkill gunicorn
+naved20@ip-172-31-17-49:/home/luxment/htdocs/mentorship.weslux.lu/WES-Working$ git fetch origin
+git reset --hard origin/main
+git pull
+HEAD is now at 92100050 add certificate
+Already up to date.
+naved20@ip-172-31-17-49:/home/luxment/htdocs/mentorship.weslux.lu/WES-Working$ python3 -m gunicorn -w 4 -b 127.0.0.1:8000 apnaved20@ip-172-31-17-49:/home/luxment/htdocs/mentorship.weslux.lu/WES-Working$ pkill -9 gunicorn
+naved20@ip-172-31-17-49:/home/luxment/htdocs/mentorship.weslux.lu/WES-Working$ ps aux | grep gunicorn
+clascp     74884  0.0  0.6 110664  6164 ?        Sl   Mar16   3:14 python3 -m gunicorn --bind 0.0.0.0:8001 --workers 1 CLAS.wsgi:application
+naved20   301443  0.0  0.6  34240  5688 ?        S    Mar28   1:24 python3 -m gunicorn -w 4 -b 127.0.0.1:8000 app:app --daemon
+naved20   301447  0.0  1.2 120540 11324 ?        S    Mar28   0:15 python3 -m gunicorn -w 4 -b 127.0.0.1:8000 app:app --daemon
+wesclas   423175  0.0  0.6 110660  6348 ?        Sl   Apr03   0:20 python3 -m gunicorn --bind 0.0.0.0:8090 --workers 1 CLAS.wsgi:application
+naved20   461469  0.1  3.6 106196 34588 ?        S    21:06   0:01 python3 -m gunicorn -w 4 -b 127.0.0.1:8000 app:app --daemon
+naved20   461470  0.1  8.4 111772 78684 ?        S    21:06   0:01 python3 -m gunicorn -w 4 -b 127.0.0.1:8000 app:app --daemon
+clascp    461566  0.0  2.3 159052 21664 ?        S    21:07   0:00 python3 -m gunicorn --bind 0.0.0.0:8001 --workers 1 CLAS.wsgi:application
+naved20   461567  0.1  5.5 110712 52132 ?        S    21:07   0:01 python3 -m gunicorn -w 4 -b 127.0.0.1:8000 app:app --daemon
+wesclas   461568  0.1  8.6 340320 81220 ?        Sl   21:07   0:01 python3 -m gunicorn --bind 0.0.0.0:8090 --workers 1 CLAS.wsgi:application
+naved20   462021  0.0  0.2   6868  2400 pts/1    S+   21:24   0:00 grep gunicorn
+naved20@ip-172-31-17-49:/home/luxment/htdocs/mentorship.weslux.lu/WES-Working$ python3 -m gunicorn -w 4 -b 127.0.0.1:8000 app:app
+[2026-04-05 21:25:01 +0530] [462022] [INFO] Starting gunicorn 23.0.0
+[2026-04-05 21:25:01 +0530] [462022] [ERROR] Connection in use: ('127.0.0.1', 8000)
+[2026-04-05 21:25:01 +0530] [462022] [ERROR] connection to ('127.0.0.1', 8000) failed: [Errno 98] Address already in use    
+[2026-04-05 21:25:02 +0530] [462022] [ERROR] Connection in use: ('127.0.0.1', 8000)
+[2026-04-05 21:25:02 +0530] [462022] [ERROR] connection to ('127.0.0.1', 8000) failed: [Errno 98] Address already in use
+[2026-04-05 21:25:03 +0530] [462022] [ERROR] Connection in use: ('127.0.0.1', 8000)
+[2026-04-05 21:25:03 +0530] [462022] [ERROR] connection to ('127.0.0.1', 8000) failed: [Errno 98] Address already in use    
+[2026-04-05 21:25:04 +0530] [462022] [ERROR] Connection in use: ('127.0.0.1', 8000)
+[2026-04-05 21:25:04 +0530] [462022] [ERROR] connection to ('127.0.0.1', 8000) failed: [Errno 98] Address already in use    
+[2026-04-05 21:25:05 +0530] [462022] [ERROR] Connection in use: ('127.0.0.1', 8000)
+[2026-04-05 21:25:05 +0530] [462022] [ERROR] connection to ('127.0.0.1', 8000) failed: [Errno 98] Address already in use    
+[2026-04-05 21:25:06 +0530] [462022] [ERROR] Can't connect to ('127.0.0.1', 8000)
+naved20@ip-172-31-17-49:/home/luxment/htdocs/mentorship.weslux.lu/WES-Working$ lsof -i :8000
+COMMAND    PID    USER   FD   TYPE  DEVICE SIZE/OFF NODE NAME
+python3 301443 naved20    5u  IPv4 3599410      0t0  TCP localhost:8000 (LISTEN)
+python3 301447 naved20    5u  IPv4 3599410      0t0  TCP localhost:8000 (LISTEN)
+python3 461469 naved20    5u  IPv4 3599410      0t0  TCP localhost:8000 (LISTEN)
+python3 461470 naved20    5u  IPv4 3599410      0t0  TCP localhost:8000 (LISTEN)
+python3 461567 naved20    5u  IPv4 3599410      0t0  TCP localhost:8000 (LISTEN)
+naved20@ip-172-31-17-49:/home/luxment/htdocs/mentorship.weslux.lu/WES-Working$ kill -9 3599410
+-bash: kill: (3599410) - No such process
+naved20@ip-172-31-17-49:/home/luxment/htdocs/mentorship.weslux.lu/WES-Working$ kill -9 3599410
+-bash: kill: (3599410) - No such process
+naved20@ip-172-31-17-49:/home/luxment/htdocs/mentorship.weslux.lu/WES-Working$ lsof -i :8000
+COMMAND    PID    USER   FD   TYPE  DEVICE SIZE/OFF NODE NAME
+python3 301443 naved20    5u  IPv4 3599410      0t0  TCP localhost:8000 (LISTEN)
+python3 301447 naved20    5u  IPv4 3599410      0t0  TCP localhost:8000 (LISTEN)
+python3 461469 naved20    5u  IPv4 3599410      0t0  TCP localhost:8000 (LISTEN)
+python3 461470 naved20    5u  IPv4 3599410      0t0  TCP localhost:8000 (LISTEN)
+python3 461567 naved20    5u  IPv4 3599410      0t0  TCP localhost:8000 (LISTEN)
+naved20@ip-172-31-17-49:/home/luxment/htdocs/mentorship.weslux.lu/WES-Working$ python3 -m gunicorn -w 4 -b 127.0.0.1:8000 app:app
+[2026-04-05 21:27:56 +0530] [462038] [INFO] Starting gunicorn 23.0.0
+[2026-04-05 21:27:56 +0530] [462038] [ERROR] Connection in use: ('127.0.0.1', 8000)
+[2026-04-05 21:27:56 +0530] [462038] [ERROR] connection to ('127.0.0.1', 8000) failed: [Errno 98] Address already in use    
+[2026-04-05 21:27:57 +0530] [462038] [ERROR] Connection in use: ('127.0.0.1', 8000)
+[2026-04-05 21:27:57 +0530] [462038] [ERROR] connection to ('127.0.0.1', 8000) failed: [Errno 98] Address already in use
+[2026-04-05 21:27:58 +0530] [462038] [ERROR] Connection in use: ('127.0.0.1', 8000)
+[2026-04-05 21:27:58 +0530] [462038] [ERROR] connection to ('127.0.0.1', 8000) failed: [Errno 98] Address already in use    
+[2026-04-05 21:27:59 +0530] [462038] [ERROR] Connection in use: ('127.0.0.1', 8000)
+[2026-04-05 21:27:59 +0530] [462038] [ERROR] connection to ('127.0.0.1', 8000) failed: [Errno 98] Address already in use    
+[2026-04-05 21:28:00 +0530] [462038] [ERROR] Connection in use: ('127.0.0.1', 8000)
+[2026-04-05 21:28:00 +0530] [462038] [ERROR] connection to ('127.0.0.1', 8000) failed: [Errno 98] Address already in use    
+[2026-04-05 21:28:01 +0530] [462038] [ERROR] Can't connect to ('127.0.0.1', 8000)
+naved20@ip-172-31-17-49:/home/luxment/htdocs/mentorship.weslux.lu/WES-Working$ kill -9 301443 301447 461469 461470 461567
+naved20@ip-172-31-17-49:/home/luxment/htdocs/mentorship.weslux.lu/WES-Working$
+naved20@ip-172-31-17-49:/home/luxment/htdocs/mentorship.weslux.lu/WES-Working$ lsof -i :8000
+naved20@ip-172-31-17-49:/home/luxment/htdocs/mentorship.weslux.lu/WES-Working$ python3 -m gunicorn -w 4 -b 127.0.0.1:8000 app:app
+[2026-04-05 21:29:09 +0530] [462041] [INFO] Starting gunicorn 23.0.0
+[2026-04-05 21:29:09 +0530] [462041] [INFO] Listening at: http://127.0.0.1:8000 (462041)
+[2026-04-05 21:29:09 +0530] [462041] [INFO] Using worker: sync
+[2026-04-05 21:29:09 +0530] [462042] [INFO] Booting worker with pid: 462042
+[2026-04-05 21:29:09 +0530] [462043] [INFO] Booting worker with pid: 462043
+[2026-04-05 21:29:09 +0530] [462044] [INFO] Booting worker with pid: 462044
+[2026-04-05 21:29:09 +0530] [462045] [INFO] Booting worker with pid: 462045
+🔍 Checking profile completion for user_id: 265, user_type: 2
+📊 Mentee profile found: True
+✅ Mentee profile complete: True
+🔍 Checking profile completion for user_id: 265, user_type: 2
+📊 Mentee profile found: True
+✅ Mentee profile complete: True
+🔍 Checking profile completion for user_id: 265, user_type: 2
+📊 Mentee profile found: True
+✅ Mentee profile complete: True
+🔍 Checking profile completion for user_id: 265, user_type: 2
+📊 Mentee profile found: True
+✅ Mentee profile complete: True

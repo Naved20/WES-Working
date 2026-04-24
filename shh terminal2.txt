@@ -1,0 +1,123 @@
+PS C:\MD_naved\WES-Working> SSH naved20@13.50.213.182
+naved20@13.50.213.182's password: 
+
+########################################################
+###            Welcome to CloudPanel                 ###
+########################################################
+
+* Website:         https://www.cloudpanel.io
+* Documentation:   https://www.cloudpanel.io/docs/v2/
+* Best Practices:  https://www.cloudpanel.io/docs/v2/best-practices/
+* CloudPanel:      https://13.50.213.182:8443 
+* CloudPanel CLI:  clpctl
+
+Last login: Sun Apr  5 21:21:45 2026 from 152.59.28.99
+naved20@ip-172-31-17-49:~$ cd /home/luxment/htdocs/mentorship.weslux.lu/WES-Working
+naved20@ip-172-31-17-49:/home/luxment/htdocs/mentorship.weslux.lu/WES-Working$ 050 add certificate
+Already up to date.
+naved20@ip-172-31-17-49:/home/luxment/htdocs/mentorship.weslux.lu/WES-Working$ python3 -m gunicorn -w 4 -b 127.0.0.1:8000 apnaved20@ip-172-31-17-49:/home/luxment/htdocs/mentorship.weslux.lu/WES-Working$ pkill -9 gunicorn
+naved20@ip-172-31-17-49:/home/luxment/htdocs/mentorship.weslux.lu/WES-Working$ ps aux | grep gunicorn
+clascp     74884  0.0  0.6 110664  6164 ?        Sl   Mar16   3:14 python3 -m gunicorn --bind 0.0.0.0:8001 --workers 1 CLAS.wsgi:application
+
+naved20   301443  0.0  0.6  34240  5688 ?        S    Mar28   1:24 python3 -m gunicorn -w 4 -b 127.0.0.1:8000 app:app --daemon
+naved20   301447  0.0  1.2 120540 11324 ?        S    Mar28   0:15 python3 -m gunicorn -w 4 -b 127.0.0.1:8000 app:app --daemon
+wesclas   423175  0.0  0.6 110660  6348 ?        Sl   Apr03   0:20 python3 -m gunicorn --bind 0.0.0.0:8090 --workers 1 CLAS.wsgi:application
+
+naved20   461469  0.1  3.6 106196 34588 ?        S    21:06   0:01 python3 -m gunicorn -w 4 -b 127.0.0.1:8000 app:app --daemon
+naved20   461470  0.1  8.4 111772 78684 ?        S    21:06   0:01 python3 -m gunicorn -w 4 -b 127.0.0.1:8000 app:app --daemon
+clascp    461566  0.0  2.3 159052 21664 ?        S    21:07   0:00 python3 -m gunicorn --bind 0.0.0.0:8001 --workers 1 CLAS.wsgi:application
+
+naved20   461567  0.1  5.5 110712 52132 ?        S    21:07   0:01 python3 -m gunicorn -w 4 -b 127.0.0.1:8000 app:app --daemon
+wesclas   461568  0.1  8.6 340320 81220 ?        Sl   21:07   0:01 python3 -m gunicorn --bind 0.0.0.0:8090 --workers 1 CLAS.wsgi:application
+                            ^C
+naved20@ip-172-31-17-49:/home/luxment/htdocs/mentorship.weslux.lu/WES-Working$ ^C
+naved20@ip-172-31-17-49:/home/luxment/htdocs/mentorship.weslux.lu/WES-Working$ ^C
+naved20@ip-172-31-17-49:/home/luxment/htdocs/mentorship.weslux.lu/WES-Working$ ^C
+naved20@ip-172-31-17-49:/home/luxment/htdocs/mentorship.weslux.lu/WES-Working$ nohup python3 -m gunicorn -w 4 -b 127.0.0.1:8000 app:app > gunicorn.log 2>&1 &
+[1] 462072
+naved20@ip-172-31-17-49:/home/luxment/htdocs/mentorship.weslux.lu/WES-Working$ pkill gunicorn
+[1]+  Exit 1                  nohup python3 -m gunicorn -w 4 -b 127.0.0.1:8000 app:app > gunicorn.log 2>&1
+naved20@ip-172-31-17-49:/home/luxment/htdocs/mentorship.weslux.lu/WES-Working$ pkill gunicorn
+nohup python3 -m gunicorn -w 4 -b 127.0.0.1:8000 app:app > gunicorn.log 2>&1 &
+[1] 462075
+naved20@ip-172-31-17-49:/home/luxment/htdocs/mentorship.weslux.lu/WES-Working$ python3 -m gunicorn -w 4 -b 127.0.0.1:8000 app:app^C
+[1]+  Exit 1                  nohup python3 -m gunicorn -w 4 -b 127.0.0.1:8000 app:app > gunicorn.log 2>&1
+naved20@ip-172-31-17-49:/home/luxment/htdocs/mentorship.weslux.lu/WES-Working$ ^C
+naved20@ip-172-31-17-49:/home/luxment/htdocs/mentorship.weslux.lu/WES-Working$ ^C
+naved20@ip-172-31-17-49:/home/luxment/htdocs/mentorship.weslux.lu/WES-Working$ ^C
+naved20@ip-172-31-17-49:/home/luxment/htdocs/mentorship.weslux.lu/WES-Working$ ^C
+naved20@ip-172-31-17-49:/home/luxment/htdocs/mentorship.weslux.lu/WES-Working$ ^C
+naved20@ip-172-31-17-49:/home/luxment/htdocs/mentorship.weslux.lu/WES-Working$ ^C
+naved20@ip-172-31-17-49:/home/luxment/htdocs/mentorship.weslux.lu/WES-Working$ python3 -m gunicorn -w 4 -b 127.0.0.1:8000 app:app
+[2026-04-05 21:32:43 +0530] [462076] [INFO] Starting gunicorn 23.0.0
+[2026-04-05 21:32:43 +0530] [462076] [ERROR] Connection in use: ('127.0.0.1', 8000)
+[2026-04-05 21:32:43 +0530] [462076] [ERROR] connection to ('127.0.0.1', 8000) failed: [Errno 98] Address already in use
+[2026-04-05 21:32:44 +0530] [462076] [ERROR] Connection in use: ('127.0.0.1', 8000)
+[2026-04-05 21:32:44 +0530] [462076] [ERROR] connection to ('127.0.0.1', 8000) failed: [Errno 98] Address already in use
+[2026-04-05 21:32:45 +0530] [462076] [ERROR] Connection in use: ('127.0.0.1', 8000)
+[2026-04-05 21:32:45 +0530] [462076] [ERROR] connection to ('127.0.0.1', 8000) failed: [Errno 98] Address already in use
+[2026-04-05 21:32:46 +0530] [462076] [ERROR] Connection in use: ('127.0.0.1', 8000)
+[2026-04-05 21:32:46 +0530] [462076] [ERROR] connection to ('127.0.0.1', 8000) failed: [Errno 98] Address already in use
+[2026-04-05 21:32:47 +0530] [462076] [ERROR] Connection in use: ('127.0.0.1', 8000)
+[2026-04-05 21:32:47 +0530] [462076] [ERROR] connection to ('127.0.0.1', 8000) failed: [Errno 98] Address already in use
+[2026-04-05 21:32:48 +0530] [462076] [ERROR] Can't connect to ('127.0.0.1', 8000)
+naved20@ip-172-31-17-49:/home/luxment/htdocs/mentorship.weslux.lu/WES-Working$ kill -9 301443 301447 461469 461470 461567
+-bash: kill: (301443) - No such process
+-bash: kill: (301447) - No such process
+-bash: kill: (461469) - No such process
+-bash: kill: (461470) - No such process
+-bash: kill: (461567) - No such process
+naved20@ip-172-31-17-49:/home/luxment/htdocs/mentorship.weslux.lu/WES-Working$ lsof -i :8000
+COMMAND    PID    USER   FD   TYPE  DEVICE SIZE/OFF NODE NAME
+python3 462041 naved20    5u  IPv4 6056810      0t0  TCP localhost:8000 (LISTEN)
+python3 462048 naved20    5u  IPv4 6056810      0t0  TCP localhost:8000 (LISTEN)
+python3 462049 naved20    5u  IPv4 6056810      0t0  TCP localhost:8000 (LISTEN)
+python3 462050 naved20    5u  IPv4 6056810      0t0  TCP localhost:8000 (LISTEN)
+python3 462051 naved20    5u  IPv4 6056810      0t0  TCP localhost:8000 (LISTEN)
+naved20@ip-172-31-17-49:/home/luxment/htdocs/mentorship.weslux.lu/WES-Working$ kill -9 462041 462048 462049 462050 462051
+naved20@ip-172-31-17-49:/home/luxment/htdocs/mentorship.weslux.lu/WES-Working$ lsof -i :8000
+naved20@ip-172-31-17-49:/home/luxment/htdocs/mentorship.weslux.lu/WES-Working$ python3 -m gunicorn -w 4 -b 127.0.0.1:8000 app:app -doemon
+usage: gunicorn [OPTIONS] [APP_MODULE]
+gunicorn: error: unrecognized arguments: -doemon
+naved20@ip-172-31-17-49:/home/luxment/htdocs/mentorship.weslux.lu/WES-Working$ python3 -m gunicorn -w 4 -b 127.0.0.1:8000 app:app -doemon
+usage: gunicorn [OPTIONS] [APP_MODULE]
+gunicorn: error: unrecognized arguments: -doemon
+naved20@ip-172-31-17-49:/home/luxment/htdocs/mentorship.weslux.lu/WES-Working$ python3 -m gunicorn -w 4 -b 127.0.0.1:8000 app:app
+[2026-04-05 21:34:43 +0530] [462085] [INFO] Starting gunicorn 23.0.0
+[2026-04-05 21:34:43 +0530] [462085] [INFO] Listening at: http://127.0.0.1:8000 (462085)
+[2026-04-05 21:34:43 +0530] [462085] [INFO] Using worker: sync
+[2026-04-05 21:34:43 +0530] [462086] [INFO] Booting worker with pid: 462086
+[2026-04-05 21:34:43 +0530] [462087] [INFO] Booting worker with pid: 462087
+[2026-04-05 21:34:43 +0530] [462088] [INFO] Booting worker with pid: 462088
+[2026-04-05 21:34:43 +0530] [462089] [INFO] Booting worker with pid: 462089
+🔍 Checking profile completion for user_id: 265, user_type: 2
+📊 Mentee profile found: True
+✅ Mentee profile complete: True
+🔍 Checking profile completion for user_id: 265, user_type: 2
+📊 Mentee profile found: True
+✅ Mentee profile complete: True
+🔍 Checking profile completion for user_id: 265, user_type: 2
+📊 Mentee profile found: True
+✅ Mentee profile complete: True
+^C[2026-04-05 21:35:42 +0530] [462085] [INFO] Handling signal: int
+[2026-04-05 21:35:42 +0530] [462087] [INFO] Worker exiting (pid: 462087)
+[2026-04-05 21:35:42 +0530] [462088] [INFO] Worker exiting (pid: 462088)
+[2026-04-05 21:35:42 +0530] [462089] [INFO] Worker exiting (pid: 462089)
+[2026-04-05 21:35:42 +0530] [462086] [INFO] Worker exiting (pid: 462086)
+^C[2026-04-05 21:35:42 +0530] [462085] [ERROR] Worker (pid:462088) was sent SIGINT!
+[2026-04-05 21:35:42 +0530] [462085] [ERROR] Worker (pid:462087) was sent SIGINT!
+[2026-04-05 21:35:42 +0530] [462085] [ERROR] Worker (pid:462086) was sent SIGINT!
+[2026-04-05 21:35:42 +0530] [462085] [ERROR] Worker (pid:462089) was sent SIGINT!
+[2026-04-05 21:35:42 +0530] [462085] [INFO] Shutting down: Master
+naved20@ip-172-31-17-49:/home/luxment/htdocs/mentorship.weslux.lu/WES-Working$ ^C
+naved20@ip-172-31-17-49:/home/luxment/htdocs/mentorship.weslux.lu/WES-Working$ ^C
+naved20@ip-172-31-17-49:/home/luxment/htdocs/mentorship.weslux.lu/WES-Working$ ^C
+naved20@ip-172-31-17-49:/home/luxment/htdocs/mentorship.weslux.lu/WES-Working$ pkill gunicorn
+naved20@ip-172-31-17-49:/home/luxment/htdocs/mentorship.weslux.lu/WES-Working$ lsof -i :8000
+naved20@ip-172-31-17-49:/home/luxment/htdocs/mentorship.weslux.lu/WES-Working$ pkill gunicornnohup python3 -m gunicorn -w 4 -b 127.0.0.1:8000 app:app > gunicorn.log 2>&1 ^C
+naved20@ip-172-31-17-49:/home/luxment/htdocs/mentorship.weslux.lu/WES-Working$ ^C
+naved20@ip-172-31-17-49:/home/luxment/htdocs/mentorship.weslux.lu/WES-Working$ ^C
+naved20@ip-172-31-17-49:/home/luxment/htdocs/mentorship.weslux.lu/WES-Working$ ^C
+naved20@ip-172-31-17-49:/home/luxment/htdocs/mentorship.weslux.lu/WES-Working$ nohup python3 -m gunicorn -w 4 -b 127.0.0.1:8000 app:app > gunicorn.log 2>&1 &
+[1] 462095
+naved20@ip-172-31-17-49:/home/luxment/htdocs/mentorship.weslux.lu/WES-Working$
