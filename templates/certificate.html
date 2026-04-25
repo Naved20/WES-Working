@@ -137,13 +137,13 @@
             <div class="text-center mb-8">
                 <span class="badge">
                     {% if user_type == '1' %}
-                        Registered Mentor
+                        🎓 Registered Mentor
                     {% elif user_type == '2' %}
-                        Registered Mentee
+                        📚 Registered Mentee
                     {% elif user_type == '0' %}
-                        Supervisor
+                        👨‍💼 Supervisor
                     {% elif user_type == '3' %}
-                        Institution
+                        🏛️ Institution
                     {% endif %}
                 </span>
             </div>
@@ -155,6 +155,27 @@
                     Mentorship Connect Program and is an active member of our community.
                 </p>
             </div>
+
+            <!-- Mentorship Statistics -->
+            {% if mentorship_stats and (user_type == '1' or user_type == '2') %}
+            <div class="bg-gradient-to-r from-purple-50 to-blue-50 rounded-2xl p-6 mb-8 border border-purple-200">
+                <h3 class="text-lg font-bold text-gray-800 text-center mb-4">Mentorship Achievements</h3>
+                <div class="grid grid-cols-2 gap-6">
+                    <div class="text-center">
+                        <div class="bg-white rounded-xl p-4 shadow-sm">
+                            <div class="text-3xl font-bold text-purple-600 mb-2">{{ mentorship_stats.connected_count }}</div>
+                            <div class="text-sm font-medium text-gray-600">{{ mentorship_stats.connected_type }}</div>
+                        </div>
+                    </div>
+                    <div class="text-center">
+                        <div class="bg-white rounded-xl p-4 shadow-sm">
+                            <div class="text-3xl font-bold text-blue-600 mb-2">{{ mentorship_stats.sessions_count }}</div>
+                            <div class="text-sm font-medium text-gray-600">{{ mentorship_stats.sessions_type }}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
 
             <!-- Date and ID -->
             <div class="flex justify-around items-center mt-12 pt-8 border-t-2 border-gray-200">

@@ -1,5 +1,5 @@
 PS C:\MD_naved\WES-Working> SSH naved20@13.50.213.182
-naved20@13.50.213.182's password: 
+naved20@13.50.213.182's password: M37frm7cRH1W1F1HkNot
 
 ########################################################
 ###            Welcome to CloudPanel                 ###

@@ -5631,8 +5631,51 @@ def my_certificate():
     else:
         registration_date = "Registration date not available"
     
-    # Determine back URL based on user type
+    # Calculate mentorship statistics
+    mentorship_stats = {}
     user_type = session.get("user_type")
+    
+    if user_type == "1":  # Mentor
+        # Count active mentees
+        active_mentorships = MentorshipRequest.query.filter_by(
+            mentor_id=user.id,
+            final_status="approved"
+        ).all()
+        
+        # Count total sessions given
+        total_sessions = MeetingRequest.query.filter_by(
+            requested_to_id=user.id,
+            status="approved"
+        ).count()
+        
+        mentorship_stats = {
+            "connected_count": len(active_mentorships),
+            "connected_type": "Active Mentees",
+            "sessions_count": total_sessions,
+            "sessions_type": "Sessions Conducted"
+        }
+        
+    elif user_type == "2":  # Mentee
+        # Count active mentors
+        active_mentorships = MentorshipRequest.query.filter_by(
+            mentee_id=user.id,
+            final_status="approved"
+        ).all()
+        
+        # Count total sessions attended
+        total_sessions = MeetingRequest.query.filter_by(
+            requester_id=user.id,
+            status="approved"
+        ).count()
+        
+        mentorship_stats = {
+            "connected_count": len(active_mentorships),
+            "connected_type": "Active Mentors",
+            "sessions_count": total_sessions,
+            "sessions_type": "Sessions Attended"
+        }
+    
+    # Determine back URL based on user type
     if user_type == "1":
         back_url = url_for("mentordashboard")
     elif user_type == "2":
@@ -5650,6 +5693,7 @@ def my_certificate():
         user_type=user.user_type,
         user_id=user.id,
         registration_date=registration_date,
+        mentorship_stats=mentorship_stats,
         back_url=back_url
     )
 
