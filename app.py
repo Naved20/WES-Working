@@ -4966,7 +4966,49 @@ def editmentorprofile():
                 missing_fields.append(field_name.replace("_", " ").title())
         
         if missing_fields:
-            flash(f"Please fill all mandatory fields: {', '.join(missing_fields)}", "error")
+            # Save form data to session to preserve it
+            session['mentor_form_data'] = {
+                'profession': request.form.get("profession"),
+                'other_profession': request.form.get("other_profession"),
+                'skills': request.form.get("skills"),
+                'role': request.form.get("role"),
+                'industry_sector': request.form.get("industry_sector"),
+                'other_industry_sector': request.form.get("other_industry_sector"),
+                'organisation': request.form.get("organisation"),
+                'years_of_experience': request.form.get("years_of_experience"),
+                'institution': request.form.get("institution"),
+                'other_institution_name': request.form.get("other_institution_name"),
+                'whatsapp': request.form.get("whatsapp"),
+                'whatsapp_country_code': request.form.get("whatsapp_country_code"),
+                'city': request.form.get("city"),
+                'country': request.form.get("country"),
+                'other_country': request.form.get("other_country"),
+                'language': request.form.getlist("language"),
+                'other_language': request.form.get("other_language"),
+                'linkedin_link': request.form.get("linkedin_link"),
+                'github_link': request.form.get("github_link"),
+                'portfolio_link': request.form.get("portfolio_link"),
+                'other_social_link': request.form.get("other_social_link"),
+                'mentorship_topics': request.form.getlist("mentorship_topics"),
+                'mentorship_type_preference': request.form.getlist("mentorship_type_preference"),
+                'preferred_communication': request.form.get("preferred_communication"),
+                'availability': request.form.get("availability"),
+                'connect_frequency': request.form.get("connect_frequency"),
+                'preferred_duration': request.form.get("preferred_duration"),
+                'why_mentor': request.form.get("why_mentor"),
+                'mentorship_philosophy': request.form.get("mentorship_philosophy"),
+                'mentorship_motto': request.form.get("mentorship_motto"),
+                'additional_info': request.form.get("additional_info"),
+                'highest_qualification': request.form.get("highest_qualification"),
+                'degree_name': request.form.get("degree_name"),
+                'field_of_study': request.form.get("field_of_study"),
+                'university_name': request.form.get("university_name"),
+                'graduation_year': request.form.get("graduation_year"),
+                'academic_status': request.form.get("academic_status"),
+                'certifications': request.form.get("certifications"),
+                'research_work': request.form.get("research_work")
+            }
+            flash(f"⚠️ Please fill all mandatory fields: {', '.join(missing_fields)}", "error")
             return redirect(url_for("editmentorprofile"))
 
         # Special validation for Luxembourg: Criminal Certificate is mandatory
@@ -5124,15 +5166,20 @@ def editmentorprofile():
 
         try:
             db.session.commit()
-            flash("Profile updated successfully!", "success")
+            # Clear any saved form data from session on successful save
+            session.pop('mentor_form_data', None)
+            flash("✅ Profile updated successfully!", "success")
             print("✅ Database commit successful!")
             return redirect(url_for("mentorprofile"))
         except Exception as e:
             db.session.rollback()
-            flash(f"Error updating profile: {str(e)}", "error")
+            flash(f"❌ Error updating profile: {str(e)}", "error")
             print(f"❌ Database commit failed: {str(e)}")
 
     # GET request – pre-fill form with existing data
+    # Check if there's saved form data from failed validation
+    form_data = session.pop('mentor_form_data', None)
+    
     # Parse location to get city and country separately
     location = profile.location if profile else ""
     city = ""
@@ -5159,50 +5206,55 @@ def editmentorprofile():
             # If no space or doesn't start with +, treat entire string as number
             whatsapp_number = whatsapp_full
     
+    # Use form_data if available (from failed validation), otherwise use profile data
     return render_template(
         "mentor/editmentorprofile.html",
         full_name=user.name,
         email=user.email,
-        institution=user.institution,  # Pass current institution
-        institutions=institutions,     # Pass institutions list
-        profession=profile.profession if profile else "",
-        skills=profile.skills if profile else "",
-        role=profile.role if profile else "",
-        industry_sector=profile.industry_sector if profile else "",
-        organisation=profile.organisation if profile else "",
-        years_of_experience=profile.years_of_experience if profile else "",
-        whatsapp=whatsapp_number,
-        whatsapp_country_code=whatsapp_country_code,
+        institution=form_data.get('institution') if form_data else user.institution,
+        institutions=institutions,
+        profession=form_data.get('profession') if form_data else (profile.profession if profile else ""),
+        other_profession=form_data.get('other_profession') if form_data else "",
+        skills=form_data.get('skills') if form_data else (profile.skills if profile else ""),
+        role=form_data.get('role') if form_data else (profile.role if profile else ""),
+        industry_sector=form_data.get('industry_sector') if form_data else (profile.industry_sector if profile else ""),
+        other_industry_sector=form_data.get('other_industry_sector') if form_data else "",
+        organisation=form_data.get('organisation') if form_data else (profile.organisation if profile else ""),
+        years_of_experience=form_data.get('years_of_experience') if form_data else (profile.years_of_experience if profile else ""),
+        whatsapp=form_data.get('whatsapp') if form_data else whatsapp_number,
+        whatsapp_country_code=form_data.get('whatsapp_country_code') if form_data else whatsapp_country_code,
         location=location,
-        city=city,
-        country=country,
+        city=form_data.get('city') if form_data else city,
+        country=form_data.get('country') if form_data else country,
+        other_country=form_data.get('other_country') if form_data else "",
         education=profile.education if profile else "",
-        language=profile.language if profile else "",
-        linkedin_link=profile.linkedin_link if profile else "",
-        github_link=profile.github_link if profile else "",
-        portfolio_link=profile.portfolio_link if profile else "",
-        other_social_link=profile.other_social_link if profile else "",
-        mentorship_topics=(profile.mentorship_topics or "") if profile else "",
-        mentorship_type_preference=(profile.mentorship_type_preference or "") if profile else "",
-        preferred_communication=profile.preferred_communication if profile else "",
-        availability=profile.availability if profile else "",
-        connect_frequency=profile.connect_frequency if profile else "",
-        preferred_duration=profile.preferred_duration if profile else "",
-        why_mentor=profile.why_mentor if profile else "",
-        mentorship_philosophy=profile.mentorship_philosophy if profile else "",
-        mentorship_motto=profile.mentorship_motto if profile else "",
-        additional_info=profile.additional_info if profile else "",
+        language=", ".join(form_data.get('language', [])) if form_data else (profile.language if profile else ""),
+        other_language=form_data.get('other_language') if form_data else "",
+        linkedin_link=form_data.get('linkedin_link') if form_data else (profile.linkedin_link if profile else ""),
+        github_link=form_data.get('github_link') if form_data else (profile.github_link if profile else ""),
+        portfolio_link=form_data.get('portfolio_link') if form_data else (profile.portfolio_link if profile else ""),
+        other_social_link=form_data.get('other_social_link') if form_data else (profile.other_social_link if profile else ""),
+        mentorship_topics=", ".join(form_data.get('mentorship_topics', [])) if form_data else ((profile.mentorship_topics or "") if profile else ""),
+        mentorship_type_preference=", ".join(form_data.get('mentorship_type_preference', [])) if form_data else ((profile.mentorship_type_preference or "") if profile else ""),
+        preferred_communication=form_data.get('preferred_communication') if form_data else (profile.preferred_communication if profile else ""),
+        availability=form_data.get('availability') if form_data else (profile.availability if profile else ""),
+        connect_frequency=form_data.get('connect_frequency') if form_data else (profile.connect_frequency if profile else ""),
+        preferred_duration=form_data.get('preferred_duration') if form_data else (profile.preferred_duration if profile else ""),
+        why_mentor=form_data.get('why_mentor') if form_data else (profile.why_mentor if profile else ""),
+        mentorship_philosophy=form_data.get('mentorship_philosophy') if form_data else (profile.mentorship_philosophy if profile else ""),
+        mentorship_motto=form_data.get('mentorship_motto') if form_data else (profile.mentorship_motto if profile else ""),
+        additional_info=form_data.get('additional_info') if form_data else (profile.additional_info if profile else ""),
         profile_picture=profile.profile_picture if profile else None,
         criminal_certificate=profile.criminal_certificate if profile else None,
         # Educational Information
-        highest_qualification=profile.highest_qualification if profile else "",
-        degree_name=profile.degree_name if profile else "",
-        field_of_study=profile.field_of_study if profile else "",
-        university_name=profile.university_name if profile else "",
-        graduation_year=profile.graduation_year if profile else "",
-        academic_status=profile.academic_status if profile else "",
-        certifications=profile.certifications if profile else "",
-        research_work=profile.research_work if profile else ""
+        highest_qualification=form_data.get('highest_qualification') if form_data else (profile.highest_qualification if profile else ""),
+        degree_name=form_data.get('degree_name') if form_data else (profile.degree_name if profile else ""),
+        field_of_study=form_data.get('field_of_study') if form_data else (profile.field_of_study if profile else ""),
+        university_name=form_data.get('university_name') if form_data else (profile.university_name if profile else ""),
+        graduation_year=form_data.get('graduation_year') if form_data else (profile.graduation_year if profile else ""),
+        academic_status=form_data.get('academic_status') if form_data else (profile.academic_status if profile else ""),
+        certifications=form_data.get('certifications') if form_data else (profile.certifications if profile else ""),
+        research_work=form_data.get('research_work') if form_data else (profile.research_work if profile else "")
     )
 
 

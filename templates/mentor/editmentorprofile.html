@@ -152,8 +152,8 @@
                     {% set profession_options = ['Software Engineer', 'Data Scientist', 'AI/ML Engineer', 'Web Developer', 'DevOps Engineer', 'Cybersecurity Analyst', 'Doctor', 'Surgeon', 'Dentist', 'Pharmacist', 'Medical Researcher', 'Business Consultant', 'Product Manager', 'Marketing Manager', 'Financial Analyst', 'Entrepreneur', 'Professor', 'Teacher', 'Education Consultant', 'Researcher'] %}
                     {% set is_other_profession = profession and profession not in profession_options %}
                         <div>
-                            <label class="block text-gray-700 font-semibold mb-2">Profession *</label>
-                            <select name="profession" id="profession_select" class="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition duration-300">
+                            <label class="block text-gray-700 font-semibold mb-2">Profession <span class="text-red-500">*</span></label>
+                            <select name="profession" id="profession_select" class="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition duration-300" required>
                                 <option value="">Select Your Profession</option>
                                 <optgroup label="Technology">
                                     <option value="Software Engineer" {% if profession == 'Software Engineer' %}selected{% endif %}>Software Engineer/Developer</option>
@@ -224,20 +224,20 @@
                     </div>
 
                     <div>
-                        <label class="block text-gray-700 font-semibold mb-2">Skills *</label>
-                        <textarea name="skills" class="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition duration-300" rows="3" placeholder="Python, Machine Learning, Career Guidance, Interview Preparation...">{{ skills }}</textarea>
+                        <label class="block text-gray-700 font-semibold mb-2">Skills <span class="text-red-500">*</span></label>
+                        <textarea name="skills" class="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition duration-300" rows="3" placeholder="Python, Machine Learning, Career Guidance, Interview Preparation..." required>{{ skills }}</textarea>
                         <p class="text-sm text-gray-500 mt-1"><i class="fas fa-info-circle mr-1"></i>Separate skills with commas</p>
                     </div>
 
                     <div>
-                        <label class="block text-gray-700 font-semibold mb-2">Role/Position *</label>
-                        <input type="text" name="role" value="{{ role }}" class="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition duration-300" placeholder="Senior Software Engineer, Product Manager...">
+                        <label class="block text-gray-700 font-semibold mb-2">Role/Position <span class="text-red-500">*</span></label>
+                        <input type="text" name="role" value="{{ role }}" class="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition duration-300" placeholder="Senior Software Engineer, Product Manager..." required>
                     </div>
                 </div>
                 <div class="space-y-4">
                     <div>
-                        <label class="block text-gray-700 font-semibold mb-2">Industry/Sector *</label>
-                        <select name="industry_sector" id="industry_sector_select" class="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition duration-300">
+                        <label class="block text-gray-700 font-semibold mb-2">Industry/Sector <span class="text-red-500">*</span></label>
+                        <select name="industry_sector" id="industry_sector_select" class="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition duration-300" required>
                             <option value="">Select Industry</option>
                             <option value="Technology" {% if industry_sector == 'Technology' %}selected{% endif %}>💻 Technology</option>
                             <option value="Healthcare" {% if industry_sector == 'Healthcare' %}selected{% endif %}>🏥 Healthcare</option>
@@ -266,13 +266,13 @@
                     </div>
 
                     <div>
-                        <label class="block text-gray-700 font-semibold mb-2">Organisation/Company *</label>
-                        <input type="text" name="organisation" value="{{ organisation }}" class="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition duration-300">
+                        <label class="block text-gray-700 font-semibold mb-2">Organisation/Company <span class="text-red-500">*</span></label>
+                        <input type="text" name="organisation" value="{{ organisation }}" class="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition duration-300" required>
                     </div>
 
                     <div>
-                        <label class="block text-gray-700 font-semibold mb-2">Years of Experience *</label>
-                        <select name="years_of_experience" class="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition duration-300">
+                        <label class="block text-gray-700 font-semibold mb-2">Years of Experience <span class="text-red-500">*</span></label>
+                        <select name="years_of_experience" class="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition duration-300" required>
                             <option value="">Select Experience</option>
                             <option value="0-2" {% if years_of_experience == '0-2' %}selected{% endif %}>0-2 years (Beginner)</option>
                             <option value="3-5" {% if years_of_experience == '3-5' %}selected{% endif %}>3-5 years (Intermediate)</option>
@@ -282,7 +282,7 @@
                         </select>
                     </div>
                     <div>
-                        <label class="block text-gray-700 font-semibold mb-2">Affiliated Institution *</label>
+                        <label class="block text-gray-700 font-semibold mb-2">Affiliated Institution <span class="text-red-500">*</span></label>
                         <select name="institution" id="institution" class="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition duration-300" required>
                             <option value="">Select Your Institution</option>
                             <option value="Self" {% if institution == 'Self' %}selected{% endif %}>Self (Not affiliated with any institution)</option>
@@ -319,18 +319,18 @@
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <div class="space-y-4">
                     <div>
-                        <label class="block text-gray-700 font-semibold mb-2">WhatsApp Number *</label>
+                        <label class="block text-gray-700 font-semibold mb-2">WhatsApp Number <span class="text-red-500">*</span></label>
                         <div class="flex gap-2">
-                            <input type="text" name="whatsapp_country_code" list="country_codes" value="{{ whatsapp_country_code or '+01' }}" class="w-24 p-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition duration-300" placeholder="+1">
-                            <input type="tel" name="whatsapp" value="{{ whatsapp }}" class="flex-1 p-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition duration-300" placeholder="Enter WhatsApp number">
+                            <input type="text" name="whatsapp_country_code" list="country_codes" value="{{ whatsapp_country_code or '+01' }}" class="w-24 p-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition duration-300" placeholder="+1" required>
+                            <input type="tel" name="whatsapp" value="{{ whatsapp }}" class="flex-1 p-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition duration-300" placeholder="Enter WhatsApp number" required>
                         </div>
                     </div>
 
                     {% set country_options = ['India', 'Pakistan', 'Bangladesh', 'Nepal', 'Sri Lanka', 'China', 'Japan', 'South Korea', 'Singapore', 'Malaysia', 'Indonesia', 'Philippines', 'Thailand', 'Vietnam', 'UAE', 'Saudi Arabia', 'Qatar', 'Kuwait', 'Oman', 'Bahrain', 'Israel', 'Turkey', 'UK', 'Germany', 'France', 'Italy', 'Spain', 'Netherlands', 'Belgium', 'Luxembourg', 'Switzerland', 'Austria', 'Sweden', 'Norway', 'Denmark', 'Finland', 'Poland', 'Portugal', 'Greece', 'Czech Republic', 'Hungary', 'Russia', 'Ukraine', 'Ireland', 'USA', 'Canada', 'Mexico', 'Brazil', 'Argentina', 'Chile', 'Colombia', 'Australia', 'New Zealand', 'South Africa', 'Nigeria', 'Kenya', 'Egypt', 'Morocco'] %}
                     {% set is_other_country = country and country not in country_options %}
                     <div>
-                        <label class="block text-gray-700 font-semibold mb-2">Country *</label>
-                        <select name="country" id="country_select" class="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition duration-300">
+                        <label class="block text-gray-700 font-semibold mb-2">Country <span class="text-red-500">*</span></label>
+                        <select name="country" id="country_select" class="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition duration-300" required>
                             <option value="">Select Country</option>
                             <optgroup label="Asia">
                                 <option value="India" {% if country == 'India' %}selected{% endif %}>🇮🇳 India</option>
@@ -413,7 +413,7 @@
                     </div>
 
 <div>
-    <label class="block text-gray-700 font-semibold mb-2">Language(s) *</label>
+    <label class="block text-gray-700 font-semibold mb-2">Language(s) <span class="text-red-500">*</span></label>
     
     <!-- Selected languages will appear here as tags -->
     <div id="selected_languages_container" class="flex flex-wrap gap-2 mb-2 p-2 border border-gray-300 rounded-lg min-h-[3rem] bg-gray-50">
@@ -698,8 +698,8 @@
                 </div>
                 <div class="space-y-4">
                     <div>
-                        <label class="block text-gray-700 font-semibold mb-2">City *</label>
-                        <input type="text" name="city" value="{{ city }}" class="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition duration-300">
+                        <label class="block text-gray-700 font-semibold mb-2">City <span class="text-red-500">*</span></label>
+                        <input type="text" name="city" value="{{ city }}" class="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition duration-300" required>
                     </div>
 
                     <!-- Criminal Certificate Upload (Mandatory for Luxembourg) -->
@@ -838,9 +838,9 @@
                 <div class="space-y-4">
                     <div>
                         <label class="block text-gray-700 font-semibold mb-2">
-                            <i class="fab fa-linkedin text-blue-600 mr-2"></i>LinkedIn Profile
+                            <i class="fab fa-linkedin text-blue-600 mr-2"></i>LinkedIn Profile <span class="text-red-500">*</span>
                         </label>
-                        <input type="url" name="linkedin_link" value="{{ linkedin_link }}" class="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition duration-300" placeholder="https://linkedin.com/in/yourprofile">
+                        <input type="url" name="linkedin_link" value="{{ linkedin_link }}" class="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition duration-300" placeholder="https://linkedin.com/in/yourprofile" required>
                     </div>
 
                     <div>
@@ -878,7 +878,7 @@
                     
                     
 <div>
-    <label class="block text-gray-700 font-semibold mb-2">Mentorship Topics *</label>
+    <label class="block text-gray-700 font-semibold mb-2">Mentorship Topics <span class="text-red-500">*</span></label>
     
     <!-- Selected topics will appear here as tags -->
     <div id="selected_topics_container" class="flex flex-wrap gap-2 mb-2 p-2 border border-gray-300 rounded-lg min-h-[3rem] bg-gray-50">
@@ -1184,7 +1184,7 @@
 </div>
 
     <div>
-    <label class="block text-gray-700 font-semibold mb-2">Mentorship Type Preference *</label>
+    <label class="block text-gray-700 font-semibold mb-2">Mentorship Type Preference <span class="text-red-500">*</span></label>
     
     <!-- Selected preferences will appear here as tags -->
     <div id="selected_mentorship_prefs_container" class="flex flex-wrap gap-2 mb-2 p-2 border border-gray-300 rounded-lg min-h-[3rem] bg-gray-50">
@@ -1294,8 +1294,8 @@
                 </div>
                 <div class="space-y-4">
                     <div>
-                        <label class="block text-gray-700 font-semibold mb-2">Preferred Communication *</label>
-                        <select name="preferred_communication" class="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition duration-300">
+                        <label class="block text-gray-700 font-semibold mb-2">Preferred Communication <span class="text-red-500">*</span></label>
+                        <select name="preferred_communication" class="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition duration-300" required>
                             <option value="">Select Preference</option>
                             <option value="Online" {% if preferred_communication == 'Online' %}selected{% endif %}>💻 Online Only</option>
                             <option value="Offline" {% if preferred_communication == 'Offline' %}selected{% endif %}>🏢 Offline Only</option>
@@ -1304,8 +1304,8 @@
                     </div>
 
                     <div>
-                        <label class="block text-gray-700 font-semibold mb-2">Availability *</label>
-                        <select name="availability" class="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition duration-300">
+                        <label class="block text-gray-700 font-semibold mb-2">Availability <span class="text-red-500">*</span></label>
+                        <select name="availability" class="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition duration-300" required>
                             <option value="">Select Availability</option>
                             <option value="Weekdays" {% if availability == 'Weekdays' %}selected{% endif %}>📅 Weekdays</option>
                             <option value="Weekends" {% if availability == 'Weekends' %}selected{% endif %}>🏖️ Weekends</option>
@@ -1315,8 +1315,8 @@
                     </div>
 
                     <div>
-                        <label class="block text-gray-700 font-semibold mb-2">Connect Frequency *</label>
-                        <select name="connect_frequency" class="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition duration-300">
+                        <label class="block text-gray-700 font-semibold mb-2">Connect Frequency <span class="text-red-500">*</span></label>
+                        <select name="connect_frequency" class="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition duration-300" required>
                             <option value="">Select Frequency</option>
                             <option value="Weekly" {% if connect_frequency == 'Weekly' %}selected{% endif %}>📅 Weekly</option>
                             <option value="Bi-weekly" {% if connect_frequency == 'Bi-weekly' %}selected{% endif %}>🔄 Bi-weekly</option>
@@ -1326,8 +1326,8 @@
                     </div>
 
                     <div>
-                        <label class="block text-gray-700 font-semibold mb-2">Preferred Duration *</label>
-                        <select name="preferred_duration" class="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition duration-300">
+                        <label class="block text-gray-700 font-semibold mb-2">Preferred Duration <span class="text-red-500">*</span></label>
+                        <select name="preferred_duration" class="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition duration-300" required>
                             <option value="">Select Duration</option>
                             <option value="1 month" {% if preferred_duration == '1 month' %}selected{% endif %}>1 month</option>
                             <option value="3 months" {% if preferred_duration == '3 months' %}selected{% endif %}>3 months</option>
@@ -1347,16 +1347,16 @@
             </h3>
             <div class="space-y-4">
                 <div>
-                    <label class="block text-gray-700 font-semibold mb-2">Why Mentor? *</label>
-                    <textarea name="why_mentor" class="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition duration-300" rows="3" placeholder="Share your motivation for becoming a mentor...">{{ why_mentor }}</textarea>
+                    <label class="block text-gray-700 font-semibold mb-2">Why Mentor? <span class="text-red-500">*</span></label>
+                    <textarea name="why_mentor" class="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition duration-300" rows="3" placeholder="Share your motivation for becoming a mentor..." required>{{ why_mentor }}</textarea>
                 </div>
                 <div>
-                    <label class="block text-gray-700 font-semibold mb-2">Mentorship Philosophy *</label>
-                    <textarea name="mentorship_philosophy" class="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition duration-300" rows="3" placeholder="Describe your approach to mentorship...">{{ mentorship_philosophy }}</textarea>
+                    <label class="block text-gray-700 font-semibold mb-2">Mentorship Philosophy <span class="text-red-500">*</span></label>
+                    <textarea name="mentorship_philosophy" class="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition duration-300" rows="3" placeholder="Describe your approach to mentorship..." required>{{ mentorship_philosophy }}</textarea>
                 </div>
                 <div>
-                    <label class="block text-gray-700 font-semibold mb-2">Mentorship Motto *</label>
-                    <input type="text" name="mentorship_motto" value="{{ mentorship_motto }}" class="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition duration-300" placeholder="e.g., 'Empower through guidance and support'">
+                    <label class="block text-gray-700 font-semibold mb-2">Mentorship Motto <span class="text-red-500">*</span></label>
+                    <input type="text" name="mentorship_motto" value="{{ mentorship_motto }}" class="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition duration-300" placeholder="e.g., 'Empower through guidance and support'" required>
                 </div>
             </div>
         </div>
