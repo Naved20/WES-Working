@@ -3097,11 +3097,17 @@ def editinstitutionprofile():
 #-------- find function------------
 @app.route("/find_mentor", methods=["GET"])
 def find_mentor():
+    # Get current mentee's profile for suggestions
+    current_user_id = None
+    mentee_profile = None
+    
+    if "email" in session and session.get("user_type") == "2":
+        current_user = User.query.filter_by(email=session["email"]).first()
+        if current_user:
+            current_user_id = current_user.id
+            mentee_profile = MenteeProfile.query.filter_by(user_id=current_user_id).first()
+
     query = MentorProfile.query
-
-    source_page = request.args.get("from", "mentor")
-
-
     source_page = request.args.get("from", "mentees")
     profession = request.args.get("profession")
     location = request.args.get("location")
@@ -3125,7 +3131,12 @@ def find_mentor():
         elif experience == "10+":
             query = query.filter(cast(MentorProfile.years_of_experience, Integer) >= 10)
 
-    mentors = query.all()
+    all_mentors = query.all()
+    
+    # Calculate suggestions if mentee is logged in
+    suggested_mentors = []
+    if mentee_profile:
+        suggested_mentors = calculate_mentor_suggestions(mentee_profile, all_mentors, current_user_id)
     
     # Get filter options directly instead of calling the function
     options = {
@@ -3135,11 +3146,12 @@ def find_mentor():
         "experiences": sorted({row.years_of_experience for row in MentorProfile.query.with_entities(MentorProfile.years_of_experience).distinct() if row.years_of_experience}),
     }
 
-        # Dynamic render/redirect based on source
+    # Dynamic render/redirect based on source
     if source_page == "supervisor_find_mentor":
         return render_template(
         "supervisor/supervisor_find_mentor.html",
-        all_mentors=mentors,
+        all_mentors=all_mentors,
+        suggested_mentors=suggested_mentors,
         professions=options["professions"],
         locations=options["locations"],
         educations=options["educations"],
@@ -3147,10 +3159,10 @@ def find_mentor():
         show_sidebar=True
         )
     else:  # default mentor
-
         return render_template(
         "mentee/mentee_find_mentors.html",
-        all_mentors=mentors,
+        all_mentors=all_mentors,
+        suggested_mentors=suggested_mentors,
         professions=options["professions"],
         locations=options["locations"],
         educations=options["educations"],
@@ -3158,6 +3170,80 @@ def find_mentor():
         active_section="findmentor",
         show_sidebar=True
     )
+
+def calculate_mentor_suggestions(mentee_profile, all_mentors, current_user_id):
+    """
+    Calculate mentor suggestions based on matching criteria
+    Returns list of mentors with suggestion percentage
+    """
+    suggestions = []
+    
+    # Get current mentee's user info
+    current_user = User.query.get(current_user_id)
+    
+    for mentor in all_mentors:
+        score = 0
+        max_score = 100
+        
+        # 1. Institution Match (30% weight)
+        if current_user and mentor.user and current_user.institution == mentor.user.institution:
+            score += 30
+            
+        # 2. Industry/Field Match (25% weight)
+        if mentee_profile.who_am_i and mentor.industry_sector:
+            # Map mentee categories to mentor industries
+            industry_matches = {
+                'university_student': ['Education', 'Technology', 'Research'],
+                'school_student': ['Education', 'Career Development'],
+                'young_professional': ['Technology', 'Business', 'Finance', 'Marketing'],
+                'seeking_internship': ['Technology', 'Business', 'Healthcare'],
+                'exploring': ['Career Development', 'Business', 'Education']
+            }
+            
+            if mentee_profile.who_am_i in industry_matches:
+                if mentor.industry_sector in industry_matches[mentee_profile.who_am_i]:
+                    score += 25
+                elif any(keyword in mentor.industry_sector.lower() for keyword in ['tech', 'business', 'education']):
+                    score += 15
+                    
+        # 3. Skills Match (20% weight)
+        if mentee_profile.key_skills and mentor.skills:
+            mentee_skills = set([skill.strip().lower() for skill in mentee_profile.key_skills.split(',') if skill.strip()])
+            mentor_skills = set([skill.strip().lower() for skill in mentor.skills.split(',') if skill.strip()])
+            
+            if mentee_skills.intersection(mentor_skills):
+                overlap_ratio = len(mentee_skills.intersection(mentor_skills)) / len(mentee_skills) if mentee_skills else 0
+                score += min(20, overlap_ratio * 20)
+                
+        # 4. Location Match (15% weight)
+        mentee_location = f"{mentee_profile.city}, {mentee_profile.country}" if mentee_profile.city and mentee_profile.country else ""
+        if mentee_location and mentor.location:
+            if mentee_location.lower() == mentor.location.lower():
+                score += 15
+            elif mentee_profile.country and mentee_profile.country.lower() in mentor.location.lower():
+                score += 10
+                
+        # 5. Mentorship Topics Match (10% weight)
+        if mentee_profile.mentorship_expectations and mentor.mentorship_topics:
+            mentee_expectations = mentee_profile.mentorship_expectations.lower()
+            mentor_topics = mentor.mentorship_topics.lower()
+            
+            # Check for common keywords
+            common_keywords = ['career', 'skill', 'interview', 'job', 'development', 'guidance']
+            matches = sum(1 for keyword in common_keywords if keyword in mentee_expectations and keyword in mentor_topics)
+            if matches > 0:
+                score += min(10, matches * 2)
+        
+        # Only include mentors with 60%+ match as suggestions
+        if score >= 60:
+            suggestions.append({
+                'mentor': mentor,
+                'suggestion_percentage': min(100, int(score))
+            })
+    
+    # Sort by suggestion percentage (highest first) and limit to top 10
+    suggestions.sort(key=lambda x: x['suggestion_percentage'], reverse=True)
+    return suggestions[:10]
 
 @app.route("/find_mentees", methods=["GET"])
 def find_mentees():
