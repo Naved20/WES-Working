@@ -254,6 +254,28 @@ db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 
 # ============================================================
+# JINJA2 CUSTOM FILTERS
+# ============================================================
+
+@app.template_filter('from_json')
+def from_json(value):
+    """Convert JSON string to Python object"""
+    try:
+        if isinstance(value, str):
+            return json.loads(value)
+        return value
+    except (json.JSONDecodeError, TypeError):
+        return []
+
+@app.template_filter('to_json')
+def to_json(value):
+    """Convert Python object to JSON string"""
+    try:
+        return json.dumps(value)
+    except (TypeError, ValueError):
+        return ""
+
+# ============================================================
 # EMAIL CONFIGURATION FOR OTP
 # ============================================================
 SMTP_SERVER = "smtp.gmail.com"
@@ -646,6 +668,48 @@ class Institution(db.Model):
     
     def __repr__(self):
         return f"<Institution {self.name}>"
+
+#-------------- Profile Completion Reminder System-------------------
+
+class ProfileCompletionReminder(db.Model):
+    __tablename__ = "profile_completion_reminders"
+    
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("signup_details.id"), nullable=False)
+    user_type = db.Column(db.String(20), nullable=False)  # "1" for mentor, "2" for mentee
+    completion_percentage = db.Column(db.Integer)  # Percentage at time of sending
+    missing_fields = db.Column(db.Text)  # JSON string of missing fields
+    completed_fields = db.Column(db.Integer)  # Count of completed fields
+    total_fields = db.Column(db.Integer)  # Total trackable fields
+    email_subject = db.Column(db.String(200))
+    email_style = db.Column(db.String(50))  # friendly, professional, motivational, achievement, community
+    email_content = db.Column(db.Text)  # Full email HTML content
+    sent_at = db.Column(db.DateTime, default=datetime.utcnow)
+    read = db.Column(db.Boolean, default=False)  # Track if user opened/engaged
+    previous_percentage = db.Column(db.Integer, nullable=True)  # For showing improvement
+    
+    # Relationships
+    user = db.relationship("User", backref="completion_reminders", foreign_keys="ProfileCompletionReminder.user_id")
+    
+    def __repr__(self):
+        return f"<ProfileCompletionReminder {self.user_id} - {self.completion_percentage}%>"
+
+#-------------- Admin Settings for Reminders -------------------
+
+class ReminderSettings(db.Model):
+    __tablename__ = "reminder_settings"
+    
+    id = db.Column(db.Integer, primary_key=True)
+    is_enabled = db.Column(db.Boolean, default=True)  # Enable/disable reminders globally
+    frequency_hours = db.Column(db.Integer, default=24)  # How often to send reminders (hours)
+    min_completion_for_reminder = db.Column(db.Integer, default=0)  # Min completion % to get reminders
+    max_reminders_per_user = db.Column(db.Integer, default=7)  # Max reminders before stopping
+    last_run = db.Column(db.DateTime)  # Last time the scheduled job ran
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    
+    def __repr__(self):
+        return f"<ReminderSettings - Enabled: {self.is_enabled}, Frequency: {self.frequency_hours}h>"
 
 #------------------mentorship request table-------------------
 class MentorshipRequest(db.Model):
@@ -1748,9 +1812,86 @@ def select_user_type():
     
     return render_template("auth/select_user_type.html", user=user)
 
-# ------------------ DASHBOARDS ------------------
+# Helper function to calculate mentor profile completion percentage
+def calculate_mentor_profile_completion(mentor_id):
+    """
+    Calculate profile completion percentage and return missing fields
+    Includes all meaningful profile fields for accurate completion tracking
+    Returns: {
+        'percentage': int (0-100),
+        'missing_fields': list of missing field names,
+        'completed_fields': int,
+        'total_fields': int
+    }
+    """
+    profile = MentorProfile.query.filter_by(user_id=mentor_id).first()
+    
+    # Define all profile fields for completion calculation
+    all_fields = {
+        # Personal & Professional Details
+        'Profile Photo': profile.profile_picture if profile else None,
+        'Profession': profile.profession if profile else None,
+        'Skills': profile.skills if profile else None,
+        'Job Role': profile.role if profile else None,
+        'Industry Sector': profile.industry_sector if profile else None,
+        'Organisation': profile.organisation if profile else None,
+        'Years of Experience': profile.years_of_experience if profile else None,
+        
+        # Contact Information
+        'Location': profile.location if profile else None,
+        'WhatsApp': profile.whatsapp if profile else None,
+        
+        # Education & Background
+        'Languages': profile.language if profile else None,
+        'Highest Qualification': profile.highest_qualification if profile else None,
+        'Degree Name': profile.degree_name if profile else None,
+        'Field of Study': profile.field_of_study if profile else None,
+        'University Name': profile.university_name if profile else None,
+        'Graduation Year': profile.graduation_year if profile else None,
+        'Academic Status': profile.academic_status if profile else None,
+        'Certifications': profile.certifications if profile else None,
+        'Research Work': profile.research_work if profile else None,
+        
+        # Social Links
+        'LinkedIn Profile': profile.linkedin_link if profile else None,
+        'GitHub Profile': profile.github_link if profile else None,
+        'Portfolio Link': profile.portfolio_link if profile else None,
+        'Other Social Link': profile.other_social_link if profile else None,
+        
+        # Mentorship Preferences
+        'Mentorship Topics': profile.mentorship_topics if profile else None,
+        'Mentorship Type Preference': profile.mentorship_type_preference if profile else None,
+        'Preferred Communication': profile.preferred_communication if profile else None,
+        'Availability': profile.availability if profile else None,
+        'Connect Frequency': profile.connect_frequency if profile else None,
+        'Preferred Duration': profile.preferred_duration if profile else None,
+        
+        # Mentor Philosophy
+        'Why Mentor': profile.why_mentor if profile else None,
+        'Mentorship Philosophy': profile.mentorship_philosophy if profile else None,
+        'Mentorship Motto': profile.mentorship_motto if profile else None,
+        
+        # Additional Information
+        'Additional Info': profile.additional_info if profile else None,
+    }
+    
+    # Count completed and missing fields
+    completed_fields = sum(1 for field in all_fields.values() if field)
+    total_fields = len(all_fields)
+    
+    missing_fields = [field_name for field_name, field_value in all_fields.items() if not field_value]
+    
+    percentage = (completed_fields * 100) // total_fields if total_fields > 0 else 0
+    
+    return {
+        'percentage': min(percentage, 100),  # Cap at 100%
+        'missing_fields': missing_fields,
+        'completed_fields': completed_fields,
+        'total_fields': total_fields
+    }
+
+# ------------------
 @app.route("/mentordashboard", methods=["GET", "POST"])
-@profile_required
 def mentordashboard():
     if "email" not in session or session.get("user_type") != "1":  # Only mentors
         return redirect(url_for("signin"))
@@ -1761,6 +1902,9 @@ def mentordashboard():
     # ------------------- Check Profile Completion -------------------
     user = User.query.filter_by(email=session["email"]).first()
     profile_complete = check_profile_complete(user.id, "1")
+    
+    # Calculate profile completion percentage and missing fields
+    profile_stats = calculate_mentor_profile_completion(user.id)
 
 
 
@@ -1843,13 +1987,16 @@ def mentordashboard():
         active_section="dashboard",
         show_sidebar=True,
         mentee=example_mentee,
-        profile_complete=profile_complete
+        profile_complete=profile_complete,
+        profile_stats=profile_stats
     )
 
 @app.route("/mentor_mentorship_request", methods=["GET", "POST"])
 def mentor_mentorship_request():
     if "email" not in session or session.get("user_type") != "1":  # Only mentors
         return redirect(url_for("signin"))
+    
+    # Remove profile_required check - allow mentors to access even with incomplete profile
 
     mentor_id = session.get("user_id")
 
@@ -2518,6 +2665,7 @@ def delete_user(user_id):
             ("mentor_profile", "user_id"),
             ("mentee_profile", "user_id"),
             ("supervisor_profile", "user_id"),
+            ("institutions", "user_id"),  # Delete institutions created by user
             ("mentorship_requests", "mentee_id"),
             ("mentorship_requests", "mentor_id"),
             ("meeting_requests", "requester_id"),
@@ -2528,6 +2676,10 @@ def delete_user(user_id):
             ("personal_tasks", "mentor_id"),
             ("task_ratings", "mentee_id"),
             ("task_ratings", "mentor_id"),
+            # Chat messages and conversations
+            ("chat_messages", "sender_id"),
+            ("chat_conversations", "participant1_id"),
+            ("chat_conversations", "participant2_id"),
         ]
         
         for table, column in tables_to_clean:
@@ -3107,43 +3259,134 @@ def find_mentor():
             current_user_id = current_user.id
             mentee_profile = MenteeProfile.query.filter_by(user_id=current_user_id).first()
 
-    query = MentorProfile.query
     source_page = request.args.get("from", "mentees")
     profession = request.args.get("profession")
     location = request.args.get("location")
     education = request.args.get("education")
     experience = request.args.get("experience")
 
-    # --- Apply filters ---
+    # Get ALL users with user_type = "1" (mentors) - including those without complete profiles
+    all_mentor_users = User.query.filter_by(user_type="1").all()
+    
+    # Create enriched mentor objects combining User and MentorProfile data
+    all_mentors = []
+    for user in all_mentor_users:
+        mentor_profile = MentorProfile.query.filter_by(user_id=user.id).first()
+        
+        # Create enriched object with user data as fallback
+        mentor = type('MentorData', (), {})()
+        
+        if mentor_profile:
+            # Use profile data if available
+            mentor.id = mentor_profile.id
+            mentor.user_id = user.id
+            mentor.user = user
+            mentor.profession = mentor_profile.profession
+            mentor.organisation = mentor_profile.organisation
+            mentor.location = mentor_profile.location
+            mentor.years_of_experience = mentor_profile.years_of_experience
+            mentor.education = mentor_profile.education
+            mentor.language = mentor_profile.language
+            mentor.preferred_communication = mentor_profile.preferred_communication
+            mentor.skills = mentor_profile.skills
+            mentor.role = mentor_profile.role
+            mentor.industry_sector = mentor_profile.industry_sector
+            mentor.linkedin_link = mentor_profile.linkedin_link
+            mentor.github_link = mentor_profile.github_link
+            mentor.portfolio_link = mentor_profile.portfolio_link
+            mentor.other_social_link = mentor_profile.other_social_link
+            mentor.profile_picture = mentor_profile.profile_picture
+            mentor.why_mentor = mentor_profile.why_mentor
+            mentor.mentorship_topics = mentor_profile.mentorship_topics
+            mentor.mentorship_type_preference = mentor_profile.mentorship_type_preference
+            mentor.availability = mentor_profile.availability
+            mentor.connect_frequency = mentor_profile.connect_frequency
+            mentor.preferred_duration = mentor_profile.preferred_duration
+            mentor.highest_qualification = mentor_profile.highest_qualification
+            mentor.degree_name = mentor_profile.degree_name
+            mentor.field_of_study = mentor_profile.field_of_study
+            mentor.university_name = mentor_profile.university_name
+            mentor.graduation_year = mentor_profile.graduation_year
+            mentor.academic_status = mentor_profile.academic_status
+            mentor.certifications = mentor_profile.certifications
+            mentor.research_work = mentor_profile.research_work
+            mentor.mentorship_philosophy = mentor_profile.mentorship_philosophy
+            mentor.mentorship_motto = mentor_profile.mentorship_motto
+            mentor.is_profile_complete = check_profile_complete(user.id, "1")
+        else:
+            # Use basic user data as fallback for incomplete profiles
+            mentor.id = user.id
+            mentor.user_id = user.id
+            mentor.user = user
+            mentor.profession = None
+            mentor.organisation = None
+            mentor.location = None
+            mentor.years_of_experience = None
+            mentor.education = None
+            mentor.language = None
+            mentor.preferred_communication = None
+            mentor.skills = None
+            mentor.role = None
+            mentor.industry_sector = None
+            mentor.linkedin_link = None
+            mentor.github_link = None
+            mentor.portfolio_link = None
+            mentor.other_social_link = None
+            mentor.profile_picture = user.profile_picture if hasattr(user, 'profile_picture') else None  # Use user's profile pic if available
+            mentor.why_mentor = None
+            mentor.mentorship_topics = None
+            mentor.mentorship_type_preference = None
+            mentor.availability = None
+            mentor.connect_frequency = None
+            mentor.preferred_duration = None
+            mentor.highest_qualification = None
+            mentor.degree_name = None
+            mentor.field_of_study = None
+            mentor.university_name = None
+            mentor.graduation_year = None
+            mentor.academic_status = None
+            mentor.certifications = None
+            mentor.research_work = None
+            mentor.mentorship_philosophy = None
+            mentor.mentorship_motto = None
+            mentor.is_profile_complete = False
+        
+        all_mentors.append(mentor)
+    
+    # Apply filters to enriched mentor list
+    filtered_mentors = all_mentors
+    
     if profession:
-        query = query.filter_by(profession=profession)
+        filtered_mentors = [m for m in filtered_mentors if m.profession == profession]
     if location:
-        query = query.filter_by(location=location)
+        filtered_mentors = [m for m in filtered_mentors if m.location == location]
     if education:
-        query = query.filter_by(education=education)
+        filtered_mentors = [m for m in filtered_mentors if m.education == education]
     if experience:
+        filtered_mentors = [m for m in filtered_mentors if m.years_of_experience]
         if experience == "0-2":
-            query = query.filter(cast(MentorProfile.years_of_experience, Integer).between(0, 2))
+            filtered_mentors = [m for m in filtered_mentors if 0 <= int(m.years_of_experience) <= 2]
         elif experience == "3-5":
-            query = query.filter(cast(MentorProfile.years_of_experience, Integer).between(3, 5))
+            filtered_mentors = [m for m in filtered_mentors if 3 <= int(m.years_of_experience) <= 5]
         elif experience == "6-10":
-            query = query.filter(cast(MentorProfile.years_of_experience, Integer).between(6, 10))
+            filtered_mentors = [m for m in filtered_mentors if 6 <= int(m.years_of_experience) <= 10]
         elif experience == "10+":
-            query = query.filter(cast(MentorProfile.years_of_experience, Integer) >= 10)
-
-    all_mentors = query.all()
+            filtered_mentors = [m for m in filtered_mentors if int(m.years_of_experience) >= 10]
+    
+    all_mentors = filtered_mentors
     
     # Calculate suggestions if mentee is logged in
     suggested_mentors = []
     if mentee_profile:
         suggested_mentors = calculate_mentor_suggestions(mentee_profile, all_mentors, current_user_id)
     
-    # Get filter options directly instead of calling the function
+    # Get filter options from all mentor profiles (not all mentors)
+    mentor_profiles = MentorProfile.query.all()
     options = {
-        "professions": sorted({row.profession for row in MentorProfile.query.with_entities(MentorProfile.profession).distinct() if row.profession}),
-        "locations": sorted({row.location for row in MentorProfile.query.with_entities(MentorProfile.location).distinct() if row.location}),
-        "educations": sorted({row.education for row in MentorProfile.query.with_entities(MentorProfile.education).distinct() if row.education}),
-        "experiences": sorted({row.years_of_experience for row in MentorProfile.query.with_entities(MentorProfile.years_of_experience).distinct() if row.years_of_experience}),
+        "professions": sorted({row.profession for row in mentor_profiles if row.profession}),
+        "locations": sorted({row.location for row in mentor_profiles if row.location}),
+        "educations": sorted({row.education for row in mentor_profiles if row.education}),
+        "experiences": sorted({row.years_of_experience for row in mentor_profiles if row.years_of_experience}),
     }
 
     # Dynamic render/redirect based on source
@@ -3158,7 +3401,7 @@ def find_mentor():
         experiences=options["experiences"],
         show_sidebar=True
         )
-    else:  # default mentor
+    else:  # default mentee
         return render_template(
         "mentee/mentee_find_mentors.html",
         all_mentors=all_mentors,
@@ -3448,47 +3691,139 @@ def supervisor_find_mentor():
     if "email" not in session or session.get("user_type") != "0":
         return redirect(url_for("signin"))
 
-    mentor_query = MentorProfile.query
     profession = request.args.get("profession")
     location = request.args.get("location")
     education = request.args.get("education")
     experience = request.args.get("experience")
 
+    # Fetch ALL mentors (including incomplete profiles)
+    all_users = User.query.filter_by(user_type="1").all()
+    
+    # Create enriched mentor objects with fallback data
+    enriched_mentors = []
+    for user in all_users:
+        profile = MentorProfile.query.filter_by(user_id=user.id).first()
+        
+        if profile:
+            # Complete profile exists - use it
+            enriched_mentor = {
+                'id': profile.id,
+                'user_id': user.id,
+                'user': user,
+                'profession': profile.profession,
+                'organisation': profile.organisation,
+                'location': profile.location,
+                'years_of_experience': profile.years_of_experience,
+                'profile_picture': profile.profile_picture,
+                'education': profile.education,
+                'language': profile.language,
+                'preferred_communication': profile.preferred_communication,
+                'why_mentor': profile.why_mentor,
+                'role': profile.role,
+                'industry_sector': profile.industry_sector,
+                'skills': profile.skills,
+                'availability': profile.availability,
+                'mentorship_topics': profile.mentorship_topics,
+                'linkedin_link': profile.linkedin_link,
+                'github_link': profile.github_link,
+                'portfolio_link': profile.portfolio_link,
+                'preferred_duration': profile.preferred_duration,
+                'mentorship_type_preference': profile.mentorship_type_preference,
+                'connect_frequency': profile.connect_frequency,
+                'whatsapp': profile.whatsapp,
+                'highest_qualification': profile.highest_qualification,
+                'degree_name': profile.degree_name,
+                'field_of_study': profile.field_of_study,
+                'university_name': profile.university_name,
+                'graduation_year': profile.graduation_year,
+                'academic_status': profile.academic_status,
+                'certifications': profile.certifications,
+                'research_work': profile.research_work,
+                'mentorship_philosophy': profile.mentorship_philosophy,
+                'mentorship_motto': profile.mentorship_motto,
+                'other_social_link': profile.other_social_link,
+                'criminal_certificate': profile.criminal_certificate,
+                'is_profile_complete': True
+            }
+        else:
+            # No profile yet - create basic fallback object
+            enriched_mentor = {
+                'id': user.id,
+                'user_id': user.id,
+                'user': user,
+                'profession': None,
+                'organisation': None,
+                'location': None,
+                'years_of_experience': None,
+                'profile_picture': None,
+                'education': None,
+                'language': None,
+                'preferred_communication': None,
+                'why_mentor': None,
+                'role': None,
+                'industry_sector': None,
+                'skills': None,
+                'availability': None,
+                'mentorship_topics': None,
+                'linkedin_link': None,
+                'github_link': None,
+                'portfolio_link': None,
+                'preferred_duration': None,
+                'mentorship_type_preference': None,
+                'connect_frequency': None,
+                'whatsapp': None,
+                'highest_qualification': None,
+                'degree_name': None,
+                'field_of_study': None,
+                'university_name': None,
+                'graduation_year': None,
+                'academic_status': None,
+                'certifications': None,
+                'research_work': None,
+                'mentorship_philosophy': None,
+                'mentorship_motto': None,
+                'other_social_link': None,
+                'criminal_certificate': None,
+                'is_profile_complete': False
+            }
+        
+        enriched_mentors.append(enriched_mentor)
+
+    # Apply filters to enriched mentors
+    filtered_mentors = enriched_mentors
+    
     if profession:
-        mentor_query = mentor_query.filter_by(profession=profession)
+        filtered_mentors = [m for m in filtered_mentors if m.get('profession') == profession]
     if location:
-        mentor_query = mentor_query.filter_by(location=location)
+        filtered_mentors = [m for m in filtered_mentors if m.get('location') == location]
     if education:
-        mentor_query = mentor_query.filter_by(education=education)
+        filtered_mentors = [m for m in filtered_mentors if m.get('education') == education]
     if experience:
+        filtered_mentors = [m for m in filtered_mentors if m.get('years_of_experience')]
         if experience == "0-2":
-            mentor_query = mentor_query.filter(cast(MentorProfile.years_of_experience, Integer).between(0, 2))
+            filtered_mentors = [m for m in filtered_mentors if int(m.get('years_of_experience', 0)) <= 2]
         elif experience == "3-5":
-            mentor_query = mentor_query.filter(cast(MentorProfile.years_of_experience, Integer).between(3, 5))
+            filtered_mentors = [m for m in filtered_mentors if 3 <= int(m.get('years_of_experience', 0)) <= 5]
         elif experience == "6-10":
-            mentor_query = mentor_query.filter(cast(MentorProfile.years_of_experience, Integer).between(6, 10))
+            filtered_mentors = [m for m in filtered_mentors if 6 <= int(m.get('years_of_experience', 0)) <= 10]
         elif experience == "10+":
-            mentor_query = mentor_query.filter(cast(MentorProfile.years_of_experience, Integer) >= 10)
+            filtered_mentors = [m for m in filtered_mentors if int(m.get('years_of_experience', 0)) >= 10]
 
-    mentors = mentor_query.all()
-
-    options = {
-        "professions": sorted({row[0] for row in MentorProfile.query.with_entities(MentorProfile.profession).distinct() if row[0]}),
-        "locations": sorted({row[0] for row in MentorProfile.query.with_entities(MentorProfile.location).distinct() if row[0]}),
-        "educations": sorted({row[0] for row in MentorProfile.query.with_entities(MentorProfile.education).distinct() if row[0]}),
-        "experiences": sorted({row[0] for row in MentorProfile.query.with_entities(MentorProfile.years_of_experience).distinct() if row[0]}),
-    }
+    # Get unique filter options from all enriched mentors
+    professions = sorted({m.get('profession') for m in enriched_mentors if m.get('profession')})
+    locations = sorted({m.get('location') for m in enriched_mentors if m.get('location')})
+    educations = sorted({m.get('education') for m in enriched_mentors if m.get('education')})
+    experiences = sorted({m.get('years_of_experience') for m in enriched_mentors if m.get('years_of_experience')})
 
     return render_template(
         "supervisor/supervisor_find_mentor.html",
-        mentors=mentors,
-        professions=options["professions"],
-        locations=options["locations"],
-        educations=options["educations"],
-        experiences=options["experiences"],
+        mentors=filtered_mentors,
+        professions=professions,
+        locations=locations,
+        educations=educations,
+        experiences=experiences,
         active_section="mentors",
         show_sidebar=True
-        
     )
 
 @app.route("/supervisor_find_mentee")
@@ -5020,105 +5355,10 @@ def editmentorprofile():
             profile = MentorProfile(user_id=user.id)
             db.session.add(profile)
 
-        # Validate all mandatory fields
-        mandatory_fields = {
-            "profession": request.form.get("profession"),
-            "skills": request.form.get("skills"),
-            "role": request.form.get("role"),
-            "industry_sector": request.form.get("industry_sector"),
-            "organisation": request.form.get("organisation"),
-            "years_of_experience": request.form.get("years_of_experience"),
-            "institution": request.form.get("institution"),
-            "whatsapp": request.form.get("whatsapp"),
-            "city": request.form.get("city"),
-            "country": request.form.get("country"),
-            "language": request.form.getlist("language"),
-            "linkedin_link": request.form.get("linkedin_link"),
-            "mentorship_topics": request.form.getlist("mentorship_topics"),
-            "mentorship_type_preference": request.form.getlist("mentorship_type_preference"),
-            "preferred_communication": request.form.get("preferred_communication"),
-            "availability": request.form.get("availability"),
-            "connect_frequency": request.form.get("connect_frequency"),
-            "preferred_duration": request.form.get("preferred_duration"),
-            "why_mentor": request.form.get("why_mentor"),
-            "mentorship_philosophy": request.form.get("mentorship_philosophy"),
-            "mentorship_motto": request.form.get("mentorship_motto"),
-        }
-        
-        # Check for empty fields
-        missing_fields = []
-        for field_name, field_value in mandatory_fields.items():
-            if not field_value or (isinstance(field_value, list) and len(field_value) == 0):
-                missing_fields.append(field_name.replace("_", " ").title())
-        
-        if missing_fields:
-            # Save form data to session to preserve it
-            session['mentor_form_data'] = {
-                'profession': request.form.get("profession"),
-                'other_profession': request.form.get("other_profession"),
-                'skills': request.form.get("skills"),
-                'role': request.form.get("role"),
-                'industry_sector': request.form.get("industry_sector"),
-                'other_industry_sector': request.form.get("other_industry_sector"),
-                'organisation': request.form.get("organisation"),
-                'years_of_experience': request.form.get("years_of_experience"),
-                'institution': request.form.get("institution"),
-                'other_institution_name': request.form.get("other_institution_name"),
-                'whatsapp': request.form.get("whatsapp"),
-                'whatsapp_country_code': request.form.get("whatsapp_country_code"),
-                'city': request.form.get("city"),
-                'country': request.form.get("country"),
-                'other_country': request.form.get("other_country"),
-                'language': request.form.getlist("language"),
-                'other_language': request.form.get("other_language"),
-                'linkedin_link': request.form.get("linkedin_link"),
-                'github_link': request.form.get("github_link"),
-                'portfolio_link': request.form.get("portfolio_link"),
-                'other_social_link': request.form.get("other_social_link"),
-                'mentorship_topics': request.form.getlist("mentorship_topics"),
-                'mentorship_type_preference': request.form.getlist("mentorship_type_preference"),
-                'preferred_communication': request.form.get("preferred_communication"),
-                'availability': request.form.get("availability"),
-                'connect_frequency': request.form.get("connect_frequency"),
-                'preferred_duration': request.form.get("preferred_duration"),
-                'why_mentor': request.form.get("why_mentor"),
-                'mentorship_philosophy': request.form.get("mentorship_philosophy"),
-                'mentorship_motto': request.form.get("mentorship_motto"),
-                'additional_info': request.form.get("additional_info"),
-                'highest_qualification': request.form.get("highest_qualification"),
-                'degree_name': request.form.get("degree_name"),
-                'field_of_study': request.form.get("field_of_study"),
-                'university_name': request.form.get("university_name"),
-                'graduation_year': request.form.get("graduation_year"),
-                'academic_status': request.form.get("academic_status"),
-                'certifications': request.form.get("certifications"),
-                'research_work': request.form.get("research_work")
-            }
-            flash(f"⚠️ Please fill all mandatory fields: {', '.join(missing_fields)}", "error")
-            return redirect(url_for("editmentorprofile"))
-
-        # Special validation for Luxembourg: Criminal Certificate is mandatory
-        country = request.form.get("country")
-        if country == "Other":
-            country = request.form.get("other_country")
-        
-        # Check if criminal certificate is required (Luxembourg only)
-        if country == "Luxembourg":
-            criminal_cert_file = request.files.get("criminal_certificate")
-            # If no new file uploaded, check if one already exists
-            if not criminal_cert_file or criminal_cert_file.filename == "":
-                if not profile or not profile.criminal_certificate:
-                    flash("Criminal Certificate (PDF) is mandatory for mentors in Luxembourg", "error")
-                    return redirect(url_for("editmentorprofile"))
-            else:
-                # Validate file type (must be PDF)
-                if not criminal_cert_file.filename.lower().endswith('.pdf'):
-                    flash("Criminal Certificate must be a PDF file", "error")
-                    return redirect(url_for("editmentorprofile"))
+        # No mandatory fields validation - mentor can save partial profile
 
         # Update institution if changed
         new_institution = request.form.get("institution")
-        print(f" insitiution from from:{new_institution}")
 
         if new_institution and new_institution != user.institution:
             user.institution = new_institution
@@ -7137,5 +7377,688 @@ def get_allowed_contacts():
         return jsonify({"success": False, "message": str(e)}), 500
 
 
+# ==================== PROFILE COMPLETION REMINDER SYSTEM ====================
+
+def calculate_mentee_profile_completion(mentee_id):
+    """
+    Calculate profile completion percentage for mentees - tracks meaningful profile fields
+    """
+    profile = MenteeProfile.query.filter_by(user_id=mentee_id).first()
+    
+    if not profile:
+        return {
+            'percentage': 0,
+            'missing_fields': ['Complete your entire profile'],
+            'completed_fields': 0,
+            'total_fields': 1
+        }
+    
+    # Define meaningful profile fields for mentee completion
+    all_fields = {
+        'Profile Photo': profile.profile_picture,
+        'Mobile Number': profile.mobile_number,
+        'WhatsApp Number': profile.whatsapp_number,
+        'School/College Name': profile.school_college_name,
+        'Stream': profile.stream,
+        'Goal': profile.goal,
+        'City': profile.city,
+        'Country': profile.country,
+        'Mentorship Expectations': profile.mentorship_expectations,
+        'LinkedIn Link': profile.linkedin_link,
+        'Institution': profile.institution,
+        'Who Am I': profile.who_am_i,
+    }
+    
+    completed_fields = sum(1 for field in all_fields.values() if field)
+    total_fields = len(all_fields)
+    missing_fields = [field_name for field_name, field_value in all_fields.items() if not field_value]
+    percentage = (completed_fields * 100) // total_fields if total_fields > 0 else 0
+    
+    return {
+        'percentage': min(percentage, 100),
+        'missing_fields': missing_fields,
+        'completed_fields': completed_fields,
+        'total_fields': total_fields
+    }
+
+# Email Template Variations
+
+EMAIL_TEMPLATES = {
+    'friendly': {
+        'subject_templates': [
+            "Hey {name}! Your profile is {percent}% complete 🎯",
+            "Quick reminder: Complete your {type} profile! ✨",
+            "{name}, we'd love to see your complete profile! 💫",
+            "Getting close! Your profile is {percent}% done 🚀",
+        ],
+        'body_template': """
+<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #f8f9fa; padding: 20px; border-radius: 8px;">
+    <h2 style="color: #2563eb; margin-bottom: 10px;">Hey {name}! 👋</h2>
+    <p style="color: #64748b; font-size: 16px; line-height: 1.6;">
+        We noticed your {type} profile is <strong>{percent}% complete</strong> ({completed}/{total} fields filled).
+    </p>
+    
+    <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 15px; border-radius: 6px; margin: 20px 0; text-align: center;">
+        <p style="font-size: 18px; font-weight: bold; margin: 0;">You're just {remaining} steps away from a complete profile!</p>
+    </div>
+    
+    <p style="color: #64748b; font-size: 14px; margin: 15px 0;"><strong>Missing fields:</strong></p>
+    <ul style="color: #64748b; line-height: 1.8;">
+        {missing_fields_list}
+    </ul>
+    
+    <p style="color: #64748b; margin: 20px 0;">
+        <strong>Why complete your profile?</strong><br>
+        ✅ Better mentor/mentee matching<br>
+        ✅ Increase visibility on our platform<br>
+        ✅ More connection requests & opportunities<br>
+        ✅ Build stronger trust with the community
+    </p>
+    
+    <div style="text-align: center; margin: 30px 0;">
+        <a href="{profile_link}" style="background: #2563eb; color: white; padding: 12px 30px; border-radius: 6px; text-decoration: none; font-weight: bold; display: inline-block;">
+            Complete Your Profile →
+        </a>
+    </div>
+    
+    {improvement_note}
+    
+    <p style="color: #94a3b8; font-size: 12px; margin-top: 20px; text-align: center;">
+        You're doing great! Every field you add makes your profile stronger. 💪
+    </p>
+</div>
+"""
+    },
+    'professional': {
+        'subject_templates': [
+            "Profile Completion Status: {percent}% - Action Required",
+            "{name}, Complete Your {type} Profile",
+            "Action Item: Profile Completion ({percent}%)",
+        ],
+        'body_template': """
+<div style="font-family: 'Segoe UI', Arial, sans-serif; max-width: 600px; margin: 0 auto; background: white; padding: 30px; border: 1px solid #e2e8f0; border-radius: 4px;">
+    <h2 style="color: #1e293b; margin-bottom: 15px;">Profile Completion Status</h2>
+    
+    <p style="color: #475569; font-size: 15px; line-height: 1.7; margin-bottom: 20px;">
+        Dear {name},<br><br>
+        This is a professional reminder that your {type} profile is currently <strong>{percent}% complete</strong> ({completed} of {total} required fields).
+    </p>
+    
+    <table style="width: 100%; border-collapse: collapse; margin: 20px 0; background: #f1f5f9;">
+        <tr style="background: #e2e8f0;">
+            <td style="padding: 10px; border: 1px solid #cbd5e1;">Completed Fields</td>
+            <td style="padding: 10px; border: 1px solid #cbd5e1; text-align: center; font-weight: bold;">{completed}/{total}</td>
+        </tr>
+        <tr>
+            <td style="padding: 10px; border: 1px solid #cbd5e1;">Completion Percentage</td>
+            <td style="padding: 10px; border: 1px solid #cbd5e1; text-align: center; font-weight: bold; color: #2563eb;">{percent}%</td>
+        </tr>
+        <tr style="background: #fef3c7;">
+            <td style="padding: 10px; border: 1px solid #cbd5e1;">Outstanding Items</td>
+            <td style="padding: 10px; border: 1px solid #cbd5e1; text-align: center; font-weight: bold; color: #d97706;">{remaining}</td>
+        </tr>
+    </table>
+    
+    <p style="color: #475569; font-weight: bold; margin-top: 20px; margin-bottom: 10px;">Outstanding Fields:</p>
+    <ul style="color: #475569; line-height: 2;">
+        {missing_fields_list}
+    </ul>
+    
+    <div style="background: #f0f9ff; border-left: 4px solid #0284c7; padding: 15px; margin: 20px 0;">
+        <p style="color: #0c4a6e; margin: 0;"><strong>Benefits of Profile Completion:</strong></p>
+        <ul style="color: #0c4a6e; margin: 10px 0; padding-left: 20px;">
+            <li>Enhanced visibility in mentor/mentee discovery</li>
+            <li>Improved matching algorithm accuracy</li>
+            <li>Increased trust and credibility</li>
+            <li>Better recommendations from our system</li>
+        </ul>
+    </div>
+    
+    <div style="text-align: center; margin: 30px 0;">
+        <a href="{profile_link}" style="background: #1e40af; color: white; padding: 12px 35px; border-radius: 4px; text-decoration: none; font-weight: bold; display: inline-block;">
+            Update Profile
+        </a>
+    </div>
+    
+    {improvement_note}
+    
+    <p style="color: #64748b; font-size: 13px; margin-top: 25px; border-top: 1px solid #e2e8f0; padding-top: 15px; text-align: center;">
+        This is an automated message from Mentors Connect platform.
+    </p>
+</div>
+"""
+    },
+    'motivational': {
+        'subject_templates': [
+            "You're {percent}% of the way there! 🌟",
+            "{name}, You Can Do It! Complete Your Profile 💪",
+            "Almost there! Your profile is {percent}% complete",
+        ],
+        'body_template': """
+<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 30px; border-radius: 12px; color: white;">
+    <h2 style="margin-top: 0; margin-bottom: 15px; font-size: 28px;">You're Almost There! 🎉</h2>
+    
+    <p style="font-size: 16px; line-height: 1.8; margin-bottom: 20px;">
+        {name}, you're already <strong>{percent}% complete</strong> with your {type} profile!<br>
+        That's <strong>{completed} out of {total}</strong> fields - fantastic progress! 🚀
+    </p>
+    
+    <div style="background: rgba(255,255,255,0.1); padding: 20px; border-radius: 8px; margin: 20px 0; text-align: center;">
+        <p style="font-size: 14px; margin: 0; opacity: 0.9;">Just {remaining} more items to reach 100%!</p>
+        <p style="font-size: 32px; margin: 10px 0; font-weight: bold; letter-spacing: 2px;">━━━━</p>
+    </div>
+    
+    <p style="font-size: 15px; font-weight: bold; margin: 20px 0;">Here's what's left:</p>
+    <ul style="font-size: 14px; line-height: 2;">
+        {missing_fields_list}
+    </ul>
+    
+    <div style="background: rgba(255,255,255,0.15); padding: 18px; border-radius: 8px; margin: 25px 0;">
+        <p style="font-weight: bold; margin-top: 0; margin-bottom: 10px;">🌟 Imagine when your profile is complete:</p>
+        <ul style="font-size: 14px; line-height: 1.9; margin: 0; padding-left: 20px;">
+            <li>Stand out in our community</li>
+            <li>Get matched with perfect connections</li>
+            <li>Build meaningful relationships</li>
+            <li>Unlock your full potential</li>
+        </ul>
+    </div>
+    
+    <div style="text-align: center; margin: 30px 0;">
+        <a href="{profile_link}" style="background: white; color: #667eea; padding: 14px 40px; border-radius: 8px; text-decoration: none; font-weight: bold; display: inline-block; font-size: 16px;">
+            Complete It Now! ⚡
+        </a>
+    </div>
+    
+    {improvement_note}
+    
+    <p style="font-size: 13px; margin-top: 20px; text-align: center; opacity: 0.9;">
+        We believe in you! You've got this! 💫
+    </p>
+</div>
+"""
+    },
+    'achievement': {
+        'subject_templates': [
+            "{name}, You've Achieved {percent}% Profile Completion!",
+            "Achievement Unlocked: {percent}% Profile Complete",
+            "Great Progress! {percent}% Complete",
+        ],
+        'body_template': """
+<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+    <div style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); padding: 30px; border-radius: 10px; color: white; text-align: center; margin-bottom: 20px;">
+        <div style="font-size: 60px; margin: 0;">🏆</div>
+        <h2 style="margin: 10px 0; font-size: 24px;">Achievement Unlocked!</h2>
+        <p style="margin: 10px 0; font-size: 18px; font-weight: bold;">{percent}% Profile Complete</p>
+    </div>
+    
+    <p style="color: #333; font-size: 16px; line-height: 1.7; text-align: center;">
+        Congratulations, {name}!<br>
+        You've made excellent progress on your {type} profile.
+    </p>
+    
+    <div style="background: #f0f4f8; padding: 20px; border-radius: 8px; margin: 20px 0;">
+        <h3 style="color: #2563eb; margin-top: 0;">Progress Summary</h3>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; text-align: center;">
+            <div style="background: white; padding: 15px; border-radius: 6px;">
+                <p style="margin: 0; color: #64748b; font-size: 12px;">Fields Completed</p>
+                <p style="margin: 5px 0; font-size: 24px; font-weight: bold; color: #10b981;">{completed}/{total}</p>
+            </div>
+            <div style="background: white; padding: 15px; border-radius: 6px;">
+                <p style="margin: 0; color: #64748b; font-size: 12px;">Remaining</p>
+                <p style="margin: 5px 0; font-size: 24px; font-weight: bold; color: #f59e0b;">{remaining}</p>
+            </div>
+        </div>
+    </div>
+    
+    <p style="color: #333; font-weight: bold; margin: 20px 0; font-size: 15px;">Next Steps to 100%:</p>
+    <ul style="color: #555; line-height: 2; font-size: 14px;">
+        {missing_fields_list}
+    </ul>
+    
+    <div style="background: #ecfdf5; border: 2px solid #10b981; padding: 15px; border-radius: 6px; margin: 20px 0;">
+        <p style="color: #065f46; margin: 0;"><strong>💡 Quick Tip:</strong> Completing the remaining fields will boost your profile visibility by up to 40% on our platform!</p>
+    </div>
+    
+    <div style="text-align: center; margin: 25px 0;">
+        <a href="{profile_link}" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; padding: 13px 35px; border-radius: 6px; text-decoration: none; font-weight: bold; display: inline-block;">
+            Complete Remaining Fields →
+        </a>
+    </div>
+    
+    {improvement_note}
+    
+    <p style="color: #999; font-size: 12px; text-align: center; margin-top: 20px;">
+        You're in the top {percentile}% of most complete profiles!
+    </p>
+</div>
+"""
+    },
+    'community': {
+        'subject_templates': [
+            "{name}, Help Us Strengthen Our Community! 🤝",
+            "Our Community Loves Complete Profiles Like Yours 💖",
+            "{name}, Join Our Complete Profile Club!",
+        ],
+        'body_template': """
+<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: white; padding: 30px;">
+    <div style="text-align: center; margin-bottom: 30px;">
+        <div style="font-size: 50px; margin-bottom: 10px;">🤝</div>
+        <h2 style="color: #1e40af; margin: 0; font-size: 24px;">You're Part of Our Community</h2>
+    </div>
+    
+    <p style="color: #4b5563; font-size: 15px; line-height: 1.8;">
+        Dear {name},<br><br>
+        Our Mentors Connect community thrives when members like you share complete and authentic information. Your profile is <strong>{percent}% complete</strong>, and you're already making an impact!
+    </p>
+    
+    <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 8px; margin: 20px 0;">
+        <h3 style="margin-top: 0; font-size: 16px;">Community Benefits You Unlock</h3>
+        <ul style="margin: 0; padding-left: 20px; line-height: 2;">
+            <li><strong>Discovery:</strong> Better visibility among {peers}</li>
+            <li><strong>Connection:</strong> Meaningful interactions with the community</li>
+            <li><strong>Growth:</strong> More opportunities aligned with your goals</li>
+            <li><strong>Trust:</strong> Build credibility within our platform</li>
+        </ul>
+    </div>
+    
+    <p style="color: #4b5563; font-weight: bold; margin: 20px 0; font-size: 14px;">To complete your community profile, please add:</p>
+    <div style="background: #f9fafb; padding: 15px; border-radius: 6px; border-left: 4px solid #667eea;">
+        <ul style="color: #4b5563; margin: 0; padding-left: 20px; line-height: 1.8;">
+            {missing_fields_list}
+        </ul>
+    </div>
+    
+    <div style="background: #fef3c7; border: 1px solid #fcd34d; padding: 15px; border-radius: 6px; margin: 20px 0;">
+        <p style="color: #92400e; margin: 0;"><strong>✨ Fun Fact:</strong> Members with complete profiles receive {rate}% more connection requests and opportunities!</p>
+    </div>
+    
+    <div style="text-align: center; margin: 30px 0;">
+        <a href="{profile_link}" style="background: #667eea; color: white; padding: 13px 35px; border-radius: 6px; text-decoration: none; font-weight: bold; display: inline-block;">
+            Join the Complete Profile Community
+        </a>
+    </div>
+    
+    {improvement_note}
+    
+    <p style="color: #9ca3af; font-size: 13px; text-align: center; margin-top: 25px;">
+        Thank you for being part of Mentors Connect! 🌟
+    </p>
+</div>
+"""
+    }
+}
+
+def generate_profile_completion_email(user_id, user_type):
+    """
+    Generate personalized profile completion reminder email
+    Returns: (subject, html_content, email_style, missing_fields_list)
+    """
+    user = User.query.get(user_id)
+    if not user:
+        return None
+    
+    # Calculate completion based on user type
+    if user_type == "1":  # Mentor
+        stats = calculate_mentor_profile_completion(user_id)
+        profile_type = "mentor"
+        edit_route = "editmentorprofile"
+    else:  # Mentee (user_type == "2")
+        stats = calculate_mentee_profile_completion(user_id)
+        profile_type = "mentee"
+        edit_route = "editmenteeprofile"
+    
+    # Don't send if 100% complete
+    if stats['percentage'] == 100:
+        return None
+    
+    # Get previous reminder to check for improvement
+    last_reminder = ProfileCompletionReminder.query.filter_by(
+        user_id=user_id,
+        user_type=user_type
+    ).order_by(ProfileCompletionReminder.sent_at.desc()).first()
+    
+    previous_percentage = last_reminder.completion_percentage if last_reminder else None
+    improvement_note = ""
+    if previous_percentage and stats['percentage'] > previous_percentage:
+        improvement_note = f"""
+        <div style="background: #d1fae5; border-left: 4px solid #10b981; padding: 12px; margin: 20px 0; border-radius: 4px;">
+            <p style="color: #065f46; margin: 0; font-weight: bold;">🎯 Great Progress! Your profile improved from {previous_percentage}% to {stats['percentage']}% since last week!</p>
+        </div>
+        """
+    
+    # Select random email style
+    email_style = random.choice(list(EMAIL_TEMPLATES.keys()))
+    template = EMAIL_TEMPLATES[email_style]
+    
+    # Generate subject
+    subject_template = random.choice(template['subject_templates'])
+    subject = subject_template.format(
+        name=user.name,
+        percent=stats['percentage'],
+        type=profile_type
+    )
+    
+    # Build missing fields list
+    missing_fields_html = "\n".join([
+        f"<li>• {field}</li>" for field in stats['missing_fields'][:8]  # Show max 8
+    ])
+    
+    # Generate body
+    body_template = template['body_template']
+    profile_link = url_for('mentordashboard' if user_type == "1" else 'menteedashboard', _external=True)
+    
+    html_content = body_template.format(
+        name=user.name,
+        type=profile_type,
+        percent=stats['percentage'],
+        completed=stats['completed_fields'],
+        total=stats['total_fields'],
+        remaining=stats['total_fields'] - stats['completed_fields'],
+        missing_fields_list=missing_fields_html,
+        profile_link=profile_link,
+        improvement_note=improvement_note,
+        peers="mentees" if user_type == "1" else "mentors",
+        rate="25-40",
+        percentile="top",
+    )
+    
+    return {
+        'subject': subject,
+        'html_content': html_content,
+        'email_style': email_style,
+        'missing_fields': stats['missing_fields'],
+        'completion_percentage': stats['percentage'],
+        'completed_fields': stats['completed_fields'],
+        'total_fields': stats['total_fields'],
+        'previous_percentage': previous_percentage
+    }
+
+def send_email_reminder(user_email, subject, html_content):
+    """
+    Send email reminder using SMTP - uses app's existing email configuration
+    """
+    try:
+        # Use app's existing email configuration (same as OTP emails)
+        SENDER_EMAIL = SMTP_EMAIL  # From line 284
+        SENDER_PASSWORD = SMTP_PASSWORD  # From line 286
+        REMINDER_SMTP_SERVER = SMTP_SERVER  # From line 281
+        REMINDER_SMTP_PORT = SMTP_PORT  # From line 283
+        
+        # For development/testing - can be disabled
+        if not SENDER_PASSWORD:
+            print(f"⚠️ Email service not configured. Would send to: {user_email}")
+            print(f"Subject: {subject}")
+            return True
+        
+        # Create message
+        msg = MIMEMultipart("alternative")
+        msg["Subject"] = subject
+        msg["From"] = SENDER_EMAIL
+        msg["To"] = user_email
+        
+        # Attach HTML content
+        part = MIMEText(html_content, "html")
+        msg.attach(part)
+        
+        # Send email
+        with smtplib.SMTP(REMINDER_SMTP_SERVER, REMINDER_SMTP_PORT) as server:
+            server.starttls()
+            server.login(SENDER_EMAIL, SENDER_PASSWORD)
+            server.sendmail(SENDER_EMAIL, [user_email], msg.as_string())
+        
+        print(f"✅ Reminder email sent successfully to {user_email}")
+        return True
+    except Exception as e:
+        print(f"❌ Error sending email to {user_email}: {str(e)}")
+        return False
+
+def send_profile_completion_reminders(force_send=False):
+    """
+    Scheduled job to send profile completion reminders
+    
+    Args:
+        force_send (bool): If True, bypass "already sent today" check (for manual triggers)
+    """
+    print("\n🔔 Starting Profile Completion Reminder Job...")
+    if force_send:
+        print("   ⚡ FORCE MODE: Sending to all eligible users (bypassing daily limit)")
+    
+    # Check if reminders are enabled
+    settings = ReminderSettings.query.first()
+    if not settings or not settings.is_enabled:
+        print("⚠️ Profile completion reminders are disabled.")
+        return
+    
+    # Get all mentors and mentees
+    mentors = User.query.filter_by(user_type="1").all()
+    mentees = User.query.filter_by(user_type="2").all()
+    
+    print(f"📊 Found {len(mentors)} mentors and {len(mentees)} mentees")
+    
+    sent_count = 0
+    skipped_count = 0
+    
+    for user_group, user_type, group_name in [(mentors, "1", "mentors"), (mentees, "2", "mentees")]:
+        print(f"\n📧 Processing {group_name}...")
+        
+        for user in user_group:
+            try:
+                # Generate email
+                email_data = generate_profile_completion_email(user.id, user_type)
+                
+                if not email_data:
+                    # 100% complete or error, skip
+                    skipped_count += 1
+                    continue
+                
+                print(f"   📨 {user.name} ({user.email}) - {email_data['completion_percentage']}% complete")
+                
+                # Skip "already sent today" check if force_send is True
+                if not force_send:
+                    # Check if user already received reminder today
+                    today = datetime.utcnow().date()
+                    today_reminder = ProfileCompletionReminder.query.filter(
+                        ProfileCompletionReminder.user_id == user.id,
+                        ProfileCompletionReminder.user_type == user_type,
+                        db.func.date(ProfileCompletionReminder.sent_at) == today
+                    ).first()
+                    
+                    if today_reminder:
+                        print(f"      ⏭️  Already sent today, skipping")
+                        skipped_count += 1
+                        continue
+                
+                # Send email
+                success = send_email_reminder(
+                    user.email,
+                    email_data['subject'],
+                    email_data['html_content']
+                )
+                
+                if success:
+                    # Save reminder log
+                    reminder = ProfileCompletionReminder(
+                        user_id=user.id,
+                        user_type=user_type,
+                        completion_percentage=email_data['completion_percentage'],
+                        completed_fields=email_data['completed_fields'],
+                        total_fields=email_data['total_fields'],
+                        missing_fields=json.dumps(email_data['missing_fields']),
+                        email_subject=email_data['subject'],
+                        email_style=email_data['email_style'],
+                        email_content=email_data['html_content'],
+                        previous_percentage=email_data['previous_percentage']
+                    )
+                    db.session.add(reminder)
+                    sent_count += 1
+                    print(f"      ✅ Email sent!")
+                else:
+                    print(f"      ❌ Email sending failed")
+                    skipped_count += 1
+            except Exception as e:
+                print(f"❌ Error processing user {user.id}: {str(e)}")
+                import traceback
+                traceback.print_exc()
+                skipped_count += 1
+        
+        db.session.commit()
+    
+    # Update last run timestamp
+    settings.last_run = datetime.utcnow()
+    db.session.commit()
+    
+    print(f"\n✅ Reminder job completed: {sent_count} sent, {skipped_count} skipped")
+
+# Initialize scheduler (will be started in a background worker in production)
+from apscheduler.schedulers.background import BackgroundScheduler
+from apscheduler.triggers.interval import IntervalTrigger
+
+scheduler = BackgroundScheduler()
+
+def init_scheduler():
+    """Initialize and start the scheduler"""
+    if not scheduler.running:
+        # Get frequency from settings, default to 24 hours
+        settings = ReminderSettings.query.first()
+        frequency_hours = settings.frequency_hours if settings else 24
+        
+        scheduler.add_job(
+            send_profile_completion_reminders,
+            trigger=IntervalTrigger(hours=frequency_hours),
+            id='profile_completion_reminder',
+            name='Profile Completion Reminder',
+            replace_existing=True
+        )
+        scheduler.start()
+        print("✅ Profile Completion Reminder Scheduler initialized")
+
+# Admin Routes for Reminder Management
+
+@app.route("/admin/reminder_settings", methods=["GET", "POST"])
+def admin_reminder_settings():
+    """Admin page to manage reminder system"""
+    if "email" not in session or session.get("user_type") != "0":
+        return redirect(url_for("signin"))
+    
+    settings = ReminderSettings.query.first()
+    if not settings:
+        settings = ReminderSettings()
+        db.session.add(settings)
+        db.session.commit()
+    
+    if request.method == "POST":
+        action = request.form.get("action")
+        
+        if action == "update_settings":
+            settings.is_enabled = request.form.get("is_enabled") == "on"
+            settings.frequency_hours = int(request.form.get("frequency_hours", 24))
+            settings.min_completion_for_reminder = int(request.form.get("min_completion_for_reminder", 0))
+            db.session.commit()
+            
+            # Reinitialize scheduler with new frequency
+            init_scheduler()
+            flash("Reminder settings updated successfully!", "success")
+        
+        elif action == "trigger_now":
+            send_profile_completion_reminders(force_send=True)
+            flash("Profile completion reminders sent!", "success")
+        
+        return redirect(url_for("admin_reminder_settings"))
+    
+    # Get reminder statistics
+    total_reminders_sent = ProfileCompletionReminder.query.count()
+    reminders_today = ProfileCompletionReminder.query.filter(
+        db.func.date(ProfileCompletionReminder.sent_at) == datetime.utcnow().date()
+    ).count()
+    
+    return render_template(
+        "admin/reminder_settings.html",
+        show_sidebar=True,
+        settings=settings,
+        total_reminders_sent=total_reminders_sent,
+        reminders_today=reminders_today
+    )
+
+@app.route("/admin/reminder_logs")
+def admin_reminder_logs():
+    """View history of sent reminders"""
+    if "email" not in session or session.get("user_type") != "0":
+        return redirect(url_for("signin"))
+    
+    page = request.args.get("page", 1, type=int)
+    reminders = ProfileCompletionReminder.query.order_by(
+        ProfileCompletionReminder.sent_at.desc()
+    ).paginate(page=page, per_page=20)
+    
+    return render_template(
+        "admin/reminder_logs.html",
+        show_sidebar=True,
+        reminders=reminders
+    )
+
+@app.route("/user/reminder_logs")
+def user_reminder_logs():
+    """User can view their own reminder history"""
+    if "email" not in session:
+        return redirect(url_for("signin"))
+    
+    user = User.query.filter_by(email=session["email"]).first()
+    user_type = session.get("user_type")
+    
+    reminders = ProfileCompletionReminder.query.filter_by(
+        user_id=user.id,
+        user_type=user_type
+    ).order_by(ProfileCompletionReminder.sent_at.desc()).all()
+    
+    return render_template(
+        "user/reminder_logs.html",
+        show_sidebar=True,
+        reminders=reminders,
+        completion_percentage=calculate_mentor_profile_completion(user.id)['percentage'] if user_type == "1" else calculate_mentee_profile_completion(user.id)['percentage']
+    )
+
+
+@app.route("/api/reminder/<int:reminder_id>/content")
+def get_reminder_content(reminder_id):
+    """API endpoint to get email content of a reminder"""
+    reminder = ProfileCompletionReminder.query.get(reminder_id)
+    
+    if not reminder:
+        return jsonify({"error": "Reminder not found"}), 404
+    
+    # Check authorization - admin or owner
+    if "email" not in session:
+        return jsonify({"error": "Unauthorized"}), 401
+    
+    user_type = session.get("user_type")
+    current_user = User.query.filter_by(email=session["email"]).first()
+    
+    # Allow admin or the user themselves
+    is_admin = user_type == "0"
+    is_owner = reminder.user_id == current_user.id
+    
+    if not (is_admin or is_owner):
+        return jsonify({"error": "Forbidden"}), 403
+    
+    # Get the user who received the reminder
+    user = User.query.get(reminder.user_id)
+    
+    return jsonify({
+        "recipient_name": user.name if user else "Unknown",
+        "subject": reminder.email_subject,
+        "content": reminder.email_content,
+        "completion_percentage": reminder.completion_percentage,
+        "email_style": reminder.email_style,
+        "sent_at": reminder.sent_at.isoformat()
+    })
+
+
 if __name__ == '__main__':
+    with app.app_context():
+        db.create_all()
+        try:
+            init_scheduler()
+        except Exception as e:
+            print(f"⚠️ Could not initialize scheduler: {e}")
+    
     app.run(debug=True, host='0.0.0.0', port=5000)

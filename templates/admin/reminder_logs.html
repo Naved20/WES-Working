@@ -1,0 +1,550 @@
+{% extends "base2.html" %}
+{% block title %}Reminder Logs{% endblock %}
+{% block user %}Admin{% endblock %}
+{% block profiledrop %}{% endblock %}
+
+{% block content %}
+
+<style>
+  .page-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 30px;
+    border-radius: 8px;
+    margin-bottom: 30px;
+  }
+  
+  .page-header h1 {
+    margin: 0;
+    font-size: 28px;
+  }
+  
+  .page-header p {
+    margin: 5px 0 0 0;
+    opacity: 0.9;
+  }
+  
+  .card {
+    background: white;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  }
+  
+  .table-responsive {
+    overflow-x: auto;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+  }
+  
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+  }
+  
+  thead {
+    background: #f8f9fa;
+    border-bottom: 2px solid #e2e8f0;
+  }
+  
+  th {
+    padding: 12px;
+    text-align: left;
+    font-weight: 600;
+    color: #1e293b;
+  }
+  
+  td {
+    padding: 12px;
+    border-bottom: 1px solid #e2e8f0;
+  }
+  
+  tbody tr:hover {
+    background: #f8f9fa;
+  }
+  
+  .badge {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 600;
+  }
+  
+  .badge-mentor {
+    background: #dbeafe;
+    color: #1e40af;
+  }
+  
+  .badge-mentee {
+    background: #fce7f3;
+    color: #9f1239;
+  }
+  
+  .badge-friendly {
+    background: #dbeafe;
+    color: #1e40af;
+  }
+  
+  .badge-professional {
+    background: #e0e7ff;
+    color: #3730a3;
+  }
+  
+  .badge-motivational {
+    background: #fbcfe8;
+    color: #9f1239;
+  }
+  
+  .badge-achievement {
+    background: #fef3c7;
+    color: #92400e;
+  }
+  
+  .badge-community {
+    background: #cffafe;
+    color: #0c4a6e;
+  }
+  
+  .percentage {
+    font-weight: 600;
+    color: #2563eb;
+  }
+  
+  .time-ago {
+    color: #64748b;
+    font-size: 13px;
+  }
+  
+  .modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    animation: fadeIn 0.3s;
+  }
+  
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  
+  .modal-content {
+    background: white;
+    margin: 5% auto;
+    padding: 30px;
+    border-radius: 8px;
+    width: 90%;
+    max-width: 800px;
+    max-height: 80vh;
+    overflow-y: auto;
+    animation: slideIn 0.3s;
+  }
+  
+  @keyframes slideIn {
+    from {
+      transform: translateY(-50px);
+      opacity: 0;
+    }
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+  
+  .close-btn {
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    color: #999;
+    cursor: pointer;
+    line-height: 20px;
+  }
+  
+  .close-btn:hover {
+    color: #000;
+  }
+  
+  .btn {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    font-size: 13px;
+    transition: all 0.3s;
+  }
+  
+  .btn-primary {
+    background: #2563eb;
+    color: white;
+  }
+  
+  .btn-primary:hover {
+    background: #1e40af;
+    box-shadow: 0 2px 8px rgba(37, 99, 235, 0.3);
+  }
+  
+  .btn-outline {
+    background: transparent;
+    border: 1px solid #e2e8f0;
+    color: #64748b;
+  }
+  
+  .btn-outline:hover {
+    background: #f8f9fa;
+    border-color: #cbd5e1;
+  }
+  
+  .filters {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+  }
+  
+  .filter-group {
+    display: flex;
+    gap: 8px;
+  }
+  
+  .filter-group input,
+  .filter-group select {
+    padding: 8px 12px;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    font-size: 13px;
+    font-family: inherit;
+  }
+  
+  .filter-group input:focus,
+  .filter-group select:focus {
+    outline: none;
+    border-color: #2563eb;
+    box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1);
+  }
+  
+  .pagination {
+    display: flex;
+    gap: 5px;
+    justify-content: center;
+    margin-top: 20px;
+    flex-wrap: wrap;
+  }
+  
+  .pagination a,
+  .pagination span {
+    padding: 8px 12px;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    text-decoration: none;
+    color: #2563eb;
+    font-size: 13px;
+    font-weight: 600;
+  }
+  
+  .pagination a:hover {
+    background: #f0f4f8;
+    border-color: #2563eb;
+  }
+  
+  .pagination .active {
+    background: #2563eb;
+    color: white;
+    border-color: #2563eb;
+  }
+  
+  .pagination .disabled {
+    color: #cbd5e1;
+    cursor: not-allowed;
+  }
+  
+  .empty-state {
+    text-align: center;
+    padding: 40px 20px;
+    color: #94a3b8;
+  }
+  
+  .empty-state svg {
+    width: 60px;
+    height: 60px;
+    margin-bottom: 15px;
+    opacity: 0.5;
+  }
+  
+  .email-preview {
+    background: #f8f9fa;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    padding: 15px;
+    max-height: 300px;
+    overflow-y: auto;
+    font-size: 12px;
+    color: #64748b;
+    font-family: 'Courier New', monospace;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+  
+  .modal-header {
+    margin-bottom: 20px;
+    border-bottom: 1px solid #e2e8f0;
+    padding-bottom: 15px;
+  }
+  
+  .modal-header h2 {
+    margin: 0;
+    color: #1e293b;
+  }
+  
+  .modal-body {
+    display: grid;
+    gap: 15px;
+  }
+  
+  .detail-row {
+    display: grid;
+    grid-template-columns: 150px 1fr;
+    gap: 15px;
+  }
+  
+  .detail-label {
+    font-weight: 600;
+    color: #64748b;
+  }
+  
+  .detail-value {
+    color: #1e293b;
+  }
+</style>
+
+<main class="max-w-7xl mx-auto px-4 py-8">
+  <!-- Page Header -->
+  <div class="page-header">
+    <h1>📋 Reminder Logs</h1>
+    <p>View all sent profile completion reminders and their details</p>
+  </div>
+
+  <!-- Filters Card -->
+  <div class="card">
+    <h3 style="margin-top: 0; color: #1e293b;">Filters</h3>
+    <div class="filters">
+      <div class="filter-group">
+        <input type="text" id="search" placeholder="Search by user email or name..." style="flex: 1; min-width: 200px;">
+      </div>
+    </div>
+  </div>
+
+  <!-- Logs Table -->
+  <div class="card">
+    {% if reminders.items %}
+      <div class="table-responsive">
+        <table>
+          <thead>
+            <tr>
+              <th>User</th>
+              <th>Type</th>
+              <th>Completion</th>
+              <th>Fields</th>
+              <th>Email Style</th>
+              <th>Sent At</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for reminder in reminders.items %}
+            <tr>
+              <td>
+                <div style="font-weight: 600; color: #1e293b;">{{ reminder.user.name }}</div>
+                <div style="font-size: 12px; color: #64748b;">{{ reminder.user.email }}</div>
+              </td>
+              <td>
+                {% if reminder.user_type == "1" %}
+                  <span class="badge badge-mentor">Mentor</span>
+                {% else %}
+                  <span class="badge badge-mentee">Mentee</span>
+                {% endif %}
+              </td>
+              <td>
+                <span class="percentage">{{ reminder.completion_percentage }}%</span>
+                <div style="font-size: 12px; color: #64748b;">
+                  {{ reminder.completed_fields }}/{{ reminder.total_fields }}
+                </div>
+              </td>
+              <td>
+                <div style="font-size: 12px; color: #64748b;">
+                  {% if reminder.missing_fields %}
+                    {% set fields = reminder.missing_fields | from_json %}
+                    {{ fields | length }} missing
+                  {% else %}
+                    0 missing
+                  {% endif %}
+                </div>
+              </td>
+              <td>
+                <span class="badge badge-{{ reminder.email_style }}">{{ reminder.email_style | capitalize }}</span>
+              </td>
+              <td>
+                <div style="font-weight: 600;">{{ reminder.sent_at.strftime('%b %d') }}</div>
+                <div class="time-ago">{{ reminder.sent_at.strftime('%H:%M:%S') }}</div>
+              </td>
+              <td>
+                <button class="btn btn-outline" onclick="showEmailPreview({{ reminder.id }})">
+                  👁️ View
+                </button>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Pagination -->
+      {% if reminders.pages > 1 %}
+      <div class="pagination">
+        {% if reminders.has_prev %}
+          <a href="{{ url_for('admin_reminder_logs', page=reminders.prev_num) }}">← Previous</a>
+        {% else %}
+          <span class="disabled">← Previous</span>
+        {% endif %}
+
+        {% for page_num in reminders.iter_pages() %}
+          {% if page_num %}
+            {% if page_num == reminders.page %}
+              <span class="active">{{ page_num }}</span>
+            {% else %}
+              <a href="{{ url_for('admin_reminder_logs', page=page_num) }}">{{ page_num }}</a>
+            {% endif %}
+          {% else %}
+            <span>...</span>
+          {% endif %}
+        {% endfor %}
+
+        {% if reminders.has_next %}
+          <a href="{{ url_for('admin_reminder_logs', page=reminders.next_num) }}">Next →</a>
+        {% else %}
+          <span class="disabled">Next →</span>
+        {% endif %}
+      </div>
+      {% endif %}
+
+    {% else %}
+      <div class="empty-state">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
+        </svg>
+        <h3 style="margin: 15px 0 5px 0; color: #64748b;">No Reminders Sent Yet</h3>
+        <p style="margin: 0; font-size: 14px;">Reminders will appear here once the system sends them.</p>
+      </div>
+    {% endif %}
+  </div>
+
+
+</main>
+
+<!-- Email Preview Modal -->
+<div id="emailModal" class="modal">
+  <div class="modal-content">
+    <span class="close-btn" onclick="closeEmailModal()">&times;</span>
+    
+    <div class="modal-header">
+      <h2>📧 Email Preview</h2>
+    </div>
+    
+    <div class="modal-body">
+      <div class="detail-row">
+        <div class="detail-label">Recipient:</div>
+        <div class="detail-value" id="modalRecipient"></div>
+      </div>
+      
+      <div class="detail-row">
+        <div class="detail-label">Completion:</div>
+        <div class="detail-value">
+          <span id="modalCompletion" style="font-weight: bold; color: #2563eb;"></span>% Complete
+        </div>
+      </div>
+      
+      <div class="detail-row">
+        <div class="detail-label">Email Style:</div>
+        <div class="detail-value" id="modalStyle"></div>
+      </div>
+      
+      <div class="detail-row">
+        <div class="detail-label">Subject:</div>
+        <div class="detail-value" id="modalSubject" style="font-weight: 600; color: #1e293b;"></div>
+      </div>
+      
+      <div>
+        <div style="font-weight: 600; margin-bottom: 10px; color: #1e293b;">Preview:</div>
+        <iframe id="emailPreview" style="width: 100%; height: 400px; border: 1px solid #e2e8f0; border-radius: 6px;"></iframe>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  function showEmailPreview(reminderId) {
+    document.getElementById('emailModal').style.display = 'block';
+    
+    // Fetch email content from API
+    const preview = document.getElementById('emailPreview');
+    preview.srcdoc = '<html><body style="font-family: Arial; padding: 20px; color: #666;"><p>Loading email content...</p></body></html>';
+    
+    console.log(`Fetching reminder ${reminderId} content...`);
+    
+    fetch(`/api/reminder/${reminderId}/content`)
+      .then(response => {
+        console.log(`Response status: ${response.status}`);
+        if (!response.ok) {
+          return response.json().then(data => {
+            throw new Error(data.error || 'Failed to load email');
+          });
+        }
+        return response.json();
+      })
+      .then(data => {
+        console.log('Got email data:', data);
+        
+        // Update modal with data from API
+        document.getElementById('modalRecipient').textContent = data.recipient_name || 'Unknown';
+        document.getElementById('modalCompletion').textContent = data.completion_percentage;
+        document.getElementById('modalStyle').textContent = data.email_style.charAt(0).toUpperCase() + data.email_style.slice(1);
+        document.getElementById('modalSubject').textContent = data.subject;
+        
+        // Set the iframe content with the email HTML
+        if (data.content) {
+          preview.srcdoc = data.content;
+          console.log('Email preview loaded successfully');
+        } else {
+          throw new Error('No content in response');
+        }
+      })
+      .catch(error => {
+        console.error('Error loading email:', error);
+        preview.srcdoc = '<html><body style="font-family: Arial; padding: 20px; color: #d32f2f;"><p><strong>Error:</strong> ' + error.message + '</p><p>Reminder ID: ' + reminderId + '</p></body></html>';
+      });
+  }
+  
+  function closeEmailModal() {
+    document.getElementById('emailModal').style.display = 'none';
+    // Clear iframe to prevent displaying old content
+    document.getElementById('emailPreview').srcdoc = '';
+  }
+  
+  window.onclick = function(event) {
+    const modal = document.getElementById('emailModal');
+    if (event.target === modal) {
+      modal.style.display = 'none';
+      document.getElementById('emailPreview').srcdoc = '';
+    }
+  }
+</script>
+
+{% endblock %}

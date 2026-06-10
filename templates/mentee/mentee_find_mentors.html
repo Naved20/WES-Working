@@ -174,6 +174,8 @@
             <!-- Card Header / Banner -->
             <div class="h-16 bg-blue-600 relative overflow-hidden">
               <div class="absolute top-0 right-0 w-20 h-20 bg-blue-500 opacity-30 rounded-full transform translate-x-1/2 -translate-y-1/2"></div>
+              
+
             </div>
 
             <div class="px-4 relative flex-grow">
@@ -259,7 +261,25 @@
                 data-industry="{{ mentor.industry_sector }}"
                 data-skills="{{ mentor.skills }}"
                 data-availability="{{ mentor.availability }}"
-                data-mentorship-topics="{{ mentor.mentorship_topics }}">
+                data-mentorship-topics="{{ mentor.mentorship_topics }}"
+                data-linkedin="{{ mentor.linkedin_link }}"
+                data-github="{{ mentor.github_link }}"
+                data-portfolio="{{ mentor.portfolio_link }}"
+                data-preferred-duration="{{ mentor.preferred_duration }}"
+                data-mentorship-type="{{ mentor.mentorship_type_preference }}"
+                data-connect-frequency="{{ mentor.connect_frequency }}"
+                data-whatsapp="{{ mentor.whatsapp }}"
+                data-highest-qualification="{{ mentor.highest_qualification or '' }}"
+                data-degree-name="{{ mentor.degree_name or '' }}"
+                data-field-of-study="{{ mentor.field_of_study or '' }}"
+                data-university-name="{{ mentor.university_name or '' }}"
+                data-graduation-year="{{ mentor.graduation_year or '' }}"
+                data-academic-status="{{ mentor.academic_status or '' }}"
+                data-certifications="{{ mentor.certifications or '' }}"
+                data-research-work="{{ mentor.research_work or '' }}"
+                data-mentorship-philosophy="{{ mentor.mentorship_philosophy or '' }}"
+                data-mentorship-motto="{{ mentor.mentorship_motto or '' }}"
+                data-other-social="{{ mentor.other_social_link or '' }}">
                 View Profile
               </button>
             </div>
@@ -291,6 +311,8 @@
           <!-- Card Header / Banner -->
           <div class="h-16 bg-gray-600 relative overflow-hidden">
             <div class="absolute top-0 right-0 w-20 h-20 bg-gray-500 opacity-30 rounded-full transform translate-x-1/2 -translate-y-1/2"></div>
+            
+
           </div>
 
           <div class="px-4 relative flex-grow">
@@ -836,7 +858,25 @@
           industry_sector: this.getAttribute('data-industry'),
           skills: this.getAttribute('data-skills'),
           availability: this.getAttribute('data-availability'),
-          mentorship_topics: this.getAttribute('data-mentorship-topics')
+          mentorship_topics: this.getAttribute('data-mentorship-topics'),
+          linkedin: this.getAttribute('data-linkedin'),
+          github: this.getAttribute('data-github'),
+          portfolio: this.getAttribute('data-portfolio'),
+          preferred_duration: this.getAttribute('data-preferred-duration'),
+          mentorship_type: this.getAttribute('data-mentorship-type'),
+          connect_frequency: this.getAttribute('data-connect-frequency'),
+          whatsapp: this.getAttribute('data-whatsapp'),
+          highest_qualification: this.getAttribute('data-highest-qualification'),
+          degree_name: this.getAttribute('data-degree-name'),
+          field_of_study: this.getAttribute('data-field-of-study'),
+          university_name: this.getAttribute('data-university-name'),
+          graduation_year: this.getAttribute('data-graduation-year'),
+          academic_status: this.getAttribute('data-academic-status'),
+          certifications: this.getAttribute('data-certifications'),
+          research_work: this.getAttribute('data-research-work'),
+          mentorship_philosophy: this.getAttribute('data-mentorship-philosophy'),
+          mentorship_motto: this.getAttribute('data-mentorship-motto'),
+          other_social: this.getAttribute('data-other-social')
         };
         openProfileModal(mentor);
       });
@@ -852,37 +892,81 @@
 
   // Updated openProfileModal function to accept mentor object
   function openProfileModal(mentor) {
-    // Basic Info
-    document.getElementById('modalName').innerText = mentor.user?.name || "Not specified";
+    // Helper function to safely set element text
+    const setSafeText = (elementId, value) => {
+      const element = document.getElementById(elementId);
+      if (element) element.innerText = value || "Not specified";
+    };
 
-    // Professional Details
-    document.getElementById('modalProfession').innerText = mentor.profession || "Not specified";
-    document.getElementById('modalRole').innerText = mentor.role || "Not specified";
-    document.getElementById('modalOrganisation').innerText = mentor.organisation || "Not specified";
-    document.getElementById('modalIndustry').innerText = mentor.industry_sector || "Not specified";
-    document.getElementById('modalEducation').innerText = mentor.education || "Not specified";
+    // Helper function to safely set link href
+    const setSafeLink = (elementId, value) => {
+      const element = document.getElementById(elementId);
+      if (element) {
+        if (value && value.trim()) {
+          element.href = value;
+          element.style.display = 'flex';
+        } else {
+          element.style.display = 'none';
+        }
+      }
+    };
 
-    // Experience & Skills
-    document.getElementById('modalExperience').innerText = mentor.years_of_experience ? mentor.years_of_experience + " years" : "Not specified";
-    document.getElementById('modalSkills').innerText = mentor.skills || "Not specified";
-    document.getElementById('modalLanguage').innerText = mentor.language || "Not specified";
+    // ===== BASIC INFORMATION =====
+    setSafeText('modalName', mentor.user?.name);
 
-    // Contact & Preferences
-    document.getElementById('modalLocation').innerText = mentor.location || "Not specified";
-    document.getElementById('modalCommunication').innerText = mentor.preferred_communication || "Not specified";
-    document.getElementById('modalAvailability').innerText = mentor.availability || "Not specified";
+    // ===== PROFESSIONAL INFORMATION =====
+    setSafeText('modalProfession', mentor.profession);
+    setSafeText('modalRole', mentor.role);
+    setSafeText('modalOrganisation', mentor.organisation);
+    setSafeText('modalIndustry', mentor.industry_sector);
+    setSafeText('modalEducation', mentor.education);
 
-    // Mentorship Details
-    document.getElementById('modalMentorshipTopics').innerText = mentor.mentorship_topics || "Not specified";
-    document.getElementById('modalWhyMentor').innerText = mentor.why_mentor || "Not specified";
+    // ===== EXPERIENCE & SKILLS =====
+    setSafeText('modalExperience', mentor.years_of_experience ? mentor.years_of_experience + " years" : "Not specified");
+    setSafeText('modalSkills', mentor.skills);
+    setSafeText('modalLanguage', mentor.language);
 
-    // Profile Picture
+    // ===== CONTACT & PREFERENCES =====
+    setSafeText('modalLocation', mentor.location);
+    setSafeText('modalCommunication', mentor.preferred_communication);
+    setSafeText('modalAvailability', mentor.availability);
+
+    // ===== MENTORSHIP DETAILS =====
+    setSafeText('modalMentorshipTopics', mentor.mentorship_topics);
+    setSafeText('modalWhyMentor', mentor.why_mentor);
+    setSafeText('modalPreferredDuration', mentor.preferred_duration);
+    setSafeText('modalConnectFrequency', mentor.connect_frequency);
+    setSafeText('modalMentorshipTypePreference', mentor.mentorship_type);
+
+    // ===== EDUCATIONAL BACKGROUND =====
+    setSafeText('modalHighestQualification', mentor.highest_qualification);
+    setSafeText('modalDegreeName', mentor.degree_name);
+    setSafeText('modalFieldOfStudy', mentor.field_of_study);
+    setSafeText('modalUniversityName', mentor.university_name);
+    setSafeText('modalGraduationYear', mentor.graduation_year);
+    setSafeText('modalAcademicStatus', mentor.academic_status);
+    setSafeText('modalCertifications', mentor.certifications);
+    setSafeText('modalResearchWork', mentor.research_work);
+
+    // ===== PHILOSOPHY & PREFERENCES =====
+    setSafeText('modalMentorshipPhilosophy', mentor.mentorship_philosophy);
+    setSafeText('modalMentorshipMotto', mentor.mentorship_motto);
+
+    // ===== SOCIAL LINKS =====
+    setSafeLink('modalLinkedin', mentor.linkedin);
+    setSafeLink('modalGithub', mentor.github);
+    setSafeLink('modalPortfolio', mentor.portfolio);
+    setSafeLink('modalOtherSocial', mentor.other_social);
+
+    // ===== PROFILE PICTURE =====
     const profilePicElement = document.getElementById('modalProfilePic');
-    if (mentor.profile_picture && mentor.profile_picture.trim()) {
-      profilePicElement.src = "/static/uploads/" + mentor.profile_picture;
-    } else {
-      const mentorName = mentor.user?.name || '?';
-      profilePicElement.src = "https://via.placeholder.com/100?text=" + encodeURIComponent(mentorName.charAt(0));
+    if (profilePicElement) {
+      if (mentor.profile_picture && mentor.profile_picture.trim()) {
+        profilePicElement.src = "/static/uploads/" + mentor.profile_picture;
+      } else {
+        const mentorName = mentor.user?.name || '?';
+        profilePicElement.src = "https://ui-avatars.com/api/?name=" + encodeURIComponent(mentorName) + "&background=blue&color=fff";
+      }
     }
 
     document.getElementById('profileModal').classList.remove('hidden');
