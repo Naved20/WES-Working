@@ -3245,112 +3245,10 @@ def calculate_mentor_suggestions(mentee_profile, all_mentors, current_user_id):
     suggestions.sort(key=lambda x: x['suggestion_percentage'], reverse=True)
     return suggestions[:10]
 
-def calculate_mentee_suggestions(mentor_profile, all_mentees, current_user_id):
-    """
-    Calculate mentee suggestions based on matching criteria
-    Returns list of mentees with suggestion percentage
-    """
-    suggestions = []
-    
-    # Get current mentor's user info
-    current_user = User.query.get(current_user_id)
-    
-    for mentee in all_mentees:
-        score = 0
-        max_score = 100
-        
-        # 1. Institution Match (30% weight)
-        if current_user and mentee.user and current_user.institution == mentee.user.institution:
-            score += 30
-            
-        # 2. Industry/Field Match (25% weight)
-        if mentor_profile.industry_sector and mentee.stream:
-            # Map mentee streams to mentor industries
-            industry_stream_matches = {
-                'Computer Science': ['Technology', 'Software', 'IT'],
-                'Engineering': ['Technology', 'Manufacturing', 'Construction'],
-                'Business': ['Business', 'Finance', 'Marketing', 'Management'],
-                'Medicine': ['Healthcare', 'Pharmaceutical', 'Medical'],
-                'Arts': ['Media', 'Entertainment', 'Design', 'Marketing'],
-                'Science': ['Research', 'Technology', 'Healthcare'],
-                'Commerce': ['Business', 'Finance', 'Accounting'],
-                'Management': ['Business', 'Management', 'Finance']
-            }
-            
-            # Check if mentee's stream matches mentor's industry
-            for stream_key in industry_stream_matches:
-                if stream_key.lower() in mentee.stream.lower():
-                    if mentor_profile.industry_sector in industry_stream_matches[stream_key]:
-                        score += 25
-                        break
-                    elif any(keyword in mentor_profile.industry_sector.lower() for keyword in ['tech', 'business', 'finance']):
-                        score += 15
-                        break
-                        
-        # 3. Skills/Interest Match (20% weight)
-        if mentee.key_skills and mentor_profile.skills:
-            mentee_skills = set([skill.strip().lower() for skill in mentee.key_skills.split(',') if skill.strip()])
-            mentor_skills = set([skill.strip().lower() for skill in mentor_profile.skills.split(',') if skill.strip()])
-            
-            if mentee_skills.intersection(mentor_skills):
-                overlap_ratio = len(mentee_skills.intersection(mentor_skills)) / len(mentee_skills) if mentee_skills else 0
-                score += min(20, overlap_ratio * 20)
-        
-        # Also check career interest vs mentor topics
-        if mentee.career_interest and mentor_profile.mentorship_topics:
-            mentee_interests = mentee.career_interest.lower()
-            mentor_topics = mentor_profile.mentorship_topics.lower()
-            
-            common_keywords = ['career', 'development', 'growth', 'skill', 'leadership', 'management']
-            matches = sum(1 for keyword in common_keywords if keyword in mentee_interests and keyword in mentor_topics)
-            if matches > 0:
-                score += min(10, matches * 2)
-                
-        # 4. Location Match (15% weight)
-        mentor_location = mentor_profile.location if mentor_profile.location else ""
-        mentee_location = f"{mentee.city}, {mentee.country}" if mentee.city and mentee.country else ""
-        
-        if mentor_location and mentee_location:
-            if mentor_location.lower() == mentee_location.lower():
-                score += 15
-            elif mentee.country and mentee.country.lower() in mentor_location.lower():
-                score += 10
-                
-        # 5. Goal/Expectations Match (10% weight)
-        if mentee.goal and mentor_profile.mentorship_topics:
-            mentee_goal = mentee.goal.lower()
-            mentor_topics = mentor_profile.mentorship_topics.lower()
-            
-            # Check for common goal-related keywords
-            goal_keywords = ['career', 'job', 'internship', 'skill', 'interview', 'guidance', 'development']
-            matches = sum(1 for keyword in goal_keywords if keyword in mentee_goal and keyword in mentor_topics)
-            if matches > 0:
-                score += min(10, matches * 2)
-        
-        # Only include mentees with 60%+ match as suggestions
-        if score >= 60:
-            suggestions.append({
-                'mentee': mentee,
-                'suggestion_percentage': min(100, int(score))
-            })
-    
-    # Sort by suggestion percentage (highest first) and limit to top 10
-    suggestions.sort(key=lambda x: x['suggestion_percentage'], reverse=True)
-    return suggestions[:10]
-
 @app.route("/find_mentees", methods=["GET"])
 def find_mentees():
-    # Get current mentor's profile for suggestions
-    current_user_id = None
-    mentor_profile = None
-    
     if "email" not in session or session.get("user_type") != "1": 
         return redirect(url_for("signin"))
-    
-    current_user = User.query.filter_by(email=session["email"]).first()
-    if current_user:
-        current_user_id = current_user.id
-        mentor_profile = MentorProfile.query.filter_by(user_id=current_user_id).first()
 
     # Base query
     query = MenteeProfile.query.join(User, MenteeProfile.user_id == User.id)
@@ -3379,12 +3277,7 @@ def find_mentees():
     if goal_filter:
         query = query.filter(MenteeProfile.goal == goal_filter)
 
-    all_mentees = query.all()
-    
-    # Calculate suggestions if mentor is logged in
-    suggested_mentees = []
-    if mentor_profile:
-        suggested_mentees = calculate_mentee_suggestions(mentor_profile, all_mentees, current_user_id)
+    filtered_mentees = query.all()
     
 
     # Get filter options directly
@@ -3397,8 +3290,7 @@ def find_mentees():
     if source_page == "supervisor":
         return render_template(
             "supervisor/supervisor_find_mentee.html",
-            all_mentees=all_mentees,
-            suggested_mentees=suggested_mentees,
+            all_mentees=filtered_mentees,
             streams=streams,
             schools=schools,
             goals=goals,
@@ -3408,8 +3300,7 @@ def find_mentees():
     else:  # default mentor
         return render_template(
             "mentor/mentor_find_mentees.html",
-            all_mentees=all_mentees,
-            suggested_mentees=suggested_mentees,
+            all_mentees=filtered_mentees,
             streams=streams,
             schools=schools,
             goals=goals,
